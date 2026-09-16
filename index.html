@@ -951,10 +951,8 @@ body{font-size:var(--font-size-base);background-color:var(--primary);background-
 
 <script>
 const APP_CONFIG={
-    // ⚠️ اینجا آدرس Cloudflare Worker خودت رو بذار (بدون / در آخر)
-    // مثال: baseURL:"https://siraj-api.YOURNAME.workers.dev",
-    // اگه خالی بذاری، روی هاست لوکال از /api/chat استفاده می‌کنه
-    baseURL:"baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",",
+    // ✅ آدرس Worker با مسیر کامل — این خط رو درست کردم
+    baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
     defaultSettings:{
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
         animation:'normal',model:'gemini-3.6-flash',dialect:'fusha',
@@ -2684,7 +2682,7 @@ function renderSettingsControls(){
 
             <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
                 <label><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8"/><path d="M12 18v2"/></svg>دستگاه‌های فعال</label>
-                <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;padding:2px 0 8px">این نشست‌ها روی همین مرورگر در تب‌های مختلف ثبت می‌شن. اگه یه دستگاه دیگه از همون حساب باز شده باشه، اینجا نشون داده می‌شه.</div>
+                <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;padding:2px 0 8px">این نشست‌ها روی همین مرورگر در تب‌های مختلف ثبت می‌شن.</div>
                 <div id="sessionsListInner"></div>
                 ${s.passwordEnabled&&s.password?`
                     <button class="btn-secondary" style="width:100%;margin-top:6px;border-color:rgba(239,68,68,.4);color:#F87171" onclick="logoutOtherSessions()">
