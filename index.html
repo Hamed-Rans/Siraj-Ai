@@ -9,10 +9,7 @@
 <link rel="shortcut icon" href="siraj-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Estedad:wght@100..900&family=Lalezar&family=Amiri:wght@400;700&family=Cairo:wght@200..1000&family=Inter:wght@100..900&family=Poppins:wght@100..900&family=Noto+Naskh+Arabic:wght@400..700&family=Gulzar&family=Noto+Sans+Arabic:wght@100..900&family=Noto+Kufi+Arabic:wght@100..900&family=Tajawal:wght@200;300;400;500;700;800;900&family=Almarai:wght@300;400;700;800&family=Scheherazade+New:wght@400..700&family=Reem+Kufi:wght@400..700&family=Space+Grotesk:wght@300..700&family=Manrope:wght@200..800&family=DM+Sans:opsz,wght@9..40,100..1000&family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Estedad:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
 <style>
 @property --spin{syntax:'<angle>';initial-value:0deg;inherits:false}
 :root{
@@ -775,6 +772,24 @@ body{font-size:var(--font-size-base);background-color:var(--primary);background-
 .toast.success{border-color:rgba(16,185,129,.5);color:#34D399}
 .toast.info{border-color:rgba(59,130,246,.5);color:#60A5FA}
 
+/* ===== لودینگ اسپلش ===== */
+.splash-loader{
+  position:fixed;inset:0;z-index:999999;
+  background:linear-gradient(160deg,#0E121B 0%,#0B0E14 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity .5s ease,visibility .5s ease;
+}
+.splash-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.splash-logo{width:90px;height:90px;animation:logoGlowPulse 2s ease-in-out infinite}
+.splash-logo img{width:100%;height:100%;object-fit:contain;animation:logoMotion 15s ease-in-out infinite;transform-origin:center}
+.splash-title{font-family:'Vazirmatn',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#60A5FA,#3B82F6,#2563EB);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.splash-sub{font-family:'Vazirmatn',sans-serif;font-size:11.5px;color:#8A9AB5;margin-top:-10px}
+.splash-dots{display:flex;gap:8px;margin-top:10px}
+.splash-dots span{width:8px;height:8px;border-radius:50%;background:#3B82F6;animation:bounceDot 1.4s infinite ease-in-out both}
+.splash-dots span:nth-child(1){animation-delay:-.32s}
+.splash-dots span:nth-child(2){animation-delay:-.16s}
+.splash-dots span:nth-child(3){animation-delay:0s}
+
 .site-credit{position:fixed;bottom:6px;left:10px;font-size:10px;color:var(--text-muted);opacity:.55;letter-spacing:.5px;z-index:99;pointer-events:none;font-family:'Inter',sans-serif;white-space:nowrap;display:flex;align-items:center;gap:5px;direction:ltr}
 .site-credit img{width:13px;height:13px;object-fit:contain;filter:grayscale(1) brightness(1.4);opacity:.75;flex-shrink:0}
 @media (max-width:1100px){.side-panel{display:none}.site-credit{display:none}}
@@ -782,6 +797,14 @@ body{font-size:var(--font-size-base);background-color:var(--primary);background-
 </style>
 </head>
 <body>
+
+<!-- لودینگ اسپلش -->
+<div class="splash-loader" id="splashLoader">
+  <div class="splash-logo"><img src="siraj-logo.png" alt="سراج" onerror="this.style.opacity=0.3"></div>
+  <div class="splash-title">هوشواره سراج</div>
+  <div class="splash-sub">در حال آماده‌سازی...</div>
+  <div class="splash-dots"><span></span><span></span><span></span></div>
+</div>
 
 <div class="lock-screen" id="lockScreen">
   <div class="lock-box">
@@ -951,7 +974,6 @@ body{font-size:var(--font-size-base);background-color:var(--primary);background-
 
 <script>
 const APP_CONFIG={
-    // ✅ آدرس Worker با مسیر کامل — این خط رو درست کردم
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
     defaultSettings:{
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
@@ -1121,6 +1143,44 @@ function loadSettings(){try{const l=JSON.parse(localStorage.getItem(STORAGE_KEY)
     const pi=localStorage.getItem(PROFILE_IMG_KEY);
     if(pi&&!s.profileImage)s.profileImage=pi;
     return s;}catch(e){return{...APP_CONFIG.defaultSettings};}}
+
+// 🎯 لود فونت فقط زمانی که کاربر انتخاب کرد
+const loadedFonts=new Set(['vazirmatn','estedad','inter']);
+function loadFontIfNeeded(fontId){
+    if(!fontId||loadedFonts.has(fontId))return;
+    loadedFonts.add(fontId);
+    const fontMap={
+        'shabnam':'https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css',
+        'sahel':'https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css',
+        'lalezar':'https://fonts.googleapis.com/css2?family=Lalezar&display=swap',
+        'gulzar':'https://fonts.googleapis.com/css2?family=Gulzar&display=swap',
+        'noto-sans-arabic':'https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&display=swap',
+        'amiri':'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap',
+        'cairo':'https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap',
+        'noto-naskh':'https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400..700&display=swap',
+        'noto-kufi':'https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900&display=swap',
+        'tajawal':'https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap',
+        'almarai':'https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap',
+        'scheherazade':'https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400..700&display=swap',
+        'reem-kufi':'https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&display=swap',
+        'poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@100..900&display=swap',
+        'space-grotesk':'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap',
+        'manrope':'https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap',
+        'dm-sans':'https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap',
+        'jetbrains':'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap'
+    };
+    const url=fontMap[fontId];
+    if(!url)return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';link.href=url;
+    document.head.appendChild(link);
+}
+function ensureCurrentFontLoaded(){
+    if(settings.fontFamily && settings.fontFamily!=='vazirmatn'){
+        loadFontIfNeeded(settings.fontFamily);
+    }
+}
+
 function saveSettings(){localStorage.setItem(STORAGE_KEY,JSON.stringify(settings));if(settings.profileImage!==undefined){try{localStorage.setItem(PROFILE_IMG_KEY,settings.profileImage||'');}catch(e){}}}
 function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'{}');}catch{return{};}}
 function saveHistory(h){localStorage.setItem(HISTORY_KEY,JSON.stringify(h));}
@@ -1369,6 +1429,7 @@ function applyBodyBackground(t){
 
 function applySettingsToUI(s){
     const t=s||settings;
+    loadFontIfNeeded(t.fontFamily||'vazirmatn');
     document.documentElement.setAttribute('data-theme',`${t.themeMode}-${t.themeColor}`);
     document.documentElement.setAttribute('data-bubble-shape',t.bubbleShape);
     document.documentElement.setAttribute('data-anim',t.animation||'normal');
@@ -2808,9 +2869,11 @@ function unregisterMySession(){
 }
 
 window.addEventListener('load',()=>{
+    setTimeout(()=>{const sl=document.getElementById('splashLoader');if(sl)sl.classList.add('hidden');},400);
     try{const savedImg=localStorage.getItem(PROFILE_IMG_KEY);if(savedImg&&!settings.profileImage)settings.profileImage=savedImg;}catch(e){}
     initNavState();
     applySettingsToUI();
+    ensureCurrentFontLoaded();
     if(!currentChatId)createNewChat(true);
     toggleWelcome();
     renderPanelForChat();
