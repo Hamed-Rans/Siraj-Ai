@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (Full v5) */
+/* Siraj v2.0 — planner-v2.js (Full v6) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -16,6 +16,10 @@
     var studyChatHistory = [];
 
     /* ============ helpers ============ */
+    function toFa(n){
+      var fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return String(n).replace(/\d/g, function(d){ return fa[+d]; });
+    }
     function esc(s){
       return String(s||'').replace(/[&<>"']/g,function(c){
         return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
@@ -59,39 +63,61 @@
 
     /* ============ رویدادهای مناسبتی ایران (تقریبی) ============ */
     var IRAN_EVENTS = {
+      /* فروردین */
       '01-01': 'نوروز — آغاز سال نو',
       '01-02': 'عید نوروز',
       '01-03': 'عید نوروز',
       '01-04': 'عید نوروز',
+      '01-06': 'روز امید و شادی',
       '01-12': 'روز جمهوری اسلامی',
       '01-13': 'سیزده‌بدر',
-      '01-25': 'روز بزرگداشت عطار',
+      '01-19': 'شهادت حضرت علی (ع)',
+      '01-21': 'شهادت امام علی (ع)',
+      '01-22': 'شب قدر',
+      '01-23': 'شب قدر',
+      '01-25': 'روز بزرگداشت عطار نیشابوری',
+      /* اردیبهشت */
+      '02-01': 'عید فطر',
+      '02-02': 'تعطیل عید فطر',
       '02-02': 'روز زمین پاک',
       '02-10': 'روز ملی خلیج فارس',
+      '02-12': 'روز معلم',
       '02-25': 'روز بزرگداشت فردوسی',
+      /* خرداد */
       '03-01': 'روز بهره‌وری',
+      '03-06': 'خرداد — سالگرد آزادسازی خرمشهر',
       '03-14': 'رحلت امام خمینی',
       '03-15': 'قیام ۱۵ خرداد',
+      /* تیر */
       '04-01': 'روز اصناف',
       '04-07': 'روز قوه قضائیه',
       '04-10': 'روز صنعت و معدن',
       '04-14': 'روز قلم',
       '04-25': 'روز بهزیستی',
+      /* مرداد */
       '05-05': 'روز کارمند',
       '05-08': 'روز بزرگداشت سهروردی',
       '05-14': 'روز بزرگداشت خیام',
+      /* شهریور */
       '06-05': 'روز بزرگداشت رازی',
       '06-27': 'روز شعر و ادب فارسی',
       '06-31': 'آغاز هفته دفاع مقدس',
+      /* مهر */
       '07-13': 'روز نیروی انتظامی',
-      '07-20': 'روز حافظ',
+      '07-20': 'روز بزرگداشت حافظ',
+      /* آبان */
+      '08-08': 'روز نوجوان',
       '08-13': 'روز دانش‌آموز',
       '08-24': 'روز کتاب و کتابخوانی',
+      /* آذر */
       '09-16': 'روز دانشجو',
+      /* دی */
       '10-05': 'روز خانواده',
       '10-19': 'روز بزرگداشت مولوی',
+      /* بهمن */
       '11-12': 'پیروزی انقلاب اسلامی',
       '11-22': 'روز بزرگداشت خواجه نصیر',
+      /* اسفند */
       '12-05': 'روز بزرگداشت خواجه نصیرالدین طوسی',
       '12-20': 'روز بزرگداشت نظامی گنجوی',
       '12-29': 'روز ملی شدن صنعت نفت'
@@ -432,7 +458,7 @@
         '<button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
         '<div class="phc-center">' +
           '<div class="phc-day"><span data-anim-key="monthName3">' + esc(p.monthName) + '</span> <span data-anim-key="yearNum3">' + esc(p.yearNum) + '</span></div>' +
-          '<div class="phc-date">' + doneGoals + ' از ' + goals.length + ' هدف این ماه انجام شده</div>' +
+          '<div class="phc-date">' + toFa(doneGoals) + ' از ' + toFa(goals.length) + ' هدف این ماه انجام شده</div>' +
           (!isCurrentMonth ? '<button class="phc-back-btn" onclick="window.__goThisMonth()">↩ برگرد به این ماه</button>' : '') +
         '</div>' +
         '<button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
@@ -451,7 +477,7 @@
         '<button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
         '<div class="phc-center">' +
           '<div class="phc-day"><span data-anim-key="yearNum4">' + esc(d.toLocaleDateString('fa-IR',{year:'numeric'})) + '</span></div>' +
-          '<div class="phc-date">' + done + ' از ' + goals.length + ' هدف سالانه انجام شده</div>' +
+          '<div class="phc-date">' + toFa(done) + ' از ' + toFa(goals.length) + ' هدف سالانه انجام شده</div>' +
           (!isCurrentYear ? '<button class="phc-back-btn" onclick="window.__goThisYear()">↩ برگرد به امسال</button>' : '') +
         '</div>' +
         '<button class="phc-nav-btn" onclick="window.__navYear(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
@@ -474,12 +500,131 @@
       });
       if (!studiedMin && !doneWithTime && !doneWithout) return '';
       var h = Math.floor(studiedMin/60), m = studiedMin%60;
-      var timeStr = h > 0 ? (h + ' س و ' + m + ' د') : (m + ' دقیقه');
+      var timeStr = h > 0 ? (toFa(h) + ' س و ' + toFa(m) + ' د') : (toFa(m) + ' دقیقه');
       return '<div class="week-stats-bar">' +
         '<div class="wsb-item"><span>⏱️</span><b>' + timeStr + '</b> مطالعه</div>' +
-        '<div class="wsb-item"><span>✅</span>' + doneWithTime + ' با زمان</div>' +
-        (doneWithout > 0 ? '<div class="wsb-item warn"><span>⚪</span>' + doneWithout + ' بدون زمان</div>' : '') +
+        '<div class="wsb-item"><span>✅</span>' + toFa(doneWithTime) + ' با زمان</div>' +
+        (doneWithout > 0 ? '<div class="wsb-item warn"><span>⚪</span>' + toFa(doneWithout) + ' بدون زمان</div>' : '') +
       '</div>';
+    }
+
+    /* ============ 🔥 Streak ============ */
+    function getStreakDays(){
+      var pl = window.loadPlannerNew();
+      var d = new Date();
+      d.setHours(0,0,0,0);
+      var streak = 0;
+      var isToday = true;
+      for (var i=0;i<365;i++){
+        var key = window.dateKey(d);
+        var dd = window.getDayData(pl, key);
+        var hasDone = (dd.tasks||[]).some(function(tk){ return tk.done; });
+        if (hasDone) streak++;
+        else if (!isToday) break;
+        isToday = false;
+        d.setDate(d.getDate() - 1);
+      }
+      return streak;
+    }
+    function streakHTML(){
+      var s = getStreakDays();
+      if (s < 2) return '';
+      var msg = s >= 30 ? 'فوق‌العاده‌ای! 🏆' :
+                s >= 14 ? 'عالی پیش می‌ری! ✨' :
+                s >= 7  ? 'ادامه بده! 💪' :
+                          'خوب شروع کردی! 🌱';
+      return '<div class="daily-streak">' +
+        '<span class="ds-fire">🔥</span>' +
+        '<span class="ds-num">' + toFa(s) + '</span>' +
+        '<span class="ds-text">روز پشت‌سرهم فعالی — ' + msg + '</span>' +
+      '</div>';
+    }
+
+    /* ============ 📖 مقاله‌ی روزانه ============ */
+    var DAILY_ARTICLES = [
+      {type:'بیت', text:'وَمَا نَيْلُ الْمَطَالِبِ بِالتَّمَنِّي ۞ وَلَكِنْ تُؤْخَذُ الدُّنْيَا غِلَابَا', by:'أحمد شوقي'},
+      {type:'نکته', text:'«إنَّ» و «أنَّ» هر دو حرف مشبهه بالفعل هستن؛ اسم رو منصوب و خبر رو مرفوع می‌کنن.'},
+      {type:'واژه', text:'«صَبْر» یعنی شکیبایی. ریشه: ص-ب-ر. جمع: صُبور.'},
+      {type:'بیت', text:'وَمَنْ يَتَصَبَّرْ يَجِدْ خَيْراً بِصَبْرِهِ ۞ وَمَنْ يَتَعَجَّلْ يَجْنِ غَيْرَ مَا يَشْتَهي', by:'متنبی'},
+      {type:'نکته', text:'فعل مضارع با «سـ» یعنی آینده‌ی نزدیک، با «سوف» یعنی آینده‌ی دور.'},
+      {type:'واژه', text:'«عِلْم» یعنی دانش. ریشه: ع-ل-م. جمع: عُلوم.'},
+      {type:'بیت', text:'وَمَا الْحُرُّ مَنْ يَحْيَا بِغَيْرِ حُرِّيَّةٍ ۞ فَكَيْفَ يَعِيشُ الْحُرُّ وَهْوَ أَسِيرُ', by:'أبو القاسم الشابي'},
+      {type:'نکته', text:'«كان» و اخواتش اسم رو مرفوع و خبر رو منصوب می‌کنن (برعکس إنّ).'},
+      {type:'واژه', text:'«أَدَب» یعنی ادب. ریشه: أ-د-ب. جمع: آداب.'},
+      {type:'بیت', text:'وَإِنِّي لَمِنْ قَوْمٍ عَلَى الدَّهْرِ ثَائِرِينَ ۞ إِذَا ظُلِمُوا هَاجُوا وَإِنْ غَضِبُوا ائْتَمَرُوا', by:'الشاعر'},
+      {type:'نکته', text:'اسم فاعل بر وزن «فاعل» میاد و اسم مفعول بر وزن «مفعول».'},
+      {type:'واژه', text:'«نُور» یعنی روشنایی. ریشه: ن-و-ر. جمع: أنوار.'},
+      {type:'بیت', text:'تَعَلَّمْ فَلَيْسَ الْمَرْءُ يُولَدُ عَالِماً ۞ وَلَيْسَ أَخُو عِلْمٍ كَمَنْ هُوَ جَاهِلُ', by:'متنبی'},
+      {type:'نکته', text:'«مُبْتَدَأ» و «خبر» هر دو مرفوع هستن.'},
+      {type:'واژه', text:'«قَلْب» یعنی دل. ریشه: ق-ل-ب. جمع: قلوب.'},
+      {type:'بیت', text:'وَلَيْسَ بِمُسْتَبْقٍ مِنَ الْمَجْدِ بِالَّذِي ۞ يُفَارِقُ أَوْ لَا يَصْطَنِعْ مَا يُعَاشِرُ', by:'الشاعر'},
+      {type:'نکته', text:'«فَعَلَ» ماضی ساده است و «كانَ يَفْعَلُ» ماضی استمراری.'},
+      {type:'واژه', text:'«كِتاب» یعنی کتاب. ریشه: ك-ت-ب. جمع: كُتُب.'},
+      {type:'بیت', text:'إِذَا الشَّعْبُ أَرَادَ الْحَيَاةَ فَلَا بُدَّ أَنْ يَسْتَجِيبَ الْقَدَرُ', by:'أبو القاسم الشابي'},
+      {type:'نکته', text:'تمییز در عربی معمولاً منصوب میاد.'},
+      {type:'واژه', text:'«شَمْس» یعنی خورشید. ریشه: ش-م-س. جمع: شُموس.'},
+      {type:'بیت', text:'دَعِ الْأَيَّامَ تَفْعَلُ مَا تَشَاءُ ۞ وَطِبْ نَفْساً إِذَا حَكَمَ الْقَضَاءُ', by:'الإمام الشافعي'},
+      {type:'نکته', text:'«مِن» و «إلى» و «عَن» و «عَلَى» و «في» از حروف جر هستن.'},
+      {type:'واژه', text:'«قَمَر» یعنی ماه. ریشه: ق-م-ر. جمع: أقمار.'},
+      {type:'بیت', text:'وَمَا أَنَا مِنْ عَبْدٍ يُلَبِّي مُنَادِياً ۞ إِذَا كَانَ عَنْ حَقٍّ يُخَافُ ويُنْذَرُ', by:'الشاعر'},
+      {type:'نکته', text:'اسم اشاره: «هذا» مفرد مذکر، «هذه» مفرد مؤنث، «هؤلاء» جمع.'},
+      {type:'واژه', text:'«نَفْس» یعنی خود/جان. ریشه: ن-ف-س. جمع: نُفوس.'},
+      {type:'بیت', text:'أَلَا إِنَّمَا الدُّنْيَا كَظِلٍّ زَائِلٍ ۞ فَخُذْ مَا تَرَاهُ صَالِحاً وَتَزَوَّدِ', by:'الشاعر'},
+      {type:'نکته', text:'فعل امر از ثلاثی مجرد همیشه بر وزن «اُفْعُلْ» یا «اِفْعِلْ» میاد.'},
+      {type:'واژه', text:'«حَياة» یعنی زندگی. ریشه: ح-ي-ي. جمع: حَيات.'}
+    ];
+    function getDailyArticle(){
+      var now = new Date();
+      var start = new Date(now.getFullYear(), 0, 0);
+      var day = Math.floor((now - start) / 86400000);
+      return DAILY_ARTICLES[day % DAILY_ARTICLES.length];
+    }
+    function dailyArticleHTML(){
+      var a = getDailyArticle();
+      if (!a) return '';
+      return '<div class="daily-article">' +
+        '<div class="da-head"><span class="da-badge">📖 ' + esc(a.type) + ' امروز</span></div>' +
+        '<div class="da-text">' + esc(a.text) + '</div>' +
+        (a.by ? '<div class="da-by">— ' + esc(a.by) + '</div>' : '') +
+      '</div>';
+    }
+
+    /* ============ 🎉 جشن پایان روز ============ */
+    function showConfetti(){
+      var old = document.getElementById('sirajConfetti');
+      if (old) old.remove();
+      var el = document.createElement('div');
+      el.id = 'sirajConfetti';
+      el.className = 'confetti-wrap';
+      var colors = ['#F59E0B','#10B981','#3B82F6','#EF4444','#A855F7','#EC4899','#FBBF24','#06B6D4'];
+      var html = '';
+      for (var i=0;i<80;i++){
+        var left = Math.random()*100;
+        var delay = Math.random()*0.6;
+        var dur = 2.2 + Math.random()*1.6;
+        var color = colors[Math.floor(Math.random()*colors.length)];
+        var size = 6 + Math.random()*8;
+        var rot = Math.random()*360;
+        html += '<span class="confetti-piece" style="left:' + left + '%;background:' + color +
+          ';width:' + size + 'px;height:' + size + 'px;animation-delay:' + delay +
+          's;animation-duration:' + dur + 's;transform:rotate(' + rot + 'deg)"></span>';
+      }
+      el.innerHTML = html;
+      document.body.appendChild(el);
+      setTimeout(function(){ if (el.parentNode) el.remove(); }, 4200);
+    }
+    function maybeCelebrate(dayKey){
+      dayKey = dayKey || window.dateKey(window.plannerDate || new Date());
+      var pl = window.loadPlannerNew();
+      var dd = window.getDayData(pl, dayKey);
+      var tasks = (dd.tasks||[]);
+      if (tasks.length === 0) return;
+      if (tasks.every(function(t){ return t.done; })) {
+        showConfetti();
+        setTimeout(function(){
+          showPopup('🎉', 'آفرین!', 'همه‌ی کارهای امروز رو انجام دادی! یه روز کامل و پرافتخار بود 🏆');
+        }, 400);
+      }
     }
 
     /* ============ روزانه ============ */
@@ -514,7 +659,7 @@
         : '<div class="tasks-list tasks-done-list">' + done.map(function(tk){
             var idx = allTasks.indexOf(tk);
             var timeBadge = tk.studiedMinutes
-              ? '<span class="studied-badge">⏱️ ' + tk.studiedMinutes + ' د</span>'
+              ? '<span class="studied-badge">⏱️ ' + toFa(tk.studiedMinutes) + ' د</span>'
               : '<span class="no-time-badge">⚪ بدون زمان</span>';
             return '<div class="task-item done pri-' + (tk.priority||'med') + '">' +
               '<button class="task-check checked" onclick="window.__dToggleTask(' + idx + ')">' +
@@ -538,7 +683,7 @@
       window.__pendingTime = '';
       window.__pendingPri = 'med';
 
-      return weekStatsHTML() +
+      return streakHTML() + dailyArticleHTML() + weekStatsHTML() +
         '<div class="task-add-form">' +
           '<input type="text" id="pNewTitle" placeholder="عنوان کار جدید..." onkeydown="if(event.key===\'Enter\')window.__dAddTask()">' +
           '<div class="task-form-selects">' +
@@ -548,7 +693,7 @@
           '<button class="task-add-btn" onclick="window.__dAddTask()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>افزودن</button>' +
         '</div>' +
         '<div class="tasks-list-title">🎯 در جریان:</div>' + activeHTML +
-        '<div class="tasks-list-title done-title">✅ انجام شده (' + done.length + '):</div>' + doneHTML;
+        '<div class="tasks-list-title done-title">✅ انجام شده (' + toFa(done.length) + '):</div>' + doneHTML;
     }
     function viewDaily(){ return heroDaily() + '<div class="planner-body-content">' + dailyContentHTML() + '</div>'; }
 
@@ -573,9 +718,11 @@
       if (!dd.tasks[i]) return;
       var task = dd.tasks[i];
       if (task.done || forceMode === 'silent'){
+        var wasDone = task.done;
         task.done = !task.done;
         if (!task.done){ delete task.studiedMinutes; }
         window.savePlanner(pl);
+        if (task.done && !wasDone) maybeCelebrate(key);
         refreshBody('left');
         return;
       }
@@ -583,6 +730,7 @@
         {text:'همینطور ثبت', onClick: function(){
           task.done = true;
           window.savePlanner(pl);
+          maybeCelebrate(key);
           refreshBody('left');
         }},
         {text:'دقیقه بزنم', onClick: function(){
@@ -593,6 +741,7 @@
           task.done = true;
           task.studiedMinutes = mins;
           window.savePlanner(pl);
+          maybeCelebrate(key);
           refreshBody('left');
         }},
         {text:'بریم مطالعه 🎯', onClick: function(){
@@ -686,7 +835,7 @@
           var hasTask = (dd.tasks||[]).some(function(tk){ return tk.time && tk.time.indexOf(hk+':00') === 0; });
           return '<td class="task-cell' + (isToday?' today':'') + (hasTask?' has-task':'') + '">' + buildWeekCell(day, hk, pl) + '</td>';
         }).join('');
-        return '<tr><td class="hour-cell">' + hk + ':۰۰</td>' + cells + '</tr>';
+        return '<tr><td class="hour-cell">' + toFa(hk) + ':۰۰</td>' + cells + '</tr>';
       }).join('');
 
       var totalTasks = 0, doneCount = 0;
@@ -699,9 +848,9 @@
       });
       var pct = totalTasks ? Math.round((doneCount/totalTasks)*100) : 0;
       var summaryHTML = '<div class="week-summary">' +
-        '<div class="ws-box"><div class="ws-num">' + totalTasks + '</div><div class="ws-lbl">کل کارها</div></div>' +
-        '<div class="ws-box"><div class="ws-num">' + doneCount + '</div><div class="ws-lbl">انجام شده</div></div>' +
-        '<div class="ws-box"><div class="ws-num">' + pct + '%</div><div class="ws-lbl">پیشرفت</div></div>' +
+        '<div class="ws-box"><div class="ws-num">' + toFa(totalTasks) + '</div><div class="ws-lbl">کل کارها</div></div>' +
+        '<div class="ws-box"><div class="ws-num">' + toFa(doneCount) + '</div><div class="ws-lbl">انجام شده</div></div>' +
+        '<div class="ws-box"><div class="ws-num">' + toFa(pct) + '%</div><div class="ws-lbl">پیشرفت</div></div>' +
       '</div>';
 
       return '<div class="week-grid-wrap"><table class="week-table"><thead>' + headerRow + '</thead><tbody>' + bodyRows + '</tbody></table></div>' + summaryHTML;
@@ -768,9 +917,9 @@
       var pct = totalTasks ? Math.round((doneCount/totalTasks)*100) : 0;
       var nums = statsWrap.querySelectorAll('.ws-num');
       if (nums.length >= 3){
-        nums[0].textContent = totalTasks;
-        nums[1].textContent = doneCount;
-        nums[2].textContent = pct + '%';
+        nums[0].textContent = toFa(totalTasks);
+        nums[1].textContent = toFa(doneCount);
+        nums[2].textContent = toFa(pct) + '%';
       }
     }
 
@@ -791,6 +940,7 @@
         {text:'همینطور ثبت', onClick: function(){
           task.done = true;
           window.savePlanner(pl);
+          maybeCelebrate(dayKey);
           refreshBody('left');
         }},
         {text:'دقیقه بزنم', onClick: function(){
@@ -801,6 +951,7 @@
           task.done = true;
           task.studiedMinutes = mins;
           window.savePlanner(pl);
+          maybeCelebrate(dayKey);
           refreshBody('left');
         }},
         {text:'بریم مطالعه 🎯', onClick: function(){
@@ -859,7 +1010,7 @@
         var doneC = (dayData.tasks||[]).filter(function(x){return x.done;}).length;
         var total = (dayData.tasks||[]).length;
         var rems = getDayReminders(k);
-        var nationalEvt = getIranianEvent(k);
+        var evt = getIranianEvent(k);
         var dayClass = '';
         if (total > 0){
           var ratio = doneC / total;
@@ -867,12 +1018,24 @@
           else if (ratio > 0) dayClass = 'day-partial';
           else dayClass = 'day-pending';
         }
-        if (rems.length) dayClass += ' has-reminders';
-        if (nationalEvt) dayClass += ' cal-day-national';
-        cells.push('<div class="cal-day' + (isToday?' today':'') + (isSel?' selected':'') + (isFri?' friday':'') + (dayClass?' '+dayClass:'') + '" title="' + (nationalEvt || '') + '" onclick="window.__calDayClick(' + dd + ')">' +
-          '<span class="cal-day-num">' + dd + '</span>' +
-          (total > 0 ? '<span class="cal-day-count">' + doneC + '/' + total + '</span>' : '') +
-          (rems.length ? '<span class="cal-day-rem">🔔</span>' : '') +
+        if (isFri) dayClass += ' friday';
+        var icons = '';
+        if (rems.length) icons += '<span class="cal-day-icon icon-evt" title="' + rems.length + ' رویداد">' +
+          '<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>' +
+          (rems.length > 1 ? '<b>' + toFa(rems.length) + '</b>' : '') + '</span>';
+        if (evt) icons += '<span class="cal-day-icon icon-occ" title="' + esc(evt) + '">' +
+          '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>' +
+          '<b>۱</b></span>';
+        var statusIcon = '';
+        if (total > 0){
+          if (doneC === total) statusIcon = '<span class="cal-day-status st-done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>';
+          else if (doneC > 0) statusIcon = '<span class="cal-day-status st-partial"><svg viewBox="0 0 24 24"><path d="M12 6v6l4 2"/></svg></span>';
+          else statusIcon = '<span class="cal-day-status st-pending"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></span>';
+        }
+        cells.push('<div class="cal-day' + (isToday?' today':'') + (isSel?' selected':'') + (dayClass?' '+dayClass:'') + '" title="' + (evt || '') + '" onclick="window.__calDayClick(' + dd + ')">' +
+          '<span class="cal-day-num">' + toFa(dd) + '</span>' +
+          statusIcon +
+          (icons ? '<div class="cal-day-icons-row">' + icons + '</div>' : '') +
           '</div>');
       }
 
@@ -895,32 +1058,31 @@
       var doneGoals = goals.filter(function(g){return g.done;}).length;
 
       return '<div class="monthly-layout">' +
-          '<div class="monthly-main">' +
-            '<div class="cal-legend">' +
-              '<span class="cl-item"><span class="cl-dot day-done-bg"></span>کامل</span>' +
-              '<span class="cl-item"><span class="cl-dot day-partial-bg"></span>نیمه</span>' +
-              '<span class="cl-item"><span class="cl-dot day-pending-bg"></span>انجام نشده</span>' +
-              '<span class="cl-item"><span style="color:#EF4444">🔴</span>جمعه</span>' +
-              '<span class="cl-item"><span style="color:#A855F7">🟣</span>مناسب</span>' +
-              '<span class="cl-item"><span>🔔</span>یادآور</span>' +
-            '</div>' +
-            '<div class="month-calendar">' +
-              '<div class="cal-weekdays">' + weekdays.map(function(w){return '<div class="cal-weekday">'+w+'</div>';}).join('') + '</div>' +
-              '<div class="cal-grid">' + cells.join('') + '</div>' +
-            '</div>' +
-          '</div>' +
           '<div class="monthly-side">' +
             '<div class="month-goals compact">' +
               '<div class="month-goals-title">' +
                 '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>' +
                 '<span>اهداف این ماه</span>' +
-                (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
+                (goals.length > 0 ? '<span class="mg-counter">' + toFa(doneGoals) + '/' + toFa(goals.length) + '</span>' : '') +
               '</div>' +
               goalsHTML +
               '<div class="month-goal-add compact">' +
                 '<input type="text" id="newGoalInput" placeholder="هدف جدید..." onkeydown="if(event.key===\'Enter\')addMonthGoal(\'' + monthKey + '\')">' +
                 '<button onclick="addMonthGoal(\'' + monthKey + '\')">+</button>' +
               '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="monthly-main">' +
+            '<div class="cal-legend">' +
+              '<span class="cl-item"><span class="cl-dot day-done-bg"></span>کامل</span>' +
+              '<span class="cl-item"><span class="cl-dot day-partial-bg"></span>نیمه</span>' +
+              '<span class="cl-item"><span class="cl-dot day-pending-bg"></span>انجام نشده</span>' +
+              '<span class="cl-item"><span class="cl-icon-occ">★</span>مناسبت</span>' +
+              '<span class="cl-item"><span class="cl-icon-evt">🔔</span>رویداد</span>' +
+            '</div>' +
+            '<div class="month-calendar">' +
+              '<div class="cal-weekdays">' + weekdays.map(function(w){return '<div class="cal-weekday">'+w+'</div>';}).join('') + '</div>' +
+              '<div class="cal-grid">' + cells.join('') + '</div>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -959,13 +1121,13 @@
       el.id = 'calDayPopup';
       el.className = 'siraj-popup-overlay';
       el.innerHTML = '<div class="siraj-popup cal-popup-wide">' +
-        '<div class="siraj-popup-title">📅 ' + day + ' ' + d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}) + '</div>' +
+        '<div class="siraj-popup-title">📅 ' + toFa(day) + ' ' + d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}) + '</div>' +
         (nationalEvt ? '<div class="cal-national-badge">🇮🇷 ' + esc(nationalEvt) + '</div>' : '') +
         '<div class="cal-popup-section">' +
           '<div class="cal-popup-label">🎯 کارها</div>' +
           (tasks.length === 0
             ? '<div class="cal-popup-empty">کاری ثبت نشده</div>'
-            : '<div class="cal-popup-text">' + doneC + ' از ' + tasks.length + ' انجام شده</div>' + tasksList) +
+            : '<div class="cal-popup-text">' + toFa(doneC) + ' از ' + toFa(tasks.length) + ' انجام شده</div>' + tasksList) +
         '</div>' +
         '<div class="cal-popup-section">' +
           '<div class="cal-popup-label">🔔 یادآورها</div>' +
@@ -1056,23 +1218,17 @@
         return '<div class="year-month-card' + (isCur ? ' current' : '') + '" onclick="window.__goToMonth(' + idx + ')">' +
           '<div class="ymc-name">' + mName + '</div>' +
           '<div class="ymc-bar"><div class="ymc-fill" style="width:' + pct + '%"></div></div>' +
-          '<div class="ymc-stat">' + md + '/' + mg.length + '</div>' +
+          '<div class="ymc-stat">' + toFa(md) + '/' + toFa(mg.length) + '</div>' +
         '</div>';
       }).join('');
 
       return '<div class="monthly-layout">' +
-          '<div class="monthly-main">' +
-            '<div class="year-overview">' +
-              '<div class="year-overview-title">📊 نگاه کلی به ماه‌ها</div>' +
-              '<div class="year-months-grid">' + monthCards + '</div>' +
-            '</div>' +
-          '</div>' +
           '<div class="monthly-side">' +
             '<div class="month-goals year-goals compact">' +
               '<div class="month-goals-title">' +
                 '<span style="font-size:16px">🏅</span>' +
                 '<span>اهداف سالانه</span>' +
-                (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
+                (goals.length > 0 ? '<span class="mg-counter">' + toFa(doneGoals) + '/' + toFa(goals.length) + '</span>' : '') +
               '</div>' +
               goalsHTML +
               '<div class="month-goal-add compact">' +
@@ -1081,22 +1237,35 @@
               '</div>' +
             '</div>' +
           '</div>' +
+          '<div class="monthly-main">' +
+            '<div class="year-overview">' +
+              '<div class="year-overview-title">📊 نگاه کلی به ماه‌ها</div>' +
+              '<div class="year-months-grid">' + monthCards + '</div>' +
+            '</div>' +
+          '</div>' +
         '</div>';
     }
     function viewYearly(){ return heroYearly() + '<div class="planner-body-content">' + yearlyContentHTML() + '</div>'; }
 
     /* ============ پرش به ماه درست ============ */
     window.__goToMonth = function(monthIdx){
-      /* monthIdx: 0..11 (فروردین تا اسفند) */
-      var now = new Date();
+      /* monthIdx: 0..11 */
+      var base = new Date(window.plannerDate || new Date());
+      var faYearTarget = -1;
+      try{
+        faYearTarget = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(base));
+      }catch(e){ return; }
       var found = null;
-      /* از ابتدای امسال شمسی بگرد تا ماه مورد نظر رو پیدا کن */
-      /* شروع از ۲ ماه قبل از امروز */
-      var ref = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-      for (var i=0;i<500;i++){
-        var faM = -1;
-        try{ faM = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(ref)); }catch(e){ break; }
-        if (faM === (monthIdx + 1)){ found = new Date(ref); break; }
+      var ref = new Date(base.getFullYear(), base.getMonth() - 4, 1);
+      for (var i=0;i<900;i++){
+        var faM = -1, faY = -1;
+        try{
+          faM = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(ref));
+          faY = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(ref));
+        }catch(e){ break; }
+        if (faM === (monthIdx + 1) && faY === faYearTarget){
+          found = new Date(ref); break;
+        }
         ref.setDate(ref.getDate() + 1);
       }
       if (found){
@@ -1120,7 +1289,7 @@
       var t = document.querySelector('.month-goals-title .mg-counter');
       if (t){
         var gs = pl.months[monthKey].goals;
-        t.textContent = gs.filter(function(g){return g.done;}).length + '/' + gs.length;
+        t.textContent = toFa(gs.filter(function(g){return g.done;}).length) + '/' + toFa(gs.length);
       }
     };
     window.__deleteMonthGoalLocal = function(monthKey, i){
@@ -1370,7 +1539,7 @@
           '<div class="stp-wrap" id="studyTimePicker">' +
             '<div class="stp-hint">↑ بکش بالا / ↓ پایین</div>' +
             '<span class="stp-unit">دقیقه</span>' +
-            '<span class="stp-num" id="studyTimeNum">25</span>' +
+            '<span class="stp-num" id="studyTimeNum">' + toFa(25) + '</span>' +
           '</div>' +
           '<div class="study-music-section">' +
             '<div class="study-music-title"><span>🎵 صدای محیطی</span></div>' +
@@ -1392,11 +1561,11 @@
           '<div class="study-icon"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg></div>' +
           '<div class="study-mode-badge">🎯 در حال تمرکز</div>' +
           '<div class="study-timer" id="studyTimer">' +
-            '<span class="study-digit" data-k="m1">0</span>' +
-            '<span class="study-digit" data-k="m2">0</span>' +
+            '<span class="study-digit" data-k="m1">۰</span>' +
+            '<span class="study-digit" data-k="m2">۰</span>' +
             '<span class="study-colon">:</span>' +
-            '<span class="study-digit" data-k="s1">0</span>' +
-            '<span class="study-digit" data-k="s2">0</span>' +
+            '<span class="study-digit" data-k="s1">۰</span>' +
+            '<span class="study-digit" data-k="s2">۰</span>' +
           '</div>' +
           '<div class="study-task" id="studyTaskName">—</div>' +
           '<div id="studyNowPlaying" style="display:none"><span class="study-now-playing">در حال پخش</span></div>' +
@@ -1413,7 +1582,7 @@
       var picker = el.querySelector('#studyTimePicker');
       var numEl = el.querySelector('#studyTimeNum');
       var pickerVal = 25, dragStartY = 0, dragStartVal = 25, dragging = false;
-      function setPV(v){ pickerVal = Math.max(1, Math.min(180, Math.round(v))); numEl.textContent = pickerVal; }
+      function setPV(v){ pickerVal = Math.max(1, Math.min(180, Math.round(v))); numEl.textContent = toFa(pickerVal); }
       function pd(e){
         dragging = true;
         dragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
@@ -1535,8 +1704,10 @@
           clearInterval(studyTimer); studyTimer = null; studyRunning = false;
           stopAudio(); unlockSite(); markSourceTaskDone();
           showPopup('🎉', 'عالی بود!', 'زمان مطالعه تموم شد.');
+          var srcDay = window.__studyTaskSourceDay;
           window.__studyTask = ''; window.__studyTaskSourceId = null; window.__studyTaskSourceDay = null;
           clearStudyChat(); closeStudy();
+          if (srcDay) maybeCelebrate(srcDay);
         }
       }, 1000);
     }
@@ -1566,9 +1737,10 @@
     function setDigit(k, val, animate){
       var el = document.querySelector('.study-digit[data-k="' + k + '"]');
       if (!el) return;
-      if (el.textContent === String(val)) return;
+      var faVal = toFa(val);
+      if (el.textContent === faVal) return;
       if (animate){ el.classList.remove('roll'); void el.offsetWidth; el.classList.add('roll'); }
-      el.textContent = String(val);
+      el.textContent = faVal;
     }
     function updateStudyTimer(initial){
       if (studySeconds < 0) studySeconds = 0;
@@ -1582,16 +1754,18 @@
     }
     function finishAndRecord(){
       var mins = elapsedMinutes();
+      var srcDay = window.__studyTaskSourceDay;
       markSourceTaskDone();
       if (window.__studyTask){
-        showPopup('🏆', 'کار انجام شد!', 'کار «' + window.__studyTask + '» با ' + mins + ' دقیقه ثبت شد.');
+        showPopup('🏆', 'کار انجام شد!', 'کار «' + window.__studyTask + '» با ' + toFa(mins) + ' دقیقه ثبت شد.');
       } else {
-        showPopup('✨', 'خوب بود!', mins + ' دقیقه مطالعه ثبت شد.');
+        showPopup('✨', 'خوب بود!', toFa(mins) + ' دقیقه مطالعه ثبت شد.');
       }
       if (studyTimer) clearInterval(studyTimer);
       studyTimer = null; studyRunning = false;
       window.__studyTask = ''; window.__studyTaskSourceId = null; window.__studyTaskSourceDay = null;
       clearStudyChat(); stopAudio(); unlockSite(); closeStudy();
+      if (srcDay) setTimeout(function(){ maybeCelebrate(srcDay); }, 500);
     }
     function exitStudyConfirm(){
       if (!confirm('مطمئنی خارج شی؟')) return;
@@ -2006,6 +2180,6 @@
       setTimeout(colorizeHours, 500);
     }, 200);
 
-    console.log('[Siraj v2.0] planner loaded ✓');
+    console.log('[Siraj v2.0] planner loaded ✓ (v6 — Streak + Article + Confetti)');
   }
 })();
