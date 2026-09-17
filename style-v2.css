@@ -1185,3 +1185,10 @@
   0%,60%,100%{transform:scale(.45);opacity:.25}
   30%{transform:scale(1);opacity:1}
 }
+/* ============ رفع نمایش همه viewها ============ */
+.view{
+  display: none !important;
+}
+.view.active{
+  display: block !important;
+}
