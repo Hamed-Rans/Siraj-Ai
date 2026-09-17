@@ -1134,7 +1134,10 @@ function startTypewriter(el){
 
 function handleInput(){const v=document.getElementById('q').value.trim();document.getElementById('sendBtn').classList.toggle('visible',v.length>0||!!currentFile);}
 function handleKeydown(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
-function handleSendClick(){if(isStreaming){pauseStream();}else{send();}}
+function handleSendClick(){
+    if(isStreaming){pauseStream();}
+    else{send();}
+}
 function pauseStream(){
     if(activeChatId&&pendingRequests[activeChatId]){
         try{pendingRequests[activeChatId].abort();}catch(e){}
@@ -1142,6 +1145,7 @@ function pauseStream(){
     }
     chatInFlight=false;isStreaming=false;
     setSendButton();
+    document.getElementById('sendBtn').classList.add('visible');
     document.getElementById('typing-indicator')?.remove();
     streamFinished=true;
     toast('متوقف شد','info');
