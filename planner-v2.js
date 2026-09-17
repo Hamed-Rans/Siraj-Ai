@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v15 Final) */
+/* Siraj v2.0 — planner-v2.js (v16 Final) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -14,22 +14,69 @@
     var PROFILE_KEY = 'siraj-profile';
     var REMINDER_KEY = 'siraj-reminders';
     var STUDY_CHAT_KEY = 'siraj-study-chat-session';
+    var LEVEL_KEY = 'siraj-user-level';
     var studyChatHistory = [];
     var USER_AVATAR_URL = 'siraj-logo.png';
 
-    /* ★★ صداها — فایل‌های واقعی ★★ */
     var SOUND_FILES = {
-      nature: 'sounds/ocean.mp3',
-      forest: 'sounds/forest.mp3',
-      hall:   'sounds/hall.mp3',
-      rain:   'sounds/rain.mp3'
+      nature:'sounds/ocean.mp3',
+      forest:'sounds/forest.mp3',
+      hall:'sounds/hall.mp3',
+      rain:'sounds/rain.mp3'
     };
     var SOUND_NAMES = {
-      nature: 'موج دریا 🌊',
-      forest: 'جنگل 🌳',
-      hall:   'سکوت گرم 🌙',
-      rain:   'بارش ملایم ☔'
+      nature:'موج دریا 🌊', forest:'جنگل 🌳',
+      hall:'سکوت گرم 🌙', rain:'بارش ملایم ☔'
     };
+
+    /* ═══ واژه‌ها به تفکیک سطح ═══ */
+    var WORDS_BY_LEVEL = {
+      beginner: [
+        {type:'واژه', text:'«کِتاب» یعنی کتاب. ریشه: ک-ت-ب. جمع: کُتُب.'},
+        {type:'واژه', text:'«قَلَم» یعنی قلم. ریشه: ق-ل-م. جمع: أقلام.'},
+        {type:'واژه', text:'«باب» یعنی در. ریشه: ب-و-ب. جمع: أبواب.'},
+        {type:'واژه', text:'«ماء» یعنی آب. جمع: میاه.'},
+        {type:'واژه', text:'«یَوم» یعنی روز. جمع: أیام.'},
+        {type:'واژه', text:'«شَمس» یعنی خورشید. جمع: شُموس.'},
+        {type:'واژه', text:'«قَمَر» یعنی ماه. ریشه: ق-م-ر. جمع: أقمار.'},
+        {type:'نکته', text:'«مُبْتَدَأ» و «خبر» هر دو مرفوع هستن.'},
+        {type:'واژه', text:'«بَیت» یعنی خانه. جمع: بیوت.'},
+        {type:'واژه', text:'«طالِب» یعنی دانش‌آموز. جمع: طُلّاب.'},
+        {type:'واژه', text:'«مَدْرَسَة» یعنی مدرسه. جمع: مدارس.'},
+        {type:'نکته', text:'فعل ماضی برای گذشته و مضارع برای حال و آینده‌ی نزدیک.'}
+      ],
+      intermediate: [
+        {type:'بیت', text:'وَمَا نَيْلُ الْمَطَالِبِ بِالتَّمَنِّي ۞ وَلَكِنْ تُؤْخَذُ الدُّنْيَا غِلَابَا', by:'أحمد شوقي'},
+        {type:'بیت', text:'وَمَنْ يَتَصَبَّرْ يَجِدْ خَيْراً بِصَبْرِهِ ۞ وَمَنْ يَتَعَجَّلْ يَجْنِ غَيْرَ مَا يَشْتَهي', by:'متنبی'},
+        {type:'نکته', text:'«إنَّ» و «أنَّ» اسم رو منصوب و خبر رو مرفوع می‌کنن.'},
+        {type:'نکته', text:'فعل مضارع با «سـ» یعنی آینده‌ی نزدیک، با «سوف» یعنی آینده‌ی دور.'},
+        {type:'بیت', text:'تَعَلَّمْ فَلَيْسَ الْمَرْءُ يُولَدُ عَالِماً ۞ وَلَيْسَ أَخُو عِلْمٍ كَمَنْ هُوَ جَاهِلُ', by:'متنبی'},
+        {type:'نکته', text:'«كان» و اخواتش اسم رو مرفوع و خبر رو منصوب می‌کنن.'},
+        {type:'واژه', text:'«صَبْر» یعنی شکیبایی. ریشه: ص-ب-ر. جمع: صُبور.'},
+        {type:'نکته', text:'اسم فاعل بر وزن «فاعل» و اسم مفعول بر وزن «مفعول».'},
+        {type:'واژه', text:'«عِلْم» یعنی دانش. ریشه: ع-ل-م. جمع: عُلوم.'},
+        {type:'واژه', text:'«أَدَب» یعنی ادب. ریشه: أ-د-ب. جمع: آداب.'},
+        {type:'نکته', text:'«مِن، إلى، عَن، عَلى، في» از حروف جر هستن.'}
+      ],
+      advanced: [
+        {type:'بیت', text:'وَمَا الْحُرُّ مَنْ يَحْيَا بِغَيْرِ حُرِّيَّةٍ ۞ فَكَيْفَ يَعِيشُ الْحُرُّ وَهْوَ أَسِيرُ', by:'أبو القاسم الشابي'},
+        {type:'بیت', text:'إِذَا الشَّعْبُ أَرَادَ الْحَيَاةَ فَلَا بُدَّ أَنْ يَسْتَجِيبَ الْقَدَرُ', by:'أبو القاسم الشابي'},
+        {type:'بیت', text:'دَعِ الْأَيَّامَ تَفْعَلُ مَا تَشَاءُ ۞ وَطِبْ نَفْساً إِذَا حَكَمَ الْقَضَاءُ', by:'الإمام الشافعي'},
+        {type:'نکته', text:'تمییز، حال، و مفعول‌به همه از منصوبات هستن ولی نقش متفاوت دارن.'},
+        {type:'نکته', text:'«لای نفی جنس» اسمش منصوب و خبرش مرفوعه: لا طالِبَ مهملٌ.'},
+        {type:'نکته', text:'اسلوب شرط: «إن» شرطیه دو فعل مضارع رو مجزوم می‌کنه.'},
+        {type:'نکته', text:'«مفعول مطلق» مصدر منصوبیه که برای تأکید فعل میاد.'},
+        {type:'نکته', text:'اسم تفضیل بر وزن «أفعَل» و اسم مبالغه بر وزن «فَعّال».'},
+        {type:'بیت', text:'وَمَا أَنَا بِالَّذِي يَرْضَى بِذُلٍّ ۞ وَلَا أَرْضَى بِمَا فِيهِ الْخَنَاةُ', by:'عنتره'},
+        {type:'نکته', text:'«کان» تامه یعنی «وجود داشت» و ناقصه اسم و خبر می‌گیره.'}
+      ]
+    };
+    var LEVEL_LABELS = {
+      beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته'
+    };
+
+    var _currentWord = null;
+    var _lastTab = 'daily';
 
     function toFa(n){
       var fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
@@ -43,7 +90,6 @@
       if (m === 0) return toFa(h) + ' ساعت';
       return toFa(h) + ' ساعت و ' + toFa(m) + ' دقیقه';
     }
-    /* ★ تایمر: فرمت HH:MM ★ */
     function formatTimer(mins){
       mins = Math.max(0, Math.round(mins));
       var h = Math.floor(mins/60);
@@ -54,6 +100,16 @@
       return String(s||'').replace(/[&<>"']/g,function(c){
         return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
       });
+    }
+    function getUserLevel(){
+      try{ return localStorage.getItem(LEVEL_KEY) || 'beginner'; }catch(e){ return 'beginner'; }
+    }
+    function setUserLevel(l){
+      try{ localStorage.setItem(LEVEL_KEY, l); }catch(e){}
+    }
+    function pickNewWord(){
+      var pool = WORDS_BY_LEVEL[getUserLevel()] || WORDS_BY_LEVEL.beginner;
+      _currentWord = pool[Math.floor(Math.random()*pool.length)];
     }
     function getBaseURL(){
       try{ if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG && APP_CONFIG.baseURL) return APP_CONFIG.baseURL; }catch(e){}
@@ -73,14 +129,16 @@
       var out = '\n\n👤 اطلاعات کاربر:\n';
       if (p.name) out += '• اسمش: ' + p.name + '\n';
       if (p.bio) out += '• درباره‌ی خودش: ' + p.bio + '\n';
+      var lvl = getUserLevel();
+      out += '• سطح عربیش: ' + LEVEL_LABELS[lvl] + '\n';
       return out;
     }
     function loadReminders(){ try{ return JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}'); }catch(e){ return {}; } }
     function saveReminders(r){ try{ localStorage.setItem(REMINDER_KEY, JSON.stringify(r)); }catch(e){} }
-    function getDayReminders(key){ return loadReminders()[key] || []; }
-    function setDayReminders(key, list){
+    function getDayReminders(k){ return loadReminders()[k] || []; }
+    function setDayReminders(k, list){
       var r = loadReminders();
-      if (list.length) r[key] = list; else delete r[key];
+      if (list.length) r[k] = list; else delete r[k];
       saveReminders(r);
     }
 
@@ -287,6 +345,8 @@
     window.__refreshCurrentTab = refreshBody;
 
     window.switchPlannerTab = function(tab){
+      if (tab === 'daily' && _lastTab !== 'daily') pickNewWord();
+      _lastTab = tab;
       document.querySelectorAll('.panel-planner-tab').forEach(function(b){ b.classList.remove('active'); });
       var idx = {daily:0, weekly:1, monthly:2, yearly:3}[tab];
       var btns = document.querySelectorAll('.panel-planner-tab');
@@ -322,7 +382,7 @@
       }
     }
 
-    /* ========== HEROES ========== */
+    /* ═══ HEROES ═══ */
     function heroDaily(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -440,39 +500,14 @@
       return '<div class="daily-streak"><span class="ds-fire">🔥</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
     }
 
-    var DAILY_ARTICLES = [
-      {type:'بیت', text:'وَمَا نَيْلُ الْمَطَالِبِ بِالتَّمَنِّي ۞ وَلَكِنْ تُؤْخَذُ الدُّنْيَا غِلَابَا', by:'أحمد شوقي'},
-      {type:'نکته', text:'«إنَّ» و «أنَّ» هر دو حرف مشبهه بالفعل هستن؛ اسم رو منصوب و خبر رو مرفوع می‌کنن.'},
-      {type:'واژه', text:'«صَبْر» یعنی شکیبایی. ریشه: ص-ب-ر. جمع: صُبور.'},
-      {type:'بیت', text:'وَمَنْ يَتَصَبَّرْ يَجِدْ خَيْراً بِصَبْرِهِ ۞ وَمَنْ يَتَعَجَّلْ يَجْنِ غَيْرَ مَا يَشْتَهي', by:'متنبی'},
-      {type:'نکته', text:'فعل مضارع با «سـ» یعنی آینده‌ی نزدیک، با «سوف» یعنی آینده‌ی دور.'},
-      {type:'واژه', text:'«عِلْم» یعنی دانش. ریشه: ع-ل-م. جمع: عُلوم.'},
-      {type:'بیت', text:'وَمَا الْحُرُّ مَنْ يَحْيَا بِغَيْرِ حُرِّيَّةٍ ۞ فَكَيْفَ يَعِيشُ الْحُرُّ وَهْوَ أَسِيرُ', by:'أبو القاسم الشابي'},
-      {type:'نکته', text:'«كان» و اخواتش اسم رو مرفوع و خبر رو منصوب می‌کنن.'},
-      {type:'واژه', text:'«أَدَب» یعنی ادب. ریشه: أ-د-ب. جمع: آداب.'},
-      {type:'بیت', text:'تَعَلَّمْ فَلَيْسَ الْمَرْءُ يُولَدُ عَالِماً ۞ وَلَيْسَ أَخُو عِلْمٍ كَمَنْ هُوَ جَاهِلُ', by:'متنبی'},
-      {type:'نکته', text:'اسم فاعل بر وزن «فاعل» میاد و اسم مفعول بر وزن «مفعول».'},
-      {type:'واژه', text:'«نُور» یعنی روشنایی. ریشه: ن-و-ر. جمع: أنوار.'},
-      {type:'بیت', text:'إِذَا الشَّعْبُ أَرَادَ الْحَيَاةَ فَلَا بُدَّ أَنْ يَسْتَجِيبَ الْقَدَرُ', by:'أبو القاسم الشابي'},
-      {type:'نکته', text:'«مُبْتَدَأ» و «خبر» هر دو مرفوع هستن.'},
-      {type:'واژه', text:'«قَلْب» یعنی دل. ریشه: ق-ل-ب. جمع: قلوب.'},
-      {type:'بیت', text:'دَعِ الْأَيَّامَ تَفْعَلُ مَا تَشَاءُ ۞ وَطِبْ نَفْساً إِذَا حَكَمَ الْقَضَاءُ', by:'الإمام الشافعي'},
-      {type:'نکته', text:'«فَعَلَ» ماضی ساده است و «كانَ يَفْعَلُ» ماضی استمراری.'},
-      {type:'واژه', text:'«كِتاب» یعنی کتاب. ریشه: ك-ت-ب. جمع: كُتُب.'},
-      {type:'نکته', text:'«مِن» و «إلى» و «عَن» و «عَلَى» و «في» از حروف جر هستن.'},
-      {type:'واژه', text:'«قَمَر» یعنی ماه. ریشه: ق-م-ر. جمع: أقمار.'},
-      {type:'نکته', text:'فعل امر از ثلاثی مجرد همیشه بر وزن «اُفْعُلْ» یا «اِفْعِلْ» میاد.'},
-      {type:'واژه', text:'«حَياة» یعنی زندگی. ریشه: ح-ي-ي. جمع: حَيات.'}
-    ];
-    function getDailyArticle(){
-      var now = new Date();
-      var start = new Date(now.getFullYear(), 0, 0);
-      var day = Math.floor((now - start) / 86400000);
-      return DAILY_ARTICLES[day % DAILY_ARTICLES.length];
-    }
-    function dailyArticleHTML(){
-      var a = getDailyArticle(); if (!a) return '';
-      return '<div class="daily-article"><div class="da-head"><span class="da-badge">📖 '+esc(a.type)+' امروز</span></div><div class="da-text">'+esc(a.text)+'</div>'+(a.by?'<div class="da-by">— '+esc(a.by)+'</div>':'')+'</div>';
+    function dailyWordHTML(){
+      if (!_currentWord) pickNewWord();
+      var w = _currentWord;
+      return '<div class="daily-article">' +
+        '<div class="da-head"><span class="da-badge">📖 '+esc(w.type)+' امروز</span></div>' +
+        '<div class="da-text">'+esc(w.text)+'</div>' +
+        (w.by?'<div class="da-by">— '+esc(w.by)+'</div>':'') +
+      '</div>';
     }
 
     function showConfetti(){
@@ -550,7 +585,7 @@
       window.__pendingTime = '';
       window.__pendingPri = 'med';
 
-      return streakHTML() + dailyArticleHTML() + weekStatsHTML() +
+      return streakHTML() + dailyWordHTML() + weekStatsHTML() +
         '<div class="task-add-form">' +
           '<input type="text" id="pNewTitle" placeholder="عنوان کار جدید..." onkeydown="if(event.key===\'Enter\')window.__dAddTask()">' +
           '<div class="task-form-selects">'+makeSelect('pNewTime','',hourOpt)+makeSelect('pNewPri','med',priOpt,'اولویت‌بندی')+'</div>' +
@@ -639,7 +674,7 @@
       var firstTask = hourTasks[0];
       if (firstTask){
         var isDone = firstTask.done;
-        return '<div class="week-cell-task'+(isDone?' done':'')+'">' +
+        return '<div class="week-cell-task'+(isDone?' done':'')+'" data-task-id="'+esc(firstTask.id)+'" data-day="'+day.key+'">' +
           '<span class="wt-title">'+esc(firstTask.title)+'</span>' +
           '<div class="wt-actions">' +
             '<button type="button" class="wt-btn edit" onclick="event.stopPropagation();window.__wEditTask(\''+day.key+'\',\''+firstTask.id+'\')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
@@ -649,7 +684,7 @@
       }
       return '<div class="week-cell-edit" data-day="'+day.key+'" data-hour="'+hk+'">' +
         '<input type="text" class="wc-input" placeholder="+ افزودن..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();window.__wQuickSave(this)}" oninput="window.__wInputChange(this)">' +
-        '<div class="wc-btns" style="display:none">' +
+        '<div class="wc-btns">' +
           '<button type="button" class="wc-btn save" onclick="event.preventDefault();event.stopPropagation();window.__wQuickSave(this.closest(\'.week-cell-edit\').querySelector(\'.wc-input\'))">✓ ثبت</button>' +
           '<button type="button" class="wc-btn cancel" onclick="event.preventDefault();event.stopPropagation();window.__wQuickCancel(this)">✕ لغو</button>' +
         '</div></div>';
@@ -681,24 +716,30 @@
       });
       var pct = totalTasks ? Math.round((doneCount/totalTasks)*100) : 0;
       var summaryHTML = '<div class="week-summary">' +
-        '<div class="ws-box"><div class="ws-num">'+toFa(totalTasks)+'</div><div class="ws-lbl">کل کارها</div></div>' +
-        '<div class="ws-box"><div class="ws-num">'+toFa(doneCount)+'</div><div class="ws-lbl">انجام شده</div></div>' +
-        '<div class="ws-box"><div class="ws-num">'+toFa(pct)+'%</div><div class="ws-lbl">پیشرفت</div></div>' +
+        '<div class="ws-box" data-stat="total" title="نمایش کل کارها"><div class="ws-num">'+toFa(totalTasks)+'</div><div class="ws-lbl">کل کارها</div></div>' +
+        '<div class="ws-box" data-stat="done" title="نمایش کارهای انجام‌شده"><div class="ws-num">'+toFa(doneCount)+'</div><div class="ws-lbl">انجام شده</div></div>' +
+        '<div class="ws-box" data-stat="progress" title="درصد پیشرفت"><div class="ws-num">'+toFa(pct)+'%</div><div class="ws-lbl">پیشرفت</div></div>' +
       '</div>';
       return '<div class="week-grid-wrap"><table class="week-table"><thead>'+headerRow+'</thead><tbody>'+bodyRows+'</tbody></table></div>'+summaryHTML;
     }
     function viewWeekly(){ return heroWeekly()+'<div class="planner-body-content">'+weeklyContentHTML()+'</div>'; }
 
+    /* ★ انیمیشن نرم دکمه‌های جدول هفتگی ★ */
     window.__wInputChange = function(inp){
       var wrap = inp.closest('.week-cell-edit'); if (!wrap) return;
       var btns = wrap.querySelector('.wc-btns'); if (!btns) return;
-      btns.style.display = (inp.value.trim().length > 0) ? 'flex' : 'none';
+      if (inp.value.trim().length > 0){
+        btns.classList.add('visible');
+      } else {
+        btns.classList.remove('visible');
+      }
     };
     window.__wQuickCancel = function(btn){
       var wrap = btn.closest('.week-cell-edit'); if (!wrap) return;
       var inp = wrap.querySelector('.wc-input');
       if (inp){ inp.value = ''; inp.blur(); }
-      var btns = wrap.querySelector('.wc-btns'); if (btns) btns.style.display = 'none';
+      var btns = wrap.querySelector('.wc-btns');
+      if (btns) btns.classList.remove('visible');
     };
     window.__wQuickSave = function(inp){
       if (!inp) return;
@@ -709,9 +750,9 @@
       var pl = window.loadPlannerNew();
       var dd = window.getDayData(pl, dayKey);
       if (!dd.tasks) dd.tasks = [];
+      var newId = 'tk_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
       dd.tasks.push({
-        id: 'tk_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
-        title: val, time: hourKey+':00 تا '+(parseInt(hourKey)+1)+':00',
+        id: newId, title: val, time: hourKey+':00 تا '+(parseInt(hourKey)+1)+':00',
         priority: 'med', done: false, createdAt: Date.now()
       });
       window.savePlanner(pl);
@@ -738,6 +779,37 @@
         nums[1].textContent = toFa(doneCount);
         nums[2].textContent = toFa(pct) + '%';
       }
+    }
+
+    /* ★ کلیک روی کارت آمار → هایلایت سلول‌های مربوطه ★ */
+    function setupWeekSummaryClicks(){
+      document.querySelectorAll('.week-summary .ws-box').forEach(function(box){
+        box.onclick = function(){
+          var stat = box.getAttribute('data-stat');
+          var cells;
+          if (stat === 'total'){
+            cells = document.querySelectorAll('.week-cell-task');
+          } else if (stat === 'done'){
+            cells = document.querySelectorAll('.week-cell-task.done');
+          } else {
+            cells = document.querySelectorAll('.week-cell-task:not(.done)');
+          }
+          if (!cells.length){
+            if (window.toast) window.toast('چیزی برای نمایش نیست','info');
+            return;
+          }
+          cells.forEach(function(c){
+            c.classList.remove('highlight');
+            void c.offsetWidth;
+            c.classList.add('highlight');
+            setTimeout(function(){ c.classList.remove('highlight'); }, 1700);
+          });
+          var first = cells[0];
+          if (first && first.scrollIntoView){
+            first.scrollIntoView({behavior:'smooth', block:'center'});
+          }
+        };
+      });
     }
 
     window.__wTickTask = function(dayKey, taskId){
@@ -1039,13 +1111,15 @@
       refreshBody('left');
     };
 
-    /* ========== پنل راست ========== */
+    /* ═══ پنل راست ═══ */
     window.renderPanelForPlanner = function(){
       var p = getProfile();
       var titleEl = document.getElementById('panelTitleText');
       var subEl = document.getElementById('panelSubText');
       if (titleEl) titleEl.textContent = 'برنامه‌ریزی';
-      if (subEl) subEl.textContent = p.name ? ('خوش آمدی ' + p.name + ' 👋') : 'خوش آمدی 👋';
+      if (subEl){
+        subEl.textContent = p.name ? ('سلام ' + p.name + '، خوشومدی 👋') : 'سلام، خوشومدی 👋';
+      }
       var tab = getTab();
       var tabs = [
         {id:'daily', label:'روزانه', icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'},
@@ -1076,10 +1150,9 @@
         '</div>';
     };
 
-    /* ========== Sound — استفاده از فایل صوتی ★ ========== */
+    /* ═══ Sound ═══ */
     var currentAudio = null;
     var masterVolume = 0.4;
-
     function stopAudio(){
       if (currentAudio){
         try{ currentAudio.pause(); currentAudio.currentTime = 0; }catch(e){}
@@ -1105,7 +1178,7 @@
       if (currentAudio) currentAudio.volume = masterVolume;
     }
 
-    /* ========== Study ========== */
+    /* ═══ Study ═══ */
     function loadStudyChat(){ try{ return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY) || '[]'); }catch(e){ return []; } }
     function saveStudyChat(){ try{ sessionStorage.setItem(STUDY_CHAT_KEY, JSON.stringify(studyChatHistory)); }catch(e){} }
     function clearStudyChat(){ studyChatHistory = []; try{ sessionStorage.removeItem(STUDY_CHAT_KEY); }catch(e){} }
@@ -1241,20 +1314,9 @@
       overlay.classList.remove('paused');
       var fb = overlay.querySelector('#studyFinishBtn');
       if (fb) fb.disabled = true;
-      if (currentAudio){
-        var np = overlay.querySelector('#studyNowPlaying');
-        if (np){
-          np.querySelector('.study-now-playing').textContent = SOUND_NAMES[currentSoundType()] || 'در حال پخش';
-          np.style.display = 'block';
-        }
-      }
       updateStudyTimer(true);
       startStudyTimer();
       lockSite();
-    }
-    function currentSoundType(){
-      var b = document.querySelector('.study-sound-btn.on:not(.off-btn)');
-      return b ? b.getAttribute('data-sound') : '';
     }
     function elapsedMinutes(){ return Math.max(1, studyTotalMinutes - Math.floor(studySeconds/60)); }
     function markSourceTaskDone(){
@@ -1282,7 +1344,6 @@
           var fb = document.getElementById('studyFinishBtn');
           if (fb) fb.disabled = false;
           stopAudio();
-          /* بوق پایان */
           try{
             var ac = new (window.AudioContext || window.webkitAudioContext)();
             var o = ac.createOscillator(), g = ac.createGain();
@@ -1484,7 +1545,7 @@
       }catch(err){ var t2 = document.getElementById(tid); if (t2) t2.textContent = 'خطا: ' + err.message; }
     };
 
-    /* ========== Community + Blog ========== */
+    /* ═══ Community + Blog ═══ */
     function blogHTML(){
       return '<div class="page-title-bar"><div class="page-title-text">مقالات سراج</div></div>' +
         '<div class="community-hero">' +
@@ -1523,7 +1584,7 @@
     setTimeout(fillViews, 1500);
     setTimeout(fillViews, 2500);
 
-    /* ★ راه‌های ارتباطی کلیک‌پذیر ★ */
+    /* ═══ راه‌های ارتباطی ═══ */
     function linkifyContacts(){
       document.querySelectorAll('.contact-row-v2, .contact-row').forEach(function(row){
         if (row.tagName === 'A' || row.dataset.linkified === '1') return;
@@ -1561,22 +1622,26 @@
     setTimeout(linkifyContacts, 1800);
     setTimeout(linkifyContacts, 3000);
 
-    /* ★ آواتار و قفل بالای چت ★ */
+    /* ★ آواتار و قفل — داخل هدر، نه شناور ★ */
     function injectMainTopActions(){
-      var mainChat = document.querySelector('.main-chat');
-      if (!mainChat) return;
-      if (getComputedStyle(mainChat).position === 'static'){
-        mainChat.style.position = 'relative';
+      var header = document.querySelector('.chat-header');
+      if (!header) return;
+
+      var wrap = header.querySelector('.header-left-actions');
+      if (!wrap){
+        wrap = document.createElement('div');
+        wrap.className = 'header-left-actions';
+        var lockBtn = header.querySelector('#headerLockBtn');
+        if (lockBtn){
+          header.insertBefore(wrap, lockBtn);
+          wrap.appendChild(lockBtn);
+        } else {
+          header.appendChild(wrap);
+        }
       }
-      var bar = mainChat.querySelector('#mainTopActions');
-      if (!bar){
-        bar = document.createElement('div');
-        bar.id = 'mainTopActions';
-        bar.className = 'main-top-actions';
-        mainChat.insertBefore(bar, mainChat.firstChild);
-      }
+
       var p = getProfile();
-      var av = bar.querySelector('#mainProfileAvatar');
+      var av = wrap.querySelector('#mainProfileAvatar');
       if (!av){
         av = document.createElement('div');
         av.id = 'mainProfileAvatar';
@@ -1584,22 +1649,11 @@
         av.onclick = function(){
           if (typeof window.openSettings === 'function') window.openSettings();
         };
-        bar.appendChild(av);
+        wrap.insertBefore(av, wrap.firstChild);
       }
       av.title = p.name ? p.name : 'مشخصات من';
       var avatarSrc = p.avatar || USER_AVATAR_URL;
       av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
-
-      var lk = bar.querySelector('#mainLockBtn');
-      if (!lk){
-        lk = document.createElement('button');
-        lk.id = 'mainLockBtn';
-        lk.className = 'main-top-icon-btn';
-        lk.title = 'قفل کردن سایت';
-        lk.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
-        lk.onclick = function(){ if (typeof window.lockNow === 'function') window.lockNow(); };
-        bar.appendChild(lk);
-      }
     }
     setTimeout(injectMainTopActions, 500);
     setTimeout(injectMainTopActions, 1500);
@@ -1613,7 +1667,7 @@
       av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
     }
 
-    /* ★ تب مشخصات من در تنظیمات + یادداشت دسترسی ★ */
+    /* ★ تب مشخصات من در تنظیمات + انتخاب سطح ★ */
     if (typeof window.openSettings === 'function'){
       var origOpenSettings = window.openSettings;
       window.openSettings = function(){
@@ -1644,24 +1698,73 @@
       var pane = document.querySelector('.settings-content[data-cat="profile"]'); if (!pane) return;
       var p = getProfile();
       var avatarSrc = p.avatar || USER_AVATAR_URL;
+      var lvl = getUserLevel();
+      var lvlOpts = ['beginner','intermediate','advanced'];
+      var lvlHTML = lvlOpts.map(function(k){
+        return '<button class="level-opt'+(k===lvl?' active':'')+'" data-level="'+k+'">'+LEVEL_LABELS[k]+'</button>';
+      }).join('');
+
       pane.innerHTML =
         '<div class="setting-group profile-section">' +
           '<label style="font-size:13px;font-weight:800;color:var(--accent)">👤 مشخصات شخصی</label>' +
           '<div class="about-avatar" style="margin:14px auto"><img src="'+avatarSrc+'" alt=""></div>' +
           '<div class="profile-access-note">' +
             '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>' +
-            '<span>دستیار هوشمند سراج به این اطلاعات دسترسی داره و توی جواب‌هاش ازشون استفاده می‌کنه.</span>' +
+            '<span>دستیار هوشمند سراج به این اطلاعات و سطح انتخابی دسترسی داره و توی جواب‌هاش ازشون استفاده می‌کنه.</span>' +
           '</div>' +
           '<input type="text" id="profileName" placeholder="اسمت چیه؟" value="'+(p.name?esc(p.name):'')+'" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;margin-bottom:8px;margin-top:8px">' +
           '<textarea id="profileBio" placeholder="یه توضیح کوتاه..." style="width:100%;min-height:90px;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;resize:vertical;line-height:1.8;margin-bottom:8px">'+(p.bio?esc(p.bio):'')+'</textarea>' +
-          '<button class="btn-primary" id="profileSaveBtn" style="width:100%;justify-content:center;margin-top:10px">💾 ذخیره</button>' +
+          '<button class="btn-primary" id="profileSaveBtn" style="width:100%;justify-content:center;margin-top:6px">💾 ذخیره</button>' +
+        '</div>' +
+
+        '<div class="level-selector">' +
+          '<div class="level-selector-title">' +
+            '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M3 20h18M7 20 12 6l5 14M9.5 13h5"/></svg>' +
+            '<span>سطح زبان عربیت</span>' +
+          '</div>' +
+          '<div class="level-options">'+lvlHTML+'</div>' +
+          '<button class="level-determine-btn" id="determineLevelBtn">' +
+            '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>' +
+            'سطحمو نمی‌دونم، با هوش مصنوعی تعیین کن' +
+          '</button>' +
         '</div>';
-      var sv = document.getElementById('profileSaveBtn');
+
+      pane.querySelectorAll('.level-opt').forEach(function(b){
+        b.onclick = function(){
+          var l = b.getAttribute('data-level');
+          setUserLevel(l);
+          pane.querySelectorAll('.level-opt').forEach(function(x){ x.classList.remove('active'); });
+          b.classList.add('active');
+          pickNewWord();
+          if (window.toast) window.toast('سطح '+LEVEL_LABELS[l]+' انتخاب شد ✓','success');
+        };
+      });
+
+      var det = pane.querySelector('#determineLevelBtn');
+      if (det){
+        det.onclick = function(){
+          if (typeof window.openSettings === 'function') {
+            var modal = document.getElementById('settingsModal');
+            if (modal) modal.classList.remove('open');
+          }
+          if (typeof window.switchView === 'function') window.switchView('chat');
+          setTimeout(function(){
+            var q = document.getElementById('q');
+            if (q){
+              q.value = 'میخوام سطح عربیم رو تعیین کنی. چند سوال از آسون به سخت ازم بپرس و آخرش سطحم رو مشخص کن که مبتدیم، متوسط یا پیشرفته.';
+              if (typeof window.handleInput === 'function') window.handleInput();
+              q.focus();
+            }
+          }, 500);
+        };
+      }
+
+      var sv = pane.querySelector('#profileSaveBtn');
       if (sv){
         sv.onclick = function(){
           var p2 = getProfile();
-          p2.name = (document.getElementById('profileName')||{}).value || '';
-          p2.bio = (document.getElementById('profileBio')||{}).value || '';
+          p2.name = (pane.querySelector('#profileName')||{}).value || '';
+          p2.bio = (pane.querySelector('#profileBio')||{}).value || '';
           saveProfile(p2);
           if (window.toast) window.toast('ذخیره شد ✓','success');
           if (typeof window.renderPanelForPlanner === 'function') window.renderPanelForPlanner();
@@ -1670,7 +1773,7 @@
       }
     }
 
-    /* ★ اسلایدر نوار — با فیکس فلش ★ */
+    /* ★ اسلایدر نوار — بدون فلش ★ */
     (function(){
       function ensureSlider(){
         var nav = document.getElementById('bottomNav'); if (!nav) return null;
@@ -1703,7 +1806,10 @@
           newLeft = btnRect.left - navRect.left; newTop = btnRect.top - navRect.top;
           newW = btnRect.width; newH = btnRect.height; newRadius = 21;
         }
-        if (animate === false) slider.style.transition = 'none';
+        if (animate === false){
+          slider.style.transition = 'none';
+          slider.classList.remove('ready');
+        }
         slider.style.left = newLeft + 'px';
         slider.style.top = newTop + 'px';
         slider.style.width = newW + 'px';
@@ -1713,6 +1819,7 @@
         if (animate === false){
           void slider.offsetWidth;
           slider.style.transition = '';
+          setTimeout(function(){ slider.classList.add('ready'); }, 20);
         }
       }
       var timer = null;
@@ -1726,11 +1833,12 @@
         new MutationObserver(function(){ schedule(true, 480); }).observe(navEl, {attributes:true, attributeFilter:['class'], subtree:true});
       }
       new MutationObserver(function(){
+        var sl = document.getElementById('navSlider');
+        if (sl) sl.classList.remove('ready');
         schedule(false, 100);
         schedule(true, 400);
       }).observe(document.documentElement, {attributes:true, attributeFilter:['data-nav-position']});
       window.addEventListener('resize', function(){ moveSlider(false); });
-      /* ★ اول بدون انیمیشن، بعد با انیمیشن ★ */
       setTimeout(function(){ moveSlider(false); }, 700);
       setTimeout(function(){ moveSlider(true); }, 1100);
     })();
@@ -1754,6 +1862,18 @@
       setTimeout(colorizeHours, 500);
     }, 200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v15)');
+    /* راه‌اندازی اولیه */
+    pickNewWord();
+
+    /* راه‌اندازی کلیک آمار هفتگی بعد از رندر */
+    var _origRenderPane = renderPane;
+    renderPane = function(tab){
+      _origRenderPane(tab);
+      if (tab === 'weekly'){
+        setTimeout(setupWeekSummaryClicks, 50);
+      }
+    };
+
+    console.log('[Siraj v2.0] planner loaded ✓ (v16)');
   }
 })();
