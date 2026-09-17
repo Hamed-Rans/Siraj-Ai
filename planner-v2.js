@@ -1,20 +1,20 @@
-/* Siraj v2.0 — planner-v2.js (Full v10 Final) */
+/* Siraj v2.0 — planner-v2.js (v11 — minimal & safe) */
 (function(){
   'use strict';
 
   var boot = setInterval(function(){
     if (typeof window.renderPlanner === 'function' && typeof window.loadPlannerNew === 'function') {
       clearInterval(boot);
-      try { init(); } catch(e){ console.error('[Siraj planner] init error:', e); }
+      try { init(); } catch(e){ console.error('[Planner] init error:', e); }
     }
   }, 100);
   var bc = 0;
   var bg = setInterval(function(){ if (++bc > 60) clearInterval(bg); }, 100);
 
   function init(){
-    var STUDY_CHAT_KEY = 'siraj-study-chat-session';
     var PROFILE_KEY = 'siraj-profile';
     var REMINDER_KEY = 'siraj-reminders';
+    var STUDY_CHAT_KEY = 'siraj-study-chat-session';
     var studyChatHistory = [];
 
     /* ========== helpers ========== */
@@ -28,8 +28,8 @@
       });
     }
     function getBaseURL(){
-      try{ if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG && APP_CONFIG.baseURL && APP_CONFIG.baseURL.trim()) return APP_CONFIG.baseURL; }catch(e){}
-      try{ if (window.APP_CONFIG && window.APP_CONFIG.baseURL && window.APP_CONFIG.baseURL.trim()) return window.APP_CONFIG.baseURL; }catch(e){}
+      try{ if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG && APP_CONFIG.baseURL) return APP_CONFIG.baseURL; }catch(e){}
+      try{ if (window.APP_CONFIG && window.APP_CONFIG.baseURL) return window.APP_CONFIG.baseURL; }catch(e){}
       return '/api/chat';
     }
     function getModel(){
@@ -40,14 +40,12 @@
     function getProfile(){
       try{ return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}'); }catch(e){ return {}; }
     }
-    function saveProfile(p){ try{ localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }catch(e){} }
     function profilePrompt(){
       var p = getProfile();
       if (!p.name && !p.bio) return '';
       var out = '\n\n👤 اطلاعات کاربر:\n';
       if (p.name) out += '• اسمش: ' + p.name + '\n';
-      if (p.bio) out += '• درباره‌ی خودش گفته: ' + p.bio + '\n';
-      out += 'می‌تونی تو جواب‌هات اسمش رو صدا بزنی.';
+      if (p.bio) out += '• درباره‌ی خودش: ' + p.bio + '\n';
       return out;
     }
 
@@ -64,7 +62,7 @@
       '01-01':'نوروز — آغاز سال نو','01-02':'عید نوروز','01-03':'عید نوروز','01-04':'عید نوروز',
       '01-06':'روز امید و شادی','01-12':'روز جمهوری اسلامی','01-13':'سیزده‌بدر',
       '01-19':'شهادت حضرت علی (ع)','01-21':'شهادت امام علی (ع)','01-22':'شب قدر','01-23':'شب قدر',
-      '01-25':'روز بزرگداشت عطار نیشابوری','02-01':'عید فطر','02-02':'تعطیل عید فطر',
+      '01-25':'روز بزرگداشت عطار','02-01':'عید فطر','02-02':'تعطیل عید فطر','02-02':'روز زمین پاک',
       '02-10':'روز ملی خلیج فارس','02-12':'روز معلم','02-25':'روز بزرگداشت فردوسی',
       '03-01':'روز بهره‌وری','03-06':'سالگرد آزادسازی خرمشهر','03-14':'رحلت امام خمینی',
       '03-15':'قیام ۱۵ خرداد','04-01':'روز اصناف','04-07':'روز قوه قضائیه','04-10':'روز صنعت و معدن',
@@ -80,11 +78,8 @@
       try{
         var parts = dayKey.split('-');
         var gDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-        var faMonth, faDay;
-        try{
-          faMonth = new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(gDate);
-          faDay = new Intl.DateTimeFormat('en-US-u-ca-persian',{day:'numeric'}).format(gDate);
-        }catch(e){ return ''; }
+        var faMonth = new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(gDate);
+        var faDay = new Intl.DateTimeFormat('en-US-u-ca-persian',{day:'numeric'}).format(gDate);
         var key = String(faMonth).padStart(2,'0') + '-' + String(faDay).padStart(2,'0');
         return IRAN_EVENTS[key] || '';
       }catch(e){ return ''; }
@@ -115,7 +110,7 @@
     function weekOrd(n){ n=Math.max(1,Math.min(6,n)); return ORD[n-1]; }
     function weekStart(d){
       var x = new Date(d); x.setHours(0,0,0,0);
-      var day = x.getDay(); var diff = (day+1)%7;
+      var diff = (x.getDay()+1)%7;
       x.setDate(x.getDate() - diff);
       return x;
     }
@@ -279,7 +274,7 @@
       var btns = document.querySelectorAll('.panel-planner-tab');
       if (btns[idx]) btns[idx].classList.add('active');
       renderPane(tab);
-      if (typeof window.renderPanelForPlanner === 'function') window.renderPanelForPlanner();
+      window.renderPanelForPlanner();
     };
     function renderPane(tab){
       var pane = document.getElementById('plannerPane'); if (!pane) return;
@@ -439,7 +434,7 @@
       {type:'نکته', text:'فعل مضارع با «سـ» یعنی آینده‌ی نزدیک، با «سوف» یعنی آینده‌ی دور.'},
       {type:'واژه', text:'«عِلْم» یعنی دانش. ریشه: ع-ل-م. جمع: عُلوم.'},
       {type:'بیت', text:'وَمَا الْحُرُّ مَنْ يَحْيَا بِغَيْرِ حُرِّيَّةٍ ۞ فَكَيْفَ يَعِيشُ الْحُرُّ وَهْوَ أَسِيرُ', by:'أبو القاسم الشابي'},
-      {type:'نکته', text:'«كان» و اخواتش اسم رو مرفوع و خبر رو منصوب می‌کنن (برعکس إنّ).'},
+      {type:'نکته', text:'«كان» و اخواتش اسم رو مرفوع و خبر رو منصوب می‌کنن.'},
       {type:'واژه', text:'«أَدَب» یعنی ادب. ریشه: أ-د-ب. جمع: آداب.'},
       {type:'بیت', text:'تَعَلَّمْ فَلَيْسَ الْمَرْءُ يُولَدُ عَالِماً ۞ وَلَيْسَ أَخُو عِلْمٍ كَمَنْ هُوَ جَاهِلُ', by:'متنبی'},
       {type:'نکته', text:'اسم فاعل بر وزن «فاعل» میاد و اسم مفعول بر وزن «مفعول».'},
@@ -450,13 +445,8 @@
       {type:'بیت', text:'دَعِ الْأَيَّامَ تَفْعَلُ مَا تَشَاءُ ۞ وَطِبْ نَفْساً إِذَا حَكَمَ الْقَضَاءُ', by:'الإمام الشافعي'},
       {type:'نکته', text:'«فَعَلَ» ماضی ساده است و «كانَ يَفْعَلُ» ماضی استمراری.'},
       {type:'واژه', text:'«كِتاب» یعنی کتاب. ریشه: ك-ت-ب. جمع: كُتُب.'},
-      {type:'بیت', text:'أَلَا إِنَّمَا الدُّنْيَا كَظِلٍّ زَائِلٍ ۞ فَخُذْ مَا تَرَاهُ صَالِحاً وَتَزَوَّدِ', by:'الشاعر'},
-      {type:'نکته', text:'تمییز در عربی معمولاً منصوب میاد.'},
-      {type:'واژه', text:'«شَمْس» یعنی خورشید. ریشه: ش-م-س. جمع: شُموس.'},
       {type:'نکته', text:'«مِن» و «إلى» و «عَن» و «عَلَى» و «في» از حروف جر هستن.'},
       {type:'واژه', text:'«قَمَر» یعنی ماه. ریشه: ق-م-ر. جمع: أقمار.'},
-      {type:'نکته', text:'اسم اشاره: «هذا» مفرد مذکر، «هذه» مفرد مؤنث، «هؤلاء» جمع.'},
-      {type:'واژه', text:'«نَفْس» یعنی خود/جان. ریشه: ن-ف-س. جمع: نُفوس.'},
       {type:'نکته', text:'فعل امر از ثلاثی مجرد همیشه بر وزن «اُفْعُلْ» یا «اِفْعِلْ» میاد.'},
       {type:'واژه', text:'«حَياة» یعنی زندگی. ریشه: ح-ي-ي. جمع: حَيات.'}
     ];
@@ -494,7 +484,7 @@
       if (tasks.length === 0) return;
       if (tasks.every(function(t){ return t.done; })) {
         showConfetti();
-        setTimeout(function(){ showPopup('🎉', 'آفرین!', 'همه‌ی کارهای امروز رو انجام دادی! یه روز کامل و پرافتخار بود 🏆'); }, 400);
+        setTimeout(function(){ showPopup('🎉', 'آفرین!', 'همه‌ی کارهای امروز رو انجام دادی! 🏆'); }, 400);
       }
     }
 
@@ -562,7 +552,7 @@
       var dd = window.getDayData(pl, dayKey);
       var task = dd.tasks[idx];
       if (!task || task.done) return;
-      showConfirm('🎯', 'ورود به اتاق مطالعه', 'می‌خوای کار «' + task.title + '» رو توی حالت مطالعه شروع کنی؟', function(){
+      showConfirm('🎯', 'ورود به اتاق مطالعه', 'کار «' + task.title + '» رو شروع کنی؟', function(){
         window.__studyTask = task.title;
         window.__studyTaskSourceId = task.id;
         window.__studyTaskSourceDay = dayKey;
@@ -585,10 +575,10 @@
         refreshBody('left');
         return;
       }
-      showTriple('✅', 'کار انجام شد!', 'ولی زمانش ثبت نشد ⏱️ چطور ثبت کنیم؟',
+      showTriple('✅', 'کار انجام شد!', 'زمانش ثبت نشد ⏱️ چطور ثبت کنیم؟',
         {text:'همینطور ثبت', onClick: function(){ task.done = true; window.savePlanner(pl); maybeCelebrate(key); refreshBody('left'); }},
         {text:'دقیقه بزنم', onClick: function(){
-          var mins = prompt('چند دقیقه وقت گذاشتی؟', '25');
+          var mins = prompt('چند دقیقه؟', '25');
           if (mins === null){ refreshBody('left'); return; }
           mins = parseInt(mins); if (isNaN(mins) || mins < 1) mins = 25;
           task.done = true; task.studiedMinutes = mins;
@@ -638,13 +628,13 @@
         return '<div class="week-cell-task' + (isDone?' done':'') + '">' +
           '<span class="wt-title">' + esc(firstTask.title) + '</span>' +
           '<div class="wt-actions">' +
-            '<button type="button" class="wt-btn edit" onclick="event.stopPropagation();window.__wEditTask(\'' + day.key + '\',\'' + firstTask.id + '\')" title="ویرایش"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
-            '<button type="button" class="wt-btn tick' + (isDone?' on':'') + '" onclick="event.stopPropagation();window.__wTickTask(\'' + day.key + '\',\'' + firstTask.id + '\')" title="انجام شد"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>' +
-            '<button type="button" class="wt-btn del" onclick="event.stopPropagation();window.__wDeleteTask(\'' + day.key + '\',\'' + firstTask.id + '\')" title="حذف"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
+            '<button type="button" class="wt-btn edit" onclick="event.stopPropagation();window.__wEditTask(\'' + day.key + '\',\'' + firstTask.id + '\')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+            '<button type="button" class="wt-btn tick' + (isDone?' on':'') + '" onclick="event.stopPropagation();window.__wTickTask(\'' + day.key + '\',\'' + firstTask.id + '\')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>' +
+            '<button type="button" class="wt-btn del" onclick="event.stopPropagation();window.__wDeleteTask(\'' + day.key + '\',\'' + firstTask.id + '\')"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
           '</div></div>';
       }
       return '<div class="week-cell-edit" data-day="' + day.key + '" data-hour="' + hk + '">' +
-        '<input type="text" class="wc-input" placeholder="+ افزودن..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();window.__wQuickSave(this)}else if(event.key===\'Escape\'){this.value=\'\';this.blur()}" oninput="window.__wInputChange(this)">' +
+        '<input type="text" class="wc-input" placeholder="+ افزودن..." onkeydown="if(event.key===\'Enter\'){event.preventDefault();window.__wQuickSave(this)}" oninput="window.__wInputChange(this)">' +
         '<div class="wc-btns" style="display:none">' +
           '<button type="button" class="wc-btn save" onclick="event.preventDefault();event.stopPropagation();window.__wQuickSave(this.closest(\'.week-cell-edit\').querySelector(\'.wc-input\'))">✓ ثبت</button>' +
           '<button type="button" class="wc-btn cancel" onclick="event.preventDefault();event.stopPropagation();window.__wQuickCancel(this)">✕ لغو</button>' +
@@ -657,7 +647,7 @@
       var todayKey = window.dateKey(new Date());
       var headerRow = '<tr><th class="hour-col">ساعت</th>' + days.map(function(day){
         var isToday = day.key === todayKey;
-        return '<th' + (isToday ? ' style="background:var(--accent-soft);color:var(--accent)"' : '') + '>' + esc(day.name) + '<div style="font-size:9.5px;opacity:.7;font-weight:600;margin-top:2px">' + esc(day.date) + '</div></th>';
+        return '<th' + (isToday ? ' style="background:var(--accent-soft);color:var(--accent)"' : '') + '>' + esc(day.name) + '<div style="font-size:9.5px;opacity:.7;margin-top:2px">' + esc(day.date) + '</div></th>';
       }).join('') + '</tr>';
       var HOURS = [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
       var bodyRows = HOURS.map(function(h){
@@ -814,8 +804,8 @@
         }
         if (isFri) dayClass += ' friday';
         var icons = '';
-        if (rems.length) icons += '<span class="cal-day-icon icon-evt" title="' + rems.length + ' رویداد"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>' + (rems.length > 1 ? '<b>' + toFa(rems.length) + '</b>' : '') + '</span>';
-        if (evt) icons += '<span class="cal-day-icon icon-occ" title="' + esc(evt) + '"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><b>۱</b></span>';
+        if (rems.length) icons += '<span class="cal-day-icon icon-evt"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>' + (rems.length > 1 ? '<b>' + toFa(rems.length) + '</b>' : '') + '</span>';
+        if (evt) icons += '<span class="cal-day-icon icon-occ"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>';
         var statusIcon = '';
         if (total > 0){
           if (doneC === total) statusIcon = '<span class="cal-day-status st-done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>';
@@ -882,7 +872,7 @@
       var el = document.createElement('div');
       el.id = 'calDayPopup'; el.className = 'siraj-popup-overlay';
       el.innerHTML = '<div class="siraj-popup cal-popup-wide">' +
-        '<div class="siraj-popup-title">📅 <bdi dir="rtl">' + toFa(day) + ' ' + d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}) + '</bdi></div>' +
+        '<div class="siraj-popup-title">📅 ' + toFa(day) + ' ' + d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}) + '</div>' +
         (nationalEvt ? '<div class="cal-national-badge">🇮🇷 ' + esc(nationalEvt) + '</div>' : '') +
         '<div class="cal-popup-section"><div class="cal-popup-label">🎯 کارها</div>' + (tasks.length === 0 ? '<div class="cal-popup-empty">کاری ثبت نشده</div>' : '<div class="cal-popup-text">' + toFa(doneC) + ' از ' + toFa(tasks.length) + ' انجام شده</div>' + tasksList) + '</div>' +
         '<div class="cal-popup-section"><div class="cal-popup-label">🔔 یادآورها</div><div class="cal-rem-list">' + (remsList || '<div class="cal-popup-empty">یادآوری نداری</div>') + '</div>' +
@@ -895,6 +885,11 @@
       el.querySelector('#calPopupClose').onclick = close;
       el.querySelector('#calPopupGo').onclick = function(){ close(); selectMonthDay(day); };
     };
+
+    function selectMonthDay(day){
+      window.plannerDate = new Date(window.plannerDate.getFullYear(), window.plannerDate.getMonth(), day);
+      window.switchPlannerTab('daily');
+    }
 
     window.__addReminder = function(key){
       var inp = document.getElementById('newRemText');
@@ -940,8 +935,7 @@
       var months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
       var currentMonthIdx = -1;
       try{
-        var faMonth = new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(new Date());
-        var faMonthNum = parseInt(faMonth);
+        var faMonthNum = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(new Date()));
         if (faMonthNum >= 1 && faMonthNum <= 12) currentMonthIdx = faMonthNum - 1;
       }catch(e){}
       var monthCards = months.map(function(mName, idx){
@@ -967,16 +961,12 @@
 
     window.__goToMonth = function(monthIdx){
       var base = new Date(window.plannerDate || new Date());
-      var faYearTarget = -1;
-      try{ faYearTarget = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(base)); }catch(e){ return; }
+      var faYearTarget = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(base));
       var found = null;
       var ref = new Date(base.getFullYear(), base.getMonth() - 4, 1);
       for (var i=0;i<900;i++){
-        var faM = -1, faY = -1;
-        try{
-          faM = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(ref));
-          faY = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(ref));
-        }catch(e){ break; }
+        var faM = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(ref));
+        var faY = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(ref));
         if (faM === (monthIdx + 1) && faY === faYearTarget){ found = new Date(ref); break; }
         ref.setDate(ref.getDate() + 1);
       }
@@ -989,7 +979,7 @@
       pl.months[monthKey].goals[i].done = !!checkbox.checked;
       window.savePlanner(pl);
       var parent = checkbox.closest('.month-goal');
-      if (parent){ parent.classList.toggle('done', !!checkbox.checked); parent.classList.remove('just-toggled'); void parent.offsetWidth; parent.classList.add('just-toggled'); }
+      if (parent){ parent.classList.toggle('done', !!checkbox.checked); }
       var t = document.querySelector('.month-goals-title .mg-counter');
       if (t){ var gs = pl.months[monthKey].goals; t.textContent = toFa(gs.filter(function(g){return g.done;}).length) + '/' + toFa(gs.length); }
     };
@@ -997,9 +987,7 @@
       var pl = window.loadPlannerNew();
       if (!pl.months[monthKey] || !pl.months[monthKey].goals) return;
       pl.months[monthKey].goals.splice(i,1); window.savePlanner(pl);
-      var p = document.querySelector('[data-goal-i="' + i + '"]');
-      if (p){ p.style.transition = 'all .3s'; p.style.opacity = '0'; p.style.transform = 'translateX(20px)'; }
-      setTimeout(function(){ refreshBody('left'); }, 300);
+      refreshBody('left');
     };
     window.__toggleYearGoalLocal = function(y, i, checkbox){
       var pl = window.loadPlannerNew();
@@ -1007,17 +995,38 @@
       pl.years[y].goals[i].done = !!checkbox.checked;
       window.savePlanner(pl);
       var p = checkbox.closest('.month-goal');
-      if (p){ p.classList.toggle('done', !!checkbox.checked); p.classList.remove('just-toggled'); void p.offsetWidth; p.classList.add('just-toggled'); }
+      if (p){ p.classList.toggle('done', !!checkbox.checked); }
     };
     window.__deleteYearGoalLocal = function(y, i){
       var pl = window.loadPlannerNew();
       if (!pl.years || !pl.years[y] || !pl.years[y].goals) return;
       pl.years[y].goals.splice(i,1); window.savePlanner(pl);
-      var p = document.querySelector('[data-ygoal-i="' + i + '"]');
-      if (p){ p.style.transition = 'all .3s'; p.style.opacity = '0'; p.style.transform = 'translateX(20px)'; }
-      setTimeout(function(){ refreshBody('left'); }, 300);
+      refreshBody('left');
     };
 
+    window.addMonthGoal = function(monthKey){
+      var inp = document.getElementById('newGoalInput'); if (!inp) return;
+      var v = inp.value.trim(); if (!v) return;
+      var pl = window.loadPlannerNew();
+      if (!pl.months[monthKey]) pl.months[monthKey] = {goals:[]};
+      pl.months[monthKey].goals.push({text:v, done:false});
+      window.savePlanner(pl);
+      inp.value = '';
+      refreshBody('left');
+    };
+    window.addYearGoal = function(y){
+      var inp = document.getElementById('newYearGoalInput'); if (!inp) return;
+      var v = inp.value.trim(); if (!v) return;
+      var pl = window.loadPlannerNew();
+      if (!pl.years) pl.years = {};
+      if (!pl.years[y]) pl.years[y] = {goals:[]};
+      pl.years[y].goals.push({text:v, done:false});
+      window.savePlanner(pl);
+      inp.value = '';
+      refreshBody('left');
+    };
+
+    /* ========== پنل راست ========== */
     window.renderPanelForPlanner = function(){
       var p = getProfile();
       var titleEl = document.getElementById('panelTitleText');
@@ -1028,7 +1037,7 @@
       var tabs = [
         {id:'daily', label:'روزانه', icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'},
         {id:'weekly', label:'هفتگی', icon:'<path d="M3 21h18"/><path d="M5 21v-6M9 21v-10M13 21v-7M17 21v-13M21 21v-4"/>'},
-        {id:'monthly', label:'ماهانه', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/><circle cx="8" cy="19" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/>'},
+        {id:'monthly', label:'ماهانه', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/>'},
         {id:'yearly', label:'سالانه', icon:'<path d="M3 20h18"/><path d="m7 20 5-14 5 14"/><path d="M9.5 13h5"/>'}
       ];
       var tabsHTML = '<div class="panel-planner-tabs">' + tabs.map(function(t){
@@ -1054,6 +1063,7 @@
         '</div>';
     };
 
+    /* ========== Sound ========== */
     var audioCtx = null, audioNodes = null, currentSound = null, masterGain = null;
     function stopAudio(){
       if (audioNodes && audioNodes.nodes){
@@ -1142,6 +1152,7 @@
     }
     function setMasterVolume(v){ if (masterGain) masterGain.gain.value = v; }
 
+    /* ========== Study Chat ========== */
     function loadStudyChat(){ try{ return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY) || '[]'); }catch(e){ return []; } }
     function saveStudyChat(){ try{ sessionStorage.setItem(STUDY_CHAT_KEY, JSON.stringify(studyChatHistory)); }catch(e){} }
     function clearStudyChat(){ studyChatHistory = []; try{ sessionStorage.removeItem(STUDY_CHAT_KEY); }catch(e){} }
@@ -1165,6 +1176,7 @@
       }catch(e){ return {today:'—', current:'—', time:'—', studying:'مطالعه آزاد'}; }
     }
 
+    /* ========== Study Mode ========== */
     var studyTimer = null, studySeconds = 0, studyRunning = false, studyPaused = false, studyTotalMinutes = 0;
 
     function buildStudyOverlay(){
@@ -1180,8 +1192,7 @@
             '<div class="siraj-select-panel" style="width:100%;min-width:100%">' + allTasks.map(function(tn){
               return '<div class="siraj-select-item' + (window.__studyTask === tn ? ' active' : '') + '" data-value="' + esc(tn) + '"><span>' + esc(tn) + '</span></div>';
             }).join('') + '</div></div>'
-        : '<div class="study-empty-box">📝 کاری برای امروز نداری<br>برو یه کار اضافه کن، بعد برگرد</div>' +
-          '<button class="study-btn" id="studyGoPlanBtn" style="width:100%">برو به برنامه‌ریزی</button>';
+        : '<div class="study-empty-box">📝 کاری برای امروز نداری</div>';
 
       var el = document.createElement('div');
       el.id = 'studyOverlay'; el.className = 'study-overlay';
@@ -1189,7 +1200,6 @@
         '<div id="studySetup" class="study-setup">' +
           '<div class="study-icon"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg></div>' +
           '<div class="study-title">حالت مطالعه</div>' +
-          '<div class="study-sub">کاری که می‌خوای روش تمرکز کنی</div>' +
           taskFieldHTML +
           '<div class="stp-wrap" id="studyTimePicker"><div class="stp-hint">↑ بکش بالا / ↓ پایین</div><span class="stp-unit">دقیقه</span><span class="stp-num" id="studyTimeNum">' + toFa(25) + '</span></div>' +
           '<div class="study-music-section"><div class="study-music-title"><span>🎵 صدای محیطی</span></div>' +
@@ -1277,8 +1287,6 @@
         });
       }
 
-      var goBtn = el.querySelector('#studyGoPlanBtn');
-      if (goBtn) goBtn.onclick = function(){ stopAudio(); closeStudy(); };
       el.querySelector('#studyStartBtn').onclick = startStudy;
       el.querySelector('#studyCancelBtn').onclick = function(){ stopAudio(); closeStudy(); };
       el.querySelector('#studyExitBtn').onclick = exitStudyConfirm;
@@ -1307,12 +1315,6 @@
           np.querySelector('.study-now-playing').textContent = names[currentSound] || 'در حال پخش';
           np.style.display = 'block';
         }
-      }
-      var pb = overlay.querySelector('#studyPauseBtn');
-      if (pb){
-        pb.classList.remove('resume-mode'); pb.classList.add('pause-mode');
-        var lbl = pb.querySelector('#studyPauseLabel');
-        if (lbl) lbl.textContent = 'توقف';
       }
       updateStudyTimer(true);
       startStudyTimer();
@@ -1453,7 +1455,7 @@
       var box = document.getElementById('studyChatMessages'); if (!box) return;
       var p = getProfile();
       var greeting = p.name ? 'سلام ' + esc(p.name) + ' 👋' : 'سلام 👋';
-      var html = '<div class="sc-msg sc-bot">' + greeting + ' من سراجم. توی حالت مطالعه هر سؤال درسی داشتی بپرس.</div>';
+      var html = '<div class="sc-msg sc-bot">' + greeting + ' من سراجم.</div>';
       studyChatHistory.forEach(function(m){
         if (m.role === 'user') html += '<div class="sc-msg sc-user">' + esc(m.content) + '</div>';
         else if (m.role === 'assistant') html += '<div class="sc-msg sc-bot">' + esc(m.content) + '</div>';
@@ -1488,7 +1490,7 @@
       box.insertAdjacentHTML('beforeend', '<div class="sc-msg sc-bot" id="' + tid + '">💭 ...</div>');
       box.scrollTop = box.scrollHeight;
       var ctx = getStudyContext();
-      var sysPrompt = 'تو «سراج» هستی و الان در «حالت مطالعه» کاربر قرار داری.\n\n📋 برنامه امروز:\n' + ctx.today + '\n\n🕐 همین ساعت (' + ctx.time + '):\n' + ctx.current + '\n\n📚 کاربر داره روی «' + ctx.studying + '» کار می‌کنه\n' + profilePrompt() + '\n\nقوانین: جواب کوتاه، غیردرسی پرسید مهربون یادآوری کن، ستاره نزن.';
+      var sysPrompt = 'تو «سراج» هستی و الان در «حالت مطالعه» کاربر قرار داری.\n\n📋 برنامه امروز:\n' + ctx.today + '\n\n📚 کاربر داره روی «' + ctx.studying + '» کار می‌کنه\n' + profilePrompt();
       try{
         var res = await fetch(getBaseURL(), {
           method:'POST',
@@ -1520,134 +1522,12 @@
         }
         studyChatHistory.push({role:'assistant', content: full}); saveStudyChat();
       }catch(err){
-        var te2 = document.getElementById(tid);
+        var te2 = document.getElementById('tid');
         if (te2) te2.textContent = 'خطا: ' + err.message;
       }
     };
 
-    window.addMonthGoal = function(monthKey){
-      var inp = document.getElementById('newGoalInput'); if (!inp) return;
-      var v = inp.value.trim(); if (!v) return;
-      var pl = window.loadPlannerNew();
-      if (!pl.months[monthKey]) pl.months[monthKey] = {goals:[]};
-      pl.months[monthKey].goals.push({text:v, done:false});
-      window.savePlanner(pl);
-      inp.value = '';
-      refreshBody('left');
-    };
-    window.addYearGoal = function(y){
-      var inp = document.getElementById('newYearGoalInput'); if (!inp) return;
-      var v = inp.value.trim(); if (!v) return;
-      var pl = window.loadPlannerNew();
-      if (!pl.years) pl.years = {};
-      if (!pl.years[y]) pl.years[y] = {goals:[]};
-      pl.years[y].goals.push({text:v, done:false});
-      window.savePlanner(pl);
-      inp.value = '';
-      refreshBody('left');
-    };
-
-    /* مقالات — با MutationObserver (بدون override) */
-    function fillBlogIfEmpty(){
-      var v = document.getElementById('view-blog');
-      if (!v) return;
-      if (v.dataset.sirajFilled === '1') return;
-      var inner = v.querySelector('.community-hero');
-      if (inner) { v.dataset.sirajFilled = '1'; return; }
-      v.dataset.sirajFilled = '1';
-      v.innerHTML =
-        '<div class="page-title-bar"><div class="page-title-text">مقالات سراج</div></div>' +
-        '<div class="community-hero">' +
-          '<div class="community-icon">' +
-            '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>' +
-          '</div>' +
-          '<div class="community-title">مقالات سراج</div>' +
-          '<div class="community-desc">' +
-            'اینجا قراره مطالب آموزشی، تحلیل‌های ادبی، نکات دستوری و یادداشت‌های کوتاه درباره‌ی زبان و ادبیات عربی منتشر بشه. اگه دنبال یادگیری عمیق‌تر و مطالب بیشتر هستی، این بخش رو از دست نده.' +
-          '</div>' +
-          '<div class="community-badge">' +
-            '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>' +
-            'به‌زودی راه‌اندازی می‌شه' +
-          '</div>' +
-        '</div>';
-    }
-
-    /* اسلایدر نوار — نسخه تک‌حرکتی با debounce */
-    (function(){
-      function ensureSlider(){
-        var nav = document.getElementById('bottomNav'); if (!nav) return null;
-        var slider = document.getElementById('navSlider');
-        if (!slider){
-          slider = document.createElement('div');
-          slider.id = 'navSlider';
-          slider.className = 'nav-slider';
-          nav.insertBefore(slider, nav.firstChild);
-        }
-        return slider;
-      }
-      function moveSlider(animate){
-        var nav = document.getElementById('bottomNav');
-        var slider = ensureSlider();
-        if (!nav || !slider) return;
-        var active = document.querySelector('.bottom-nav-btn.active');
-        if (!active){ slider.style.opacity = '0'; return; }
-        if (active.classList.contains('nav-btn-chat')){ slider.style.opacity = '0'; return; }
-        var navRect = nav.getBoundingClientRect();
-        var btnRect = active.getBoundingClientRect();
-        var pos = document.documentElement.getAttribute('data-nav-position') || 'bottom';
-        var isVert = pos === 'left' || pos === 'right';
-        var newLeft, newTop, newW, newH, newRadius;
-        if (isVert){
-          newLeft = 6; newW = navRect.width - 12;
-          newTop = btnRect.top - navRect.top; newH = btnRect.height;
-          newRadius = 18;
-        } else {
-          newLeft = btnRect.left - navRect.left; newTop = btnRect.top - navRect.top;
-          newW = btnRect.width; newH = btnRect.height; newRadius = 22;
-        }
-        if (animate === false) slider.style.transition = 'none';
-        slider.style.left = newLeft + 'px';
-        slider.style.top = newTop + 'px';
-        slider.style.width = newW + 'px';
-        slider.style.height = newH + 'px';
-        slider.style.borderRadius = newRadius + 'px';
-        slider.style.opacity = '1';
-        if (animate === false){ void slider.offsetWidth; slider.style.transition = ''; }
-      }
-
-      var sliderTimer = null;
-      function scheduleMove(animate, delay){
-        if (sliderTimer) clearTimeout(sliderTimer);
-        sliderTimer = setTimeout(function(){
-          moveSlider(animate);
-          sliderTimer = null;
-        }, delay == null ? 500 : delay);
-      }
-
-      window.__moveNavSlider = moveSlider;
-
-      var navEl = document.getElementById('bottomNav');
-      if (navEl){
-        new MutationObserver(function(){
-          scheduleMove(true, 500);
-        }).observe(navEl, {attributes:true, attributeFilter:['class'], subtree:true});
-      }
-
-      new MutationObserver(function(){
-        scheduleMove(false, 100);
-        scheduleMove(true, 400);
-      }).observe(document.documentElement, {attributes:true, attributeFilter:['data-nav-position']});
-
-      window.addEventListener('resize', function(){ moveSlider(false); });
-      window.addEventListener('orientationchange', function(){
-        setTimeout(function(){ moveSlider(false); }, 300);
-      });
-
-      setTimeout(function(){ moveSlider(false); }, 700);
-      setTimeout(function(){ moveSlider(true); }, 1100);
-    })();
-
-    /* پروفایل داخل هدر پنل */
+    /* ========== پروفایل در پنل هدر ========== */
     function injectPanelHeaderActions(){
       var oldBar = document.getElementById('floatingTopBar');
       if (oldBar) oldBar.remove();
@@ -1696,9 +1576,9 @@
       var pin = actions.querySelector('#panelHeaderPinBtn');
       if (pin) pin.remove();
     }
-    setTimeout(injectPanelHeaderActions, 400);
-    setTimeout(injectPanelHeaderActions, 1200);
-    setTimeout(injectPanelHeaderActions, 2000);
+    setTimeout(injectPanelHeaderActions, 500);
+    setTimeout(injectPanelHeaderActions, 1500);
+    setTimeout(injectPanelHeaderActions, 2500);
 
     function updateFloatingProfile(){
       var av = document.getElementById('panelHeaderAvatar'); if (!av) return;
@@ -1708,35 +1588,9 @@
       else av.textContent = p.name ? p.name.substring(0,1) : '👤';
     }
 
-    /* morph دکمه توقف */
-    setTimeout(function(){
-      var sendIcon = document.getElementById('sendIcon');
-      var sendBtn = document.getElementById('sendBtn');
-      if (!sendIcon || !sendBtn || !sendIcon.animate) return;
-      new MutationObserver(function(){
-        try {
-          sendIcon.animate([
-            {transform: 'scale(0.4) rotate(-180deg)', opacity: 0.2},
-            {transform: 'scale(1.15) rotate(20deg)', opacity: 1},
-            {transform: 'scale(1) rotate(0deg)', opacity: 1}
-          ], {duration: 340, easing: 'cubic-bezier(.34,1.4,.64,1)'});
-        } catch(e){}
-      }).observe(sendIcon, {childList: true, subtree: true});
-    }, 1500);
-
-    /* پاک کردن حالت اولیه اشتباه */
-    setTimeout(function(){
-      try{
-        var activeView = document.querySelector('.view.active');
-        var activeId = activeView ? activeView.id.replace('view-','') : '';
-        if (activeId === 'chat'){
-          if (typeof window.renderPanelForChat === 'function') window.renderPanelForChat();
-        }
-      }catch(e){}
-    }, 1600);
-
-    var origOpenSettings = window.openSettings;
-    if (typeof origOpenSettings === 'function'){
+    /* ========== تنظیمات: مشخصات من ========== */
+    if (typeof window.openSettings === 'function'){
+      var origOpenSettings = window.openSettings;
       window.openSettings = function(){
         try { origOpenSettings.apply(this, arguments); } catch(e){}
         setTimeout(injectProfileTab, 250);
@@ -1784,10 +1638,9 @@
           var p2 = getProfile();
           p2.name = (document.getElementById('profileName')||{}).value || '';
           p2.bio = (document.getElementById('profileBio')||{}).value || '';
-          saveProfile(p2);
+          try{ localStorage.setItem(PROFILE_KEY, JSON.stringify(p2)); }catch(e){}
           if (window.toast) window.toast('مشخصات ذخیره شد ✓','success');
           if (typeof window.renderPanelForPlanner === 'function') window.renderPanelForPlanner();
-          updateHeaderAvatar();
           updateFloatingProfile();
         };
       }
@@ -1800,10 +1653,9 @@
           r.onload = function(ev){
             var p3 = getProfile();
             p3.avatar = ev.target.result;
-            saveProfile(p3);
+            try{ localStorage.setItem(PROFILE_KEY, JSON.stringify(p3)); }catch(e){}
             if (window.toast) window.toast('عکس ذخیره شد ✓','success');
             renderProfilePane();
-            updateHeaderAvatar();
             updateFloatingProfile();
           };
           r.readAsDataURL(f);
@@ -1814,20 +1666,12 @@
         cl.onclick = function(){
           var p4 = getProfile();
           delete p4.avatar;
-          saveProfile(p4);
+          try{ localStorage.setItem(PROFILE_KEY, JSON.stringify(p4)); }catch(e){}
           if (window.toast) window.toast('عکس حذف شد','info');
           renderProfilePane();
-          updateHeaderAvatar();
           updateFloatingProfile();
         };
       }
-    }
-    function updateHeaderAvatar(){
-      var av = document.getElementById('headerUserAvatar'); if (!av) return;
-      var p = getProfile();
-      av.title = p.name ? p.name : 'مشخصات من';
-      if (p.avatar) av.innerHTML = '<img src="' + p.avatar + '" alt="">';
-      else av.textContent = p.name ? p.name.substring(0,1) : '👤';
     }
     function renderAboutPane(){
       var aboutContent = document.querySelector('.settings-content[data-cat="about"]'); if (!aboutContent) return;
@@ -1855,39 +1699,13 @@
         '<div class="siraj-version-badge">✨ نسخه: <span>v2.0</span></div>';
     }
 
+    /* ========== retry + رنگ ساعت ========== */
     setTimeout(function(){
       window.retryMsg = function(e, btn){
         e.stopPropagation();
         var w = btn.closest('.msg-wrap');
         var t = w.querySelector('.msg').textContent;
         w.classList.remove('selected');
-        var all = Array.from(document.querySelectorAll('#box .msg-wrap'));
-        var myIdx = all.indexOf(w);
-        if (myIdx >= 0){
-          for (var i = all.length - 1; i > myIdx; i--){ if (all[i].classList.contains('bot')) all[i].remove(); }
-        }
-        if (window.currentChatId){
-          var h = window.loadHistory();
-          if (h[window.currentChatId]){
-            for (var j = h[window.currentChatId].messages.length - 1; j >= 0; j--){
-              if (h[window.currentChatId].messages[j].role === 'assistant') h[window.currentChatId].messages.splice(j, 1);
-              else break;
-            }
-          }
-          window.saveHistory(h);
-        }
-        w.remove();
-        if (window.currentChatId){
-          var h2 = window.loadHistory();
-          if (h2[window.currentChatId]){
-            for (var k = h2[window.currentChatId].messages.length - 1; k >= 0; k--){
-              if (h2[window.currentChatId].messages[k].role === 'user' && h2[window.currentChatId].messages[k].content === t){
-                h2[window.currentChatId].messages.splice(k, 1); break;
-              }
-            }
-          }
-          window.saveHistory(h2);
-        }
         if (typeof window.renderHistory === 'function') window.renderHistory();
         document.getElementById('q').value = t;
         if (typeof window.handleInput === 'function') window.handleInput();
@@ -1913,17 +1731,6 @@
       setTimeout(colorizeHours, 500);
     }, 200);
 
-    /* MutationObserver برای Blog — جایگزین امن */
-    new MutationObserver(function(){
-      var v = document.getElementById('view-blog');
-      if (v && v.classList.contains('active')){
-        fillBlogIfEmpty();
-      }
-    }).observe(document.body, {childList: true, subtree: true, attributes: true, attributeFilter: ['class']});
-
-    setTimeout(fillBlogIfEmpty, 2000);
-    setTimeout(fillBlogIfEmpty, 3000);
-
-    console.log('[Siraj v2.0] planner loaded ✓ (v10 Final)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v11)');
   }
 })();
