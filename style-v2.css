@@ -2302,3 +2302,53 @@ body.modal-open .floating-top-bar{opacity: 0; pointer-events: none}
   opacity: .42 !important;
 }
 .site-credit{font-size: 10px !important; opacity: .55 !important}
+/* ============ v8.0 — برگرداندن چیدمان اصلی ============ */
+
+/* 1) input-wrapper — برگشت به حالت پایین مرکز */
+.chat-view-inner{
+  padding-bottom: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+.input-wrapper{
+  margin-bottom: 12px !important;
+  margin-top: auto !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  padding: 0 20px !important;
+  box-sizing: border-box !important;
+}
+.input-bar-shell{
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* 2) side-panel — هیچ‌وقت مخفی نشه */
+.side-panel{
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.side-panel.minimized{
+  /* فقط باریک بشه، ولی کاملاً نره */
+  min-width: 60px !important;
+}
+
+/* 3) main-chat — بدون padding اضافی */
+.main-chat{
+  padding-bottom: 0 !important;
+}
+
+/* 4) views — بدون padding اضافی که input رو جابجا کنه */
+.view{
+  padding-bottom: 0 !important;
+}
+
+/* 5) top-row — هم‌تراز */
+.top-row{
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+}
