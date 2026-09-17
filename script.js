@@ -1162,12 +1162,20 @@ function setSendButton(){
 }
 function toggleThink(){
     settings.thinking=!settings.thinking;
+    if(settings.thinking&&settings.quick){
+        settings.quick=false;
+        document.getElementById('quickBtn').classList.remove('active');
+    }
     saveSettings();
     document.getElementById('thinkBtn').classList.toggle('active',settings.thinking);
     toast(settings.thinking?'🧠 حالت تفکر عمیق فعال شد':'حالت تفکر عمیق خاموش شد','info');
 }
 function toggleQuick(){
     settings.quick=!settings.quick;
+    if(settings.quick&&settings.thinking){
+        settings.thinking=false;
+        document.getElementById('thinkBtn').classList.remove('active');
+    }
     saveSettings();
     document.getElementById('quickBtn').classList.toggle('active',settings.quick);
     toast(settings.quick?'⚡ حالت پاسخ سریع فعال شد':'حالت پاسخ سریع خاموش شد','info');
