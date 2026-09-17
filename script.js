@@ -28,18 +28,13 @@ const APP_CONFIG={
         {id:'flower',name:'گل'},{id:'star',name:'ستاره'},{id:'tazhib',name:'ترنج'},
         {id:'eslimi',name:'اسلیمی'},{id:'boteh',name:'بته جقه'},{id:'none',name:'بدون طرح'}
     ],
-    inputStyles:[
+       inputStyles:[
         {id:'solid',name:'ساده',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/>'},
-        {id:'glass',name:'شیشه‌ای',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8v8M17 8v8" opacity=".5"/>'},
-        {id:'blur',name:'بلر',icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18" opacity=".4"/>'},
-        {id:'transparent',name:'شفاف',icon:'<rect x="3" y="8" width="18" height="8" rx="4" stroke-dasharray="2 2"/>'},
-        {id:'none',name:'بدون',icon:'<rect x="3" y="8" width="18" height="8" rx="4" opacity=".3"/>'}
+        {id:'glass',name:'شیشه‌ای',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8v8M17 8v8" opacity=".5"/>'}
     ],
-    headerStyles:[
+       headerStyles:[
         {id:'solid',name:'ساده',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/>'},
-        {id:'glass',name:'شیشه‌ای',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 6v12M18 6v12" opacity=".4"/>'},
-        {id:'blur',name:'بلر',icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18" opacity=".3"/>'},
-        {id:'transparent',name:'شفاف',icon:'<rect x="2" y="6" width="20" height="12" rx="3" stroke-dasharray="2 2"/>'}
+        {id:'glass',name:'شیشه‌ای',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 6v12M18 6v12" opacity=".4"/>'}
     ],
     navPositions:[
         {id:'bottom',name:'پایین',icon:'<rect x="3" y="17" width="18" height="4" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="18" height="12" rx="2"/>'},
@@ -47,11 +42,9 @@ const APP_CONFIG={
         {id:'left',name:'چپ',icon:'<rect x="3" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="9" y="3" width="12" height="18" rx="2"/>'},
         {id:'right',name:'راست',icon:'<rect x="17" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="12" height="18" rx="2"/>'}
     ],
-    navStyles:[
-        {id:'default',name:'پیش‌فرض',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/>'},
-        {id:'glass',name:'شیشه‌ای',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8v8M17 8v8" opacity=".5"/>'},
-        {id:'blur',name:'بلر',icon:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" opacity=".4"/>'},
-        {id:'liquid',name:'لیکویید گلس',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/><path d="M3 12 Q9 9 15 12 T27 12" opacity=".7"/>'}
+      navStyles:[
+        {id:'default',name:'ساده',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/>'},
+        {id:'glass',name:'شیشه‌ای',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8v8M17 8v8" opacity=".5"/>'}
     ],
     bgPresets:[
         {id:'none',name:'پیش‌فرض',value:'',valueLight:''},
