@@ -1,0 +1,153 @@
+/* ============================================================
+   style-v2.css — ارتقاء استایل سراج
+   شامل: افکت‌های شیشه‌ای/بلر، نئون ملایم، انیمیشن دکمه‌های نوار
+   ============================================================ */
+
+/* ===== ۱) افکت‌های شیشه‌ای و بلر — واضح‌تر و متمایزتر ===== */
+[data-input-style="glass"] .input-bar{
+  background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.03))!important;
+  backdrop-filter:blur(28px) saturate(200%) brightness(1.15)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(200%) brightness(1.15)!important;
+  border-color:rgba(255,255,255,.18)!important;
+  box-shadow:0 10px 30px -10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)!important;
+}
+[data-input-style="blur"] .input-bar{
+  background:rgba(18,22,32,.55)!important;
+  backdrop-filter:blur(50px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(50px) saturate(180%)!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+[data-input-style="transparent"] .input-bar{
+  background:rgba(255,255,255,.02)!important;
+  border-color:var(--border-strong)!important;
+  box-shadow:none!important;
+}
+[data-input-style="none"] .input-bar{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+
+[data-header-style="glass"] .chat-header{
+  background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.03))!important;
+  backdrop-filter:blur(32px) saturate(220%) brightness(1.15)!important;
+  -webkit-backdrop-filter:blur(32px) saturate(220%) brightness(1.15)!important;
+  border-bottom:1px solid rgba(255,255,255,.1)!important;
+  box-shadow:0 4px 20px -8px rgba(0,0,0,.4);
+}
+[data-header-style="blur"] .chat-header{
+  background:rgba(15,18,26,.6)!important;
+  backdrop-filter:blur(45px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(45px) saturate(180%)!important;
+}
+[data-header-style="transparent"] .chat-header{background:transparent!important}
+
+/* نوار پایین (glass / blur / liquid) */
+[data-nav-style="glass"] .bottom-nav{
+  background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04))!important;
+  backdrop-filter:blur(30px) saturate(220%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(220%)!important;
+  border-color:rgba(255,255,255,.16)!important;
+}
+[data-nav-style="blur"] .bottom-nav{
+  background:rgba(18,22,32,.6)!important;
+  backdrop-filter:blur(60px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(60px) saturate(200%)!important;
+}
+[data-nav-style="liquid"] .bottom-nav{
+  background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.05) 40%,rgba(255,255,255,.15))!important;
+  backdrop-filter:blur(36px) saturate(250%) contrast(1.15)!important;
+  -webkit-backdrop-filter:blur(36px) saturate(250%) contrast(1.15)!important;
+  border-color:rgba(255,255,255,.32)!important;
+}
+
+/* ===== ۲) نئون نوار منو — ملایم‌تر و فقط روی hover/active ===== */
+.bottom-nav::before,
+.bottom-nav::after{
+  opacity:.12!important;
+  transition:opacity .35s var(--ease-smooth)!important;
+}
+.bottom-nav:hover::before,
+.bottom-nav:hover::after{
+  opacity:.55!important;
+}
+.bottom-nav:has(.bottom-nav-btn.active:not(.nav-btn-chat))::before,
+.bottom-nav:has(.bottom-nav-btn.active:not(.nav-btn-chat))::after{
+  opacity:.7!important;
+}
+
+/* نوار پیام نئون — کمی ملایم‌تر ولی هنوز پویا */
+.input-bar-shell::before{opacity:.75!important}
+.input-bar-shell::after{opacity:.55!important}
+
+/* ===== ۳) انیمیشن متن دکمه‌های نوار پایین ===== */
+.bottom-nav-btn{
+  padding:0 12px!important;
+  transition:color .25s,transform .15s,background .25s,padding .35s var(--ease-smooth)!important;
+}
+.bottom-nav-btn[data-label]{
+  display:flex!important;
+  gap:0;
+  min-width:auto;
+}
+.bottom-nav-btn[data-label] .nav-btn-label{
+  max-width:0;
+  opacity:0;
+  overflow:hidden;
+  white-space:nowrap;
+  font-family:var(--font-text);
+  font-size:11.5px;
+  font-weight:700;
+  color:currentColor;
+  transition:max-width .35s var(--ease-smooth),opacity .25s,margin .3s;
+  margin-right:0;
+  pointer-events:none;
+}
+.bottom-nav-btn[data-label].active .nav-btn-label,
+.bottom-nav-btn[data-label]:hover .nav-btn-label{
+  max-width:90px;
+  opacity:1;
+  margin-right:6px;
+}
+.bottom-nav-btn[data-label].active,
+.bottom-nav-btn[data-label]:hover{
+  padding:0 14px!important;
+}
+/* دکمه چت وسط - همچنان گرد و بدون متن */
+.bottom-nav-btn.nav-btn-chat[data-label] .nav-btn-label{display:none!important}
+
+/* ===== ۴) پنل راست - فاصله بهتر + یکدست ===== */
+.panel-content{padding:14px!important}
+.panel-pane{gap:12px!important}
+.panel-card{padding:12px 14px!important;border-radius:16px!important}
+.panel-tabs{margin:10px 12px 20px!important}
+
+/* فلش پنل راست - کمی راست‌تر */
+.panel-toggle{left:16px!important}
+
+/* ===== ۵) دکمه‌های برنامه‌ریز - پس‌زمینه پیش‌فرض ===== */
+.planner-tab{
+  background:rgba(255,255,255,.045)!important;
+  border:1px solid var(--border)!important;
+}
+.planner-tab:hover{background:var(--accent-soft)!important}
+.planner-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent-dark))!important}
+
+/* ===== ۶) کارت‌های آمار برنامه‌ریز ===== */
+.planner-stats-card{
+  margin:14px 20px 0!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.01))!important;
+}
+
+/* ===== ۷) انیمیشن‌های کوچک ===== */
+@keyframes taskIn{
+  from{opacity:0;transform:translateY(-6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.task-item{animation:taskIn .28s var(--ease-smooth) both}
+
+@keyframes statsIn{
+  from{opacity:0;transform:scale(.96)}
+  to{opacity:1;transform:scale(1)}
+}
+.planner-stats-card{animation:statsIn .4s var(--ease-smooth) both}
