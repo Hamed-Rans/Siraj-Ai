@@ -1227,7 +1227,7 @@
       document.getElementById('panelTitleText').textContent = 'برنامه‌ریزی';
       document.getElementById('panelSubText').textContent = p.name ? ('خوش آمدی ' + p.name + ' 👋') : 'خوش آمدی 👋';
       var tab = getTab();
-      var tabs = [
+     var tabs = [
         {id:'daily', label:'روزانه', icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'},
         {id:'weekly', label:'هفتگی', icon:'<path d="M3 21h18"/><path d="M5 21v-6M9 21v-10M13 21v-7M17 21v-13M21 21v-4"/>'},
         {id:'monthly', label:'ماهانه', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/><circle cx="8" cy="19" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/>'},
@@ -1841,39 +1841,79 @@
     }, 900);
 
     /* ============ پروفایل شناور همه‌جا ============ */
-       function injectFloatingProfile(){
-      /* پاک کردن شناور قدیمی اگه مونده */
+           function injectFloatingProfile(){
       var oldBar = document.getElementById('floatingTopBar');
       if (oldBar) oldBar.remove();
 
       var header = document.querySelector('.panel-header');
       if (!header) return;
-      if (header.querySelector('.panel-header-actions')) return;
 
-      var actions = document.createElement('div');
-      actions.className = 'panel-header-actions';
+      var actions = header.querySelector('.panel-header-actions');
+      if (!actions){
+        actions = document.createElement('div');
+        actions.className = 'panel-header-actions';
+        header.appendChild(actions);
+      }
 
-      var lockBtn = document.createElement('button');
-      lockBtn.id = 'panelHeaderLockBtn';
-      lockBtn.className = 'panel-header-icon-btn';
-      lockBtn.title = 'قفل کردن سایت';
-      lockBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
-      lockBtn.onclick = function(){ if (typeof window.lockNow === 'function') window.lockNow(); };
-
-      var av = document.createElement('div');
-      av.id = 'panelHeaderAvatar';
-      av.className = 'panel-header-avatar';
       var p = getProfile();
+
+      /* ۱ — پروفایل (چپ‌ترین) */
+      var av = actions.querySelector('#panelHeaderAvatar');
+      if (!av){
+        av = document.createElement('div');
+        av.id = 'panelHeaderAvatar';
+        av.className = 'panel-header-avatar';
+        actions.appendChild(av);
+        av.onclick = function(){
+          if (typeof window.openSettings === 'function') window.openSettings();
+          setTimeout(function(){
+            var b = document.querySelector('.settings-tab-btn[data-cat="profile"]');
+            if (b) b.click();
+          }, 400);
+        };
+      }
       av.title = p.name ? p.name : 'مشخصات من';
       if (p.avatar) av.innerHTML = '<img src="' + p.avatar + '" alt="">';
       else av.textContent = p.name ? p.name.substring(0,1) : '👤';
-      av.onclick = function(){
-        if (typeof window.openSettings === 'function') window.openSettings();
-        setTimeout(function(){
-          var b = document.querySelector('.settings-tab-btn[data-cat="profile"]');
-          if (b) b.click();
-        }, 400);
-      };
+
+      /* ۲ — قفل (وسط) */
+      var lockBtn = actions.querySelector('#panelHeaderLockBtn');
+      if (!lockBtn){
+        lockBtn = document.createElement('button');
+        lockBtn.id = 'panelHeaderLockBtn';
+        lockBtn.className = 'panel-header-icon-btn';
+        lockBtn.title = 'قفل کردن سایت';
+        lockBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+        lockBtn.onclick = function(){ if (typeof window.lockNow === 'function') window.lockNow(); };
+        actions.appendChild(lockBtn);
+      }
+
+      /* ۳ — پین (راست‌ترین) — فقط وقتی نوار کناره */
+      var pos = document.documentElement.getAttribute('data-nav-position') || 'bottom';
+      var isSide = (pos === 'left' || pos === 'right');
+      var pinBtn = actions.querySelector('#panelHeaderPinBtn');
+      if (isSide){
+        if (!pinBtn){
+          pinBtn = document.createElement('button');
+          pinBtn.id = 'panelHeaderPinBtn';
+          pinBtn.className = 'panel-header-icon-btn';
+          pinBtn.title = 'پین کردن نوار';
+          pinBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>';
+          pinBtn.onclick = function(){ if (typeof window.toggleNavCollapse === 'function') window.toggleNavCollapse(); };
+          actions.appendChild(pinBtn);
+        }
+      } else {
+        if (pinBtn) pinBtn.remove();
+      }
+    }
+    setTimeout(injectFloatingProfile, 400);
+    setTimeout(injectFloatingProfile, 1200);
+    setTimeout(injectFloatingProfile, 2000);
+
+    /* هر بار موقعیت نوار عوض شد، پنل هدر رو دوباره بساز */
+    new MutationObserver(function(){
+      setTimeout(injectFloatingProfile, 100);
+    }).observe(document.documentElement, {attributes:true, attributeFilter:['data-nav-position']});
 
       actions.appendChild(lockBtn);
       actions.appendChild(av);
@@ -1883,7 +1923,7 @@
     setTimeout(injectFloatingProfile, 1200);
     setTimeout(injectFloatingProfile, 2000);
 
-    function updateFloatingProfile(){
+     function updateFloatingProfile(){
       var av = document.getElementById('panelHeaderAvatar');
       if (!av) return;
       var p = getProfile();
@@ -2182,8 +2222,7 @@
       var origSwitch = window.switchView;
       window.switchView = function(v){
         origSwitch.apply(this, arguments);
-        setTimeout(function(){ moveSlider(true); }, 30);
-        setTimeout(function(){ moveSlider(true); }, 160);
+        moveSlider(true);
       };
 
       // Override toggleNavCollapse
@@ -2206,8 +2245,9 @@
         };
       }
 
-      // MutationObserver روی تغییرات کلاس دکمه‌ها
+      // MutationObserver روی تغییرات کلاس دکمه‌ها — با debounce
       var navEl = document.getElementById('bottomNav');
+      var sliderTimer = null;
       if (navEl){
         new MutationObserver(function(muts){
           var should = false;
@@ -2218,7 +2258,10 @@
               should = true; break;
             }
           }
-          if (should) setTimeout(function(){ moveSlider(true); }, 20);
+          if (should){
+            if (sliderTimer) clearTimeout(sliderTimer);
+            sliderTimer = setTimeout(function(){ moveSlider(true); }, 40);
+          }
         }).observe(navEl, {attributes:true, attributeFilter:['class'], subtree:true});
       }
 
