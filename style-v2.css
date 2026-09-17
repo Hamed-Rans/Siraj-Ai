@@ -1676,3 +1676,144 @@ body.modal-open .floating-top-bar{opacity: 0; pointer-events: none}
   justify-content: center !important;
   overflow: hidden !important;
 }
+/* ============ v6.0 — رفع باگ‌های نهایی ============ */
+
+/* 1) رفع سایه دکمه + اهداف (سایه بیرون نمی‌زنه) */
+.monthly-side .month-goals,
+.monthly-side .month-goals.compact{
+  overflow: visible !important;
+  padding: 14px 14px 18px !important;
+}
+.monthly-side .month-goal-add,
+.monthly-side .month-goal-add.compact{
+  overflow: visible !important;
+  padding: 0 !important;
+}
+.month-goal-add button{
+  box-shadow: 0 4px 12px -4px var(--accent) !important;
+}
+
+/* 2) اسلایدر نرم بدون overshoot و بدون بونس */
+.nav-slider{
+  transition: left .42s cubic-bezier(.22,1,.36,1),
+             top .42s cubic-bezier(.22,1,.36,1),
+             width .38s cubic-bezier(.22,1,.36,1),
+             height .38s cubic-bezier(.22,1,.36,1),
+             border-radius .35s cubic-bezier(.22,1,.36,1),
+             opacity .25s ease !important;
+}
+
+/* 3) نوار چپ/راست — نزدیک‌تر به لبه */
+[data-nav-position="right"] .nav-row{padding-right: 0 !important}
+[data-nav-position="left"] .nav-row{padding-left: 0 !important}
+
+/* 4) انیمیشن یکنواخت در همه حالت‌ها (چپ/راست/بالا/پایین) */
+.app-container,
+.top-row,
+.nav-row,
+.main-chat,
+.side-panel{
+  transition: padding .45s cubic-bezier(.22,1,.36,1),
+             margin .45s cubic-bezier(.22,1,.36,1),
+             width .45s cubic-bezier(.22,1,.36,1),
+             grid-template-columns .45s cubic-bezier(.22,1,.36,1),
+             gap .45s cubic-bezier(.22,1,.36,1),
+             transform .45s cubic-bezier(.22,1,.36,1) !important;
+}
+
+/* 5) پین هدر پنل کاملاً حذف */
+#panelHeaderPinBtn{display: none !important}
+
+/* 6) فاصله‌ی Created by از کادرها */
+.chat-view-inner,
+.planner-view,
+.blog-view,
+.videos-view,
+.tools-view{
+  padding-bottom: 48px !important;
+}
+.planner-body,
+.planner-body-content,
+.planner-pane{
+  padding-bottom: 12px !important;
+}
+.input-wrapper{
+  margin-bottom: 20px !important;
+}
+
+/* 7) بازطراحی اسپلش لودر */
+.splash-loader{
+  background: linear-gradient(160deg, #0B0E14 0%, #0a0f1c 60%, #0B0E14 100%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 20px !important;
+  font-family: 'Vazirmatn', system-ui, sans-serif !important;
+}
+.splash-loader *{
+  font-family: 'Vazirmatn', system-ui, sans-serif !important;
+  letter-spacing: 0 !important;
+}
+.splash-logo{
+  width: 96px !important;
+  height: 96px !important;
+  animation: splashFloat 3s ease-in-out infinite !important;
+  filter: drop-shadow(0 0 30px rgba(59,130,246,.4)) !important;
+}
+.splash-logo img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+@keyframes splashFloat{
+  0%,100%{transform:translateY(0) scale(1); filter:drop-shadow(0 0 30px rgba(59,130,246,.4))}
+  50%{transform:translateY(-8px) scale(1.03); filter:drop-shadow(0 0 45px rgba(59,130,246,.55))}
+}
+.splash-title{
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  color: #fff !important;
+  letter-spacing: -0.5px !important;
+  background: linear-gradient(135deg, #fff 30%, #60A5FA 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: splashPulse 2s ease-in-out infinite;
+}
+@keyframes splashPulse{
+  0%,100%{opacity:.9}
+  50%{opacity:1}
+}
+.splash-sub{
+  font-size: 13px !important;
+  color: rgba(255,255,255,.55) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+.splash-dots{
+  display: flex !important;
+  gap: 8px !important;
+  margin-top: 4px !important;
+}
+.splash-dots span{
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #3B82F6 !important;
+  animation: splashDot 1.4s ease-in-out infinite !important;
+}
+.splash-dots span:nth-child(1){animation-delay: 0s !important}
+.splash-dots span:nth-child(2){animation-delay: .2s !important}
+.splash-dots span:nth-child(3){animation-delay: .4s !important}
+@keyframes splashDot{
+  0%,60%,100%{transform: scale(.5); opacity: .3}
+  30%{transform: scale(1); opacity: 1}
+}
+
+/* 8) لوگوی سایت — خاکستری */
+.site-credit img{
+  filter: grayscale(1) brightness(1.6) !important;
+  opacity: .42 !important;
+}
+.site-credit{font-size: 10px !important; opacity: .55 !important}
