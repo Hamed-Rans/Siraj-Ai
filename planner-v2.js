@@ -781,6 +781,18 @@
       });
     }, 900);
 
+        // نسخه در تنظیمات
+    setTimeout(function(){
+      var privacyContent = document.querySelector('.settings-content[data-cat="about"]');
+      if (privacyContent && !privacyContent.querySelector('.siraj-version-badge')){
+        var badge = document.createElement('div');
+        badge.className = 'siraj-version-badge';
+        badge.style.cssText = 'text-align:center;padding:12px;margin-top:10px;border-radius:12px;background:var(--accent-soft);border:1px solid var(--border);font-size:12px;color:var(--text-muted);font-weight:700';
+        badge.innerHTML = '✨ نسخه‌ی فعلی سراج: <span style="color:var(--accent);font-weight:900">v2.0</span>';
+        privacyContent.appendChild(badge);
+      }
+    }, 2000);
+
     console.log('[Siraj v2.0] planner loaded ✓');
   }
 })();
