@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (Full v8) */
+/* Siraj v2.0 — planner-v2.js (Full v9) */
 (function(){
   'use strict';
 
@@ -51,7 +51,6 @@
       return out;
     }
 
-    /* Reminders */
     function loadReminders(){ try{ return JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}'); }catch(e){ return {}; } }
     function saveReminders(r){ try{ localStorage.setItem(REMINDER_KEY, JSON.stringify(r)); }catch(e){} }
     function getDayReminders(key){ return loadReminders()[key] || []; }
@@ -61,14 +60,13 @@
       saveReminders(r);
     }
 
-    /* ========== IRAN_EVENTS ========== */
     var IRAN_EVENTS = {
       '01-01':'نوروز — آغاز سال نو','01-02':'عید نوروز','01-03':'عید نوروز','01-04':'عید نوروز',
       '01-06':'روز امید و شادی','01-12':'روز جمهوری اسلامی','01-13':'سیزده‌بدر',
       '01-19':'شهادت حضرت علی (ع)','01-21':'شهادت امام علی (ع)','01-22':'شب قدر','01-23':'شب قدر',
       '01-25':'روز بزرگداشت عطار نیشابوری','02-01':'عید فطر','02-02':'تعطیل عید فطر',
-      '02-02':'روز زمین پاک','02-10':'روز ملی خلیج فارس','02-12':'روز معلم','02-25':'روز بزرگداشت فردوسی',
-      '03-01':'روز بهره‌وری','03-06':'خرداد — سالگرد آزادسازی خرمشهر','03-14':'رحلت امام خمینی',
+      '02-10':'روز ملی خلیج فارس','02-12':'روز معلم','02-25':'روز بزرگداشت فردوسی',
+      '03-01':'روز بهره‌وری','03-06':'سالگرد آزادسازی خرمشهر','03-14':'رحلت امام خمینی',
       '03-15':'قیام ۱۵ خرداد','04-01':'روز اصناف','04-07':'روز قوه قضائیه','04-10':'روز صنعت و معدن',
       '04-14':'روز قلم','04-25':'روز بهزیستی','05-05':'روز کارمند','05-08':'روز بزرگداشت سهروردی',
       '05-14':'روز بزرگداشت خیام','06-05':'روز بزرگداشت رازی','06-27':'روز شعر و ادب فارسی',
@@ -136,7 +134,6 @@
       return days;
     }
 
-    /* ========== Popups ========== */
     function showPopup(emoji, title, text){
       var old = document.getElementById('sirajPopup'); if (old) old.remove();
       var el = document.createElement('div');
@@ -173,7 +170,6 @@
       el.querySelector('#sirajTriple3').onclick = function(){ close(); if (opt3.onClick) opt3.onClick(); };
     }
 
-    /* ========== Select ========== */
     function makeSelect(id, value, options, label){
       var cur = options.find(function(o){return o.value === value;}) || options[0];
       var items = options.map(function(o){
@@ -206,7 +202,6 @@
       document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});
     });
 
-    /* ========== انیمیشن هیرو ========== */
     function smartUpdateHero(tab, direction){
       var c = document.querySelector('.phc-center'); if (!c) return;
       var d = new Date(window.plannerDate || new Date());
@@ -237,7 +232,6 @@
       });
     }
 
-    /* ========== ناوبری ========== */
     function moveDate(dir, unit){
       var d = new Date(window.plannerDate || new Date());
       if (unit === 'day') d.setDate(d.getDate() + dir);
@@ -315,7 +309,6 @@
       }
     }
 
-    /* ========== هیروها ========== */
     function heroDaily(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -393,7 +386,6 @@
       '</div>';
     }
 
-    /* ========== Stats ========== */
     function weekStatsHTML(){
       var pl = window.loadPlannerNew();
       var days = myWeekDays();
@@ -417,7 +409,6 @@
       '</div>';
     }
 
-    /* ========== Streak ========== */
     function getStreakDays(){
       var pl = window.loadPlannerNew();
       var d = new Date(); d.setHours(0,0,0,0);
@@ -440,7 +431,6 @@
       return '<div class="daily-streak"><span class="ds-fire">🔥</span><span class="ds-num">' + toFa(s) + '</span><span class="ds-text">روز پشت‌سرهم فعالی — ' + msg + '</span></div>';
     }
 
-    /* ========== مقاله روزانه ========== */
     var DAILY_ARTICLES = [
       {type:'بیت', text:'وَمَا نَيْلُ الْمَطَالِبِ بِالتَّمَنِّي ۞ وَلَكِنْ تُؤْخَذُ الدُّنْيَا غِلَابَا', by:'أحمد شوقي'},
       {type:'نکته', text:'«إنَّ» و «أنَّ» هر دو حرف مشبهه بالفعل هستن؛ اسم رو منصوب و خبر رو مرفوع می‌کنن.'},
@@ -460,10 +450,9 @@
       {type:'بیت', text:'دَعِ الْأَيَّامَ تَفْعَلُ مَا تَشَاءُ ۞ وَطِبْ نَفْساً إِذَا حَكَمَ الْقَضَاءُ', by:'الإمام الشافعي'},
       {type:'نکته', text:'«فَعَلَ» ماضی ساده است و «كانَ يَفْعَلُ» ماضی استمراری.'},
       {type:'واژه', text:'«كِتاب» یعنی کتاب. ریشه: ك-ت-ب. جمع: كُتُب.'},
-      {type:'بیت', text:'وَمَا أَنَا مِنْ عَبْدٍ يُلَبِّي مُنَادِياً ۞ إِذَا كَانَ عَنْ حَقٍّ يُخَافُ ويُنْذَرُ', by:'الشاعر'},
+      {type:'بیت', text:'أَلَا إِنَّمَا الدُّنْيَا كَظِلٍّ زَائِلٍ ۞ فَخُذْ مَا تَرَاهُ صَالِحاً وَتَزَوَّدِ', by:'الشاعر'},
       {type:'نکته', text:'تمییز در عربی معمولاً منصوب میاد.'},
       {type:'واژه', text:'«شَمْس» یعنی خورشید. ریشه: ش-م-س. جمع: شُموس.'},
-      {type:'بیت', text:'أَلَا إِنَّمَا الدُّنْيَا كَظِلٍّ زَائِلٍ ۞ فَخُذْ مَا تَرَاهُ صَالِحاً وَتَزَوَّدِ', by:'الشاعر'},
       {type:'نکته', text:'«مِن» و «إلى» و «عَن» و «عَلَى» و «في» از حروف جر هستن.'},
       {type:'واژه', text:'«قَمَر» یعنی ماه. ریشه: ق-م-ر. جمع: أقمار.'},
       {type:'نکته', text:'اسم اشاره: «هذا» مفرد مذکر، «هذه» مفرد مؤنث، «هؤلاء» جمع.'},
@@ -482,7 +471,6 @@
       return '<div class="daily-article"><div class="da-head"><span class="da-badge">📖 ' + esc(a.type) + ' امروز</span></div><div class="da-text">' + esc(a.text) + '</div>' + (a.by ? '<div class="da-by">— ' + esc(a.by) + '</div>' : '') + '</div>';
     }
 
-    /* ========== Confetti ========== */
     function showConfetti(){
       var old = document.getElementById('sirajConfetti'); if (old) old.remove();
       var el = document.createElement('div');
@@ -510,7 +498,6 @@
       }
     }
 
-    /* ========== روزانه ========== */
     function dailyContentHTML(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -642,7 +629,6 @@
       refreshBody('left');
     };
 
-    /* ========== هفتگی ========== */
     function buildWeekCell(day, hk, pl){
       var dd = window.getDayData(pl, day.key);
       var hourTasks = (dd.tasks||[]).filter(function(tk){ return tk.time && tk.time.indexOf(hk+':00') === 0; });
@@ -795,7 +781,6 @@
       window.savePlanner(pl); refreshBody('left');
     };
 
-    /* ========== ماهانه ========== */
     function monthlyContentHTML(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -934,7 +919,6 @@
       window.__calDayClick(parseInt(key.split('-')[2],10));
     };
 
-    /* ========== سالانه ========== */
     function yearlyContentHTML(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -1034,7 +1018,6 @@
       setTimeout(function(){ refreshBody('left'); }, 300);
     };
 
-    /* ========== پنل راست ========== */
     window.renderPanelForPlanner = function(){
       var p = getProfile();
       var titleEl = document.getElementById('panelTitleText');
@@ -1071,7 +1054,6 @@
         '</div>';
     };
 
-    /* ========== Sound ========== */
     var audioCtx = null, audioNodes = null, currentSound = null, masterGain = null;
     function stopAudio(){
       if (audioNodes && audioNodes.nodes){
@@ -1160,7 +1142,6 @@
     }
     function setMasterVolume(v){ if (masterGain) masterGain.gain.value = v; }
 
-    /* ========== Study Chat ========== */
     function loadStudyChat(){ try{ return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY) || '[]'); }catch(e){ return []; } }
     function saveStudyChat(){ try{ sessionStorage.setItem(STUDY_CHAT_KEY, JSON.stringify(studyChatHistory)); }catch(e){} }
     function clearStudyChat(){ studyChatHistory = []; try{ sessionStorage.removeItem(STUDY_CHAT_KEY); }catch(e){} }
@@ -1184,7 +1165,6 @@
       }catch(e){ return {today:'—', current:'—', time:'—', studying:'مطالعه آزاد'}; }
     }
 
-    /* ========== Study Mode ========== */
     var studyTimer = null, studySeconds = 0, studyRunning = false, studyPaused = false, studyTotalMinutes = 0;
 
     function buildStudyOverlay(){
@@ -1469,7 +1449,6 @@
       requestAnimationFrame(function(){ overlay.classList.add('open'); });
     };
 
-    /* ========== Study Chat ========== */
     function renderStudyChat(){
       var box = document.getElementById('studyChatMessages'); if (!box) return;
       var p = getProfile();
@@ -1546,7 +1525,6 @@
       }
     };
 
-    /* ========== Goals ========== */
     window.addMonthGoal = function(monthKey){
       var inp = document.getElementById('newGoalInput'); if (!inp) return;
       var v = inp.value.trim(); if (!v) return;
@@ -1569,14 +1547,12 @@
       refreshBody('left');
     };
 
-    /* ========== Blog ========== */
     window.renderBlog = function(){
       var v = document.getElementById('view-blog'); if (!v) return;
       v.innerHTML = '<div class="page-title-bar"><div class="page-title-text">مقالات سراج</div></div>' +
         '<div class="community-hero"><div class="community-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="community-title">مقالات سراج</div><div class="community-desc">به‌زودی ✍️</div><div class="community-badge">به‌زودی</div></div>';
     };
 
-    /* ========== transitions بین صفحات ========== */
     var VIEW_ORDER = {planner:0, blog:1, chat:2, tools:3, videos:4};
     var origSwitchView = window.switchView;
     window.switchView = function(v){
@@ -1603,7 +1579,6 @@
       setTimeout(function(){ renderPane(getTab()); window.renderPanelForPlanner(); }, 30);
     };
 
-    /* Labels */
     setTimeout(function(){
       var labels = {planner:'برنامه‌ریز',chat:'گفتگو',tools:'دستیار',videos:'انجمن',blog:'مقالات'};
       document.querySelectorAll('.bottom-nav-btn[data-view]').forEach(function(btn){
@@ -1618,7 +1593,7 @@
       });
     }, 900);
 
-    /* ========== پروفایل داخل هدر پنل ========== */
+    /* ========== پروفایل در هدر پنل ========== */
     function injectPanelHeaderActions(){
       var oldBar = document.getElementById('floatingTopBar');
       if (oldBar) oldBar.remove();
@@ -1664,27 +1639,13 @@
         actions.appendChild(lockBtn);
       }
 
-      var pos = document.documentElement.getAttribute('data-nav-position') || 'bottom';
-      var isSide = (pos === 'left' || pos === 'right');
-      var pinBtn = actions.querySelector('#panelHeaderPinBtn');
-      if (isSide){
-        if (!pinBtn){
-          pinBtn = document.createElement('button');
-          pinBtn.id = 'panelHeaderPinBtn';
-          pinBtn.className = 'panel-header-icon-btn';
-          pinBtn.title = 'پین کردن نوار';
-          pinBtn.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>';
-          pinBtn.onclick = function(){ if (typeof window.toggleNavCollapse === 'function') window.toggleNavCollapse(); };
-          actions.appendChild(pinBtn);
-        }
-      } else {
-        if (pinBtn) pinBtn.remove();
-      }
+      /* pin کاملاً حذف شد */
+      var pin = actions.querySelector('#panelHeaderPinBtn');
+      if (pin) pin.remove();
     }
     setTimeout(injectPanelHeaderActions, 400);
     setTimeout(injectPanelHeaderActions, 1200);
     setTimeout(injectPanelHeaderActions, 2000);
-    new MutationObserver(function(){ setTimeout(injectPanelHeaderActions, 100); }).observe(document.documentElement, {attributes:true, attributeFilter:['data-nav-position']});
 
     function updateFloatingProfile(){
       var av = document.getElementById('panelHeaderAvatar'); if (!av) return;
@@ -1694,7 +1655,7 @@
       else av.textContent = p.name ? p.name.substring(0,1) : '👤';
     }
 
-    /* ========== دکمه توقف morph ========== */
+    /* دکمه توقف morph */
     setTimeout(function(){
       var sendIcon = document.getElementById('sendIcon');
       var sendBtn = document.getElementById('sendBtn');
@@ -1708,7 +1669,7 @@
       }).observe(sendIcon, {childList: true, subtree: true});
     }, 1500);
 
-    /* ========== اسلایدر نوار پایین ========== */
+    /* اسلایدر نوار پایین */
     (function(){
       function ensureSlider(){
         var nav = document.getElementById('bottomNav'); if (!nav) return null;
@@ -1808,7 +1769,26 @@
       setTimeout(function(){ moveSlider(true); }, 1700);
     })();
 
-    /* ========== Settings: profile + about ========== */
+    /* ========== Fix initial view ========== */
+    setTimeout(function(){
+      /* اگه روی chat هستیم ولی پنل برنامه‌ریز نشون می‌ده، همراستا کن */
+      var activeView = document.querySelector('.view.active');
+      var activeId = activeView ? activeView.id.replace('view-','') : '';
+      var activePanel = document.querySelector('.panel-planner-tab.active');
+      if (activeId === 'chat' && activePanel){
+        /* chat باید پنل chat داشته باشه */
+        if (typeof window.renderPanelForChat === 'function') window.renderPanelForChat();
+      } else if (activeId === 'planner'){
+        if (typeof window.renderPanelForPlanner === 'function') window.renderPanelForPlanner();
+      } else if (activeId === 'blog'){
+        if (typeof window.renderPanelForBlog === 'function') window.renderPanelForBlog();
+      } else if (activeId === 'videos'){
+        if (typeof window.renderPanelForVideos === 'function') window.renderPanelForVideos();
+      } else if (activeId === 'tools'){
+        if (typeof window.renderPanelForTools === 'function') window.renderPanelForTools();
+      }
+    }, 1500);
+
     var origOpenSettings = window.openSettings;
     window.openSettings = function(){
       origOpenSettings.apply(this, arguments);
@@ -1927,7 +1907,6 @@
         '<div class="siraj-version-badge">✨ نسخه: <span>v2.0</span></div>';
     }
 
-    /* Retry */
     setTimeout(function(){
       window.retryMsg = function(e, btn){
         e.stopPropagation();
@@ -1968,7 +1947,6 @@
       };
     }, 1300);
 
-    /* رنگ ساعت */
     setTimeout(function(){
       function colorizeHours(){
         var list = document.querySelector('.hours-list'); if (!list) return;
@@ -1987,6 +1965,6 @@
       setTimeout(colorizeHours, 500);
     }, 200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v8 clean)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v9)');
   }
 })();
