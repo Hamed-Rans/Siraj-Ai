@@ -1267,3 +1267,315 @@
 .contact-row-v2 .ci-telegram{background:linear-gradient(135deg,#0088CC,#229ED9)}
 .contact-row-v2 .ci-instagram{background:linear-gradient(135deg,#833AB4,#E1306C,#F77737)}
 .contact-row-v2 .ci-x{background:linear-gradient(135deg,#000,#333)}
+/* ============ v2.2 اصلاحات ============ */
+
+/* جدول هفتگی — دکمه‌ها سمت چپ، متن راست */
+.week-cell-task{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:6px;
+  padding:8px 10px!important;
+  border-radius:10px!important;
+  background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.05))!important;
+  border:1px solid rgba(59,130,246,.2);
+  font-size:11px!important;
+  direction:rtl!important;
+  min-height:42px;
+  margin:3px;
+  transition:all .25s cubic-bezier(.22,1,.36,1);
+}
+.week-cell-task:hover{
+  border-color:var(--accent);
+  box-shadow:0 4px 12px -6px var(--accent);
+}
+.week-cell-task .wt-title{
+  flex:1!important;
+  text-align:right!important;
+  font-size:11.5px!important;
+  font-weight:700!important;
+  color:var(--text-main)!important;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  padding:0 4px;
+  line-height:1.4;
+  order:1;
+}
+.week-cell-task .wt-actions{
+  display:flex!important;
+  gap:3px!important;
+  flex-shrink:0!important;
+  order:2;
+  align-items:center;
+}
+.week-cell-task .wt-btn{
+  width:22px!important;
+  height:22px!important;
+  border-radius:50%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0!important;
+  background:rgba(255,255,255,.05);
+  border:none;
+  cursor:pointer;
+  transition:all .22s cubic-bezier(.34,1.4,.64,1);
+}
+.week-cell-task .wt-btn:hover{transform:scale(1.2)}
+.week-cell-task .wt-btn.tick{color:#10B981}
+.week-cell-task .wt-btn.tick:hover{background:rgba(16,185,129,.25)}
+.week-cell-task .wt-btn.tick.on{background:#10B981;color:#fff}
+.week-cell-task .wt-btn.cross{color:#EF4444}
+.week-cell-task .wt-btn.cross:hover{background:rgba(239,68,68,.25)}
+.week-cell-task .wt-btn.edit{color:#F59E0B}
+.week-cell-task .wt-btn.edit:hover{background:rgba(245,158,11,.25)}
+.week-cell-task .wt-btn.del{color:#94A3B8}
+.week-cell-task .wt-btn.del:hover{background:rgba(148,163,184,.2);color:#64748B}
+.week-cell-task .wt-btn svg{width:11px!important;height:11px!important;stroke:currentColor;fill:none;stroke-width:2.6}
+
+/* انیمیشن اسمارت — فقط متن تغییرکرده */
+.heroRoll{
+  display:inline-block;
+  animation:heroRollAnim .5s cubic-bezier(.22,1,.36,1);
+  will-change:transform,opacity;
+}
+@keyframes heroRollAnim{
+  0%{opacity:0;transform:translateY(-14px) scale(.94);filter:blur(4px)}
+  60%{opacity:.85;transform:translateY(3px) scale(1.01);filter:blur(0)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+
+/* انیمیشن لود پنل (فقط بار اول که تب عوض میشه) */
+.planner-hero-card{animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both}
+.task-add-form{animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;animation-delay:.05s}
+.tasks-list-title{animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;animation-delay:.1s}
+.tasks-list,.tasks-empty{animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;animation-delay:.14s}
+.week-grid-wrap,.month-goals,.month-calendar,.year-overview{animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;animation-delay:.1s}
+@keyframes paneLoad{
+  0%{opacity:0;transform:translateY(24px) scale(.98)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* تایمر بدون چشمک */
+.study-colon{animation:none!important;opacity:.5!important}
+.study-digit.roll{animation:digitRoll .4s cubic-bezier(.34,1.3,.64,1)!important}
+@keyframes digitRoll{
+  0%{transform:translateY(0);opacity:1}
+  45%{transform:translateY(-80%);opacity:0}
+  55%{transform:translateY(80%);opacity:0}
+  100%{transform:translateY(0);opacity:1}
+}
+
+/* گوشه‌های گردتر هیرو */
+.planner-hero-card{border-radius:24px!important;padding:20px 22px!important}
+
+/* پنل اهداف بازطراحی کامل */
+.month-goals{
+  padding:18px 20px!important;
+  border-radius:20px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02))!important;
+  border:1px solid var(--border)!important;
+  margin:14px 20px 0!important;
+  position:relative;
+  overflow:hidden;
+}
+.month-goals::before{
+  content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;
+  border-radius:50%;background:radial-gradient(circle,var(--accent-soft),transparent 70%);
+  pointer-events:none;
+}
+.month-goals-title{
+  font-size:13px!important;font-weight:800!important;
+  color:var(--accent)!important;
+  display:flex!important;align-items:center!important;gap:8px!important;
+  margin-bottom:14px!important;padding-bottom:10px!important;
+  border-bottom:1px dashed var(--border)!important;
+  position:relative;z-index:1;
+}
+.month-goals-title svg{width:16px!important;height:16px!important;stroke:currentColor;fill:none;stroke-width:2}
+.mg-counter{
+  margin-right:auto!important;font-size:11px!important;
+  padding:3px 10px!important;border-radius:8px!important;
+  background:var(--accent-soft)!important;color:var(--accent)!important;
+  font-weight:800!important;letter-spacing:0!important;
+}
+.month-goals-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;position:relative;z-index:1}
+.month-goal{
+  display:flex!important;align-items:center!important;gap:12px!important;
+  padding:12px 14px!important;border-radius:14px!important;
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid var(--border)!important;
+  transition:all .25s cubic-bezier(.22,1,.36,1)!important;
+  position:relative;
+}
+.month-goal:hover{
+  border-color:var(--accent)!important;
+  background:var(--accent-soft)!important;
+  transform:translateX(-3px)!important;
+}
+.month-goal.done{opacity:.55}
+.month-goal.done .mg-text{text-decoration:line-through;color:var(--text-muted)}
+.mg-check-wrap{position:relative;width:22px;height:22px;min-width:22px;cursor:pointer;flex-shrink:0}
+.mg-check-wrap input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.mg-check{
+  position:absolute;inset:0;border-radius:50%;
+  border:2px solid var(--border);
+  transition:all .25s cubic-bezier(.34,1.4,.64,1);
+  display:flex;align-items:center;justify-content:center;
+}
+.mg-check::after{
+  content:'';width:8px;height:8px;border-radius:50%;
+  background:var(--accent);transform:scale(0);
+  transition:transform .25s cubic-bezier(.34,1.4,.64,1);
+}
+.mg-check-wrap:hover .mg-check{border-color:var(--accent);transform:scale(1.1)}
+.mg-check-wrap input:checked ~ .mg-check{border-color:var(--accent);background:var(--accent)}
+.mg-check-wrap input:checked ~ .mg-check::after{background:#fff;transform:scale(1)}
+.mg-text{flex:1!important;font-size:12.5px!important;font-weight:600!important;min-width:0;word-break:break-word;line-height:1.6}
+.mg-del{
+  width:28px!important;height:28px!important;border-radius:9px!important;
+  border:none;background:transparent;color:var(--text-muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;
+  transition:all .22s cubic-bezier(.34,1.4,.64,1)!important;opacity:0;
+}
+.month-goal:hover .mg-del{opacity:.7}
+.month-goal:hover .mg-del:hover{opacity:1;background:rgba(239,68,68,.15);color:#EF4444;transform:scale(1.08)}
+.mg-del svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
+.mg-empty{text-align:center;padding:24px 10px;position:relative;z-index:1}
+.mg-empty-icon{font-size:40px;display:block;margin-bottom:10px;opacity:.4}
+.mg-empty-text{font-size:12px;color:var(--text-muted);font-weight:600}
+.month-goal-add{display:flex!important;gap:8px!important;margin-top:6px;position:relative;z-index:1}
+.month-goal-add input{
+  flex:1;padding:12px 16px!important;border-radius:12px!important;
+  border:1px solid var(--border)!important;background:var(--primary)!important;
+  color:var(--text-main);font-family:var(--font-text);font-size:12.5px!important;outline:none;
+  transition:border-color .2s!important;
+}
+.month-goal-add input:focus{border-color:var(--accent)!important}
+.month-goal-add button{
+  padding:12px 20px!important;border-radius:12px!important;border:none!important;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  color:#fff!important;font-weight:800!important;font-family:var(--font-text);
+  font-size:12px!important;cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:transform .22s cubic-bezier(.34,1.4,.64,1)!important;
+  box-shadow:0 6px 18px -6px var(--accent);
+}
+.month-goal-add button:hover{transform:translateY(-2px)}
+.month-goal-add button:active{transform:translateY(0)}
+.month-goal-add button svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.4}
+
+/* تقویم بازطراحی کامل */
+.month-calendar{
+  padding:14px!important;
+  margin:14px 20px 20px!important;
+  border-radius:18px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.01))!important;
+  border:1px solid var(--border)!important;
+}
+.cal-weekdays{gap:6px!important;margin-bottom:8px!important}
+.cal-weekday{
+  font-size:10.5px!important;padding:6px 2px!important;
+  color:var(--text-muted)!important;
+  font-weight:800!important;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.cal-weekday:first-child{color:#EF4444!important}
+.cal-weekday:last-child{color:#10B981!important}
+.cal-grid{gap:5px!important}
+.cal-day{
+  min-height:42px!important;
+  padding:4px!important;
+  border-radius:12px!important;
+  aspect-ratio:1!important;
+  background:rgba(255,255,255,.02)!important;
+  border:1px solid transparent!important;
+  cursor:pointer;
+  transition:all .25s cubic-bezier(.22,1,.36,1)!important;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;
+}
+.cal-day:hover{
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+  transform:scale(1.06)!important;
+  z-index:2;
+}
+.cal-day.empty{background:transparent!important;cursor:default;pointer-events:none}
+.cal-day.empty:hover{transform:none}
+.cal-day-num{font-size:12.5px!important;font-weight:700!important;color:var(--text-main)!important;line-height:1}
+.cal-day.today{
+  background:linear-gradient(135deg,var(--accent-soft),rgba(59,130,246,.05))!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 0 0 1px var(--accent),0 4px 12px -6px var(--accent)!important;
+}
+.cal-day.today .cal-day-num{color:var(--accent)!important;font-weight:900!important}
+.cal-day.selected{
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 6px 18px -6px var(--accent)!important;
+  transform:scale(1.06)!important;
+}
+.cal-day.selected .cal-day-num{color:#fff!important}
+.cal-day.friday .cal-day-num{color:#EF4444!important}
+.cal-day.selected.friday .cal-day-num{color:#fff!important}
+.cal-day-dots{gap:2px!important;margin-top:3px!important}
+.cal-day-dot{width:3px!important;height:3px!important;border-radius:50%!important}
+.cal-day.selected .cal-day-dot{background:#fff!important}
+
+/* سالانه — نمای جدید */
+.year-goals{
+  background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(212,175,55,.02))!important;
+  border-color:rgba(212,175,55,.25)!important;
+}
+.year-goals .month-goals-title{color:#D4AF37!important;border-bottom-color:rgba(212,175,55,.3)!important}
+.year-goals .mg-counter{background:rgba(212,175,55,.15)!important;color:#D4AF37!important}
+.year-goals .mg-check-wrap input:checked ~ .mg-check{background:#D4AF37!important;border-color:#D4AF37!important}
+.year-goals .month-goal-add button{background:linear-gradient(135deg,#F4D03F,#B8860B)!important;box-shadow:0 6px 18px -6px #D4AF37!important}
+.year-overview{
+  padding:18px 20px!important;
+  margin:14px 20px 20px!important;
+  border-radius:20px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.01))!important;
+  border:1px solid var(--border)!important;
+}
+.year-overview-title{
+  font-size:13px!important;font-weight:800!important;color:var(--accent)!important;
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed var(--border);
+}
+.year-months-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+}
+@media (max-width:700px){.year-months-grid{grid-template-columns:repeat(2,1fr)}}
+.year-month-card{
+  padding:10px 8px;border-radius:12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  text-align:center;transition:all .25s cubic-bezier(.22,1,.36,1);
+}
+.year-month-card:hover{
+  border-color:var(--accent);background:var(--accent-soft);transform:translateY(-2px);
+}
+.ymc-name{font-size:11px;font-weight:800;color:var(--text-main);margin-bottom:6px}
+.ymc-bar{height:5px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:6px}
+.ymc-fill{height:100%;background:linear-gradient(90deg,var(--accent-light),var(--accent));border-radius:5px;transition:width .6s cubic-bezier(.22,1,.36,1)}
+.ymc-stat{font-size:9.5px;color:var(--text-muted);font-weight:700}
+
+/* لاک اسکرین — انیمیشن قوی‌تر */
+.lock-screen.open .lock-box{
+  animation:lockIn .55s cubic-bezier(.34,1.4,.64,1);
+}
+@keyframes lockIn{
+  0%{opacity:0;transform:scale(.85) translateY(30px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+.lock-icon{
+  animation:lockPulse 3s ease-in-out infinite;
+}
+@keyframes lockPulse{
+  0%,100%{box-shadow:0 0 0 4px var(--panel-bg),0 0 0 5px var(--accent-soft),0 12px 30px -10px var(--accent)}
+  50%{box-shadow:0 0 0 4px var(--panel-bg),0 0 0 5px var(--accent),0 12px 40px -6px var(--accent)}
+}
+.lock-screen.open{animation:fadeInLock .4s ease both}
+@keyframes fadeInLock{from{opacity:0}to{opacity:1}}
