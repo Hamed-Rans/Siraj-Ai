@@ -974,3 +974,256 @@
   animation-fill-mode:forwards;will-change:transform,opacity;
 }
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0);opacity:1}80%{opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+/* ============ v3.0 — بازطراحی نهایی ============ */
+
+/* 1) تب‌های پنل راست — راست‌چین + استایل حالت مطالعه + گردتر */
+.panel-planner-tabs{
+  direction: rtl;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+.panel-planner-tab{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  padding: 16px 20px !important;
+  border-radius: 22px !important;
+  border: 1px solid var(--border) !important;
+  background: rgba(255,255,255,.02) !important;
+  color: var(--text-muted) !important;
+  font-family: var(--font-text);
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  transition: all .3s cubic-bezier(.22,1,.36,1);
+}
+.panel-planner-tab svg{
+  width: 18px !important; height: 18px !important;
+  stroke: currentColor; fill: none; stroke-width: 2;
+  flex-shrink: 0;
+}
+.panel-planner-tab:hover{
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  transform: translateX(-3px);
+}
+.panel-planner-tab.active{
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-dark)) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 10px 30px -10px var(--accent);
+  transform: translateX(-3px);
+}
+.panel-planner-tab.active svg{stroke:#fff !important}
+
+/* 2) مخفی کردن تب‌های پنل چپ + پر کردن فضا */
+.planner-tabs{display:none !important}
+.planner-body{grid-template-columns:1fr !important}
+.planner-pane{grid-column:1 / -1 !important}
+
+/* 3) هم‌ترازی پنل اهداف با تقویم (نه با افسانه) */
+.monthly-layout .monthly-side{
+  padding-top: 48px; /* ارتفاع افسانه + مارجین */
+}
+@media (max-width: 900px){
+  .monthly-layout .monthly-side{padding-top: 0}
+}
+
+/* 4) آیکون‌های افسانه */
+.cal-legend .cl-icon-svg{
+  width: 15px; height: 15px;
+  stroke: currentColor; fill: none; stroke-width: 2;
+  flex-shrink: 0;
+}
+.cal-legend .cl-item.done .cl-icon-svg{color: #10B981}
+.cal-legend .cl-item.partial .cl-icon-svg{color: #F59E0B}
+.cal-legend .cl-item.pending .cl-icon-svg{color: #EF4444}
+.cal-legend .cl-item.occ .cl-icon-svg{color: #C084FC}
+.cal-legend .cl-item.evt .cl-icon-svg{color: #60A5FA}
+.cal-legend .cl-item{gap: 5px}
+
+/* 5) انیمیشن جابجایی صفحات — اسلاید افقی بر اساس ترتیب نوار */
+.view{
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.view.active{
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  position: relative;
+  animation: none !important;
+}
+.view.slide-in-from-left{animation: viewInFromLeft .5s cubic-bezier(.22,1,.36,1) both !important}
+.view.slide-in-from-right{animation: viewInFromRight .5s cubic-bezier(.22,1,.36,1) both !important}
+@keyframes viewInFromLeft{
+  0%{opacity:0;transform:translateX(-90px)}
+  60%{opacity:.7}
+  100%{opacity:1;transform:translateX(0)}
+}
+@keyframes viewInFromRight{
+  0%{opacity:0;transform:translateX(90px)}
+  60%{opacity:.7}
+  100%{opacity:1;transform:translateX(0)}
+}
+
+/* 6) دکمه توقف — morph واضح */
+#sendBtn{
+  transition: background .35s cubic-bezier(.34,1.4,.64,1),
+             box-shadow .35s cubic-bezier(.34,1.4,.64,1),
+             transform .25s cubic-bezier(.34,1.4,.64,1) !important;
+}
+#sendBtn.pause-mode{
+  background: linear-gradient(135deg, #EF4444, #DC2626) !important;
+  box-shadow: 0 4px 20px -4px #EF4444, 0 0 0 2px rgba(239,68,68,.3) !important;
+  animation: pausePulse 1.4s ease-in-out infinite;
+}
+@keyframes pausePulse{
+  0%,100%{box-shadow: 0 4px 20px -4px #EF4444, 0 0 0 2px rgba(239,68,68,.3)}
+  50%{box-shadow: 0 4px 26px -2px #EF4444, 0 0 0 4px rgba(239,68,68,.15)}
+}
+#sendIcon{transition: transform .35s cubic-bezier(.34,1.4,.64,1)}
+
+/* 7) نوار منو در حالت چپ/راست — متن زیر آیکون */
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav{
+  padding: 12px 8px !important;
+  gap: 6px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn[data-label],
+[data-nav-position="right"] .bottom-nav-btn[data-label]{
+  flex-direction: column !important;
+  max-width: 62px !important;
+  width: 62px !important;
+  height: auto !important;
+  min-height: 58px !important;
+  padding: 8px 4px !important;
+  gap: 4px !important;
+  border-radius: 18px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn[data-label] .nav-btn-label,
+[data-nav-position="right"] .bottom-nav-btn[data-label] .nav-btn-label{
+  order: 0 !important;
+  max-width: 100% !important;
+  opacity: 1 !important;
+  margin: 0 !important;
+  transform: none !important;
+  font-size: 10px !important;
+  text-align: center !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+  pointer-events: auto !important;
+}
+[data-nav-position="left"] .bottom-nav-btn[data-label].active,
+[data-nav-position="right"] .bottom-nav-btn[data-label].active{
+  max-width: 62px !important;
+  padding: 8px 4px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat{
+  width: 52px !important; min-width: 52px !important; max-width: 52px !important;
+  height: 52px !important; border-radius: 50% !important;
+}
+
+/* 8) فاصله نوار از پایین در حالت چپ/راست/بالا */
+[data-nav-position="left"] .nav-row,
+[data-nav-position="right"] .nav-row,
+[data-nav-position="top"] .nav-row{
+  padding-bottom: 44px !important;
+}
+
+/* 9) پروفایل شناور در همه‌جا + دکمه قفل کنارش */
+.floating-top-bar{
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 90;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  direction: ltr;
+  pointer-events: auto;
+}
+.floating-top-bar .header-user-avatar{
+  width: 40px; height: 40px; min-width: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-dark));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-family: 'Lalezar','Vazirmatn', sans-serif;
+  font-size: 15px; font-weight: 900;
+  cursor: pointer;
+  border: 2px solid var(--panel-bg);
+  box-shadow: 0 0 0 1.5px var(--accent), 0 4px 14px -6px var(--accent);
+  overflow: hidden;
+  transition: transform .3s var(--ease-spring), box-shadow .3s;
+}
+.floating-top-bar .header-user-avatar:hover{
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px var(--accent), 0 6px 20px -4px var(--accent);
+}
+.floating-top-bar .header-user-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.floating-top-bar .header-icon-btn{
+  width: 40px; height: 40px; min-width: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  transition: all .25s var(--ease-spring);
+}
+.floating-top-bar .header-icon-btn:hover{
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.06);
+}
+.floating-top-bar .header-icon-btn svg{
+  width: 18px; height: 18px;
+  stroke: currentColor; fill: none; stroke-width: 2.2;
+}
+/* مخفی کردن آواتار و قفل هدر چت (چون شناور داریم) */
+.chat-header .header-user-avatar,
+.chat-header #headerLockBtn{
+  display: none !important;
+}
+/* مخفی کردن هنگام open بودن پاپ‌آپ / settings / study */
+body.modal-open .floating-top-bar{opacity: 0; pointer-events: none}
+
+/* 10) لوگوی سایت کریتد بای — خاکستری */
+.site-credit img{
+  filter: grayscale(1) brightness(1.6) !important;
+  opacity: .45 !important;
+}
+
+/* 11) درباره ما — پیام خوش‌آمد */
+.about-welcome{
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 16px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  animation: welcomePulse 3s ease-in-out infinite;
+}
+@keyframes welcomePulse{
+  0%,100%{box-shadow: 0 0 0 0 var(--accent-soft)}
+  50%{box-shadow: 0 0 0 6px transparent}
+}
