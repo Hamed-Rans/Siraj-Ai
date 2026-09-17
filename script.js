@@ -1068,6 +1068,12 @@ function getSystemPrompt(){
     const dm={fusha:'العربية الفصحى',iraqi:'اللهجة العراقية',levantine:'اللهجة الشامية',egyptian:'اللهجة المصرية',maghrebi:'اللهجة المغربية'};
     const dialect=dm[settings.dialect]||'العربية الفصحى';
     let extra='';
+        // پروفایل کاربر
+    try{
+        var prof = JSON.parse(localStorage.getItem('siraj-profile')||'{}');
+        if(prof.name) extra += '\n\n👤 اسم کاربر: ' + prof.name;
+        if(prof.bio) extra += '\n📝 درباره‌ی خودش: ' + prof.bio + '\nمی‌تونی توی جواب‌هات به این اطلاعات اشاره کنی و اسمش رو صدا بزنی.';
+    }catch(e){}
     if(settings.quick)extra+='\n\n⚡ حالت پاسخ سریع: پاسخ‌ها را کوتاه، مختصر و مستقیم بده.';
     if(settings.thinking)extra+='\n\n🧠 حالت تفکر عمیق: با دقت و عمق بیشتر تحلیل کن.';
     return `شما «سراج» هستید — دستیار هوشمند، خوش‌برخورد و صمیمی زبان و ادبیات عربی.
