@@ -1615,7 +1615,7 @@ function renderSettingsControls(){
     const wrap=document.getElementById('settingsContentWrap');
     tabs.innerHTML=`
         <button class="settings-tab-btn${settingsCat==='appearance'?' active':''}" data-cat="appearance" onclick="switchSettingsCat('appearance')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 L14 9 L12 12 L10 9 Z"/></svg>ظاهر</button>
-        <button class="settings-tab-btn${settingsCat==='header'?' active':''}" data-cat="header" onclick="switchSettingsCat('header')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>هدر</button>
+        <button class="settings-tab-btn${settingsCat==='header'?' active':''}" data-cat="header" onclick="switchSettingsCat('header')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>استایل</button>
         <button class="settings-tab-btn${settingsCat==='pattern'?' active':''}" data-cat="pattern" onclick="switchSettingsCat('pattern')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 Q16 9 12 12 Q8 9 12 3Z"/></svg>طرح</button>
         <button class="settings-tab-btn${settingsCat==='font'?' active':''}" data-cat="font" onclick="switchSettingsCat('font')"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>فونت</button>
         <button class="settings-tab-btn${settingsCat==='nav'?' active':''}" data-cat="nav" onclick="switchSettingsCat('nav')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>نوار</button>
