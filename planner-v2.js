@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v13 Final — Debugged) */
+/* Siraj v2.0 — planner-v2.js (v14 Final) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -16,12 +16,21 @@
     var STUDY_CHAT_KEY = 'siraj-study-chat-session';
     var studyChatHistory = [];
 
-    /* ★ عکس پروفایل هاردکد شده — بعداً عکس خودت رو اینجا بذار ★ */
+    /* ★ آواتار هاردکد — بعداً عکس خودت رو اینجا بذار ★ */
     var USER_AVATAR_URL = 'siraj-logo.png';
 
     function toFa(n){
       var fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
       return String(n).replace(/\d/g, function(d){ return fa[+d]; });
+    }
+    /* ★ تبدیل دقیقه به فرمت انسانی ★ */
+    function formatMinutes(mins){
+      mins = Math.max(0, Math.round(mins));
+      if (mins < 60) return toFa(mins) + ' دقیقه';
+      var h = Math.floor(mins/60);
+      var m = mins % 60;
+      if (m === 0) return toFa(h) + ' ساعت';
+      return toFa(h) + ' ساعت و ' + toFa(m) + ' دقیقه';
     }
     function esc(s){
       return String(s||'').replace(/[&<>"']/g,function(c){
@@ -385,10 +394,8 @@
         });
       });
       if (!studiedMin && !doneWithTime && !doneWithout) return '';
-      var h = Math.floor(studiedMin/60), m = studiedMin%60;
-      var timeStr = h>0 ? (toFa(h)+' س و '+toFa(m)+' د') : (toFa(m)+' دقیقه');
       return '<div class="week-stats-bar">' +
-        '<div class="wsb-item"><span>⏱️</span><b>'+timeStr+'</b> مطالعه</div>' +
+        '<div class="wsb-item"><span>⏱️</span><b>'+formatMinutes(studiedMin)+'</b> مطالعه</div>' +
         '<div class="wsb-item"><span>✅</span>'+toFa(doneWithTime)+' با زمان</div>' +
         (doneWithout>0?'<div class="wsb-item warn"><span>⚪</span>'+toFa(doneWithout)+' بدون زمان</div>':'') +
       '</div>';
@@ -506,7 +513,7 @@
         : '<div class="tasks-list tasks-done-list">'+done.map(function(tk){
             var idx = allTasks.indexOf(tk);
             var timeBadge = tk.studiedMinutes
-              ? '<span class="studied-badge">⏱️ '+toFa(tk.studiedMinutes)+' د</span>'
+              ? '<span class="studied-badge">⏱️ '+formatMinutes(tk.studiedMinutes)+'</span>'
               : '<span class="no-time-badge">⚪ بدون زمان</span>';
             return '<div class="task-item done pri-'+(tk.priority||'med')+'">' +
               '<button class="task-check checked" onclick="window.__dToggleTask('+idx+')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>' +
@@ -1051,8 +1058,9 @@
         '</div>';
     };
 
-    /* ========== Sound ========== */
+    /* ========== Sound — بهبودیافته ★ ========== */
     var audioCtx = null, audioNodes = null, currentSound = null, masterGain = null;
+
     function stopAudio(){
       if (audioNodes && audioNodes.nodes){
         audioNodes.nodes.forEach(function(n){ try{ if (n.stop) n.stop(); }catch(e){} try{ n.disconnect(); }catch(e){} });
@@ -1061,82 +1069,198 @@
       if (audioNodes && audioNodes.gain){ try{ audioNodes.gain.disconnect(); }catch(e){} }
       audioNodes = null; currentSound = null;
     }
+
+    /* ★ تولید صدای موج دریا — با LFO روی فیلتر + نویز صورتی ★ */
+    function makeOceanSound(masterGain){
+      var ctx = audioCtx;
+      var nodes = [];
+      var filter = ctx.createBiquadFilter();
+      var gain = ctx.createGain();
+      gain.gain.value = 0.22;
+      filter.connect(gain); gain.connect(masterGain);
+      filter.type = 'lowpass'; filter.frequency.value = 500; filter.Q.value = 0.5;
+
+      /* نویز صورتی */
+      var bs = ctx.sampleRate * 4;
+      var buf = ctx.createBuffer(1, bs, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+      for (var i=0;i<bs;i++){
+        var white = Math.random()*2-1;
+        b0 = 0.99886*b0 + white*0.0555179;
+        b1 = 0.99332*b1 + white*0.0750759;
+        b2 = 0.96900*b2 + white*0.1538520;
+        b3 = 0.86650*b3 + white*0.3104856;
+        b4 = 0.55000*b4 + white*0.5329522;
+        b5 = -0.7616*b5 - white*0.0168980;
+        data[i] = (b0+b1+b2+b3+b4+b5+b6+white*0.5362)*0.11;
+        b6 = white*0.115926;
+      }
+      var src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+      filter.type='lowpass'; filter.frequency.value=600; filter.Q.value=0.7;
+
+      /* موج‌های آروم (LFO) */
+      var lfo1 = ctx.createOscillator(), lfoG1 = ctx.createGain();
+      lfo1.frequency.value = 0.07; lfoG1.gain.value = 250;
+      lfo1.connect(lfoG1); lfoG1.connect(filter.frequency);
+
+      var lfo2 = ctx.createOscillator(), lfoG2 = ctx.createGain();
+      lfo2.frequency.value = 0.05; lfoG2.gain.value = 0.1;
+      lfo2.connect(lfoG2); lfoG2.connect(gain.gain);
+
+      src.connect(filter);
+      lfo1.start(); lfo2.start(); src.start();
+      nodes.push(src, lfo1, lfoG1, lfo2, lfoG2);
+      return {nodes:nodes, gain:gain, filter:filter};
+    }
+
+    /* ★ تولید صدای جنگل — نویز پایه + چهچهه پرنده ★ */
+    function makeForestSound(masterGain){
+      var ctx = audioCtx;
+      var nodes = [];
+      var filter = ctx.createBiquadFilter();
+      var gain = ctx.createGain();
+      gain.gain.value = 0.16;
+      filter.connect(gain); gain.connect(masterGain);
+      filter.type = 'bandpass'; filter.frequency.value = 1200; filter.Q.value = 0.3;
+
+      var bs = ctx.sampleRate * 4;
+      var buf = ctx.createBuffer(1, bs, ctx.sampleRate);
+      var d = buf.getChannelData(0);
+      var last = 0;
+      for (var i=0;i<bs;i++){
+        var w = Math.random()*2-1;
+        d[i] = (last + 0.02*w)/1.02; last = d[i]; d[i] *= 2.2;
+      }
+      var src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+      src.connect(filter); src.start();
+      nodes.push(src);
+
+      /* ★ چهچهه پرنده — واریاسیون طبیعی ★ */
+      function scheduleBird(){
+        if (!audioNodes || currentSound !== 'forest') return;
+        var t = ctx.currentTime + 0.05 + Math.random()*0.2;
+        var noteCount = 2 + Math.floor(Math.random()*4);
+        var baseF = 2000 + Math.random()*1800;
+        for (var n=0;n<noteCount;n++){
+          var osc = ctx.createOscillator(), env = ctx.createGain();
+          osc.type = Math.random() > 0.5 ? 'sine' : 'triangle';
+          var startT = t + n*(0.05 + Math.random()*0.04);
+          var dur = 0.05 + Math.random()*0.08;
+          var fStart = baseF + (Math.random()-0.5)*400;
+          var fEnd = fStart + (Math.random()-0.5)*600;
+          osc.frequency.setValueAtTime(fStart, startT);
+          osc.frequency.exponentialRampToValueAtTime(Math.max(400, fEnd), startT+dur);
+          env.gain.setValueAtTime(0, startT);
+          env.gain.linearRampToValueAtTime(0.05 + Math.random()*0.03, startT+0.01);
+          env.gain.exponentialRampToValueAtTime(0.001, startT+dur);
+          osc.connect(env); env.connect(masterGain);
+          osc.start(startT); osc.stop(startT+dur+0.02);
+        }
+        /* گاهی گروه دوم */
+        if (Math.random() > 0.55){
+          setTimeout(scheduleBird, 400 + Math.random()*600);
+        }
+      }
+      var birdLoop = setInterval(function(){
+        if (!audioNodes || currentSound !== 'forest'){ clearInterval(birdLoop); return; }
+        if (Math.random() > 0.35) scheduleBird();
+      }, 2200);
+      return {nodes:nodes, gain:gain, filter:filter, loop:birdLoop};
+    }
+
+    /* ★ صدای سالن سکوت — همهمه ملایم ★ */
+    function makeHallSound(masterGain){
+      var ctx = audioCtx;
+      var nodes = [];
+      var filter = ctx.createBiquadFilter();
+      var gain = ctx.createGain();
+      gain.gain.value = 0.14;
+      filter.connect(gain); gain.connect(masterGain);
+      filter.type = 'lowpass'; filter.frequency.value = 300;
+
+      var bs = ctx.sampleRate * 3;
+      var buf = ctx.createBuffer(1, bs, ctx.sampleRate);
+      var d = buf.getChannelData(0); var lv = 0;
+      for (var i=0;i<bs;i++){ var w = Math.random()*2-1; d[i]=(lv+0.008*w)/1.008; lv=d[i]; d[i]*=2.2; }
+      var src = ctx.createBufferSource(); src.buffer=buf; src.loop=true;
+
+      var osc = ctx.createOscillator(), oscG = ctx.createGain();
+      osc.type='sine'; osc.frequency.value=90; oscG.gain.value=0.035;
+      osc.connect(oscG); oscG.connect(gain);
+
+      var osc2 = ctx.createOscillator(), oscG2 = ctx.createGain();
+      osc2.type='sine'; osc2.frequency.value=135; oscG2.gain.value=0.02;
+      osc2.connect(oscG2); oscG2.connect(gain);
+
+      src.connect(filter); osc.start(); osc2.start(); src.start();
+      nodes.push(src, osc, osc2, oscG, oscG2);
+      return {nodes:nodes, gain:gain, filter:filter};
+    }
+
+    /* ★ صدای بارش — لایه‌ای با رعد ملایم ★ */
+    function makeRainSound(masterGain){
+      var ctx = audioCtx;
+      var nodes = [];
+      var filter = ctx.createBiquadFilter();
+      var gain = ctx.createGain();
+      gain.gain.value = 0.18;
+      filter.connect(gain); gain.connect(masterGain);
+      filter.type='bandpass'; filter.frequency.value=800; filter.Q.value=0.4;
+
+      var bs = ctx.sampleRate * 2;
+      var buf = ctx.createBuffer(1, bs, ctx.sampleRate);
+      var d = buf.getChannelData(0);
+      for (var i=0;i<bs;i++) d[i] = (Math.random()*2-1)*0.5;
+      var src = ctx.createBufferSource(); src.buffer=buf; src.loop=true;
+
+      /* لایه‌ی دوم — چکه‌ها */
+      var bs2 = ctx.sampleRate * 2;
+      var buf2 = ctx.createBuffer(1, bs2, ctx.sampleRate);
+      var d2 = buf2.getChannelData(0); var last=0;
+      for (var j=0;j<bs2;j++){ var w=Math.random()*2-1; d2[j]=(last + 0.03*w)/1.03; last=d2[j]; d2[j]*=2; }
+      var src2 = ctx.createBufferSource(); src2.buffer=buf2; src2.loop=true;
+      var filter2 = ctx.createBiquadFilter();
+      filter2.type='highpass'; filter2.frequency.value=1200;
+
+      src.connect(filter); src2.connect(filter2); filter2.connect(gain);
+      src.start(); src2.start();
+      nodes.push(src, src2, filter2);
+
+      /* رعد ملایم گاهی */
+      var thunderLoop = setInterval(function(){
+        if (!audioNodes || currentSound !== 'rain'){ clearInterval(thunderLoop); return; }
+        if (Math.random() > 0.7){
+          var t = ctx.currentTime;
+          var tOsc = ctx.createOscillator(), tGain = ctx.createGain();
+          tOsc.type='sine';
+          tOsc.frequency.setValueAtTime(80, t);
+          tOsc.frequency.exponentialRampToValueAtTime(35, t+0.8);
+          tGain.gain.setValueAtTime(0, t);
+          tGain.gain.linearRampToValueAtTime(0.08, t+0.05);
+          tGain.gain.exponentialRampToValueAtTime(0.001, t+0.9);
+          tOsc.connect(tGain); tGain.connect(masterGain);
+          tOsc.start(t); tOsc.stop(t+1);
+        }
+      }, 8000);
+
+      return {nodes:nodes, gain:gain, filter:filter, loop:thunderLoop};
+    }
+
     function makeNoise(type){
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
       if (!masterGain){ masterGain = audioCtx.createGain(); masterGain.gain.value = 0.4; masterGain.connect(audioCtx.destination); }
-      var nodes = [];
-      var filter = audioCtx.createBiquadFilter();
-      var gain = audioCtx.createGain();
-      gain.gain.value = 0.22;
-      filter.connect(gain); gain.connect(masterGain);
-      if (type === 'nature'){
-        var bs = audioCtx.sampleRate * 4;
-        var buf = audioCtx.createBuffer(1, bs, audioCtx.sampleRate);
-        var da = buf.getChannelData(0); var last = 0;
-        for (var i=0;i<bs;i++){ var w = Math.random()*2-1; da[i] = (last + 0.015*w)/1.015; last = da[i]; da[i] *= 3.2; }
-        var src = audioCtx.createBufferSource(); src.buffer = buf; src.loop = true;
-        filter.type='lowpass'; filter.frequency.value=550; filter.Q.value=0.7;
-        var lfo = audioCtx.createOscillator(), lfoG = audioCtx.createGain();
-        lfo.frequency.value = 0.08; lfoG.gain.value = 150;
-        lfo.connect(lfoG); lfoG.connect(filter.frequency);
-        src.connect(filter); lfo.start(); src.start();
-        nodes.push(src, lfo, lfoG);
-      } else if (type === 'forest'){
-        var bsF = audioCtx.sampleRate * 4;
-        var bufF = audioCtx.createBuffer(1, bsF, audioCtx.sampleRate);
-        var dF = bufF.getChannelData(0); var lvF = 0;
-        for (var jf=0;jf<bsF;jf++){ var wF=Math.random()*2-1; dF[jf]=(lvF+0.012*wF)/1.012; lvF=dF[jf]; dF[jf]*=2.8; }
-        var srcF = audioCtx.createBufferSource(); srcF.buffer = bufF; srcF.loop = true;
-        var filtF = audioCtx.createBiquadFilter(); filtF.type='lowpass'; filtF.frequency.value=800; filtF.Q.value=0.6;
-        srcF.connect(filtF); filtF.connect(gain); srcF.start();
-        nodes.push(srcF, filtF);
-        function scheduleBird(startTime){
-          var osc = audioCtx.createOscillator(), env = audioCtx.createGain();
-          osc.type = 'sine';
-          var baseF = 1800+Math.random()*1400;
-          osc.frequency.setValueAtTime(baseF, startTime);
-          osc.frequency.linearRampToValueAtTime(baseF+400, startTime+0.05);
-          osc.frequency.linearRampToValueAtTime(baseF-200, startTime+0.12);
-          env.gain.setValueAtTime(0, startTime);
-          env.gain.linearRampToValueAtTime(0.06, startTime+0.02);
-          env.gain.linearRampToValueAtTime(0, startTime+0.15);
-          osc.connect(env); env.connect(masterGain);
-          osc.start(startTime); osc.stop(startTime+0.2);
-        }
-        var birdLoop = setInterval(function(){
-          if (!audioNodes || currentSound !== 'forest'){ clearInterval(birdLoop); return; }
-          var t = audioCtx.currentTime + 0.1;
-          if (Math.random()>0.4) scheduleBird(t);
-          if (Math.random()>0.7) scheduleBird(t+0.25);
-        }, 4500);
-        audioNodes = {nodes:nodes, gain:gain, filter:filter, loop:birdLoop};
-        currentSound = 'forest';
-        return;
-      } else if (type === 'hall'){
-        var bs2 = audioCtx.sampleRate * 3;
-        var buf2 = audioCtx.createBuffer(1, bs2, audioCtx.sampleRate);
-        var d2 = buf2.getChannelData(0); var lv = 0;
-        for (var j=0;j<bs2;j++){ var w2=Math.random()*2-1; d2[j]=(lv+0.008*w2)/1.008; lv=d2[j]; d2[j]*=2.5; }
-        var src2 = audioCtx.createBufferSource(); src2.buffer=buf2; src2.loop=true;
-        filter.type='lowpass'; filter.frequency.value=280;
-        var osc2 = audioCtx.createOscillator(), oscG = audioCtx.createGain();
-        osc2.type='sine'; osc2.frequency.value=110; oscG.gain.value=0.03;
-        osc2.connect(oscG); oscG.connect(gain);
-        src2.connect(filter); osc2.start(); src2.start();
-        nodes.push(src2, osc2, oscG);
-      } else if (type === 'rain'){
-        var bs3 = audioCtx.sampleRate * 2;
-        var buf3 = audioCtx.createBuffer(1, bs3, audioCtx.sampleRate);
-        var d3 = buf3.getChannelData(0);
-        for (var k=0;k<bs3;k++) d3[k] = (Math.random()*2-1)*0.6;
-        var src3 = audioCtx.createBufferSource(); src3.buffer=buf3; src3.loop=true;
-        filter.type='lowpass'; filter.frequency.value=700; filter.Q.value=1.2;
-        src3.connect(filter); src3.start();
-        nodes.push(src3);
+      stopAudio();
+      var res;
+      if (type === 'nature') res = makeOceanSound(masterGain);
+      else if (type === 'forest') res = makeForestSound(masterGain);
+      else if (type === 'hall') res = makeHallSound(masterGain);
+      else if (type === 'rain') res = makeRainSound(masterGain);
+      if (res){
+        audioNodes = res;
+        currentSound = type;
       }
-      audioNodes = {nodes:nodes, gain:gain, filter:filter};
-      currentSound = type;
     }
     function setMasterVolume(v){ if (masterGain) masterGain.gain.value = v; }
 
@@ -1153,10 +1277,12 @@
       var pl = window.loadPlannerNew();
       var todayKey = window.dateKey(new Date());
       var ddToday = window.getDayData(pl, todayKey);
-      var allTasks = (ddToday.tasks||[]).filter(function(tk){ return !tk.done; }).map(function(tk){ return tk.title; });
+      var allTasks = (ddToday.tasks||[]).filter(function(tk){ return !tk.done; }).map(function(tk){
+        return { id: tk.id, title: tk.title, dayKey: todayKey };
+      });
       var hasTasks = allTasks.length > 0;
       var taskFieldHTML = hasTasks
-        ? '<div class="siraj-select" id="studyTaskSelect" style="width:100%"><div class="siraj-select-trigger" style="width:100%"><span class="siraj-select-value">'+(window.__studyTask?esc(window.__studyTask):'— یک کار از امروز (اختیاری) —')+'</span><svg class="siraj-select-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div><div class="siraj-select-panel" style="width:100%;min-width:100%">'+allTasks.map(function(tn){ return '<div class="siraj-select-item'+(window.__studyTask===tn?' active':'')+'" data-value="'+esc(tn)+'"><span>'+esc(tn)+'</span></div>'; }).join('')+'</div></div>'
+        ? '<div class="siraj-select" id="studyTaskSelect" style="width:100%"><div class="siraj-select-trigger" style="width:100%"><span class="siraj-select-value">'+(window.__studyTask?esc(window.__studyTask):'— یک کار از امروز (اختیاری) —')+'</span><svg class="siraj-select-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div><div class="siraj-select-panel" style="width:100%;min-width:100%">'+allTasks.map(function(tk){ return '<div class="siraj-select-item'+(window.__studyTask===tk.title?' active':'')+'" data-value="'+esc(tk.title)+'" data-id="'+esc(tk.id)+'" data-day="'+esc(tk.dayKey)+'"><span>'+esc(tk.title)+'</span></div>'; }).join('')+'</div></div>'
         : '<div class="study-empty-box">📝 کاری برای امروز نداری</div>';
       var el = document.createElement('div');
       el.id = 'studyOverlay'; el.className = 'study-overlay';
@@ -1165,13 +1291,13 @@
           '<div class="study-icon"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg></div>' +
           '<div class="study-title">حالت مطالعه</div>' +
           taskFieldHTML +
-          '<div class="stp-wrap" id="studyTimePicker"><div class="stp-hint">↑ بکش بالا / ↓ پایین</div><span class="stp-unit">دقیقه</span><span class="stp-num" id="studyTimeNum">'+toFa(25)+'</span></div>' +
+          '<div class="stp-wrap" id="studyTimePicker"><div class="stp-hint">↑ بکش بالا / ↓ پایین</div><span class="stp-num" id="studyTimeNum">'+toFa(25)+'</span></div>' +
           '<div class="study-music-section"><div class="study-music-title"><span>🎵 صدای محیطی</span></div>' +
             '<div class="study-sound-grid">' +
               '<button class="study-sound-btn" data-sound="nature"><span class="ss-icon">🌊</span><span>موج دریا</span></button>' +
               '<button class="study-sound-btn" data-sound="forest"><span class="ss-icon">🌳</span><span>جنگل</span></button>' +
               '<button class="study-sound-btn" data-sound="hall"><span class="ss-icon">🌙</span><span>سکوت گرم</span></button>' +
-              '<button class="study-sound-btn" data-sound="rain"><span class="ss-icon">☔</span><span>بارش ملایم</span></button>' +
+              '<button class="study-sound-btn" data-sound="rain"><span class="ss-icon">☔</span><span>بارش</span></button>' +
               '<button class="study-sound-btn off-btn on" data-sound=""><span class="ss-icon">🔇</span><span>خاموش</span></button>' +
             '</div>' +
             '<div class="study-volume-row"><input type="range" min="0" max="100" value="40" id="studyVolume" style="--vp:40%"></div>' +
@@ -1190,7 +1316,7 @@
           '<div class="study-actions">' +
             '<button class="study-btn pause-mode" id="studyPauseBtn"><span id="studyPauseLabel">توقف</span></button>' +
             '<button class="study-btn" id="studyChatBtn">مطالعه با سراج</button>' +
-            '<button class="study-btn finish-mode" id="studyFinishBtn">پایان و ثبت</button>' +
+            '<button class="study-btn finish-mode" id="studyFinishBtn" disabled>پایان و ثبت</button>' +
             '<button class="study-btn secondary" id="studyExitBtn">خروج</button>' +
           '</div>' +
         '</div>';
@@ -1199,7 +1325,10 @@
       var picker = el.querySelector('#studyTimePicker');
       var numEl = el.querySelector('#studyTimeNum');
       var pickerVal = 25, dragStartY = 0, dragStartVal = 25, dragging = false;
-      function setPV(v){ pickerVal = Math.max(1, Math.min(180, Math.round(v))); numEl.textContent = toFa(pickerVal); }
+      function setPV(v){
+        pickerVal = Math.max(1, Math.min(180, Math.round(v)));
+        numEl.textContent = formatMinutes(pickerVal);
+      }
       function pd(e){ dragging = true; dragStartY = (e.touches?e.touches[0].clientY:e.clientY); dragStartVal = pickerVal; picker.classList.add('dragging'); e.preventDefault(); }
       function pm(e){ if (!dragging) return; var y = (e.touches?e.touches[0].clientY:e.clientY); setPV(dragStartVal + Math.round((dragStartY-y)/6)); }
       function pu(){ if (!dragging) return; dragging = false; picker.classList.remove('dragging'); }
@@ -1216,7 +1345,7 @@
           var snd = btn.getAttribute('data-sound');
           el.querySelectorAll('.study-sound-btn').forEach(function(b){ b.classList.remove('on'); });
           if (!snd){ stopAudio(); btn.classList.add('on'); return; }
-          btn.classList.add('on'); stopAudio();
+          btn.classList.add('on');
           try{ makeNoise(snd); }catch(e){}
         };
       });
@@ -1236,9 +1365,12 @@
           it.onclick = function(e){
             e.stopPropagation();
             var v = it.getAttribute('data-value');
+            var id = it.getAttribute('data-id');
+            var dk = it.getAttribute('data-day');
             window.__studyTask = v;
-            window.__studyTaskSourceId = null;
-            window.__studyTaskSourceDay = null;
+            /* ★ مهم: source ID رو هم ست کن تا بتونیم بعداً تسک رو done کنیم ★ */
+            window.__studyTaskSourceId = id || null;
+            window.__studyTaskSourceDay = dk || null;
             taskSel.querySelector('.siraj-select-value').textContent = v;
             taskSel.classList.remove('open');
           };
@@ -1266,6 +1398,9 @@
       overlay.querySelector('#studyRunning').style.display = 'flex';
       overlay.querySelector('#studyTaskName').textContent = task || 'مطالعه آزاد';
       overlay.classList.remove('paused');
+      /* ★ دکمه پایان غیرفعال تا تموم شدن ★ */
+      var fb = overlay.querySelector('#studyFinishBtn');
+      if (fb) fb.disabled = true;
       if (currentSound){
         var np = overlay.querySelector('#studyNowPlaying');
         if (np){
@@ -1280,11 +1415,21 @@
     }
     function elapsedMinutes(){ return Math.max(1, studyTotalMinutes - Math.floor(studySeconds/60)); }
     function markSourceTaskDone(){
-      if (!window.__studyTaskSourceId || !window.__studyTaskSourceDay) return;
+      if (!window.__studyTaskSourceId || !window.__studyTaskSourceDay){
+        console.warn('[Study] No source task to mark done');
+        return;
+      }
       var pl = window.loadPlannerNew();
       var dd = window.getDayData(pl, window.__studyTaskSourceDay);
       var idx = (dd.tasks||[]).findIndex(function(tk){ return tk.id === window.__studyTaskSourceId; });
-      if (idx >= 0){ dd.tasks[idx].done = true; dd.tasks[idx].studiedMinutes = elapsedMinutes(); window.savePlanner(pl); }
+      if (idx >= 0){
+        dd.tasks[idx].done = true;
+        dd.tasks[idx].studiedMinutes = elapsedMinutes();
+        window.savePlanner(pl);
+        console.log('[Study] Task marked done with', elapsedMinutes(), 'min');
+      } else {
+        console.warn('[Study] Task not found:', window.__studyTaskSourceId);
+      }
     }
     function startStudyTimer(){
       if (studyTimer) clearInterval(studyTimer);
@@ -1294,12 +1439,23 @@
         updateStudyTimer(false);
         if (studySeconds <= 0){
           clearInterval(studyTimer); studyTimer = null; studyRunning = false;
-          stopAudio(); unlockSite(); markSourceTaskDone();
-          showPopup('🎉', 'عالی بود!', 'زمان مطالعه تموم شد.');
-          var srcDay = window.__studyTaskSourceDay;
-          window.__studyTask=''; window.__studyTaskSourceId=null; window.__studyTaskSourceDay=null;
-          clearStudyChat(); closeStudy();
-          if (srcDay) maybeCelebrate(srcDay);
+          /* ★ الان دکمه پایان فعاله ★ */
+          var fb = document.getElementById('studyFinishBtn');
+          if (fb) fb.disabled = false;
+          stopAudio();
+          /* پخش صدای پایان */
+          try{
+            if (audioCtx){
+              var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+              o.type='sine'; o.frequency.value=880;
+              g.gain.setValueAtTime(0, audioCtx.currentTime);
+              g.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime+0.05);
+              g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.8);
+              o.connect(g); g.connect(audioCtx.destination);
+              o.start(); o.stop(audioCtx.currentTime+0.85);
+            }
+          }catch(e){}
+          showPopup('🎉', 'عالی بود!', 'زمان مطالعه تموم شد. دکمه‌ی پایان و ثبت رو بزن.');
         }
       }, 1000);
     }
@@ -1344,11 +1500,12 @@
     function finishAndRecord(){
       var mins = elapsedMinutes();
       var srcDay = window.__studyTaskSourceDay;
+      var srcTitle = window.__studyTask;
       markSourceTaskDone();
-      if (window.__studyTask){
-        showPopup('🏆', 'کار انجام شد!', 'کار «'+window.__studyTask+'» با '+toFa(mins)+' دقیقه ثبت شد.');
+      if (srcTitle){
+        showPopup('🏆', 'کار انجام شد!', 'کار «'+srcTitle+'» با '+formatMinutes(mins)+' مطالعه ثبت شد.');
       } else {
-        showPopup('✨', 'خوب بود!', toFa(mins)+' دقیقه مطالعه ثبت شد.');
+        showPopup('✨', 'خوب بود!', formatMinutes(mins)+' مطالعه ثبت شد.');
       }
       if (studyTimer) clearInterval(studyTimer);
       studyTimer = null; studyRunning = false;
@@ -1357,7 +1514,7 @@
       if (srcDay) setTimeout(function(){ maybeCelebrate(srcDay); }, 500);
     }
     function exitStudyConfirm(){
-      if (!confirm('مطمئنی خارج شی؟')) return;
+      if (!confirm('مطمئنی خارج شی؟ (زمانت ثبت نمیشه)')) return;
       if (studyTimer) clearInterval(studyTimer);
       studyTimer = null; studyRunning = false;
       window.__studyTask=''; window.__studyTaskSourceId=null; window.__studyTaskSourceDay=null;
@@ -1400,16 +1557,13 @@
       window.removeEventListener('beforeunload', blockUnload);
     }
 
-    /* ★ انیمیشن ورود به حالت مطالعه ★ */
     window.__openStudy = function(){
       buildStudyOverlay();
       var overlay = document.getElementById('studyOverlay');
       if (!overlay) return;
-      /* استایل‌های اولیه — با scale کوچک و شفاف */
       overlay.style.opacity = '0';
       overlay.style.transform = 'scale(.92) translateY(20px)';
       overlay.style.transition = 'none';
-      /* فریم بعد — اعمال انیمیشن */
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
           overlay.style.transition = 'opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.34,1.4,.64,1), visibility .45s';
@@ -1512,7 +1666,6 @@
         '</div>';
     }
 
-    /* MutationObserver برای پر کردن blog و community — بدون override */
     function fillViews(){
       var blog = document.getElementById('view-blog');
       if (blog && blog.classList.contains('active') && !blog.querySelector('.community-hero')){
@@ -1535,28 +1688,23 @@
     setTimeout(fillViews, 1500);
     setTimeout(fillViews, 2500);
 
-    /* ★★★ راه‌های ارتباطی: تبدیل به لینک + حذف دکمه کپی ★★★ */
+    /* ★ راه‌های ارتباطی: کلیک‌پذیر + حذف دکمه کپی ★ */
     function linkifyContacts(){
       document.querySelectorAll('.contact-row-v2, .contact-row').forEach(function(row){
         if (row.tagName === 'A' || row.dataset.linkified === '1') return;
         row.dataset.linkified = '1';
-
-        /* حذف دکمه کپی */
         row.querySelectorAll('.contact-copy, [data-copy], .copy-btn').forEach(function(b){ b.remove(); });
-
         var labelEl = row.querySelector('.contact-label');
         var valueEl = row.querySelector('.contact-value');
         var label = (labelEl ? labelEl.textContent : '').trim();
         var value = (valueEl ? valueEl.textContent : '').trim();
         var v = value.replace(/^[@\s]+/,'').trim();
-
         var href = '';
         if (/تلگرام|telegram/i.test(label)) href = 'https://t.me/' + v;
         else if (/ایمیل|email|mail/i.test(label)) href = 'mailto:' + value;
         else if (/اینستاگرام|instagram|insta/i.test(label)) href = 'https://instagram.com/' + v;
         else if (/^X$|توییتر|twitter/i.test(label)) href = 'https://x.com/' + v;
         else if (/سایت|وب|website|site/i.test(label)) href = /^https?:/.test(value) ? value : ('https://' + value);
-
         if (href){
           row.style.cursor = 'pointer';
           row.setAttribute('role', 'link');
@@ -1578,15 +1726,13 @@
     setTimeout(linkifyContacts, 1800);
     setTimeout(linkifyContacts, 3000);
 
-    /* ========== اقدامات هدر اصلی — فقط آواتار، بدون قفل (چون HTML داره) ========== */
+    /* ★ اقدامات هدر — فقط آواتار (قفل رو HTML داره) ★ */
     function injectMainTopActions(){
       var mainChat = document.querySelector('.main-chat');
       if (!mainChat) return;
-
       if (getComputedStyle(mainChat).position === 'static'){
         mainChat.style.position = 'relative';
       }
-
       var bar = mainChat.querySelector('#mainTopActions');
       if (!bar){
         bar = document.createElement('div');
@@ -1594,10 +1740,7 @@
         bar.className = 'main-top-actions';
         mainChat.insertBefore(bar, mainChat.firstChild);
       }
-
       var p = getProfile();
-
-      /* آواتار کاربر — با آواتار هاردکد شده (پلیس‌هولدر) */
       var av = bar.querySelector('#mainProfileAvatar');
       if (!av){
         av = document.createElement('div');
@@ -1605,19 +1748,13 @@
         av.className = 'main-top-avatar';
         av.onclick = function(){
           if (typeof window.openSettings === 'function') window.openSettings();
-          setTimeout(function(){
-            var b = document.querySelector('.settings-tab-btn[data-cat="profile"]');
-            if (b) b.click();
-          }, 400);
         };
         bar.appendChild(av);
       }
       av.title = p.name ? p.name : 'مشخصات من';
-      /* ★ همیشه از آواتار هاردکد یا آواتار ذخیره‌شده استفاده کن ★ */
       var avatarSrc = p.avatar || USER_AVATAR_URL;
       av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
 
-      /* دکمه قفل */
       var lk = bar.querySelector('#mainLockBtn');
       if (!lk){
         lk = document.createElement('button');
@@ -1641,62 +1778,7 @@
       av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
     }
 
-    /* ========== Settings: profile tab ========== */
-    if (typeof window.openSettings === 'function'){
-      var origOpenSettings = window.openSettings;
-      window.openSettings = function(){
-        try { origOpenSettings.apply(this, arguments); } catch(e){}
-        setTimeout(injectProfileTab, 250);
-      };
-    }
-    function injectProfileTab(){
-      var tabsWrap = document.getElementById('settingsTabs'); if (!tabsWrap) return;
-      if (!tabsWrap.querySelector('[data-cat="profile"]')){
-        var btn = document.createElement('button');
-        btn.className = 'settings-tab-btn';
-        btn.setAttribute('data-cat','profile');
-        btn.setAttribute('onclick',"switchSettingsCat('profile')");
-        btn.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
-        tabsWrap.insertBefore(btn, tabsWrap.children[6] || null);
-      }
-      var contentWrap = document.getElementById('settingsContentWrap');
-      if (contentWrap && !contentWrap.querySelector('[data-cat="profile"]')){
-        var pane = document.createElement('div');
-        pane.className = 'settings-content';
-        pane.setAttribute('data-cat','profile');
-        contentWrap.appendChild(pane);
-      }
-      renderProfilePane();
-    }
-    function renderProfilePane(){
-      var pane = document.querySelector('.settings-content[data-cat="profile"]'); if (!pane) return;
-      var p = getProfile();
-      /* ★ آواتار از فایل هاردکد — گزینه‌ی انتخاب عکس حذف شد ★ */
-      var avatarSrc = p.avatar || USER_AVATAR_URL;
-      pane.innerHTML =
-        '<div class="setting-group profile-section">' +
-          '<label style="font-size:13px;font-weight:800;color:var(--accent)">👤 مشخصات شخصی</label>' +
-          '<div class="about-avatar" style="margin:14px auto"><img src="'+avatarSrc+'" alt=""></div>' +
-          '<div style="font-size:11px;color:var(--text-muted);line-height:1.9;text-align:center;padding:2px 0 10px">سراج اسم و بیوگرافی تو رو می‌خونه و تو جواب‌هاش ازش استفاده می‌کنه.</div>' +
-          '<input type="text" id="profileName" placeholder="اسمت چیه؟" value="'+(p.name?esc(p.name):'')+'" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;margin-bottom:8px">' +
-          '<textarea id="profileBio" placeholder="یه توضیح کوتاه..." style="width:100%;min-height:90px;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;resize:vertical;line-height:1.8;margin-bottom:8px">'+(p.bio?esc(p.bio):'')+'</textarea>' +
-          '<button class="btn-primary" id="profileSaveBtn" style="width:100%;justify-content:center;margin-top:10px">💾 ذخیره</button>' +
-        '</div>';
-      var sv = document.getElementById('profileSaveBtn');
-      if (sv){
-        sv.onclick = function(){
-          var p2 = getProfile();
-          p2.name = (document.getElementById('profileName')||{}).value || '';
-          p2.bio = (document.getElementById('profileBio')||{}).value || '';
-          saveProfile(p2);
-          if (window.toast) window.toast('ذخیره شد ✓','success');
-          if (typeof window.renderPanelForPlanner === 'function') window.renderPanelForPlanner();
-          updateMainTopAvatar();
-        };
-      }
-    }
-
-    /* ========== اسلایدر نوار پایین ============ */
+    /* اسلایدر نوار */
     (function(){
       function ensureSlider(){
         var nav = document.getElementById('bottomNav'); if (!nav) return null;
@@ -1757,20 +1839,7 @@
       setTimeout(function(){ moveSlider(true); }, 1100);
     })();
 
-    /* ========== retry + رنگ ساعت ========== */
-    setTimeout(function(){
-      window.retryMsg = function(e, btn){
-        e.stopPropagation();
-        var w = btn.closest('.msg-wrap');
-        var t = w.querySelector('.msg').textContent;
-        w.classList.remove('selected');
-        if (typeof window.renderHistory === 'function') window.renderHistory();
-        document.getElementById('q').value = t;
-        if (typeof window.handleInput === 'function') window.handleInput();
-        if (typeof window.send === 'function') window.send();
-      };
-    }, 1300);
-
+    /* رنگ ساعت */
     setTimeout(function(){
       function colorizeHours(){
         var list = document.querySelector('.hours-list'); if (!list) return;
@@ -1789,6 +1858,6 @@
       setTimeout(colorizeHours, 500);
     }, 200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v13)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v14)');
   }
 })();
