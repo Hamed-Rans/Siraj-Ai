@@ -1,7 +1,46 @@
 /* ============================================================
-   Siraj v2.0 — style-v2.css (Complete v13)
-   همه‌ی تغییرات در یک فایل یکپارچه
+   Siraj v2.0 — style-v2.css (Complete v14 — Final)
    ============================================================ */
+
+/* ============ ۰) VIEWها — چیدمان پایه ============ */
+.view{display:none!important}
+.view.active{
+  display:flex!important;
+  flex-direction:column!important;
+  height:100%!important;
+  width:100%!important;
+  min-height:0!important;
+}
+#view-chat.view.active{display:flex!important}
+
+.chat-view-inner{
+  display:flex!important;
+  flex-direction:column!important;
+  height:100%!important;
+  width:100%!important;
+  min-height:0!important;
+  position:relative!important;
+}
+.chat-view-inner .chat-header{flex-shrink:0!important}
+#box{
+  flex:1 1 auto!important;
+  overflow-y:auto!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.welcome-screen{position:absolute!important;inset:0!important;z-index:5!important;pointer-events:none!important}
+.welcome-screen.hidden{display:none!important}
+.input-wrapper{
+  flex-shrink:0!important;
+  margin-top:auto!important;
+  position:relative!important;
+  z-index:10!important;
+  width:100%!important;
+  padding:0 20px 16px!important;
+  box-sizing:border-box!important;
+}
+.input-bar-shell{width:100%!important;max-width:100%!important}
 
 /* ============ ۱) نوارها (input / header / nav) ============ */
 [data-input-style="solid"] .input-bar{
@@ -30,7 +69,7 @@
   -webkit-backdrop-filter:none!important;border-color:var(--border)!important;
 }
 
-/* ============ ۲) نوار پایین — دکمه‌ها ============ */
+/* ============ ۲) نوار پایین ============ */
 .bottom-nav::before{display:none!important}
 .bottom-nav::after{
   content:''!important;position:absolute!important;
@@ -86,22 +125,19 @@
 }
 .bottom-nav-btn.active:not(.nav-btn-chat) svg{stroke:#fff!important}
 
-/* دکمه چت گرد — در همه حالت‌ها */
 .bottom-nav-btn.nav-btn-chat,
 [data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
 [data-nav-position="right"] .bottom-nav-btn.nav-btn-chat,
 [data-nav-position="left"] .bottom-nav-btn.nav-btn-chat.active,
 [data-nav-position="right"] .bottom-nav-btn.nav-btn-chat.active,
 [data-nav-position="left"] .bottom-nav-btn.nav-btn-chat:hover,
-[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat:hover,
-[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat:active,
-[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat:active{
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat:hover{
   flex:0 0 54px!important;
   width:54px!important;min-width:54px!important;max-width:54px!important;
   height:54px!important;min-height:54px!important;max-height:54px!important;
   padding:0!important;aspect-ratio:1/1!important;
   border-radius:50%!important;box-sizing:border-box!important;
-  align-self:center!important;transform-origin:center center!important;
+  align-self:center!important;
   background:linear-gradient(135deg,var(--accent),var(--accent-dark))!important;
   color:#fff!important;border:2px solid var(--panel-bg)!important;
   box-shadow:0 0 0 2px var(--accent),0 6px 18px -6px var(--accent)!important;
@@ -125,7 +161,6 @@
   box-shadow:0 6px 20px -6px var(--accent)!important;
 }
 
-/* اسلایدر نوار — پس‌زمینه متحرک */
 .nav-slider{
   position:absolute;
   border-radius:22px;
@@ -324,7 +359,6 @@
 .cal-day-rem{position:absolute;bottom:3px;left:4px;font-size:9px;opacity:.85}
 .cal-day.selected .cal-day-rem{filter:brightness(1.5)}
 
-/* افسانه با آیکون SVG */
 .cal-legend{
   display:flex;gap:10px;flex-wrap:wrap;margin:12px 20px 0;padding:8px 12px;
   border-radius:12px;background:rgba(255,255,255,.02);border:1px solid var(--border);
@@ -338,7 +372,7 @@
 .cl-item.occ .cl-icon-svg{color:#C084FC}
 .cl-item.evt .cl-icon-svg{color:#60A5FA}
 
-/* ============ ۸) چیدمان ماهانه/سالانه — اهداف سمت راست ============ */
+/* ============ ۸) چیدمان ماهانه/سالانه ============ */
 .monthly-layout{
   display:grid;grid-template-columns:240px 1fr;gap:14px;
   margin:14px 20px 16px;align-items:flex-start;
@@ -351,7 +385,6 @@
 .monthly-layout .year-overview{margin:0!important}
 .monthly-layout .cal-legend{margin:0 0 8px 0!important;padding:6px 10px!important;width:max-content!important;margin-left:auto!important;margin-right:auto!important}
 
-/* اهداف */
 .month-goals{
   padding:16px 18px!important;border-radius:20px!important;
   background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02))!important;
@@ -402,7 +435,6 @@
 .mg-del svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5}
 .mg-empty-compact{font-size:11px;color:var(--text-muted);text-align:center;padding:8px;opacity:.75}
 
-/* فرم افزودن هدف — دکمه + مربع و ثابت */
 .month-goal-add{
   display:flex!important;
   flex-wrap:nowrap!important;
@@ -440,7 +472,6 @@
 }
 .month-goal-add button:hover{transform:translateY(-2px)}
 
-/* فشرده در ستون راست */
 .monthly-side .month-goals,
 .monthly-side .month-goals.compact{padding:12px 14px 16px!important;margin:12px 20px 0!important}
 .monthly-side .month-goals-list{gap:5px!important}
@@ -450,7 +481,6 @@
 .monthly-side .month-goal-add input{padding:8px 10px!important;font-size:11px!important}
 .monthly-side .month-goal-add button{flex:0 0 36px!important;width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important;max-height:36px!important;font-size:16px!important}
 
-/* سالانه */
 .year-goals{background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(212,175,55,.02))!important;border-color:rgba(212,175,55,.25)!important}
 .year-goals .month-goals-title{color:#D4AF37!important;border-bottom-color:rgba(212,175,55,.3)!important}
 .year-goals .month-goals-title > span:first-child{display:none!important}
@@ -485,7 +515,7 @@
 .ymc-fill{height:100%;background:linear-gradient(90deg,var(--accent-light),var(--accent));border-radius:5px;transition:width .6s cubic-bezier(.22,1,.36,1)}
 .ymc-stat{font-size:9.5px;color:var(--text-muted);font-weight:700}
 
-/* ============ ۹) Select سفارشی ============ */
+/* ============ ۹) Select ============ */
 .siraj-select{position:relative;display:inline-block;min-width:130px;z-index:1}
 .siraj-select.open{z-index:900}
 .siraj-select-trigger{
@@ -740,7 +770,7 @@
 .study-chat-send{width:40px;height:40px;min-width:40px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .2s}
 .study-chat-send:hover{transform:scale(1.06)}
 
-/* ============ ۱۴) site-credit (لوگو خاکستری) ============ */
+/* ============ ۱۴) site-credit ============ */
 .site-credit{
   position:fixed;bottom:10px;left:14px;
   font-size:10px!important;color:var(--text-muted);opacity:.55!important;
@@ -805,7 +835,6 @@
 .header-user-avatar:hover{transform:scale(1.08)}
 .header-user-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 
-/* پروفایل در پنل هدر (سمت چپ) */
 .panel-header{
   position:relative!important;
   padding-left:96px!important;
@@ -842,7 +871,6 @@
 .panel-header-icon-btn svg{width:17px!important;height:17px!important;stroke:currentColor!important;fill:none!important;stroke-width:2.2!important}
 #panelHeaderPinBtn{display:none!important}
 
-/* main-top-actions — اختیاری (پروفایل + قفل در همه تب‌ها) */
 .main-top-actions{
   position:absolute!important;top:14px!important;left:14px!important;
   z-index:45!important;display:flex!important;align-items:center!important;gap:8px!important;
@@ -870,7 +898,6 @@
 .main-top-icon-btn:hover{border-color:var(--accent)!important;color:var(--accent)!important;transform:scale(1.06)!important}
 .main-top-icon-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2}
 
-/* پروفایل در تنظیمات */
 .profile-section{padding:16px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.02);margin-bottom:14px}
 .profile-section .about-avatar{margin:0 auto}
 .profile-section input:focus,.profile-section textarea:focus{border-color:var(--accent)!important}
@@ -898,7 +925,7 @@
 .hour-row.time-night{border-right:3px solid #6366F1!important;background:linear-gradient(90deg,rgba(99,102,241,.06),transparent)!important}
 .hour-row.time-night .hour-label{background:rgba(99,102,241,.15)!important;color:#6366F1!important}
 
-/* ============ ۱۹) پنل راست — تب‌های عمودی مثل دکمه مطالعه ============ */
+/* ============ ۱۹) پنل راست — تب‌های عمودی ============ */
 .panel-planner-tabs{
   direction:rtl;
   display:flex!important;
@@ -927,16 +954,10 @@
   transition:all .3s cubic-bezier(.22,1,.36,1);
 }
 .panel-planner-tab svg{width:18px!important;height:18px!important;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
-.panel-planner-tab:hover{
-  background:var(--accent-soft)!important;
-  color:var(--accent)!important;
-  border-color:var(--accent)!important;
-  transform:translateX(-3px);
-}
+.panel-planner-tab:hover{background:var(--accent-soft)!important;color:var(--accent)!important;border-color:var(--accent)!important;transform:translateX(-3px)}
 .panel-planner-tab.active{
   background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
-  color:#fff!important;
-  border-color:var(--accent)!important;
+  color:#fff!important;border-color:var(--accent)!important;
   box-shadow:0 10px 30px -10px var(--accent);
   transform:translateX(-3px);
 }
@@ -1019,7 +1040,6 @@
              background .3s!important;
 }
 
-/* انیمیشن پیام */
 .msg-wrap.me:not(.no-anim){animation:msgUserInNew .55s var(--ease-smooth) both!important}
 .msg-wrap.bot:not(.no-anim){animation:msgBotInNew .55s var(--ease-smooth) both!important}
 @keyframes msgUserInNew{from{opacity:0;transform:translate(40px,40px) scale(.9);filter:blur(6px)}to{opacity:1;transform:translate(0,0) scale(1);filter:blur(0)}}
@@ -1035,7 +1055,6 @@
 [data-nav-position="right"] .nav-row{padding-right:0!important}
 [data-nav-position="left"] .nav-row{padding-left:0!important}
 
-/* انیمیشن پین */
 .app-container,
 .top-row,
 .side-panel,
@@ -1184,11 +1203,4 @@
 @keyframes splashDot{
   0%,60%,100%{transform:scale(.45);opacity:.25}
   30%{transform:scale(1);opacity:1}
-}
-/* ============ رفع نمایش همه viewها ============ */
-.view{
-  display: none !important;
-}
-.view.active{
-  display: block !important;
 }
