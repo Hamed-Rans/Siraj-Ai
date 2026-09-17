@@ -1270,3 +1270,166 @@ body.modal-open .floating-top-bar{opacity: 0; pointer-events: none}
   box-shadow: 0 0 0 2px var(--accent), 0 6px 18px -6px var(--accent) !important;
   color: #fff !important;
 }
+/* ============ v4.0 — رفع باگ‌های نهایی ============ */
+
+/* 1) اسلایدر نرم بدون بونس (سر جاش برمیگشت) */
+.nav-slider{
+  transition: left .5s cubic-bezier(.22,1,.36,1),
+             top .5s cubic-bezier(.22,1,.36,1),
+             width .45s cubic-bezier(.22,1,.36,1),
+             height .45s cubic-bezier(.22,1,.36,1),
+             border-radius .4s cubic-bezier(.22,1,.36,1),
+             opacity .3s ease !important;
+}
+
+/* 2) نوار چپ/راست — متن مخفی تا وقتی کلیک شد */
+[data-nav-position="left"] .bottom-nav-btn[data-label] .nav-btn-label,
+[data-nav-position="right"] .bottom-nav-btn[data-label] .nav-btn-label{
+  max-width: 0 !important;
+  opacity: 0 !important;
+  transform: scaleY(0) !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  transition: max-width .5s cubic-bezier(.22,1,.36,1),
+              opacity .35s ease,
+              transform .45s cubic-bezier(.34,1.4,.64,1),
+              margin .4s cubic-bezier(.22,1,.36,1) !important;
+}
+[data-nav-position="left"] .bottom-nav-btn[data-label].active .nav-btn-label,
+[data-nav-position="right"] .bottom-nav-btn[data-label].active .nav-btn-label{
+  max-width: 100% !important;
+  opacity: 1 !important;
+  transform: scaleY(1) !important;
+  margin: 4px 0 0 !important;
+}
+/* دکمه فعال در چپ/راست — ارتفاع بلندتر برای نمایش متن */
+[data-nav-position="left"] .bottom-nav-btn[data-label].active,
+[data-nav-position="right"] .bottom-nav-btn[data-label].active{
+  min-height: 62px !important;
+}
+
+/* 3) دکمه چت در چپ/راست — بدون فشردگی (بیضی) */
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat{
+  width: 54px !important;
+  min-width: 54px !important;
+  max-width: 54px !important;
+  height: 54px !important;
+  min-height: 54px !important;
+  max-height: 54px !important;
+  flex: 0 0 54px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  aspect-ratio: 1 / 1 !important;
+  align-self: center !important;
+}
+
+/* 4) فاصله نوار چپ/راست/بالا از پایین (بالای Created by) */
+[data-nav-position="left"] .nav-row,
+[data-nav-position="right"] .nav-row,
+[data-nav-position="top"] .nav-row{
+  padding-bottom: 46px !important;
+}
+
+/* 5) پروفایل و قفل داخل هدر پنل راست (سمت چپ هدر) */
+.panel-header{
+  position: relative !important;
+  padding-left: 96px !important;
+}
+.panel-header-actions{
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  direction: ltr;
+  z-index: 10;
+}
+.panel-header-avatar{
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: 'Lalezar','Vazirmatn', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  border: 2px solid var(--panel-bg);
+  box-shadow: 0 0 0 1.5px var(--accent);
+  overflow: hidden;
+  transition: transform .3s var(--ease-spring);
+}
+.panel-header-avatar:hover{transform: scale(1.08)}
+.panel-header-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.panel-header-icon-btn{
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all .25s var(--ease-spring);
+}
+.panel-header-icon-btn:hover{
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.06);
+}
+.panel-header-icon-btn svg{
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+}
+/* مخفی کردن آواتار قدیمی هدر چت */
+.chat-header .header-user-avatar,
+.chat-header #headerLockBtn{display: none !important}
+/* اگر شناور قدیمی مونده، مخفی */
+.floating-top-bar{display: none !important}
+
+/* 6) رفع باگ دکمه‌ی هدف در ستون راست */
+.monthly-side .month-goal-add.compact{
+  display: flex !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  gap: 6px !important;
+}
+.monthly-side .month-goal-add.compact input{
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  padding: 8px 10px !important;
+  font-size: 11px !important;
+}
+.monthly-side .month-goal-add.compact button{
+  flex: 0 0 auto !important;
+  min-width: 40px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+}
+
+/* 7) لوگوی Created by — خاکستری */
+.site-credit img{
+  filter: grayscale(1) brightness(1.6) !important;
+  opacity: .42 !important;
+}
+.site-credit{
+  font-size: 10px !important;
+  opacity: .55 !important;
+}
