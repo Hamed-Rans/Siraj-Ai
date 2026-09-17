@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v16 Final) */
+/* Siraj v2.0 — planner-v2.js (v17 Final) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -29,7 +29,6 @@
       hall:'سکوت گرم 🌙', rain:'بارش ملایم ☔'
     };
 
-    /* ═══ واژه‌ها به تفکیک سطح ═══ */
     var WORDS_BY_LEVEL = {
       beginner: [
         {type:'واژه', text:'«کِتاب» یعنی کتاب. ریشه: ک-ت-ب. جمع: کُتُب.'},
@@ -71,9 +70,7 @@
         {type:'نکته', text:'«کان» تامه یعنی «وجود داشت» و ناقصه اسم و خبر می‌گیره.'}
       ]
     };
-    var LEVEL_LABELS = {
-      beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته'
-    };
+    var LEVEL_LABELS = { beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته' };
 
     var _currentWord = null;
     var _lastTab = 'daily';
@@ -322,25 +319,35 @@
     window.__goThisYear = window.__goToday;
 
     function refreshBody(direction){
+      var pane = document.getElementById('plannerPane');
+      if (!pane) return;
+      if (pane.dataset.animating === '1') return;
+
       var tab = getTab();
-      var pane = document.getElementById('plannerPane'); if (!pane) return;
-      var hero = pane.querySelector('.planner-hero-card');
-      var body = pane.querySelector('.planner-body-content');
-      if (!hero || !body){ renderPane(tab); return; }
-      smartUpdateHero(tab, direction || 'left');
-      body.style.transition = 'opacity .15s ease';
-      body.style.opacity = '0';
+      var dir = direction || 'left';
+      var outClass = dir === 'left' ? 'heroOutRight' : 'heroOutLeft';
+      var inClass  = dir === 'left' ? 'heroInFromLeft' : 'heroInFromRight';
+
+      pane.dataset.animating = '1';
+      pane.style.pointerEvents = 'none';
+      pane.classList.add(outClass);
+
       setTimeout(function(){
+        pane.classList.remove(outClass);
         var html = '';
-        if (tab === 'daily') html = dailyContentHTML();
-        else if (tab === 'weekly') html = weeklyContentHTML();
-        else if (tab === 'monthly') html = monthlyContentHTML();
-        else if (tab === 'yearly') html = yearlyContentHTML();
-        body.innerHTML = html;
+        if (tab === 'daily')        html = viewDaily();
+        else if (tab === 'weekly')  html = viewWeekly();
+        else if (tab === 'monthly') html = viewMonthly();
+        else if (tab === 'yearly')  html = viewYearly();
+        pane.innerHTML = html;
         bindPaneEvents(tab);
-        body.style.transition = 'opacity .3s ease';
-        body.style.opacity = '1';
-      }, 150);
+        pane.classList.add(inClass);
+        pane.style.pointerEvents = '';
+        setTimeout(function(){
+          pane.classList.remove(inClass);
+          delete pane.dataset.animating;
+        }, 450);
+      }, 330);
     }
     window.__refreshCurrentTab = refreshBody;
 
@@ -362,6 +369,7 @@
       else if (tab === 'monthly') pane.innerHTML = viewMonthly();
       else if (tab === 'yearly') pane.innerHTML = viewYearly();
       bindPaneEvents(tab);
+      if (tab === 'weekly') setTimeout(setupWeekSummaryClicks, 50);
     }
     window.renderPlannerPane = function(){ renderPane(getTab()); };
     function bindPaneEvents(tab){
@@ -382,7 +390,6 @@
       }
     }
 
-    /* ═══ HEROES ═══ */
     function heroDaily(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -724,15 +731,11 @@
     }
     function viewWeekly(){ return heroWeekly()+'<div class="planner-body-content">'+weeklyContentHTML()+'</div>'; }
 
-    /* ★ انیمیشن نرم دکمه‌های جدول هفتگی ★ */
     window.__wInputChange = function(inp){
       var wrap = inp.closest('.week-cell-edit'); if (!wrap) return;
       var btns = wrap.querySelector('.wc-btns'); if (!btns) return;
-      if (inp.value.trim().length > 0){
-        btns.classList.add('visible');
-      } else {
-        btns.classList.remove('visible');
-      }
+      if (inp.value.trim().length > 0){ btns.classList.add('visible'); }
+      else { btns.classList.remove('visible'); }
     };
     window.__wQuickCancel = function(btn){
       var wrap = btn.closest('.week-cell-edit'); if (!wrap) return;
@@ -781,19 +784,14 @@
       }
     }
 
-    /* ★ کلیک روی کارت آمار → هایلایت سلول‌های مربوطه ★ */
     function setupWeekSummaryClicks(){
       document.querySelectorAll('.week-summary .ws-box').forEach(function(box){
         box.onclick = function(){
           var stat = box.getAttribute('data-stat');
           var cells;
-          if (stat === 'total'){
-            cells = document.querySelectorAll('.week-cell-task');
-          } else if (stat === 'done'){
-            cells = document.querySelectorAll('.week-cell-task.done');
-          } else {
-            cells = document.querySelectorAll('.week-cell-task:not(.done)');
-          }
+          if (stat === 'total') cells = document.querySelectorAll('.week-cell-task');
+          else if (stat === 'done') cells = document.querySelectorAll('.week-cell-task.done');
+          else cells = document.querySelectorAll('.week-cell-task:not(.done)');
           if (!cells.length){
             if (window.toast) window.toast('چیزی برای نمایش نیست','info');
             return;
@@ -1111,7 +1109,6 @@
       refreshBody('left');
     };
 
-    /* ═══ پنل راست ═══ */
     window.renderPanelForPlanner = function(){
       var p = getProfile();
       var titleEl = document.getElementById('panelTitleText');
@@ -1320,10 +1317,7 @@
     }
     function elapsedMinutes(){ return Math.max(1, studyTotalMinutes - Math.floor(studySeconds/60)); }
     function markSourceTaskDone(){
-      if (!window.__studyTaskSourceId || !window.__studyTaskSourceDay){
-        console.warn('[Study] No source task');
-        return;
-      }
+      if (!window.__studyTaskSourceId || !window.__studyTaskSourceDay) return;
       var pl = window.loadPlannerNew();
       var dd = window.getDayData(pl, window.__studyTaskSourceDay);
       var idx = (dd.tasks||[]).findIndex(function(tk){ return tk.id === window.__studyTaskSourceId; });
@@ -1545,9 +1539,12 @@
       }catch(err){ var t2 = document.getElementById(tid); if (t2) t2.textContent = 'خطا: ' + err.message; }
     };
 
-    /* ═══ Community + Blog ═══ */
+    /* ═══ Blog + Community ═══ */
     function blogHTML(){
-      return '<div class="page-title-bar"><div class="page-title-text">مقالات سراج</div></div>' +
+      return '<div class="page-title-bar">' +
+          '<div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>' +
+          '<div class="page-title-text">مقالات سراج</div>' +
+        '</div>' +
         '<div class="community-hero">' +
           '<div class="community-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>' +
           '<div class="community-title">مقالات سراج</div>' +
@@ -1556,7 +1553,10 @@
         '</div>';
     }
     function communityHTML(){
-      return '<div class="page-title-bar"><div class="page-title-text">انجمن سراج</div></div>' +
+      return '<div class="page-title-bar">' +
+          '<div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>' +
+          '<div class="page-title-text">انجمن سراج</div>' +
+        '</div>' +
         '<div class="community-hero">' +
           '<div class="community-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>' +
           '<div class="community-title">انجمن گفتگوی سراج</div>' +
@@ -1622,52 +1622,67 @@
     setTimeout(linkifyContacts, 1800);
     setTimeout(linkifyContacts, 3000);
 
-    /* ★ آواتار و قفل — داخل هدر، نه شناور ★ */
+    /* ═══ دکمه‌های پروفایل + قفل در هدر ═══ */
     function injectMainTopActions(){
-      var header = document.querySelector('.chat-header');
-      if (!header) return;
-
-      var wrap = header.querySelector('.header-left-actions');
-      if (!wrap){
-        wrap = document.createElement('div');
-        wrap.className = 'header-left-actions';
-        var lockBtn = header.querySelector('#headerLockBtn');
-        if (lockBtn){
-          header.insertBefore(wrap, lockBtn);
-          wrap.appendChild(lockBtn);
-        } else {
-          header.appendChild(wrap);
-        }
-      }
+      document.querySelectorAll('#mainTopActions, .main-top-actions').forEach(function(el){ el.remove(); });
+      document.querySelectorAll('#headerLockBtn').forEach(function(el){ el.style.display = 'none'; });
 
       var p = getProfile();
-      var av = wrap.querySelector('#mainProfileAvatar');
-      if (!av){
-        av = document.createElement('div');
-        av.id = 'mainProfileAvatar';
-        av.className = 'main-top-avatar';
-        av.onclick = function(){
-          if (typeof window.openSettings === 'function') window.openSettings();
-        };
-        wrap.insertBefore(av, wrap.firstChild);
-      }
-      av.title = p.name ? p.name : 'مشخصات من';
       var avatarSrc = p.avatar || USER_AVATAR_URL;
-      av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
+
+      var headers = document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar');
+      headers.forEach(function(header){
+        if (header.querySelector('.header-left-actions')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'header-left-actions';
+
+        var av = document.createElement('div');
+        av.className = 'main-top-avatar';
+        av.title = p.name ? p.name : 'مشخصات من';
+        av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
+        av.onclick = function(){ if (typeof window.openSettings === 'function') window.openSettings(); };
+
+        var lk = document.createElement('button');
+        lk.type = 'button';
+        lk.className = 'main-top-icon-btn';
+        lk.title = 'قفل کردن سایت';
+        lk.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+        lk.onclick = function(){ if (typeof window.lockNow === 'function') window.lockNow(); };
+
+        wrap.appendChild(av);
+        wrap.appendChild(lk);
+        header.appendChild(wrap);
+      });
     }
-    setTimeout(injectMainTopActions, 500);
-    setTimeout(injectMainTopActions, 1500);
-    setTimeout(injectMainTopActions, 3000);
+    var _injectTimer = null;
+    function scheduleInjectMainTopActions(){
+      if (_injectTimer) clearTimeout(_injectTimer);
+      _injectTimer = setTimeout(function(){
+        _injectTimer = null;
+        injectMainTopActions();
+      }, 120);
+    }
+    setTimeout(scheduleInjectMainTopActions, 500);
+    setTimeout(scheduleInjectMainTopActions, 1500);
+    setTimeout(scheduleInjectMainTopActions, 3000);
+
+    var mainChatEl = document.querySelector('.main-chat');
+    if (mainChatEl){
+      new MutationObserver(scheduleInjectMainTopActions).observe(mainChatEl, {
+        childList: true, subtree: true
+      });
+    }
 
     function updateMainTopAvatar(){
-      var av = document.getElementById('mainProfileAvatar'); if (!av) return;
       var p = getProfile();
-      av.title = p.name ? p.name : 'مشخصات من';
       var avatarSrc = p.avatar || USER_AVATAR_URL;
-      av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
+      document.querySelectorAll('.main-top-avatar').forEach(function(av){
+        av.title = p.name ? p.name : 'مشخصات من';
+        av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
+      });
     }
 
-    /* ★ تب مشخصات من در تنظیمات + انتخاب سطح ★ */
+    /* ═══ تب مشخصات من ═══ */
     if (typeof window.openSettings === 'function'){
       var origOpenSettings = window.openSettings;
       window.openSettings = function(){
@@ -1743,10 +1758,8 @@
       var det = pane.querySelector('#determineLevelBtn');
       if (det){
         det.onclick = function(){
-          if (typeof window.openSettings === 'function') {
-            var modal = document.getElementById('settingsModal');
-            if (modal) modal.classList.remove('open');
-          }
+          var modal = document.getElementById('settingsModal');
+          if (modal) modal.classList.remove('open');
           if (typeof window.switchView === 'function') window.switchView('chat');
           setTimeout(function(){
             var q = document.getElementById('q');
@@ -1773,7 +1786,7 @@
       }
     }
 
-    /* ★ اسلایدر نوار — بدون فلش ★ */
+    /* ═══ اسلایدر نوار — بدون فلش ═══ */
     (function(){
       function ensureSlider(){
         var nav = document.getElementById('bottomNav'); if (!nav) return null;
@@ -1786,61 +1799,88 @@
         }
         return slider;
       }
-      function moveSlider(animate){
+      function doMove(){
         var nav = document.getElementById('bottomNav');
         var slider = ensureSlider();
         if (!nav || !slider) return;
         var active = document.querySelector('.bottom-nav-btn.active');
-        if (!active){ slider.style.opacity = '0'; return; }
-        if (active.classList.contains('nav-btn-chat')){ slider.style.opacity = '0'; return; }
+        if (!active || active.classList.contains('nav-btn-chat')){
+          slider.classList.remove('visible');
+          return;
+        }
         var navRect = nav.getBoundingClientRect();
         var btnRect = active.getBoundingClientRect();
         var pos = document.documentElement.getAttribute('data-nav-position') || 'bottom';
         var isVert = pos === 'left' || pos === 'right';
-        var newLeft, newTop, newW, newH, newRadius;
+        var L, T, W, H, R;
         if (isVert){
-          newLeft = 4; newW = navRect.width - 8;
-          newTop = btnRect.top - navRect.top; newH = btnRect.height;
-          newRadius = 18;
+          L = 3; W = navRect.width - 6;
+          T = btnRect.top - navRect.top; H = btnRect.height;
+          R = 14;
         } else {
-          newLeft = btnRect.left - navRect.left; newTop = btnRect.top - navRect.top;
-          newW = btnRect.width; newH = btnRect.height; newRadius = 21;
+          L = btnRect.left - navRect.left;
+          T = btnRect.top - navRect.top;
+          W = btnRect.width; H = btnRect.height; R = 21;
         }
-        if (animate === false){
-          slider.style.transition = 'none';
-          slider.classList.remove('ready');
-        }
-        slider.style.left = newLeft + 'px';
-        slider.style.top = newTop + 'px';
-        slider.style.width = newW + 'px';
-        slider.style.height = newH + 'px';
-        slider.style.borderRadius = newRadius + 'px';
-        slider.style.opacity = '1';
-        if (animate === false){
-          void slider.offsetWidth;
-          slider.style.transition = '';
-          setTimeout(function(){ slider.classList.add('ready'); }, 20);
-        }
+        slider.style.left = L + 'px';
+        slider.style.top = T + 'px';
+        slider.style.width = W + 'px';
+        slider.style.height = H + 'px';
+        slider.style.borderRadius = R + 'px';
+        slider.classList.add('ready', 'visible');
       }
-      var timer = null;
-      function schedule(animate, delay){
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(function(){ moveSlider(animate); timer = null; }, delay == null ? 480 : delay);
+      function doMoveInstant(){
+        var slider = ensureSlider();
+        if (!slider) return;
+        slider.classList.remove('ready', 'visible');
+        slider.style.transition = 'none';
+        doMove();
+        void slider.offsetWidth;
+        slider.style.transition = '';
+        slider.classList.remove('visible');
+        setTimeout(function(){ slider.classList.add('visible'); }, 40);
       }
-      window.__moveNavSlider = moveSlider;
+      function scheduleAfterButtonExpand(){
+        var nav = document.getElementById('bottomNav'); if (!nav) return;
+        var active = nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
+        if (!active){ doMove(); return; }
+        var done = false;
+        function finish(){
+          if (done) return; done = true;
+          active.removeEventListener('transitionend', onEnd);
+          doMove();
+        }
+        function onEnd(e){
+          if (e.target === active &&
+              (e.propertyName === 'max-width' || e.propertyName === 'padding' || e.propertyName === 'width')){
+            finish();
+          }
+        }
+        active.addEventListener('transitionend', onEnd);
+        setTimeout(finish, 600);
+      }
+      window.__moveNavSlider = doMove;
       var navEl = document.getElementById('bottomNav');
       if (navEl){
-        new MutationObserver(function(){ schedule(true, 480); }).observe(navEl, {attributes:true, attributeFilter:['class'], subtree:true});
+        new MutationObserver(function(muts){
+          for (var i=0;i<muts.length;i++){
+            if (muts[i].attributeName === 'class' &&
+                muts[i].target.classList.contains('bottom-nav-btn')){
+              scheduleAfterButtonExpand();
+              return;
+            }
+          }
+        }).observe(navEl, {attributes:true, attributeFilter:['class'], subtree:true});
       }
       new MutationObserver(function(){
         var sl = document.getElementById('navSlider');
         if (sl) sl.classList.remove('ready');
-        schedule(false, 100);
-        schedule(true, 400);
+        doMoveInstant();
+        setTimeout(doMove, 500);
       }).observe(document.documentElement, {attributes:true, attributeFilter:['data-nav-position']});
-      window.addEventListener('resize', function(){ moveSlider(false); });
-      setTimeout(function(){ moveSlider(false); }, 700);
-      setTimeout(function(){ moveSlider(true); }, 1100);
+      window.addEventListener('resize', doMoveInstant);
+      setTimeout(doMoveInstant, 800);
+      setTimeout(doMove, 1400);
     })();
 
     /* رنگ ساعت */
@@ -1862,18 +1902,7 @@
       setTimeout(colorizeHours, 500);
     }, 200);
 
-    /* راه‌اندازی اولیه */
     pickNewWord();
-
-    /* راه‌اندازی کلیک آمار هفتگی بعد از رندر */
-    var _origRenderPane = renderPane;
-    renderPane = function(tab){
-      _origRenderPane(tab);
-      if (tab === 'weekly'){
-        setTimeout(setupWeekSummaryClicks, 50);
-      }
-    };
-
-    console.log('[Siraj v2.0] planner loaded ✓ (v16)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v17)');
   }
 })();
