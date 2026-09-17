@@ -1145,7 +1145,8 @@ function pauseStream(){
     }
     chatInFlight=false;isStreaming=false;
     setSendButton();
-    document.getElementById('sendBtn').classList.add('visible');
+    const sb=document.getElementById('sendBtn');
+    if(sb)sb.classList.add('visible');
     document.getElementById('typing-indicator')?.remove();
     streamFinished=true;
     toast('متوقف شد','info');
