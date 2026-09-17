@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (Full v6) */
+/* Siraj v2.0 — planner-v2.js (Full v7) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -61,66 +61,22 @@
       saveReminders(r);
     }
 
-    /* ============ رویدادهای مناسبتی ایران (تقریبی) ============ */
+    /* ============ مناسبت‌های ایران ============ */
     var IRAN_EVENTS = {
-      /* فروردین */
-      '01-01': 'نوروز — آغاز سال نو',
-      '01-02': 'عید نوروز',
-      '01-03': 'عید نوروز',
-      '01-04': 'عید نوروز',
-      '01-06': 'روز امید و شادی',
-      '01-12': 'روز جمهوری اسلامی',
-      '01-13': 'سیزده‌بدر',
-      '01-19': 'شهادت حضرت علی (ع)',
-      '01-21': 'شهادت امام علی (ع)',
-      '01-22': 'شب قدر',
-      '01-23': 'شب قدر',
-      '01-25': 'روز بزرگداشت عطار نیشابوری',
-      /* اردیبهشت */
-      '02-01': 'عید فطر',
-      '02-02': 'تعطیل عید فطر',
-      '02-02': 'روز زمین پاک',
-      '02-10': 'روز ملی خلیج فارس',
-      '02-12': 'روز معلم',
-      '02-25': 'روز بزرگداشت فردوسی',
-      /* خرداد */
-      '03-01': 'روز بهره‌وری',
-      '03-06': 'خرداد — سالگرد آزادسازی خرمشهر',
-      '03-14': 'رحلت امام خمینی',
-      '03-15': 'قیام ۱۵ خرداد',
-      /* تیر */
-      '04-01': 'روز اصناف',
-      '04-07': 'روز قوه قضائیه',
-      '04-10': 'روز صنعت و معدن',
-      '04-14': 'روز قلم',
-      '04-25': 'روز بهزیستی',
-      /* مرداد */
-      '05-05': 'روز کارمند',
-      '05-08': 'روز بزرگداشت سهروردی',
-      '05-14': 'روز بزرگداشت خیام',
-      /* شهریور */
-      '06-05': 'روز بزرگداشت رازی',
-      '06-27': 'روز شعر و ادب فارسی',
-      '06-31': 'آغاز هفته دفاع مقدس',
-      /* مهر */
-      '07-13': 'روز نیروی انتظامی',
-      '07-20': 'روز بزرگداشت حافظ',
-      /* آبان */
-      '08-08': 'روز نوجوان',
-      '08-13': 'روز دانش‌آموز',
-      '08-24': 'روز کتاب و کتابخوانی',
-      /* آذر */
-      '09-16': 'روز دانشجو',
-      /* دی */
-      '10-05': 'روز خانواده',
-      '10-19': 'روز بزرگداشت مولوی',
-      /* بهمن */
-      '11-12': 'پیروزی انقلاب اسلامی',
-      '11-22': 'روز بزرگداشت خواجه نصیر',
-      /* اسفند */
-      '12-05': 'روز بزرگداشت خواجه نصیرالدین طوسی',
-      '12-20': 'روز بزرگداشت نظامی گنجوی',
-      '12-29': 'روز ملی شدن صنعت نفت'
+      '01-01': 'نوروز — آغاز سال نو','01-02': 'عید نوروز','01-03': 'عید نوروز','01-04': 'عید نوروز',
+      '01-06': 'روز امید و شادی','01-12': 'روز جمهوری اسلامی','01-13': 'سیزده‌بدر',
+      '01-19': 'شهادت حضرت علی (ع)','01-21': 'شهادت امام علی (ع)','01-22': 'شب قدر','01-23': 'شب قدر',
+      '01-25': 'روز بزرگداشت عطار نیشابوری','02-01': 'عید فطر','02-02': 'تعطیل عید فطر',
+      '02-02': 'روز زمین پاک','02-10': 'روز ملی خلیج فارس','02-12': 'روز معلم','02-25': 'روز بزرگداشت فردوسی',
+      '03-01': 'روز بهره‌وری','03-06': 'خرداد — سالگرد آزادسازی خرمشهر','03-14': 'رحلت امام خمینی',
+      '03-15': 'قیام ۱۵ خرداد','04-01': 'روز اصناف','04-07': 'روز قوه قضائیه','04-10': 'روز صنعت و معدن',
+      '04-14': 'روز قلم','04-25': 'روز بهزیستی','05-05': 'روز کارمند','05-08': 'روز بزرگداشت سهروردی',
+      '05-14': 'روز بزرگداشت خیام','06-05': 'روز بزرگداشت رازی','06-27': 'روز شعر و ادب فارسی',
+      '06-31': 'آغاز هفته دفاع مقدس','07-13': 'روز نیروی انتظامی','07-20': 'روز بزرگداشت حافظ',
+      '08-08': 'روز نوجوان','08-13': 'روز دانش‌آموز','08-24': 'روز کتاب و کتابخوانی','09-16': 'روز دانشجو',
+      '10-05': 'روز خانواده','10-19': 'روز بزرگداشت مولوی','11-12': 'پیروزی انقلاب اسلامی',
+      '11-22': 'روز بزرگداشت خواجه نصیر','12-05': 'روز بزرگداشت خواجه نصیرالدین طوسی',
+      '12-20': 'روز بزرگداشت نظامی گنجوی','12-29': 'روز ملی شدن صنعت نفت'
     };
     function getIranianEvent(dayKey){
       try{
@@ -185,13 +141,10 @@
 
     /* ============ Popups ============ */
     function showPopup(emoji, title, text){
-      var old = document.getElementById('sirajPopup');
-      if (old) old.remove();
+      var old = document.getElementById('sirajPopup'); if (old) old.remove();
       var el = document.createElement('div');
-      el.id = 'sirajPopup';
-      el.className = 'siraj-popup-overlay';
-      el.innerHTML = '<div class="siraj-popup">' +
-        '<span class="siraj-popup-emoji">' + emoji + '</span>' +
+      el.id = 'sirajPopup'; el.className = 'siraj-popup-overlay';
+      el.innerHTML = '<div class="siraj-popup"><span class="siraj-popup-emoji">' + emoji + '</span>' +
         '<div class="siraj-popup-title">' + title + '</div>' +
         '<div class="siraj-popup-text">' + text + '</div>' +
         '<button class="siraj-popup-btn" id="sirajPopupOk">متوجه شدم</button></div>';
@@ -203,13 +156,10 @@
       };
     }
     function showConfirm(emoji, title, text, onYes, yesText, noText){
-      var old = document.getElementById('sirajConfirmPopup');
-      if (old) old.remove();
+      var old = document.getElementById('sirajConfirmPopup'); if (old) old.remove();
       var el = document.createElement('div');
-      el.id = 'sirajConfirmPopup';
-      el.className = 'siraj-popup-overlay';
-      el.innerHTML = '<div class="siraj-popup">' +
-        '<span class="siraj-popup-emoji">' + emoji + '</span>' +
+      el.id = 'sirajConfirmPopup'; el.className = 'siraj-popup-overlay';
+      el.innerHTML = '<div class="siraj-popup"><span class="siraj-popup-emoji">' + emoji + '</span>' +
         '<div class="siraj-popup-title">' + title + '</div>' +
         '<div class="siraj-popup-text">' + text + '</div>' +
         '<div class="siraj-popup-actions">' +
@@ -223,13 +173,10 @@
       el.querySelector('#sirajConfirmNo').onclick = close;
     }
     function showTriple(emoji, title, text, opt1, opt2, opt3){
-      var old = document.getElementById('sirajTriplePopup');
-      if (old) old.remove();
+      var old = document.getElementById('sirajTriplePopup'); if (old) old.remove();
       var el = document.createElement('div');
-      el.id = 'sirajTriplePopup';
-      el.className = 'siraj-popup-overlay';
-      el.innerHTML = '<div class="siraj-popup">' +
-        '<span class="siraj-popup-emoji">' + emoji + '</span>' +
+      el.id = 'sirajTriplePopup'; el.className = 'siraj-popup-overlay';
+      el.innerHTML = '<div class="siraj-popup"><span class="siraj-popup-emoji">' + emoji + '</span>' +
         '<div class="siraj-popup-title">' + title + '</div>' +
         '<div class="siraj-popup-text">' + text + '</div>' +
         '<div class="siraj-popup-actions-3">' +
@@ -284,7 +231,7 @@
       document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});
     });
 
-    /* ============ انیمیشن هوشمند ============ */
+    /* ============ انیمیشن هوشمند هیرو ============ */
     function smartUpdateHero(tab, direction){
       var c = document.querySelector('.phc-center');
       if (!c) return;
@@ -511,10 +458,8 @@
     /* ============ 🔥 Streak ============ */
     function getStreakDays(){
       var pl = window.loadPlannerNew();
-      var d = new Date();
-      d.setHours(0,0,0,0);
-      var streak = 0;
-      var isToday = true;
+      var d = new Date(); d.setHours(0,0,0,0);
+      var streak = 0; var isToday = true;
       for (var i=0;i<365;i++){
         var key = window.dateKey(d);
         var dd = window.getDayData(pl, key);
@@ -531,8 +476,7 @@
       if (s < 2) return '';
       var msg = s >= 30 ? 'فوق‌العاده‌ای! 🏆' :
                 s >= 14 ? 'عالی پیش می‌ری! ✨' :
-                s >= 7  ? 'ادامه بده! 💪' :
-                          'خوب شروع کردی! 🌱';
+                s >= 7  ? 'ادامه بده! 💪' : 'خوب شروع کردی! 🌱';
       return '<div class="daily-streak">' +
         '<span class="ds-fire">🔥</span>' +
         '<span class="ds-num">' + toFa(s) + '</span>' +
@@ -591,11 +535,9 @@
 
     /* ============ 🎉 جشن پایان روز ============ */
     function showConfetti(){
-      var old = document.getElementById('sirajConfetti');
-      if (old) old.remove();
+      var old = document.getElementById('sirajConfetti'); if (old) old.remove();
       var el = document.createElement('div');
-      el.id = 'sirajConfetti';
-      el.className = 'confetti-wrap';
+      el.id = 'sirajConfetti'; el.className = 'confetti-wrap';
       var colors = ['#F59E0B','#10B981','#3B82F6','#EF4444','#A855F7','#EC4899','#FBBF24','#06B6D4'];
       var html = '';
       for (var i=0;i<80;i++){
@@ -728,21 +670,15 @@
       }
       showTriple('✅', 'کار انجام شد!', 'ولی زمانش ثبت نشد ⏱️ چطور ثبت کنیم؟',
         {text:'همینطور ثبت', onClick: function(){
-          task.done = true;
-          window.savePlanner(pl);
-          maybeCelebrate(key);
-          refreshBody('left');
+          task.done = true; window.savePlanner(pl); maybeCelebrate(key); refreshBody('left');
         }},
         {text:'دقیقه بزنم', onClick: function(){
           var mins = prompt('چند دقیقه وقت گذاشتی؟', '25');
           if (mins === null){ refreshBody('left'); return; }
           mins = parseInt(mins);
           if (isNaN(mins) || mins < 1) mins = 25;
-          task.done = true;
-          task.studiedMinutes = mins;
-          window.savePlanner(pl);
-          maybeCelebrate(key);
-          refreshBody('left');
+          task.done = true; task.studiedMinutes = mins;
+          window.savePlanner(pl); maybeCelebrate(key); refreshBody('left');
         }},
         {text:'بریم مطالعه 🎯', onClick: function(){
           window.__studyTask = task.title;
@@ -768,9 +704,7 @@
         priority: window.__pendingPri || 'med', done: false, createdAt: Date.now()
       });
       window.savePlanner(pl);
-      inp.value = '';
-      window.__pendingTime = '';
-      window.__pendingPri = 'med';
+      inp.value = ''; window.__pendingTime = ''; window.__pendingPri = 'med';
       refreshBody('left');
     };
     window.__dDeleteTask = function(i){
@@ -842,8 +776,7 @@
       days.forEach(function(day){
         var dd = window.getDayData(pl, day.key);
         (dd.tasks||[]).forEach(function(tk){
-          totalTasks++;
-          if (tk.done) doneCount++;
+          totalTasks++; if (tk.done) doneCount++;
         });
       });
       var pct = totalTasks ? Math.round((doneCount/totalTasks)*100) : 0;
@@ -858,15 +791,12 @@
     function viewWeekly(){ return heroWeekly() + '<div class="planner-body-content">' + weeklyContentHTML() + '</div>'; }
 
     window.__wInputChange = function(inp){
-      var wrap = inp.closest('.week-cell-edit');
-      if (!wrap) return;
-      var btns = wrap.querySelector('.wc-btns');
-      if (!btns) return;
+      var wrap = inp.closest('.week-cell-edit'); if (!wrap) return;
+      var btns = wrap.querySelector('.wc-btns'); if (!btns) return;
       btns.style.display = (inp.value.trim().length > 0) ? 'flex' : 'none';
     };
     window.__wQuickCancel = function(btn){
-      var wrap = btn.closest('.week-cell-edit');
-      if (!wrap) return;
+      var wrap = btn.closest('.week-cell-edit'); if (!wrap) return;
       var inp = wrap.querySelector('.wc-input');
       if (inp){ inp.value = ''; inp.blur(); }
       var btns = wrap.querySelector('.wc-btns');
@@ -876,8 +806,7 @@
       if (!inp) return;
       var val = (inp.value || '').trim();
       if (!val) return;
-      var wrap = inp.closest('.week-cell-edit');
-      if (!wrap) return;
+      var wrap = inp.closest('.week-cell-edit'); if (!wrap) return;
       var dayKey = wrap.getAttribute('data-day');
       var hourKey = wrap.getAttribute('data-hour');
       var pl = window.loadPlannerNew();
@@ -894,25 +823,17 @@
       if (td){
         var days = myWeekDays();
         var day = days.find(function(x){ return x.key === dayKey; });
-        if (day){
-          td.classList.add('has-task');
-          td.innerHTML = buildWeekCell(day, hourKey, pl);
-        }
+        if (day){ td.classList.add('has-task'); td.innerHTML = buildWeekCell(day, hourKey, pl); }
       }
       updateWeekStats();
     };
     function updateWeekStats(){
-      var statsWrap = document.querySelector('.week-summary');
-      if (!statsWrap) return;
-      var pl = window.loadPlannerNew();
-      var days = myWeekDays();
+      var statsWrap = document.querySelector('.week-summary'); if (!statsWrap) return;
+      var pl = window.loadPlannerNew(); var days = myWeekDays();
       var totalTasks = 0, doneCount = 0;
       days.forEach(function(day){
         var dd = window.getDayData(pl, day.key);
-        (dd.tasks||[]).forEach(function(tk){
-          totalTasks++;
-          if (tk.done) doneCount++;
-        });
+        (dd.tasks||[]).forEach(function(tk){ totalTasks++; if (tk.done) doneCount++; });
       });
       var pct = totalTasks ? Math.round((doneCount/totalTasks)*100) : 0;
       var nums = statsWrap.querySelectorAll('.ws-num');
@@ -930,29 +851,20 @@
       if (idx < 0) return;
       var task = dd.tasks[idx];
       if (task.done){
-        task.done = false;
-        delete task.studiedMinutes;
-        window.savePlanner(pl);
-        refreshBody('left');
-        return;
+        task.done = false; delete task.studiedMinutes;
+        window.savePlanner(pl); refreshBody('left'); return;
       }
       showTriple('✅', 'کار انجام شد!', 'چطور ثبت کنیم؟',
         {text:'همینطور ثبت', onClick: function(){
-          task.done = true;
-          window.savePlanner(pl);
-          maybeCelebrate(dayKey);
-          refreshBody('left');
+          task.done = true; window.savePlanner(pl); maybeCelebrate(dayKey); refreshBody('left');
         }},
         {text:'دقیقه بزنم', onClick: function(){
           var mins = prompt('چند دقیقه؟', '25');
           if (mins === null){ refreshBody('left'); return; }
           mins = parseInt(mins);
           if (isNaN(mins) || mins < 1) mins = 25;
-          task.done = true;
-          task.studiedMinutes = mins;
-          window.savePlanner(pl);
-          maybeCelebrate(dayKey);
-          refreshBody('left');
+          task.done = true; task.studiedMinutes = mins;
+          window.savePlanner(pl); maybeCelebrate(dayKey); refreshBody('left');
         }},
         {text:'بریم مطالعه 🎯', onClick: function(){
           window.__studyTask = task.title;
@@ -968,8 +880,7 @@
       var idx = (dd.tasks||[]).findIndex(function(tk){return tk.id === taskId;});
       if (idx < 0) return;
       dd.tasks.splice(idx,1);
-      window.savePlanner(pl);
-      refreshBody('left');
+      window.savePlanner(pl); refreshBody('left');
     };
     window.__wEditTask = function(dayKey, taskId){
       var pl = window.loadPlannerNew();
@@ -982,11 +893,10 @@
       newTitle = newTitle.trim();
       if (!newTitle) return;
       dd.tasks[idx].title = newTitle;
-      window.savePlanner(pl);
-      refreshBody('left');
+      window.savePlanner(pl); refreshBody('left');
     };
 
-    /* ============ ماهانه — چیدمان دو ستونه ============ */
+    /* ============ ماهانه ============ */
     function monthlyContentHTML(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -1074,11 +984,11 @@
           '</div>' +
           '<div class="monthly-main">' +
             '<div class="cal-legend">' +
-              '<span class="cl-item"><span class="cl-dot day-done-bg"></span>کامل</span>' +
-              '<span class="cl-item"><span class="cl-dot day-partial-bg"></span>نیمه</span>' +
-              '<span class="cl-item"><span class="cl-dot day-pending-bg"></span>انجام نشده</span>' +
-              '<span class="cl-item"><span class="cl-icon-occ">★</span>مناسبت</span>' +
-              '<span class="cl-item"><span class="cl-icon-evt">🔔</span>رویداد</span>' +
+              '<span class="cl-item done"><svg class="cl-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>کامل</span>' +
+              '<span class="cl-item partial"><svg class="cl-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3.5 2"/></svg>نیمه</span>' +
+              '<span class="cl-item pending"><svg class="cl-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>انجام نشده</span>' +
+              '<span class="cl-item occ"><svg class="cl-icon-svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>مناسبت</span>' +
+              '<span class="cl-item evt"><svg class="cl-icon-svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>رویداد</span>' +
             '</div>' +
             '<div class="month-calendar">' +
               '<div class="cal-weekdays">' + weekdays.map(function(w){return '<div class="cal-weekday">'+w+'</div>';}).join('') + '</div>' +
@@ -1115,11 +1025,9 @@
         '</div>';
       }).join('') : '';
 
-      var old = document.getElementById('calDayPopup');
-      if (old) old.remove();
+      var old = document.getElementById('calDayPopup'); if (old) old.remove();
       var el = document.createElement('div');
-      el.id = 'calDayPopup';
-      el.className = 'siraj-popup-overlay';
+      el.id = 'calDayPopup'; el.className = 'siraj-popup-overlay';
       el.innerHTML = '<div class="siraj-popup cal-popup-wide">' +
         '<div class="siraj-popup-title">📅 ' + toFa(day) + ' ' + d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}) + '</div>' +
         (nationalEvt ? '<div class="cal-national-badge">🇮🇷 ' + esc(nationalEvt) + '</div>' : '') +
@@ -1174,7 +1082,7 @@
       window.__calDayClick(parseInt(key.split('-')[2],10));
     };
 
-    /* ============ سالانه — چیدمان دو ستونه ============ */
+    /* ============ سالانه ============ */
     function yearlyContentHTML(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -1247,9 +1155,8 @@
     }
     function viewYearly(){ return heroYearly() + '<div class="planner-body-content">' + yearlyContentHTML() + '</div>'; }
 
-    /* ============ پرش به ماه درست ============ */
+    /* ============ پرش به ماه ============ */
     window.__goToMonth = function(monthIdx){
-      /* monthIdx: 0..11 */
       var base = new Date(window.plannerDate || new Date());
       var faYearTarget = -1;
       try{
@@ -1263,15 +1170,10 @@
           faM = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(ref));
           faY = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(ref));
         }catch(e){ break; }
-        if (faM === (monthIdx + 1) && faY === faYearTarget){
-          found = new Date(ref); break;
-        }
+        if (faM === (monthIdx + 1) && faY === faYearTarget){ found = new Date(ref); break; }
         ref.setDate(ref.getDate() + 1);
       }
-      if (found){
-        window.plannerDate = found;
-        window.switchPlannerTab('monthly');
-      }
+      if (found){ window.plannerDate = found; window.switchPlannerTab('monthly'); }
     };
 
     window.__toggleMonthGoalLocal = function(monthKey, i, checkbox){
@@ -1323,13 +1225,13 @@
     window.renderPanelForPlanner = function(){
       var p = getProfile();
       document.getElementById('panelTitleText').textContent = 'برنامه‌ریزی';
-      document.getElementById('panelSubText').textContent = p.name ? ('سلام ' + p.name + ' 🌟') : 'خوش آمدی 🌟';
+      document.getElementById('panelSubText').textContent = p.name ? ('خوش آمدی ' + p.name + ' 👋') : 'خوش آمدی 👋';
       var tab = getTab();
       var tabs = [
         {id:'daily', label:'روزانه', icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
         {id:'weekly', label:'هفتگی', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},
         {id:'monthly', label:'ماهانه', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01"/>'},
-        {id:'yearly', label:'سالانه', icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'}
+        {id:'yearly', label:'سالانه', icon:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>'}
       ];
       var tabsHTML = '<div class="panel-planner-tabs">' + tabs.map(function(t){
         return '<button class="panel-planner-tab' + (t.id===tab?' active':'') + '" onclick="window.switchPlannerTab(\'' + t.id + '\')">' +
@@ -1372,11 +1274,7 @@
     function makeNoise(type){
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
-      if (!masterGain){
-        masterGain = audioCtx.createGain();
-        masterGain.gain.value = 0.4;
-        masterGain.connect(audioCtx.destination);
-      }
+      if (!masterGain){ masterGain = audioCtx.createGain(); masterGain.gain.value = 0.4; masterGain.connect(audioCtx.destination); }
       var nodes = [];
       var filter = audioCtx.createBiquadFilter();
       var gain = audioCtx.createGain();
@@ -1386,14 +1284,9 @@
       if (type === 'nature'){
         var bs = audioCtx.sampleRate * 4;
         var buf = audioCtx.createBuffer(1, bs, audioCtx.sampleRate);
-        var da = buf.getChannelData(0);
-        var last = 0;
-        for (var i=0;i<bs;i++){
-          var w = Math.random()*2 - 1;
-          da[i] = (last + 0.015*w)/1.015; last = da[i]; da[i] *= 3.2;
-        }
-        var src = audioCtx.createBufferSource();
-        src.buffer = buf; src.loop = true;
+        var da = buf.getChannelData(0); var last = 0;
+        for (var i=0;i<bs;i++){ var w = Math.random()*2 - 1; da[i] = (last + 0.015*w)/1.015; last = da[i]; da[i] *= 3.2; }
+        var src = audioCtx.createBufferSource(); src.buffer = buf; src.loop = true;
         filter.type = 'lowpass'; filter.frequency.value = 550; filter.Q.value = 0.7;
         var lfo = audioCtx.createOscillator(), lfoG = audioCtx.createGain();
         lfo.frequency.value = 0.08; lfoG.gain.value = 150;
@@ -1403,16 +1296,10 @@
       } else if (type === 'forest'){
         var bsF = audioCtx.sampleRate * 4;
         var bufF = audioCtx.createBuffer(1, bsF, audioCtx.sampleRate);
-        var dF = bufF.getChannelData(0);
-        var lvF = 0;
-        for (var jf=0;jf<bsF;jf++){
-          var wF = Math.random()*2 - 1;
-          dF[jf] = (lvF + 0.012*wF)/1.012; lvF = dF[jf]; dF[jf] *= 2.8;
-        }
-        var srcF = audioCtx.createBufferSource();
-        srcF.buffer = bufF; srcF.loop = true;
-        var filtF = audioCtx.createBiquadFilter();
-        filtF.type = 'lowpass'; filtF.frequency.value = 800; filtF.Q.value = 0.6;
+        var dF = bufF.getChannelData(0); var lvF = 0;
+        for (var jf=0;jf<bsF;jf++){ var wF = Math.random()*2 - 1; dF[jf] = (lvF + 0.012*wF)/1.012; lvF = dF[jf]; dF[jf] *= 2.8; }
+        var srcF = audioCtx.createBufferSource(); srcF.buffer = bufF; srcF.loop = true;
+        var filtF = audioCtx.createBiquadFilter(); filtF.type = 'lowpass'; filtF.frequency.value = 800; filtF.Q.value = 0.6;
         srcF.connect(filtF); filtF.connect(gain); srcF.start();
         nodes.push(srcF, filtF);
         function scheduleBird(startTime){
@@ -1440,14 +1327,9 @@
       } else if (type === 'hall'){
         var bs2 = audioCtx.sampleRate * 3;
         var buf2 = audioCtx.createBuffer(1, bs2, audioCtx.sampleRate);
-        var d2 = buf2.getChannelData(0);
-        var lv = 0;
-        for (var j=0;j<bs2;j++){
-          var w2 = Math.random()*2 - 1;
-          d2[j] = (lv + 0.008*w2)/1.008; lv = d2[j]; d2[j] *= 2.5;
-        }
-        var src2 = audioCtx.createBufferSource();
-        src2.buffer = buf2; src2.loop = true;
+        var d2 = buf2.getChannelData(0); var lv = 0;
+        for (var j=0;j<bs2;j++){ var w2 = Math.random()*2 - 1; d2[j] = (lv + 0.008*w2)/1.008; lv = d2[j]; d2[j] *= 2.5; }
+        var src2 = audioCtx.createBufferSource(); src2.buffer = buf2; src2.loop = true;
         filter.type = 'lowpass'; filter.frequency.value = 280;
         var osc = audioCtx.createOscillator(), oscG = audioCtx.createGain();
         osc.type = 'sine'; osc.frequency.value = 110; oscG.gain.value = 0.03;
@@ -1459,8 +1341,7 @@
         var buf3 = audioCtx.createBuffer(1, bs3, audioCtx.sampleRate);
         var d3 = buf3.getChannelData(0);
         for (var k=0;k<bs3;k++) d3[k] = (Math.random()*2 - 1)*0.6;
-        var src3 = audioCtx.createBufferSource();
-        src3.buffer = buf3; src3.loop = true;
+        var src3 = audioCtx.createBufferSource(); src3.buffer = buf3; src3.loop = true;
         filter.type = 'lowpass'; filter.frequency.value = 700; filter.Q.value = 1.2;
         src3.connect(filter); src3.start();
         nodes.push(src3);
@@ -1471,16 +1352,9 @@
     function setMasterVolume(v){ if (masterGain) masterGain.gain.value = v; }
 
     /* ============ Study Chat ============ */
-    function loadStudyChat(){
-      try{ return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY) || '[]'); }catch(e){ return []; }
-    }
-    function saveStudyChat(){
-      try{ sessionStorage.setItem(STUDY_CHAT_KEY, JSON.stringify(studyChatHistory)); }catch(e){}
-    }
-    function clearStudyChat(){
-      studyChatHistory = [];
-      try{ sessionStorage.removeItem(STUDY_CHAT_KEY); }catch(e){}
-    }
+    function loadStudyChat(){ try{ return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY) || '[]'); }catch(e){ return []; } }
+    function saveStudyChat(){ try{ sessionStorage.setItem(STUDY_CHAT_KEY, JSON.stringify(studyChatHistory)); }catch(e){} }
+    function clearStudyChat(){ studyChatHistory = []; try{ sessionStorage.removeItem(STUDY_CHAT_KEY); }catch(e){} }
     studyChatHistory = loadStudyChat();
 
     function getStudyContext(){
@@ -1505,8 +1379,7 @@
     var studyTimer = null, studySeconds = 0, studyRunning = false, studyPaused = false, studyTotalMinutes = 0;
 
     function buildStudyOverlay(){
-      var old = document.getElementById('studyOverlay');
-      if (old) old.remove();
+      var old = document.getElementById('studyOverlay'); if (old) old.remove();
       var pl = window.loadPlannerNew();
       var todayKey = window.dateKey(new Date());
       var ddToday = window.getDayData(pl, todayKey);
@@ -1528,8 +1401,7 @@
           '<button class="study-btn" id="studyGoPlanBtn" style="width:100%">برو به برنامه‌ریزی</button>';
 
       var el = document.createElement('div');
-      el.id = 'studyOverlay';
-      el.className = 'study-overlay';
+      el.id = 'studyOverlay'; el.className = 'study-overlay';
       el.innerHTML =
         '<div id="studySetup" class="study-setup">' +
           '<div class="study-icon"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg></div>' +
@@ -1583,17 +1455,8 @@
       var numEl = el.querySelector('#studyTimeNum');
       var pickerVal = 25, dragStartY = 0, dragStartVal = 25, dragging = false;
       function setPV(v){ pickerVal = Math.max(1, Math.min(180, Math.round(v))); numEl.textContent = toFa(pickerVal); }
-      function pd(e){
-        dragging = true;
-        dragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
-        dragStartVal = pickerVal;
-        picker.classList.add('dragging'); e.preventDefault();
-      }
-      function pm(e){
-        if (!dragging) return;
-        var y = (e.touches ? e.touches[0].clientY : e.clientY);
-        setPV(dragStartVal + Math.round((dragStartY - y)/6));
-      }
+      function pd(e){ dragging = true; dragStartY = (e.touches ? e.touches[0].clientY : e.clientY); dragStartVal = pickerVal; picker.classList.add('dragging'); e.preventDefault(); }
+      function pm(e){ if (!dragging) return; var y = (e.touches ? e.touches[0].clientY : e.clientY); setPV(dragStartVal + Math.round((dragStartY - y)/6)); }
       function pu(){ if (!dragging) return; dragging = false; picker.classList.remove('dragging'); }
       picker.addEventListener('mousedown', pd);
       document.addEventListener('mousemove', pm);
@@ -1654,8 +1517,7 @@
     }
 
     function startStudy(){
-      var overlay = document.getElementById('studyOverlay');
-      if (!overlay) return;
+      var overlay = document.getElementById('studyOverlay'); if (!overlay) return;
       var task = window.__studyTask || '';
       var mins = window.__studyMinutesGetter ? window.__studyMinutesGetter() : 25;
       if (!mins || mins < 1) mins = 25;
@@ -1712,8 +1574,7 @@
       }, 1000);
     }
     function toggleStudyPause(){
-      var overlay = document.getElementById('studyOverlay');
-      if (!overlay) return;
+      var overlay = document.getElementById('studyOverlay'); if (!overlay) return;
       studyPaused = !studyPaused;
       var btn = overlay.querySelector('#studyPauseBtn');
       var lbl = overlay.querySelector('#studyPauseLabel');
@@ -1791,8 +1652,7 @@
       if (!studyRunning) return;
       var k = e.key || '';
       var ctrl = e.ctrlKey || e.metaKey;
-      if (k === 'F5' || k === 'F11' || k === 'Escape' ||
-          (ctrl && ['r','R','w','W','n','N','t','T','p','P'].indexOf(k) >= 0)){
+      if (k === 'F5' || k === 'F11' || k === 'Escape' || (ctrl && ['r','R','w','W','n','N','t','T','p','P'].indexOf(k) >= 0)){
         e.preventDefault(); e.stopPropagation(); return false;
       }
     }
@@ -1821,8 +1681,7 @@
 
     /* ============ Study Chat ============ */
     function renderStudyChat(){
-      var box = document.getElementById('studyChatMessages');
-      if (!box) return;
+      var box = document.getElementById('studyChatMessages'); if (!box) return;
       var p = getProfile();
       var greeting = p.name ? 'سلام ' + esc(p.name) + ' 👋' : 'سلام 👋';
       var html = '<div class="sc-msg sc-bot">' + greeting + ' من سراجم. توی حالت مطالعه هر سؤال درسی داشتی بپرس.</div>';
@@ -1835,11 +1694,7 @@
     }
     function toggleStudyChat(){
       var existing = document.getElementById('studyChatPanel');
-      if (existing){
-        existing.classList.remove('open');
-        setTimeout(function(){ existing.remove(); }, 320);
-        return;
-      }
+      if (existing){ existing.classList.remove('open'); setTimeout(function(){ existing.remove(); }, 320); return; }
       var panel = document.createElement('div');
       panel.id = 'studyChatPanel';
       panel.className = 'study-chat-panel';
@@ -1909,10 +1764,8 @@
 
     /* ============ اهداف ============ */
     window.addMonthGoal = function(monthKey){
-      var inp = document.getElementById('newGoalInput');
-      if (!inp) return;
-      var v = inp.value.trim();
-      if (!v) return;
+      var inp = document.getElementById('newGoalInput'); if (!inp) return;
+      var v = inp.value.trim(); if (!v) return;
       var pl = window.loadPlannerNew();
       if (!pl.months[monthKey]) pl.months[monthKey] = {goals:[]};
       pl.months[monthKey].goals.push({text:v, done:false});
@@ -1921,10 +1774,8 @@
       refreshBody('left');
     };
     window.addYearGoal = function(y){
-      var inp = document.getElementById('newYearGoalInput');
-      if (!inp) return;
-      var v = inp.value.trim();
-      if (!v) return;
+      var inp = document.getElementById('newYearGoalInput'); if (!inp) return;
+      var v = inp.value.trim(); if (!v) return;
       var pl = window.loadPlannerNew();
       if (!pl.years) pl.years = {};
       if (!pl.years[y]) pl.years[y] = {goals:[]};
@@ -1936,8 +1787,7 @@
 
     /* ============ مقالات ============ */
     window.renderBlog = function(){
-      var v = document.getElementById('view-blog');
-      if (!v) return;
+      var v = document.getElementById('view-blog'); if (!v) return;
       v.innerHTML = '<div class="page-title-bar"><div class="page-title-text">مقالات سراج</div></div>' +
         '<div class="community-hero"><div class="community-icon">' +
           '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>' +
@@ -1946,16 +1796,32 @@
         '<div class="community-badge">به‌زودی</div></div>';
     };
 
-    /* ============ هوک ============ */
+    /* ============ انیمیشن جابجایی صفحات ============ */
+    var VIEW_ORDER = {planner:0, blog:1, chat:2, tools:3, videos:4};
+    var origSwitchView = window.switchView;
+    window.switchView = function(v){
+      var oldView = document.querySelector('.view.active');
+      var oldId = oldView ? oldView.id.replace('view-','') : '';
+      origSwitchView.apply(this, arguments);
+      if (v !== oldId && oldId){
+        var newView = document.getElementById('view-' + v);
+        if (newView){
+          var oldIdx = VIEW_ORDER[oldId] !== undefined ? VIEW_ORDER[oldId] : 2;
+          var newIdx = VIEW_ORDER[v] !== undefined ? VIEW_ORDER[v] : 2;
+          newView.classList.remove('slide-in-from-left','slide-in-from-right');
+          void newView.offsetWidth;
+          if (newIdx > oldIdx) newView.classList.add('slide-in-from-left');
+          else if (newIdx < oldIdx) newView.classList.add('slide-in-from-right');
+        }
+      }
+      if (v === 'planner'){ setTimeout(function(){ renderPane(getTab()); window.renderPanelForPlanner(); }, 50); }
+    };
+
+    /* ============ هوک اولیه ============ */
     var origRenderPlanner = window.renderPlanner;
     window.renderPlanner = function(){
       origRenderPlanner.apply(this, arguments);
       setTimeout(function(){ renderPane(getTab()); window.renderPanelForPlanner(); }, 30);
-    };
-    var origSwitchView = window.switchView;
-    window.switchView = function(v){
-      origSwitchView.apply(this, arguments);
-      if (v === 'planner'){ setTimeout(function(){ renderPane(getTab()); window.renderPanelForPlanner(); }, 50); }
     };
 
     /* Labels */
@@ -1974,15 +1840,72 @@
       });
     }, 900);
 
-    /* ============ Settings: مشخصات من + درباره ما ============ */
+    /* ============ پروفایل شناور همه‌جا ============ */
+    function injectFloatingProfile(){
+      if (document.getElementById('floatingTopBar')) return;
+      var bar = document.createElement('div');
+      bar.id = 'floatingTopBar';
+      bar.className = 'floating-top-bar';
+
+      var av = document.createElement('div');
+      av.id = 'floatingUserAvatar';
+      av.className = 'header-user-avatar';
+      var p = getProfile();
+      av.title = p.name ? p.name : 'مشخصات من';
+      if (p.avatar) av.innerHTML = '<img src="' + p.avatar + '" alt="">';
+      else av.textContent = p.name ? p.name.substring(0,1) : '👤';
+      av.onclick = function(){
+        if (typeof window.openSettings === 'function') window.openSettings();
+        setTimeout(function(){
+          var b = document.querySelector('.settings-tab-btn[data-cat="profile"]');
+          if (b) b.click();
+        }, 400);
+      };
+
+      var lockBtn = document.createElement('button');
+      lockBtn.id = 'floatingLockBtn';
+      lockBtn.className = 'header-icon-btn';
+      lockBtn.title = 'قفل کردن سایت';
+      lockBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+      lockBtn.onclick = function(){ if (typeof window.lockNow === 'function') window.lockNow(); };
+
+      bar.appendChild(av);
+      bar.appendChild(lockBtn);
+      document.body.appendChild(bar);
+    }
+    setTimeout(injectFloatingProfile, 500);
+
+    function updateFloatingProfile(){
+      var av = document.getElementById('floatingUserAvatar');
+      if (!av) return;
+      var p = getProfile();
+      av.title = p.name ? p.name : 'مشخصات من';
+      if (p.avatar) av.innerHTML = '<img src="' + p.avatar + '" alt="">';
+      else av.textContent = p.name ? p.name.substring(0,1) : '👤';
+    }
+
+    /* ============ دکمه توقف — انیمیشن morph ============ */
+    setTimeout(function(){
+      var sendIcon = document.getElementById('sendIcon');
+      var sendBtn = document.getElementById('sendBtn');
+      if (!sendIcon || !sendBtn) return;
+      new MutationObserver(function(){
+        sendIcon.animate([
+          {transform: 'scale(0.4) rotate(-180deg)', opacity: 0.2},
+          {transform: 'scale(1.15) rotate(20deg)', opacity: 1},
+          {transform: 'scale(1) rotate(0deg)', opacity: 1}
+        ], {duration: 340, easing: 'cubic-bezier(.34,1.4,.64,1)'});
+      }).observe(sendIcon, {childList: true, subtree: true});
+    }, 1500);
+
+    /* ============ Settings: مشخصات + درباره ============ */
     var origOpenSettings = window.openSettings;
     window.openSettings = function(){
       origOpenSettings.apply(this, arguments);
       setTimeout(injectProfileTab, 250);
     };
     function injectProfileTab(){
-      var tabsWrap = document.getElementById('settingsTabs');
-      if (!tabsWrap) return;
+      var tabsWrap = document.getElementById('settingsTabs'); if (!tabsWrap) return;
       if (!tabsWrap.querySelector('[data-cat="profile"]')){
         var btn = document.createElement('button');
         btn.className = 'settings-tab-btn';
@@ -2002,8 +1925,7 @@
       renderAboutPane();
     }
     function renderProfilePane(){
-      var pane = document.querySelector('.settings-content[data-cat="profile"]');
-      if (!pane) return;
+      var pane = document.querySelector('.settings-content[data-cat="profile"]'); if (!pane) return;
       var p = getProfile();
       pane.innerHTML =
         '<div class="setting-group profile-section">' +
@@ -2030,6 +1952,7 @@
           if (window.toast) window.toast('مشخصات ذخیره شد ✓','success');
           if (typeof window.renderPanelForPlanner === 'function') window.renderPanelForPlanner();
           updateHeaderAvatar();
+          updateFloatingProfile();
         };
       }
       var av = document.getElementById('profileAvatarInput');
@@ -2046,6 +1969,7 @@
             if (window.toast) window.toast('عکس ذخیره شد ✓','success');
             renderProfilePane();
             updateHeaderAvatar();
+            updateFloatingProfile();
           };
           r.readAsDataURL(f);
         };
@@ -2059,19 +1983,16 @@
           if (window.toast) window.toast('عکس حذف شد','info');
           renderProfilePane();
           updateHeaderAvatar();
+          updateFloatingProfile();
         };
       }
     }
     function updateHeaderAvatar(){
-      var av = document.getElementById('headerUserAvatar');
-      if (!av) return;
+      var av = document.getElementById('headerUserAvatar'); if (!av) return;
       var p = getProfile();
       av.title = p.name ? p.name : 'مشخصات من';
-      if (p.avatar){
-        av.innerHTML = '<img src="' + p.avatar + '" alt="">';
-      } else {
-        av.textContent = p.name ? p.name.substring(0,1) : '👤';
-      }
+      if (p.avatar) av.innerHTML = '<img src="' + p.avatar + '" alt="">';
+      else av.textContent = p.name ? p.name.substring(0,1) : '👤';
     }
     function renderAboutPane(){
       var aboutContent = document.querySelector('.settings-content[data-cat="about"]');
@@ -2081,6 +2002,7 @@
           '<div class="about-avatar"><img src="siraj-logo.png" alt="سازنده" style="object-fit:contain;padding:14px"></div>' +
           '<div class="about-name">حامد انصاری‌فر</div>' +
           '<div class="about-role">سازنده سراج</div>' +
+          '<div class="about-welcome">🌸 خوش آمدی به دنیای سراج 🌸</div>' +
         '</div>' +
         '<div class="about-bio-card" style="line-height:2;white-space:pre-line;text-align:right">' +
           'سلام 👋\n' +
@@ -2161,8 +2083,7 @@
     /* رنگ ساعت */
     setTimeout(function(){
       function colorizeHours(){
-        var list = document.querySelector('.hours-list');
-        if (!list) return;
+        var list = document.querySelector('.hours-list'); if (!list) return;
         list.querySelectorAll('.hour-row').forEach(function(row){
           var hLabel = row.querySelector('.hour-label span:last-child');
           if (!hLabel) return;
@@ -2180,6 +2101,6 @@
       setTimeout(colorizeHours, 500);
     }, 200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v6 — Streak + Article + Confetti)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v7 — transitions + floating profile + icons)');
   }
 })();
