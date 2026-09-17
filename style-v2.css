@@ -1,8 +1,8 @@
 /* ============================================================
-   Siraj v2.0 — style-v2.css (v17 Final Debugged)
+   Siraj v2.0 — style-v2.css (v18 Final)
    ============================================================ */
 
-/* ============ ۰) VIEWها — چیدمان پایه ============ */
+/* ============ ۰) VIEWها ============ */
 .view{display:none}
 .view.active{
   display:flex;
@@ -52,14 +52,120 @@
   width:100%;
   padding:0 20px 16px;
   box-sizing:border-box;
+  transition:padding .35s cubic-bezier(.22,1,.36,1);
 }
 .input-bar-shell{
   width:100%;
   max-width:100%;
   position:relative;
+  transition:transform .4s cubic-bezier(.22,1,.36,1),max-width .4s cubic-bezier(.22,1,.36,1);
+}
+.input-bar-shell:focus-within{
+  transform:translateY(-4px);
+  max-width:94%;
+  margin:0 auto;
 }
 
-/* ============ ۱) نوارها (input / header / nav) ============ */
+/* ============ ۱) هدرها — همه یکسان، چسبیده ============ */
+.chat-header,
+.page-title-bar,
+.planner-hero{
+  position:sticky !important;
+  top:0 !important;
+  z-index:20;
+  flex-shrink:0;
+}
+.chat-header{
+  padding:10px 16px !important;
+  min-height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.page-title-bar{padding:14px 20px 10px;border-bottom:1px solid var(--border);text-align:center}
+
+/* هدر چت — فشرده */
+.chat-header .header-brand{gap:10px}
+.chat-header .brand-logo-wrap{
+  width:38px !important;
+  height:38px !important;
+  animation:logoGlowPulse 4s ease-in-out infinite;
+}
+.chat-header .brand-text h1{font-size:15px;gap:5px;line-height:1.2}
+.chat-header .brand-text h1 .small-word{font-size:.72em}
+.chat-header .brand-text h1 .accent-word{font-size:1.25em}
+.chat-header .brand-text .subtitle{font-size:9px;margin-top:1px}
+
+/* ★★★ مخفی کردن کامل قفل تکراری هدر ★★★ */
+#headerLockBtn,
+.chat-header #headerLockBtn,
+.chat-header .header-icon-btn#headerLockBtn{display:none !important}
+
+/* آواتار بالای چت — موقعیت ثابت، هماهنگ با هدر */
+.main-top-actions{
+  position:absolute;
+  top:12px;
+  left:14px;
+  z-index:45;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  direction:ltr;
+  pointer-events:auto;
+}
+.main-top-avatar{
+  width:36px;
+  height:36px;
+  min-width:36px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-family:'Lalezar','Vazirmatn',sans-serif;
+  font-size:13px;
+  font-weight:900;
+  cursor:pointer;
+  border:2px solid var(--panel-bg);
+  box-shadow:0 0 0 1.5px var(--accent),0 4px 14px -6px var(--accent);
+  overflow:hidden;
+  transition:transform .3s var(--ease-spring);
+}
+.main-top-avatar:hover{transform:scale(1.08)}
+.main-top-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+
+.main-top-icon-btn{
+  width:36px;
+  height:36px;
+  min-width:36px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--panel-bg);
+  color:var(--text-muted);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  transition:all .25s var(--ease-spring);
+}
+.main-top-icon-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  transform:scale(1.06);
+}
+.main-top-icon-btn svg{
+  width:16px;
+  height:16px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2.2;
+}
+
+/* ============ ۲) نوارها ============ */
 [data-input-style="solid"] .input-bar{
   background:var(--panel-bg);
   border-color:var(--border);
@@ -95,12 +201,12 @@
   border-color:var(--border);
 }
 
-/* ============ ۲) نوار پایین/بالا — باریک‌تر + گردتر ============ */
+/* ============ ۳) نوار پایین — گردتر، باریک‌تر ============ */
 .bottom-nav{
   position:relative;
-  padding:5px 10px;
-  gap:5px;
-  border-radius:24px;
+  padding:4px 8px;
+  gap:4px;
+  border-radius:28px;   /* ★ گردتر */
 }
 .bottom-nav::before{display:none}
 
@@ -144,7 +250,7 @@
 .input-bar-shell:focus-within::before{opacity:.45}
 .input-bar-shell:focus-within::after{opacity:.2}
 
-/* دکمه‌های نوار — کوچک‌تر و گردتر */
+/* دکمه‌های نوار */
 .nav-collapse-tab,
 .bottom-nav-btn{
   height:38px;
@@ -160,6 +266,7 @@
   min-width:42px;
   width:auto;
   max-width:42px;
+  position:relative;
   transition:
     background .45s cubic-bezier(.22,1,.36,1),
     color .3s,
@@ -168,74 +275,87 @@
     border-color .3s,
     box-shadow .5s cubic-bezier(.22,1,.36,1);
 }
-.nav-collapse-tab{
-  max-width:42px;
-  border:1px solid var(--border);
-  background:var(--panel-bg);
-}
-.bottom-nav-btn[data-label]{
-  flex-direction:row-reverse;
-  max-width:42px;
-}
 
-.bottom-nav-btn[data-label] .nav-btn-label{
+/* ★ لیبل خودکار از title دکمه ★ */
+.bottom-nav-btn::after,
+.nav-collapse-tab::after{
+  content:attr(title);
   max-width:0;
   opacity:0;
   overflow:hidden;
   white-space:nowrap;
   font-family:var(--font-text);
-  font-size:11.5px;
+  font-size:11px;
   font-weight:700;
   color:currentColor;
-  margin-left:0;
   pointer-events:none;
-  order:-1;
-  transform:translateX(6px);
   transition:
     max-width .5s cubic-bezier(.22,1,.36,1),
     opacity .35s,
-    transform .5s cubic-bezier(.22,1,.36,1),
     margin .5s cubic-bezier(.22,1,.36,1);
 }
 
-.bottom-nav-btn[data-label].active{
-  max-width:150px;
-  padding:0 12px 0 8px;
-  gap:6px;
-}
-.bottom-nav-btn[data-label].active .nav-btn-label{
+/* دکمه‌های افقی (پایین/بالا): لیبل سمت چپِ آیکون */
+[data-nav-position="bottom"] .bottom-nav-btn:not(.nav-btn-chat).active::after,
+[data-nav-position="top"] .bottom-nav-btn:not(.nav-btn-chat).active::after{
   max-width:110px;
   opacity:1;
-  margin-left:6px;
-  transform:translateX(0);
+  margin-right:6px;
 }
-.bottom-nav-btn[data-label]:not(.active):hover .nav-btn-label{
-  max-width:0;
-  opacity:0;
-  margin-left:0;
-  transform:translateX(6px);
+[data-nav-position="bottom"] .bottom-nav-btn:not(.nav-btn-chat).active,
+[data-nav-position="top"] .bottom-nav-btn:not(.nav-btn-chat).active{
+  max-width:150px;
+  padding:0 10px 0 8px;
 }
 
-.bottom-nav-btn.active:not(.nav-btn-chat){
-  background:transparent;
-  border-color:transparent;
-  box-shadow:none;
-  color:#fff;
+/* دکمه‌های عمودی (چپ/راست): لیبل زیر آیکون */
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat){
+  flex-direction:column;
+  height:auto;
+  min-height:38px;
+  max-height:56px;
+  padding:6px 4px;
+  gap:2px;
 }
-.bottom-nav-btn.active:not(.nav-btn-chat) svg{
-  stroke:#fff;
-  fill:none;
-  color:#fff;
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat).active,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat).active{
+  max-height:64px;
+  padding:6px 4px;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat).active::after,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat).active::after{
+  max-width:80px;
+  opacity:1;
+  margin-top:2px;
+}
+[data-nav-position="left"] .bottom-nav-btn svg,
+[data-nav-position="right"] .bottom-nav-btn svg{
+  width:18px;
+  height:18px;
 }
 
-/* دکمه چت */
+/* ★ نوار چپ/راست را همیشه در وسط نگه دار ★ */
+[data-nav-position="left"] .nav-row,
+[data-nav-position="right"] .nav-row{
+  top:50% !important;
+  transform:translateY(-50%) !important;
+}
+[data-nav-position="left"] .nav-row.collapsed{
+  transform:translateY(-50%) translateX(calc(-100% + 26px)) !important;
+}
+[data-nav-position="right"] .nav-row.collapsed{
+  transform:translateY(-50%) translateX(calc(100% - 26px)) !important;
+}
+[data-nav-position="left"] .nav-row.collapsed:hover,
+[data-nav-position="right"] .nav-row.collapsed:hover{
+  transform:translateY(-50%) translateX(0) !important;
+}
+
+/* چت FAB */
 .bottom-nav-btn.nav-btn-chat,
 [data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
-[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat,
-[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat.active,
-[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat.active,
-[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat:hover,
-[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat:hover{
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat{
   flex:0 0 46px;
   width:46px;
   min-width:46px;
@@ -265,7 +385,14 @@
   filter:brightness(1.15);
 }
 .bottom-nav-btn.nav-btn-chat:active{transform:scale(.95)}
-.bottom-nav-btn.nav-btn-chat .nav-btn-label{display:none}
+.bottom-nav-btn.nav-btn-chat::after{display:none}
+
+.nav-collapse-tab{
+  max-width:42px;
+  border:1px solid var(--border);
+  background:var(--panel-bg);
+}
+.nav-collapse-tab::after{display:none}
 
 .nav-row.pinned .nav-collapse-tab{
   background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
@@ -273,6 +400,14 @@
   border-color:var(--accent);
   box-shadow:0 6px 20px -6px var(--accent);
 }
+
+.bottom-nav-btn.active:not(.nav-btn-chat){
+  background:transparent;
+  border-color:transparent;
+  box-shadow:none;
+  color:#fff;
+}
+.bottom-nav-btn.active:not(.nav-btn-chat) svg{stroke:#fff;fill:none}
 
 .nav-slider{
   position:absolute;
@@ -293,54 +428,21 @@
 }
 .bottom-nav-btn,.nav-collapse-tab{position:relative;z-index:1}
 
-/* ============ ۲.۵) نوار چپ/راست ============ */
-/* حفظ translateY(-50%) برای وسط‌چین موندن */
-[data-nav-position="left"] .nav-row.collapsed{
-  transform:translateY(-50%) translateX(calc(-100% + 26px));
-}
-[data-nav-position="right"] .nav-row.collapsed{
-  transform:translateY(-50%) translateX(calc(100% - 26px));
-}
-[data-nav-position="left"] .nav-row.collapsed:hover,
-[data-nav-position="right"] .nav-row.collapsed:hover{
-  transform:translateY(-50%) translateX(0);
-}
+/* ============ ۳.۵) تنظیمات موقعیت نوار — ترتیب دکمه‌ها ============ */
+/* راست → پایین → بالا → چپ */
+.settings-body .row-btns{display:grid;grid-template-columns:repeat(4,1fr)}
+.settings-body .row-btns > *:nth-child(1){order:1}  /* راست */
+.settings-body .row-btns > *:nth-child(2){order:4}  /* چپ → آخر */
+.settings-body .row-btns > *:nth-child(3){order:3}  /* بالا */
+.settings-body .row-btns > *:nth-child(4){order:2}  /* پایین → دوم */
 
-/* نوار چپ/راست — جهت لیبل کنار آیکون، نه زیرش */
-[data-nav-position="left"] .bottom-nav-btn,
-[data-nav-position="right"] .bottom-nav-btn{
-  flex-direction:row-reverse;
-  max-width:42px;
-}
-[data-nav-position="left"] .bottom-nav-btn[data-label].active,
-[data-nav-position="right"] .bottom-nav-btn[data-label].active{
-  max-width:160px;
-  padding:0 10px 0 8px;
-  gap:6px;
-}
-[data-nav-position="left"] .bottom-nav-btn[data-label].active .nav-btn-label,
-[data-nav-position="right"] .bottom-nav-btn[data-label].active .nav-btn-label{
-  max-width:120px;
-  opacity:1;
-  margin-left:6px;
-  transform:translateX(0);
-}
-
-/* نوار کناری — همیشه عمودی بمون */
-[data-nav-position="left"] .bottom-nav,
-[data-nav-position="right"] .bottom-nav{
-  padding:6px 5px;
-  gap:3px;
-  border-radius:22px;
-}
-
-/* ============ ۳) هیرو برنامه‌ریز ============ */
+/* ============ ۴) هیرو برنامه‌ریز ============ */
 .planner-hero-card{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:14px;
-  padding:20px 22px;
+  padding:18px 22px;
   margin:14px 20px 0;
   border-radius:24px;
   background:var(--bubble-bot-bg);
@@ -444,7 +546,7 @@
   transform:translateY(-2px);
 }
 
-/* ============ ۴) فرم افزودن کار ============ */
+/* ============ ۵) فرم افزودن کار ============ */
 .task-add-form{
   display:flex;
   gap:8px;
@@ -502,7 +604,7 @@
   stroke-width:2.4;
 }
 
-/* ============ ۵) تسک‌ها ============ */
+/* ============ ۶) تسک‌ها ============ */
 .tasks-list-title{
   font-size:12px;
   font-weight:800;
@@ -551,7 +653,7 @@
   background:var(--accent-soft);
   transform:translateX(-3px);
 }
-.task-item.done{opacity:.5}
+.task-item.done{opacity:.55}
 .task-item.done .task-title{
   text-decoration:line-through;
   color:var(--text-muted);
@@ -656,7 +758,7 @@
 .tasks-done-list .task-item{
   background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.02));
   border-right-color:#10B981;
-  opacity:.75;
+  opacity:.8;
 }
 .tasks-done-empty{
   font-size:11.5px;
@@ -668,10 +770,17 @@
   border:1px dashed var(--border);
   opacity:.7;
 }
-.studied-badge{color:#10B981;font-weight:700}
+.studied-badge{
+  color:#10B981;
+  font-weight:800;
+  padding:2px 8px;
+  border-radius:6px;
+  background:rgba(16,185,129,.12);
+  border:1px solid rgba(16,185,129,.3);
+}
 .no-time-badge{color:var(--text-muted);opacity:.7}
 
-/* ============ ۶) آمار هفته ============ */
+/* ============ ۷) آمار هفته ============ */
 .week-stats-bar{
   display:flex;
   gap:10px;
@@ -679,7 +788,7 @@
   margin:14px 20px 0;
   padding:10px 14px;
   border-radius:14px;
-  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+  background:var(--panel-bg);
   border:1px solid var(--border);
   font-size:11.5px;
   color:var(--text-main);
@@ -688,7 +797,7 @@
 .wsb-item b{color:var(--accent)}
 .wsb-item.warn{color:#F59E0B}
 
-/* ============ ۷) تقویم ============ */
+/* ============ ۸) تقویم ============ */
 .month-calendar{
   padding:16px;
   margin:14px 20px 16px;
@@ -733,9 +842,9 @@
 .cal-day{
   min-height:58px;
   padding:6px 4px;
-  border-radius:16px;   /* گردتر */
+  border-radius:16px;
   aspect-ratio:auto;
-  background:rgba(255,255,255,.035);
+  background:rgba(255,255,255,.04);
   border:1px solid transparent;
   cursor:pointer;
   transition:all .22s cubic-bezier(.22,1,.36,1);
@@ -747,9 +856,7 @@
   position:relative;
   overflow:hidden;
 }
-[data-theme^="light"] .cal-day{
-  background:rgba(0,0,0,.025);
-}
+[data-theme^="light"] .cal-day{background:rgba(0,0,0,.025)}
 .cal-day:hover{
   border-color:var(--accent);
   transform:translateY(-2px) scale(1.04);
@@ -891,7 +998,7 @@
   margin:12px 20px 0;
   padding:8px 12px;
   border-radius:12px;
-  background:rgba(255,255,255,.025);
+  background:var(--panel-bg);
   border:1px solid var(--border);
   font-size:10px;
   color:var(--text-muted);
@@ -912,7 +1019,7 @@
 .cl-item.occ .cl-icon-svg{color:#C084FC}
 .cl-item.evt .cl-icon-svg{color:#60A5FA}
 
-/* ============ ۸) چیدمان ماهانه/سالانه ============ */
+/* ============ ۹) چیدمان ماهانه/سالانه ============ */
 .monthly-layout{
   display:grid;
   grid-template-columns:260px 1fr;
@@ -931,8 +1038,7 @@
   flex-direction:column;
   gap:12px;
   position:sticky;
-  top:14px;
-  padding-top:38px;  /* هم‌تراز شدن با تقویم */
+  top:80px;
 }
 .monthly-layout .month-goals,
 .monthly-layout .month-calendar,
@@ -943,18 +1049,21 @@
   width:max-content;
 }
 
+/* ★ اهداف ماهانه — پس‌زمینه مات ★ */
 .month-goals{
   padding:16px 18px;
   border-radius:20px;
-  background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
-  border:1px solid var(--border);
+  background:var(--panel-bg);
+  border:1px solid var(--border-strong);
+  box-shadow:0 8px 24px -14px rgba(0,0,0,.5);
   position:relative;
   overflow:visible;
   animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;
   animation-delay:.1s;
 }
 [data-theme^="light"] .month-goals{
-  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
+  background:#FFFFFF;
+  border-color:rgba(0,0,0,.1);
 }
 .planner-pane > .month-goals{margin:14px 20px 0}
 
@@ -993,13 +1102,11 @@
   gap:12px;
   padding:12px 14px;
   border-radius:14px;
-  background:rgba(255,255,255,.03);
+  background:rgba(255,255,255,.04);
   border:1px solid var(--border);
   transition:all .25s cubic-bezier(.22,1,.36,1);
 }
-[data-theme^="light"] .month-goal{
-  background:rgba(0,0,0,.02);
-}
+[data-theme^="light"] .month-goal{background:rgba(0,0,0,.03)}
 .month-goal:hover{
   border-color:var(--accent);
   background:var(--accent-soft);
@@ -1188,8 +1295,8 @@
 }
 
 .year-goals{
-  background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(212,175,55,.02));
-  border-color:rgba(212,175,55,.25);
+  background:var(--panel-bg);
+  border-color:rgba(212,175,55,.35);
 }
 .year-goals .month-goals-title{
   color:#D4AF37;
@@ -1213,13 +1320,15 @@
   padding:18px 20px;
   margin:14px 20px 20px;
   border-radius:20px;
-  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
-  border:1px solid var(--border);
+  background:var(--panel-bg);
+  border:1px solid var(--border-strong);
+  box-shadow:0 8px 24px -14px rgba(0,0,0,.5);
   animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;
   animation-delay:.1s;
 }
 [data-theme^="light"] .year-overview{
-  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
+  background:#FFFFFF;
+  border-color:rgba(0,0,0,.1);
 }
 .year-overview-title{
   font-size:13px;
@@ -1243,16 +1352,14 @@
 .year-month-card{
   padding:10px 8px;
   border-radius:12px;
-  background:rgba(255,255,255,.03);
+  background:rgba(255,255,255,.04);
   border:1px solid var(--border);
   text-align:center;
   transition:all .25s cubic-bezier(.22,1,.36,1);
   cursor:pointer;
   user-select:none;
 }
-[data-theme^="light"] .year-month-card{
-  background:rgba(0,0,0,.02);
-}
+[data-theme^="light"] .year-month-card{background:rgba(0,0,0,.03)}
 .year-month-card:hover{
   border-color:var(--accent);
   background:var(--accent-soft);
@@ -1277,9 +1384,7 @@
   overflow:hidden;
   margin-bottom:6px;
 }
-[data-theme^="light"] .ymc-bar{
-  background:rgba(0,0,0,.08);
-}
+[data-theme^="light"] .ymc-bar{background:rgba(0,0,0,.08)}
 .ymc-fill{
   height:100%;
   background:linear-gradient(90deg,var(--accent-light),var(--accent));
@@ -1292,7 +1397,7 @@
   font-weight:700;
 }
 
-/* ============ ۹) Select ============ */
+/* ============ ۱۰) Select ============ */
 .siraj-select{
   position:relative;
   display:inline-block;
@@ -1394,7 +1499,7 @@
 .siraj-select-item .dot.yellow{background:linear-gradient(135deg,#F59E0B,#FBBF24)}
 .siraj-select-item .dot.green{background:linear-gradient(135deg,#10B981,#34D399)}
 
-/* ============ ۱۰) جدول هفتگی — بازطراحی‌شده ============ */
+/* ============ ۱۱) جدول هفتگی ============ */
 .week-grid-wrap{
   overflow-x:auto;
   border-radius:20px;
@@ -1417,7 +1522,6 @@
   min-width:820px;
   font-size:11.5px;
 }
-
 .week-table th,
 .week-table td{
   border:none;
@@ -1430,7 +1534,6 @@
 .week-table th:last-child,
 .week-table td:last-child{border-left:none}
 .week-table tr:last-child td{border-bottom:none}
-
 .week-table th{
   background:linear-gradient(180deg,rgba(59,130,246,.18),rgba(59,130,246,.06));
   color:var(--accent-light);
@@ -1446,7 +1549,6 @@
   background:linear-gradient(180deg,rgba(37,99,235,.14),rgba(37,99,235,.04));
   color:var(--accent-dark);
 }
-
 .week-table th.hour-col{width:60px;font-size:10.5px}
 .week-table td.hour-cell{
   background:rgba(59,130,246,.06);
@@ -1460,7 +1562,6 @@
 [data-theme^="light"] .week-table td.hour-cell{
   background:rgba(37,99,235,.05);
 }
-
 .week-table td.task-cell{
   padding:0;
   min-height:52px;
@@ -1468,12 +1569,8 @@
   vertical-align:middle;
   transition:background .2s;
 }
-.week-table td.task-cell:hover{
-  background:rgba(59,130,246,.04);
-}
-.week-table td.task-cell.today{
-  background:rgba(59,130,246,.08);
-}
+.week-table td.task-cell:hover{background:rgba(59,130,246,.04)}
+.week-table td.task-cell.today{background:rgba(59,130,246,.08)}
 .week-table td.task-cell.has-task input.cell-input{display:none}
 
 .week-cell-edit{
@@ -1615,11 +1712,8 @@
   margin:14px 20px 20px;
   padding:14px 16px;
   border-radius:16px;
-  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
-  border:1px solid var(--border);
-}
-[data-theme^="light"] .week-summary{
-  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
+  background:var(--panel-bg);
+  border:1px solid var(--border-strong);
 }
 .ws-box{text-align:center}
 .ws-num{
@@ -1635,7 +1729,7 @@
   font-weight:700;
 }
 
-/* ============ ۱۱) Popup ============ */
+/* ============ ۱۲) Popup ============ */
 .siraj-popup-overlay{
   position:fixed;
   inset:0;
@@ -1762,7 +1856,7 @@
   font-size:11.5px;
   padding:6px 10px;
   border-radius:8px;
-  background:rgba(255,255,255,.03);
+  background:rgba(255,255,255,.04);
   color:var(--text-main);
   font-weight:600;
   display:flex;
@@ -1785,7 +1879,7 @@
   gap:8px;
   padding:6px 10px;
   border-radius:8px;
-  background:rgba(255,255,255,.03);
+  background:rgba(255,255,255,.04);
   border:1px solid var(--border);
   font-size:11.5px;
 }
@@ -1843,7 +1937,7 @@
 }
 .cal-rem-add button:hover{transform:translateY(-1px)}
 
-/* ============ ۱۲) حالت مطالعه — با انیمیشن ورود ============ */
+/* ============ ۱۳) حالت مطالعه ============ */
 .study-overlay{
   position:fixed;
   inset:0;
@@ -1972,13 +2066,19 @@
   font-size:14px;
   font-weight:800;
   cursor:pointer;
-  transition:transform .2s,box-shadow .2s;
+  transition:transform .2s,box-shadow .2s,opacity .3s;
   box-shadow:0 8px 24px -8px var(--accent);
   display:inline-flex;
   align-items:center;
   gap:8px;
 }
-.study-btn:hover{transform:translateY(-2px)}
+.study-btn:hover:not(:disabled){transform:translateY(-2px)}
+.study-btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  filter:grayscale(.5);
+  transform:none !important;
+}
 .study-btn.secondary{
   background:var(--panel-bg);
   color:var(--text-muted);
@@ -2054,26 +2154,16 @@
 }
 .stp-num{
   font-family:'JetBrains Mono','Vazirmatn',monospace;
-  font-size:42px;
+  font-size:38px;
   font-weight:900;
   color:var(--accent);
-  line-height:1;
-  min-width:80px;
+  line-height:1.1;
+  min-width:140px;
   text-align:center;
-  direction:ltr;
-  letter-spacing:-1px;
+  direction:rtl;
   transition:transform .2s var(--ease-smooth);
 }
 .stp-wrap.dragging .stp-num{transform:scale(1.06)}
-.stp-unit{
-  font-size:13px;
-  font-weight:700;
-  color:var(--text-muted);
-  padding:6px 12px;
-  border-radius:10px;
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--border);
-}
 .stp-hint{
   position:absolute;
   top:-9px;
@@ -2089,7 +2179,7 @@
 }
 .stp-wrap.dragging .stp-hint{color:var(--accent)}
 
-/* ★★★ دکمه‌های صدا — قبلاً استایل نداشتن ★★★ */
+/* ★★★ دکمه‌های صدا — استایل کامل ★★★ */
 .study-music-section{
   width:100%;
   display:flex;
@@ -2197,17 +2287,11 @@
   cursor:grab;
   transition:transform .15s var(--ease-spring);
 }
-.study-volume-row input[type="range"]::-webkit-slider-thumb:hover{
-  transform:scale(1.15);
-}
+.study-volume-row input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.15)}
 .study-volume-row input[type="range"]::-moz-range-thumb{
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:var(--accent);
-  border:3px solid var(--panel-bg);
-  box-shadow:0 2px 8px rgba(0,0,0,.4);
-  cursor:grab;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--accent);border:3px solid var(--panel-bg);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:grab;
 }
 .study-now-playing{
   display:inline-flex;
@@ -2222,7 +2306,7 @@
   font-weight:700;
 }
 
-/* ============ ۱۳) چت مطالعه ============ */
+/* ============ ۱۴) چت مطالعه ============ */
 .study-chat-panel{
   position:fixed;
   bottom:max(16px,env(safe-area-inset-bottom));
@@ -2351,7 +2435,7 @@
 }
 .study-chat-send:hover{transform:scale(1.06)}
 
-/* ============ ۱۴) site-credit ============ */
+/* ============ ۱۵) site-credit ============ */
 .site-credit{
   position:fixed;
   bottom:10px;
@@ -2390,14 +2474,14 @@
   opacity:.75;
 }
 
-/* ============ ۱۵) Contact rows — بدون دکمه کپی ============ */
+/* ============ ۱۶) Contact rows ============ */
 .contact-row-v2{
   display:flex;
   align-items:center;
   gap:12px;
   padding:14px 16px;
   border-radius:14px;
-  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+  background:var(--panel-bg);
   border:1px solid var(--border);
   cursor:pointer;
   transition:all .28s cubic-bezier(.22,1,.36,1);
@@ -2405,9 +2489,6 @@
   color:var(--text-main);
   position:relative;
   overflow:hidden;
-}
-[data-theme^="light"] .contact-row-v2{
-  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
 }
 .contact-row-v2::before{
   content:'';
@@ -2427,7 +2508,7 @@
 }
 .contact-row-v2:hover::before{opacity:1}
 
-/* مخفی کردن دکمه کپی */
+/* ★ حذف دکمه کپی ★ */
 .contact-copy,
 .contact-row .contact-copy,
 .contact-row-v2 .contact-copy{display:none !important}
@@ -2485,7 +2566,7 @@
 .contact-row-v2 .ci-instagram{background:linear-gradient(135deg,#833AB4,#E1306C,#F77737)}
 .contact-row-v2 .ci-x{background:linear-gradient(135deg,#000,#333)}
 
-/* ============ ۱۶) نسخه + آواتار + پروفایل ============ */
+/* ============ ۱۷) نسخه + آواتار + پروفایل ============ */
 .siraj-version-badge{
   background:transparent;
   border:none;
@@ -2521,32 +2602,16 @@
 .welcome-halo{width:420px;height:420px;filter:blur(95px)}
 
 .header-user-avatar{
-  width:40px;
-  height:40px;
-  min-width:40px;
-  border-radius:50%;
+  width:40px;height:40px;min-width:40px;border-radius:50%;
   background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
+  display:flex;align-items:center;justify-content:center;color:#fff;
   font-family:'Lalezar','Vazirmatn',sans-serif;
-  font-size:15px;
-  font-weight:900;
-  cursor:pointer;
-  flex-shrink:0;
-  border:2px solid var(--panel-bg);
-  box-shadow:0 0 0 1.5px var(--accent);
-  overflow:hidden;
-  transition:transform .3s var(--ease-spring);
+  font-size:15px;font-weight:900;cursor:pointer;flex-shrink:0;
+  border:2px solid var(--panel-bg);box-shadow:0 0 0 1.5px var(--accent);
+  overflow:hidden;transition:transform .3s var(--ease-spring);
 }
 .header-user-avatar:hover{transform:scale(1.08)}
-.header-user-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
+.header-user-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 
 .panel-header{
   position:relative;
@@ -2567,145 +2632,44 @@
   z-index:10;
 }
 .panel-header-avatar{
-  width:38px;
-  height:38px;
-  min-width:38px;
-  border-radius:50%;
+  width:38px;height:38px;min-width:38px;border-radius:50%;
   background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
+  display:flex;align-items:center;justify-content:center;color:#fff;
   font-family:'Lalezar','Vazirmatn',sans-serif;
-  font-size:14px;
-  font-weight:900;
-  cursor:pointer;
-  border:2px solid var(--panel-bg);
-  box-shadow:0 0 0 1.5px var(--accent);
-  overflow:hidden;
-  transition:transform .3s var(--ease-spring);
+  font-size:14px;font-weight:900;cursor:pointer;
+  border:2px solid var(--panel-bg);box-shadow:0 0 0 1.5px var(--accent);
+  overflow:hidden;transition:transform .3s var(--ease-spring);
 }
 .panel-header-avatar:hover{transform:scale(1.08)}
-.panel-header-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
+.panel-header-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .panel-header-icon-btn{
-  width:38px;
-  height:38px;
-  min-width:38px;
-  border-radius:50%;
-  border:1px solid var(--border);
-  background:var(--panel-bg);
-  color:var(--text-muted);
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0;
+  width:38px;height:38px;min-width:38px;border-radius:50%;
+  border:1px solid var(--border);background:var(--panel-bg);
+  color:var(--text-muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;
   transition:all .25s var(--ease-spring);
 }
 .panel-header-icon-btn:hover{
-  border-color:var(--accent);
-  color:var(--accent);
-  transform:scale(1.06);
+  border-color:var(--accent);color:var(--accent);transform:scale(1.06);
 }
 .panel-header-icon-btn svg{
-  width:17px;
-  height:17px;
-  stroke:currentColor;
-  fill:none;
-  stroke-width:2.2;
+  width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2;
 }
 #panelHeaderPinBtn{display:none}
 
-/* ★ آواتار بالای چت — موقعیت بهتر، بدون گوشه‌چسبیدن ★ */
-.main-top-actions{
-  position:absolute;
-  top:20px;
-  left:24px;
-  z-index:45;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  direction:ltr;
-  pointer-events:auto;
-}
-.main-top-avatar{
-  width:40px;
-  height:40px;
-  min-width:40px;
-  border-radius:50%;
-  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-family:'Lalezar','Vazirmatn',sans-serif;
-  font-size:14px;
-  font-weight:900;
-  cursor:pointer;
-  border:2px solid var(--panel-bg);
-  box-shadow:0 0 0 1.5px var(--accent),0 4px 14px -6px var(--accent);
-  overflow:hidden;
-  transition:transform .3s var(--ease-spring);
-}
-.main-top-avatar:hover{transform:scale(1.08)}
-.main-top-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-.main-top-icon-btn{
-  width:40px;
-  height:40px;
-  min-width:40px;
-  border-radius:50%;
-  border:1px solid var(--border);
-  background:var(--panel-bg);
-  color:var(--text-muted);
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0;
-  transition:all .25s var(--ease-spring);
-}
-.main-top-icon-btn:hover{
-  border-color:var(--accent);
-  color:var(--accent);
-  transform:scale(1.06);
-}
-.main-top-icon-btn svg{
-  width:17px;
-  height:17px;
-  stroke:currentColor;
-  fill:none;
-  stroke-width:2.2;
-}
-
-/* ★ مخفی کردن قفل تکراری در هدر چت (JS یکی دیگه اضافه می‌کنه) ★ */
-.chat-header .header-icon-btn#headerLockBtn{display:none !important}
-
 .profile-section{
-  padding:16px;
-  border:1px solid var(--border);
-  border-radius:14px;
-  background:rgba(255,255,255,.02);
-  margin-bottom:14px;
+  padding:16px;border:1px solid var(--border);border-radius:14px;
+  background:var(--panel-bg);margin-bottom:14px;
 }
 .profile-section .about-avatar{margin:0 auto}
 .profile-section input:focus,
 .profile-section textarea:focus{border-color:var(--accent)}
 
-/* ★ مخفی کردن تب پروفایل در تنظیمات ★ */
+/* ★ مخفی کردن تب پروفایل تنظیمات (به‌درخواست کاربر) ★ */
 .settings-tab-btn[data-cat="profile"]{display:none !important}
 .settings-content[data-cat="profile"]{display:none !important}
 
-/* ============ ۱۷) قفل ============ */
+/* ============ ۱۸) قفل ============ */
 .lock-screen.open .lock-box{animation:lockIn .55s cubic-bezier(.34,1.4,.64,1)}
 @keyframes lockIn{
   0%{opacity:0;transform:scale(.85) translateY(30px)}
@@ -2719,7 +2683,7 @@
   50%{box-shadow:0 0 0 4px var(--panel-bg),0 0 0 5px var(--accent),0 12px 40px -6px var(--accent)}
 }
 
-/* ============ ۱۸) رنگ ساعت ============ */
+/* ============ ۱۹) رنگ ساعت ============ */
 .hour-row.time-morning{
   border-right:3px solid #60A5FA;
   background:linear-gradient(90deg,rgba(96,165,250,.06),transparent);
@@ -2746,7 +2710,7 @@
 }
 .hour-row.time-night .hour-label{background:rgba(99,102,241,.15);color:#6366F1}
 
-/* ============ ۱۹) پنل راست — تب‌های عمودی ============ */
+/* ============ ۲۰) پنل راست ============ */
 .panel-planner-tabs{
   direction:rtl;
   display:flex;
@@ -2766,7 +2730,7 @@
   padding:14px 18px;
   border-radius:18px;
   border:1px solid var(--border);
-  background:rgba(255,255,255,.02);
+  background:var(--panel-bg);
   color:var(--text-muted);
   font-family:var(--font-text);
   font-size:13px;
@@ -2774,16 +2738,8 @@
   cursor:pointer;
   transition:all .3s cubic-bezier(.22,1,.36,1);
 }
-[data-theme^="light"] .panel-planner-tab{
-  background:rgba(0,0,0,.02);
-}
 .panel-planner-tab svg{
-  width:18px;
-  height:18px;
-  stroke:currentColor;
-  fill:none;
-  stroke-width:2;
-  flex-shrink:0;
+  width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;
 }
 .panel-planner-tab:hover{
   background:var(--accent-soft);
@@ -2823,95 +2779,50 @@
 }
 
 .guide-card .guide-list{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  padding:4px 0;
+  display:flex;flex-direction:column;gap:8px;padding:4px 0;
 }
 .guide-card .guide-item{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:8px 10px;
-  border-radius:10px;
-  background:rgba(255,255,255,.02);
-  border:1px solid var(--border);
-  font-size:11.5px;
-  color:var(--text-main);
-  justify-content:flex-start;
-}
-[data-theme^="light"] .guide-card .guide-item{
-  background:rgba(0,0,0,.02);
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border-radius:10px;background:var(--panel-bg);border:1px solid var(--border);
+  font-size:11.5px;color:var(--text-main);justify-content:flex-start;
 }
 .guide-card .guide-item span{font-size:14px;line-height:1}
 .guide-card,
 .guide-card .card-title,
 .guide-card .guide-item{direction:rtl;text-align:right}
 
-/* ★★★ مخفی کردن تب‌های برنامه‌ریز جا افتاده ★★★ */
-/* اگه .planner-tabs جایی رندر شد، حذف کن چون توی پنل راست هستن */
+/* ★ مخفی کردن تب‌های قدیمی ★ */
 .planner-tabs,
-.planner-tab{display:none !important}
-.planner-pane > .panel-planner-tabs{display:none !important}
+.planner-tab,
+.planner-pane > .panel-planner-tabs,
 .planner-body > .planner-tabs{display:none !important}
 
-/* ============ ۲۰) مقالات و انجمن ============ */
+/* ============ ۲۱) مقالات و انجمن ============ */
 .blog-view.active,
-.videos-view.active{
-  align-items:center;
-}
+.videos-view.active{align-items:center}
 .blog-view .page-title-bar,
-.videos-view .page-title-bar{
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
-}
+.videos-view .page-title-bar{width:100%;max-width:100%;box-sizing:border-box}
 .community-hero{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  max-width:640px;
-  margin:30px auto;
-  padding:38px 30px;
-  border-radius:22px;
-  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
-  border:1px solid var(--border);
-  width:calc(100% - 60px);
-  box-sizing:border-box;
-}
-[data-theme^="light"] .community-hero{
-  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;max-width:640px;margin:30px auto;padding:38px 30px;
+  border-radius:22px;background:var(--panel-bg);border:1px solid var(--border-strong);
+  box-shadow:0 8px 24px -14px rgba(0,0,0,.5);
+  width:calc(100% - 60px);box-sizing:border-box;
 }
 .community-hero .community-icon{margin:0 auto 14px}
-.community-hero .community-title{
-  text-align:center;
-  margin-bottom:12px;
-}
+.community-hero .community-title{text-align:center;margin-bottom:12px}
 .community-hero .community-desc{
-  text-align:center;
-  line-height:2;
-  max-width:520px;
-  margin:0 auto 16px;
-  color:var(--text-muted);
-  font-size:13px;
+  text-align:center;line-height:2;max-width:520px;
+  margin:0 auto 16px;color:var(--text-muted);font-size:13px;
 }
 .community-hero .community-badge{
-  margin:0 auto;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
+  margin:0 auto;display:inline-flex;align-items:center;gap:6px;
 }
 .community-hero .community-badge svg{
-  width:14px;
-  height:14px;
-  stroke:currentColor;
-  fill:none;
-  stroke-width:2;
+  width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;
 }
 
-/* ============ ۲۱) انیمیشن‌ها ============ */
+/* ============ ۲۲) انیمیشن‌ها ============ */
 .heroRollRight{
   display:inline-block;
   animation:heroSlideFromRight .5s cubic-bezier(.22,1,.36,1);
@@ -2942,15 +2853,6 @@
   will-change:opacity,transform;
 }
 
-.study-btn,
-.row-btn.active,
-[onclick*="__openStudy"]{
-  transition:
-    transform .3s cubic-bezier(.22,1,.36,1),
-    box-shadow .35s cubic-bezier(.22,1,.36,1),
-    background .3s;
-}
-
 .msg-wrap.me:not(.no-anim){animation:msgUserInNew .55s var(--ease-smooth) both}
 .msg-wrap.bot:not(.no-anim){animation:msgBotInNew .55s var(--ease-smooth) both}
 @keyframes msgUserInNew{
@@ -2962,47 +2864,41 @@
   to{opacity:1;transform:translate(0,0) scale(1);filter:blur(0)}
 }
 
-/* ============ ۲۲) نوار مخفی چپ/راست ============ */
-[data-nav-position="right"] .nav-row,
-[data-nav-position="left"] .nav-row{
-  transition:transform .42s cubic-bezier(.22,1,.36,1),opacity .3s ease;
-}
-[data-nav-position="right"] .nav-row{padding-right:0}
-[data-nav-position="left"] .nav-row{padding-left:0}
-
-.app-container,
-.top-row,
-.side-panel,
-.main-chat,
-.nav-row,
-.view,
-.planner-view,
-.planner-body,
-.planner-pane{
+/* ============ ۲۳) پنل کناری — انیمیشن باز/بسته ★ ============ */
+/* ★ به‌جای display:none از opacity استفاده کن تا انیمیشن داشته باشه ★ */
+.side-panel{
   transition:
     width .4s cubic-bezier(.22,1,.36,1),
-    height .4s cubic-bezier(.22,1,.36,1),
-    max-width .4s cubic-bezier(.22,1,.36,1),
-    max-height .4s cubic-bezier(.22,1,.36,1),
-    padding .4s cubic-bezier(.22,1,.36,1),
-    margin .4s cubic-bezier(.22,1,.36,1),
-    flex .4s cubic-bezier(.22,1,.36,1),
-    gap .4s cubic-bezier(.22,1,.36,1);
+    min-width .4s cubic-bezier(.22,1,.36,1),
+    border-color .3s,
+    box-shadow .3s !important;
+}
+.side-panel > *:not(.panel-toggle){
+  transition:opacity .3s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1);
+}
+.side-panel.minimized > *:not(.panel-toggle){
+  opacity:0 !important;
+  pointer-events:none !important;
+  transform:translateX(-10px) !important;
+  visibility:hidden;
+  transition:opacity .25s,visibility .25s,transform .3s;
+}
+.side-panel:not(.minimized) > *:not(.panel-toggle){
+  opacity:1;
+  transform:translateX(0);
+  visibility:visible;
 }
 
-/* ============ ۲۳) فاصله Created by ============ */
+/* ============ ۲۴) فاصله Created by ============ */
 [data-nav-position="left"] .main-chat,
 [data-nav-position="right"] .main-chat,
 [data-nav-position="top"] .main-chat{padding-bottom:50px}
-
 [data-nav-position="left"] .chat-view-inner,
 [data-nav-position="right"] .chat-view-inner,
 [data-nav-position="top"] .chat-view-inner{padding-bottom:50px}
-
 [data-nav-position="left"] .input-wrapper,
 [data-nav-position="right"] .input-wrapper,
 [data-nav-position="top"] .input-wrapper{padding-bottom:52px}
-
 [data-nav-position="left"] .planner-view,
 [data-nav-position="right"] .planner-view,
 [data-nav-position="top"] .planner-view,
@@ -3016,66 +2912,45 @@
 [data-nav-position="right"] .tools-view,
 [data-nav-position="top"] .tools-view{padding-bottom:46px}
 
-/* ============ ۲۴) انیمیشن input ============ */
-.input-bar-shell{
-  transition:
-    transform .25s cubic-bezier(.22,1,.36,1),
-    box-shadow .3s cubic-bezier(.22,1,.36,1);
-}
-.input-bar-shell:focus-within{transform:translateY(-2px)}
+/* ★ چت بات وقتی نوار چپ/راست — فاصله اضافه ★ */
+[data-nav-position="left"] .main-chat{margin-left:8px}
+[data-nav-position="right"] .main-chat{margin-right:8px}
+[data-nav-position="left"] .input-wrapper,
+[data-nav-position="right"] .input-wrapper{padding:0 20px 16px}
+
+/* ============ ۲۵) input animation ============ */
+.input-bar-shell:focus-within{transform:translateY(-4px)}
 .input-bar{transition:border-color .25s,box-shadow .3s}
 .input-bar:focus-within{
   border-color:var(--accent);
   box-shadow:0 0 0 3px var(--accent-soft),0 8px 24px -10px var(--accent);
 }
 
-/* ============ ۲۵) Streak + Article + Confetti ============ */
+/* ============ ۲۶) Streak + Article + Confetti ============ */
 .daily-streak{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin:14px 20px 0;
-  padding:12px 16px;
+  display:flex;align-items:center;gap:10px;margin:14px 20px 0;padding:12px 16px;
   border-radius:16px;
   background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.04));
   border:1px solid rgba(245,158,11,.35);
-  color:var(--text-main);
-  font-family:var(--font-text);
-  position:relative;
-  overflow:hidden;
+  color:var(--text-main);font-family:var(--font-text);
+  position:relative;overflow:hidden;
   animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;
 }
 .daily-streak::before{
-  content:'';
-  position:absolute;
-  inset:0;
+  content:'';position:absolute;inset:0;
   background:radial-gradient(circle at 0% 50%,rgba(245,158,11,.25),transparent 60%);
   pointer-events:none;
 }
-.ds-fire{
-  font-size:24px;
-  line-height:1;
-  filter:drop-shadow(0 0 8px rgba(245,158,11,.6));
-}
+.ds-fire{font-size:24px;line-height:1;filter:drop-shadow(0 0 8px rgba(245,158,11,.6))}
 .ds-num{
-  font-size:22px;
-  font-weight:900;
-  color:#F59E0B;
+  font-size:22px;font-weight:900;color:#F59E0B;
   font-family:'JetBrains Mono','Vazirmatn',monospace;
-  min-width:34px;
-  text-align:center;
+  min-width:34px;text-align:center;
 }
-.ds-text{
-  font-size:12px;
-  font-weight:700;
-  color:var(--text-main);
-  flex:1;
-}
+.ds-text{font-size:12px;font-weight:700;color:var(--text-main);flex:1}
 
 .daily-article{
-  margin:12px 20px 0;
-  padding:14px 16px;
-  border-radius:16px;
+  margin:12px 20px 0;padding:14px 16px;border-radius:16px;
   background:linear-gradient(135deg,rgba(96,165,250,.10),rgba(96,165,250,.02));
   border:1px solid rgba(96,165,250,.28);
   animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;
@@ -3083,47 +2958,27 @@
 }
 .da-head{display:flex;justify-content:flex-start;margin-bottom:8px}
 .da-badge{
-  font-size:10.5px;
-  font-weight:800;
-  color:#60A5FA;
-  background:rgba(96,165,250,.15);
-  border:1px solid rgba(96,165,250,.35);
-  padding:3px 10px;
-  border-radius:8px;
+  font-size:10.5px;font-weight:800;color:#60A5FA;
+  background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);
+  padding:3px 10px;border-radius:8px;
 }
 .da-text{
-  font-size:13px;
-  line-height:2;
-  color:var(--text-main);
-  font-weight:600;
-  text-align:right;
-  direction:rtl;
+  font-size:13px;line-height:2;color:var(--text-main);font-weight:600;
+  text-align:right;direction:rtl;
 }
 .da-by{
-  font-size:11px;
-  color:var(--text-muted);
-  margin-top:6px;
-  text-align:right;
-  opacity:.85;
-  font-style:italic;
+  font-size:11px;color:var(--text-muted);margin-top:6px;
+  text-align:right;opacity:.85;font-style:italic;
 }
 
 .confetti-wrap{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:1099998;
-  overflow:hidden;
+  position:fixed;inset:0;pointer-events:none;z-index:1099998;overflow:hidden;
 }
 .confetti-piece{
-  position:absolute;
-  top:-20px;
-  border-radius:2px;
-  opacity:.95;
+  position:absolute;top:-20px;border-radius:2px;opacity:.95;
   animation-name:confettiFall;
   animation-timing-function:cubic-bezier(.2,.6,.4,1);
-  animation-fill-mode:forwards;
-  will-change:transform,opacity;
+  animation-fill-mode:forwards;will-change:transform,opacity;
 }
 @keyframes confettiFall{
   0%{transform:translateY(-20px) rotate(0);opacity:1}
@@ -3131,7 +2986,7 @@
   100%{transform:translateY(105vh) rotate(720deg);opacity:0}
 }
 
-/* ============ ۲۶) دکمه توقف morph ============ */
+/* ============ ۲۷) دکمه ارسال ============ */
 #sendBtn{
   transition:
     background .35s cubic-bezier(.34,1.4,.64,1),
@@ -3149,14 +3004,10 @@
 }
 #sendIcon{transition:transform .35s cubic-bezier(.34,1.4,.64,1)}
 
-/* ============ ۲۷) اسپلش لودر ============ */
+/* ============ ۲۸) اسپلش ============ */
 .splash-loader{
   background:linear-gradient(160deg,#060810 0%,#0a0f1c 55%,#060810 100%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
   font-family:'Vazirmatn',Tahoma,'Segoe UI',system-ui,-apple-system,sans-serif;
   font-synthesis:none;
 }
@@ -3166,20 +3017,11 @@
 .splash-loader .splash-dots,
 .splash-loader .splash-logo{
   font-family:'Vazirmatn',Tahoma,'Segoe UI',system-ui,-apple-system,sans-serif;
-  font-feature-settings:normal;
-  font-variant:normal;
-  letter-spacing:0;
-  font-synthesis:none;
+  font-feature-settings:normal;font-variant:normal;letter-spacing:0;font-synthesis:none;
 }
-.splash-logo{
-  width:100px;
-  height:100px;
-  animation:splashFloat 3s ease-in-out infinite;
-}
+.splash-logo{width:100px;height:100px;animation:splashFloat 3s ease-in-out infinite}
 .splash-logo img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
+  width:100%;height:100%;object-fit:contain;
   filter:drop-shadow(0 0 35px rgba(59,130,246,.45));
 }
 @keyframes splashFloat{
@@ -3187,30 +3029,15 @@
   50%{transform:translateY(-9px) scale(1.03)}
 }
 .splash-title{
-  font-size:28px;
-  font-weight:900;
-  letter-spacing:-0.5px;
+  font-size:28px;font-weight:900;letter-spacing:-0.5px;
   background:linear-gradient(135deg,#ffffff 0%,#60A5FA 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-  color:#fff;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:#fff;
 }
-.splash-sub{
-  font-size:13px;
-  color:rgba(255,255,255,.5);
-  font-weight:600;
-}
-.splash-dots{
-  display:flex;
-  gap:8px;
-  margin-top:4px;
-}
+.splash-sub{font-size:13px;color:rgba(255,255,255,.5);font-weight:600}
+.splash-dots{display:flex;gap:8px;margin-top:4px}
 .splash-dots span{
-  width:9px;
-  height:9px;
-  border-radius:50%;
-  background:#3B82F6;
+  width:9px;height:9px;border-radius:50%;background:#3B82F6;
   animation:splashDot 1.4s ease-in-out infinite;
 }
 .splash-dots span:nth-child(2){animation-delay:.18s}
@@ -3218,4 +3045,19 @@
 @keyframes splashDot{
   0%,60%,100%{transform:scale(.45);opacity:.25}
   30%{transform:scale(1);opacity:1}
+}
+
+/* ============ ۲۹) پیش‌نمایش تنظیمات — نوار چپ/راست ============ */
+/* وقتی نوار سمت چپ/راست، کادر چت باید فاصله بگیره */
+.preview-zone[data-nav-position="left"]{
+  padding-left:56px;
+}
+.preview-zone[data-nav-position="right"]{
+  padding-right:56px;
+}
+.preview-zone[data-nav-position="left"] .pv-nav-preview{
+  left:4px;
+}
+.preview-zone[data-nav-position="right"] .pv-nav-preview{
+  right:4px;
 }
