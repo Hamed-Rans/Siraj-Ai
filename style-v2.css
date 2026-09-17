@@ -1817,3 +1817,347 @@ body.modal-open .floating-top-bar{opacity: 0; pointer-events: none}
   opacity: .42 !important;
 }
 .site-credit{font-size: 10px !important; opacity: .55 !important}
+/* ============ v7.0 — رفع کامل باگ‌ها ============ */
+
+/* 1) اسلایدر نرم و تک‌حرکتی */
+.nav-slider{
+  transition: left .5s cubic-bezier(.22,1,.36,1),
+             top .5s cubic-bezier(.22,1,.36,1),
+             width .45s cubic-bezier(.22,1,.36,1),
+             height .45s cubic-bezier(.22,1,.36,1),
+             border-radius .4s cubic-bezier(.22,1,.36,1),
+             opacity .25s ease !important;
+}
+
+/* 2) نوار مخفی چپ/راست — برود کامل بیرون */
+[data-nav-position="right"] .nav-row.collapsed{
+  transform: translateX(calc(100% - 4px)) !important;
+  margin-right: 0 !important;
+  padding-right: 4px !important;
+}
+[data-nav-position="left"] .nav-row.collapsed{
+  transform: translateX(calc(-100% + 4px)) !important;
+  margin-left: 0 !important;
+  padding-left: 4px !important;
+}
+[data-nav-position="right"] .nav-row.collapsed:hover{
+  transform: translateX(0) !important;
+}
+[data-nav-position="left"] .nav-row.collapsed:hover{
+  transform: translateX(0) !important;
+}
+[data-nav-position="right"] .nav-row,
+[data-nav-position="left"] .nav-row{
+  transition: transform .45s cubic-bezier(.22,1,.36,1),
+              opacity .3s ease !important;
+}
+
+/* 3) انیمیشن پین روی همه حالت‌ها (چپ/راست/بالا/پایین) */
+.app-container,
+.top-row,
+.nav-row,
+.main-chat,
+.side-panel,
+.view,
+.planner-view,
+.planner-body,
+.planner-pane{
+  transition: padding .45s cubic-bezier(.22,1,.36,1),
+              margin .45s cubic-bezier(.22,1,.36,1),
+              width .45s cubic-bezier(.22,1,.36,1),
+              height .45s cubic-bezier(.22,1,.36,1),
+              max-width .45s cubic-bezier(.22,1,.36,1),
+              max-height .45s cubic-bezier(.22,1,.36,1),
+              flex .45s cubic-bezier(.22,1,.36,1),
+              flex-basis .45s cubic-bezier(.22,1,.36,1),
+              grid-template-columns .45s cubic-bezier(.22,1,.36,1),
+              grid-template-rows .45s cubic-bezier(.22,1,.36,1),
+              gap .45s cubic-bezier(.22,1,.36,1) !important;
+}
+
+/* 4) فاصله Created by از کادرها */
+.main-chat{padding-bottom: 38px !important}
+.view{padding-bottom: 30px !important}
+.chat-view-inner{padding-bottom: 30px !important}
+.input-wrapper{margin-bottom: 34px !important}
+.planner-view .planner-body,
+.planner-pane{padding-bottom: 30px !important}
+
+/* 5) دکمه چت گرد — در همه حالت‌ها */
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat.active,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat.active,
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat:hover,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat:hover,
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat:active,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat:active{
+  flex: 0 0 54px !important;
+  width: 54px !important;
+  min-width: 54px !important;
+  max-width: 54px !important;
+  height: 54px !important;
+  min-height: 54px !important;
+  max-height: 54px !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  margin: 6px auto !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+  align-self: center !important;
+  transform-origin: center center !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat:hover,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat:hover,
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat.active,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat.active{
+  transform: scale(1.06) !important;
+  border-radius: 50% !important;
+}
+
+/* 6) پروفایل و قفل — سمت چپ هدر پنل */
+.panel-header{
+  position: relative !important;
+  padding-left: 96px !important;
+  min-height: 58px !important;
+}
+.panel-header-actions{
+  position: absolute !important;
+  top: 50% !important;
+  left: 12px !important;
+  right: auto !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  direction: ltr !important;
+  z-index: 10 !important;
+}
+.panel-header-avatar{
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-dark)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #fff !important;
+  font-family: 'Lalezar','Vazirmatn', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  border: 2px solid var(--panel-bg) !important;
+  box-shadow: 0 0 0 1.5px var(--accent) !important;
+  overflow: hidden !important;
+  transition: transform .3s var(--ease-spring) !important;
+}
+.panel-header-avatar:hover{transform: scale(1.08) !important}
+.panel-header-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.panel-header-icon-btn{
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--border) !important;
+  background: var(--panel-bg) !important;
+  color: var(--text-muted) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  transition: all .25s var(--ease-spring) !important;
+}
+.panel-header-icon-btn:hover{
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  transform: scale(1.06) !important;
+}
+.panel-header-icon-btn svg{
+  width: 17px !important;
+  height: 17px !important;
+  stroke: currentColor !important;
+  fill: none !important;
+  stroke-width: 2.2 !important;
+}
+#panelHeaderPinBtn{display: none !important}
+.chat-header .header-user-avatar,
+.chat-header #headerLockBtn{display: none !important}
+.floating-top-bar{display: none !important}
+
+/* 7) مقالات و انجمن — وسط‌چین و منظم */
+.blog-view,
+.videos-view{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+.blog-view .page-title-bar,
+.videos-view .page-title-bar{
+  width: 100% !important;
+}
+.community-hero{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  max-width: 640px !important;
+  margin: 30px auto !important;
+  padding: 38px 30px !important;
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.015)) !important;
+  border: 1px solid var(--border) !important;
+}
+.community-hero .community-icon{
+  margin: 0 auto 14px !important;
+}
+.community-hero .community-title{
+  text-align: center !important;
+  margin-bottom: 12px !important;
+}
+.community-hero .community-desc{
+  text-align: center !important;
+  line-height: 2 !important;
+  max-width: 520px !important;
+  margin: 0 auto 16px !important;
+  color: var(--text-muted) !important;
+  font-size: 13px !important;
+}
+.community-hero .community-badge{
+  margin: 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+.community-hero .community-badge svg{
+  width: 14px !important;
+  height: 14px !important;
+  stroke: currentColor !important;
+  fill: none !important;
+  stroke-width: 2 !important;
+}
+
+/* 8) اسپلش لودر — فونت ثابت و ظاهر بهتر */
+.splash-loader{
+  background: linear-gradient(160deg, #060810 0%, #0a0f1c 55%, #060810 100%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 18px !important;
+  font-family: 'Vazirmatn', Tahoma, 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+  font-synthesis: none !important;
+}
+.splash-loader *,
+.splash-loader .splash-title,
+.splash-loader .splash-sub,
+.splash-loader .splash-dots,
+.splash-loader .splash-logo{
+  font-family: 'Vazirmatn', Tahoma, 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+  font-feature-settings: normal !important;
+  font-variant: normal !important;
+  letter-spacing: 0 !important;
+  font-synthesis: none !important;
+}
+.splash-logo{
+  width: 100px !important;
+  height: 100px !important;
+  animation: splashFloat 3s ease-in-out infinite !important;
+}
+.splash-logo img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 0 35px rgba(59,130,246,.45)) !important;
+}
+@keyframes splashFloat{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-9px) scale(1.03)}
+}
+.splash-title{
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.5px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #60A5FA 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: #fff !important;
+}
+.splash-sub{
+  font-size: 13px !important;
+  color: rgba(255,255,255,.5) !important;
+  font-weight: 600 !important;
+}
+.splash-dots{
+  display: flex !important;
+  gap: 8px !important;
+  margin-top: 4px !important;
+}
+.splash-dots span{
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 50% !important;
+  background: #3B82F6 !important;
+  animation: splashDot 1.4s ease-in-out infinite !important;
+}
+.splash-dots span:nth-child(2){animation-delay: .18s !important}
+.splash-dots span:nth-child(3){animation-delay: .36s !important}
+@keyframes splashDot{
+  0%,60%,100%{transform: scale(.45); opacity: .25}
+  30%{transform: scale(1); opacity: 1}
+}
+
+/* 9) دکمه + اهداف — سایه بدون بیرون‌زدگی + بدون overflow */
+.monthly-side .month-goals,
+.monthly-side .month-goals.compact,
+.month-goals.year-goals{
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  padding: 16px 16px 18px !important;
+}
+.month-goal-add,
+.month-goal-add.compact{
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  width: 100% !important;
+  overflow: visible !important;
+}
+.month-goal-add input,
+.month-goal-add.compact input{
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: 0 !important;
+}
+.month-goal-add button,
+.month-goal-add.compact button{
+  flex: 0 0 40px !important;
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 14px -4px var(--accent) !important;
+}
+
+/* 10) لوگوی Created by خاکستری */
+.site-credit img{
+  filter: grayscale(1) brightness(1.6) !important;
+  opacity: .4 !important;
+}
+.site-credit{
+  font-size: 10px !important;
+  opacity: .5 !important;
+  z-index: 5 !important;
+}
