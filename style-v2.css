@@ -1616,3 +1616,63 @@ body.modal-open .floating-top-bar{opacity: 0; pointer-events: none}
   opacity: .42 !important;
 }
 .site-credit{font-size: 10px !important; opacity: .55 !important}
+/* ============ v5.1 — رفع باگ دکمه + در اهداف ============ */
+
+/* پنل اهداف - overflow مخفی + پدینگ مناسب */
+.monthly-side .month-goals,
+.monthly-side .month-goals.compact,
+.month-goals.year-goals{
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+.monthly-side .month-goals{
+  padding: 14px 14px 16px !important;
+}
+
+/* ردیف input + button */
+.month-goal-add,
+.month-goal-add.compact{
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  gap: 6px !important;
+  padding: 0 !important;
+  margin: 8px 0 0 0 !important;
+}
+
+/* input — می‌تونه کوچیک بشه */
+.month-goal-add input,
+.month-goal-add.compact input{
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 8px 10px !important;
+  font-size: 11px !important;
+}
+
+/* دکمه + — اندازه‌ی ثابت، بدون بیرون‌زدگی */
+.month-goal-add button,
+.month-goal-add.compact button{
+  flex: 0 0 38px !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+  height: auto !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  border-radius: 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
