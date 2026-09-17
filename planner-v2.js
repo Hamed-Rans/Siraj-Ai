@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v12 Final) */
+/* Siraj v2.0 — planner-v2.js (v13 Final — Debugged) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -15,6 +15,9 @@
     var REMINDER_KEY = 'siraj-reminders';
     var STUDY_CHAT_KEY = 'siraj-study-chat-session';
     var studyChatHistory = [];
+
+    /* ★ عکس پروفایل هاردکد شده — بعداً عکس خودت رو اینجا بذار ★ */
+    var USER_AVATAR_URL = 'siraj-logo.png';
 
     function toFa(n){
       var fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
@@ -1397,11 +1400,24 @@
       window.removeEventListener('beforeunload', blockUnload);
     }
 
+    /* ★ انیمیشن ورود به حالت مطالعه ★ */
     window.__openStudy = function(){
       buildStudyOverlay();
       var overlay = document.getElementById('studyOverlay');
       if (!overlay) return;
-      requestAnimationFrame(function(){ overlay.classList.add('open'); });
+      /* استایل‌های اولیه — با scale کوچک و شفاف */
+      overlay.style.opacity = '0';
+      overlay.style.transform = 'scale(.92) translateY(20px)';
+      overlay.style.transition = 'none';
+      /* فریم بعد — اعمال انیمیشن */
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          overlay.style.transition = 'opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.34,1.4,.64,1), visibility .45s';
+          overlay.classList.add('open');
+          overlay.style.opacity = '';
+          overlay.style.transform = '';
+        });
+      });
     };
 
     function renderStudyChat(){
@@ -1519,12 +1535,54 @@
     setTimeout(fillViews, 1500);
     setTimeout(fillViews, 2500);
 
-    /* ========== اقدامات هدر اصلی (profile + lock) در همه تب‌ها ========== */
+    /* ★★★ راه‌های ارتباطی: تبدیل به لینک + حذف دکمه کپی ★★★ */
+    function linkifyContacts(){
+      document.querySelectorAll('.contact-row-v2, .contact-row').forEach(function(row){
+        if (row.tagName === 'A' || row.dataset.linkified === '1') return;
+        row.dataset.linkified = '1';
+
+        /* حذف دکمه کپی */
+        row.querySelectorAll('.contact-copy, [data-copy], .copy-btn').forEach(function(b){ b.remove(); });
+
+        var labelEl = row.querySelector('.contact-label');
+        var valueEl = row.querySelector('.contact-value');
+        var label = (labelEl ? labelEl.textContent : '').trim();
+        var value = (valueEl ? valueEl.textContent : '').trim();
+        var v = value.replace(/^[@\s]+/,'').trim();
+
+        var href = '';
+        if (/تلگرام|telegram/i.test(label)) href = 'https://t.me/' + v;
+        else if (/ایمیل|email|mail/i.test(label)) href = 'mailto:' + value;
+        else if (/اینستاگرام|instagram|insta/i.test(label)) href = 'https://instagram.com/' + v;
+        else if (/^X$|توییتر|twitter/i.test(label)) href = 'https://x.com/' + v;
+        else if (/سایت|وب|website|site/i.test(label)) href = /^https?:/.test(value) ? value : ('https://' + value);
+
+        if (href){
+          row.style.cursor = 'pointer';
+          row.setAttribute('role', 'link');
+          row.setAttribute('tabindex', '0');
+          var open = function(e){
+            if (e.target.closest('a')) return;
+            e.preventDefault();
+            window.open(href, '_blank', 'noopener');
+          };
+          row.addEventListener('click', open);
+          row.addEventListener('keydown', function(e){
+            if (e.key === 'Enter' || e.key === ' ') open(e);
+          });
+        }
+      });
+    }
+    new MutationObserver(linkifyContacts).observe(document.body, {childList:true, subtree:true});
+    setTimeout(linkifyContacts, 800);
+    setTimeout(linkifyContacts, 1800);
+    setTimeout(linkifyContacts, 3000);
+
+    /* ========== اقدامات هدر اصلی — فقط آواتار، بدون قفل (چون HTML داره) ========== */
     function injectMainTopActions(){
       var mainChat = document.querySelector('.main-chat');
       if (!mainChat) return;
 
-      // باید relative باشه
       if (getComputedStyle(mainChat).position === 'static'){
         mainChat.style.position = 'relative';
       }
@@ -1539,7 +1597,7 @@
 
       var p = getProfile();
 
-      // پروفایل
+      /* آواتار کاربر — با آواتار هاردکد شده (پلیس‌هولدر) */
       var av = bar.querySelector('#mainProfileAvatar');
       if (!av){
         av = document.createElement('div');
@@ -1555,10 +1613,11 @@
         bar.appendChild(av);
       }
       av.title = p.name ? p.name : 'مشخصات من';
-      if (p.avatar) av.innerHTML = '<img src="'+p.avatar+'" alt="">';
-      else av.textContent = p.name ? p.name.substring(0,1) : '👤';
+      /* ★ همیشه از آواتار هاردکد یا آواتار ذخیره‌شده استفاده کن ★ */
+      var avatarSrc = p.avatar || USER_AVATAR_URL;
+      av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
 
-      // قفل
+      /* دکمه قفل */
       var lk = bar.querySelector('#mainLockBtn');
       if (!lk){
         lk = document.createElement('button');
@@ -1578,8 +1637,8 @@
       var av = document.getElementById('mainProfileAvatar'); if (!av) return;
       var p = getProfile();
       av.title = p.name ? p.name : 'مشخصات من';
-      if (p.avatar) av.innerHTML = '<img src="'+p.avatar+'" alt="">';
-      else av.textContent = p.name ? p.name.substring(0,1) : '👤';
+      var avatarSrc = p.avatar || USER_AVATAR_URL;
+      av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
     }
 
     /* ========== Settings: profile tab ========== */
@@ -1612,15 +1671,15 @@
     function renderProfilePane(){
       var pane = document.querySelector('.settings-content[data-cat="profile"]'); if (!pane) return;
       var p = getProfile();
+      /* ★ آواتار از فایل هاردکد — گزینه‌ی انتخاب عکس حذف شد ★ */
+      var avatarSrc = p.avatar || USER_AVATAR_URL;
       pane.innerHTML =
         '<div class="setting-group profile-section">' +
           '<label style="font-size:13px;font-weight:800;color:var(--accent)">👤 مشخصات شخصی</label>' +
-          '<div class="about-avatar" style="margin:14px auto">' + (p.avatar ? '<img src="'+p.avatar+'" alt="">' : '<span style="font-size:44px">'+(p.name?esc(p.name).substring(0,2):'من')+'</span>') + '</div>' +
+          '<div class="about-avatar" style="margin:14px auto"><img src="'+avatarSrc+'" alt=""></div>' +
           '<div style="font-size:11px;color:var(--text-muted);line-height:1.9;text-align:center;padding:2px 0 10px">سراج اسم و بیوگرافی تو رو می‌خونه و تو جواب‌هاش ازش استفاده می‌کنه.</div>' +
           '<input type="text" id="profileName" placeholder="اسمت چیه؟" value="'+(p.name?esc(p.name):'')+'" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;margin-bottom:8px">' +
           '<textarea id="profileBio" placeholder="یه توضیح کوتاه..." style="width:100%;min-height:90px;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;resize:vertical;line-height:1.8;margin-bottom:8px">'+(p.bio?esc(p.bio):'')+'</textarea>' +
-          '<label class="btn-secondary" style="cursor:pointer;width:100%;justify-content:center"><input type="file" accept="image/*" id="profileAvatarInput" style="display:none">📷 انتخاب عکس</label>' +
-          (p.avatar ? '<button class="btn-secondary" id="profileAvatarClear" style="width:100%;margin-top:6px">حذف عکس</button>' : '') +
           '<button class="btn-primary" id="profileSaveBtn" style="width:100%;justify-content:center;margin-top:10px">💾 ذخیره</button>' +
         '</div>';
       var sv = document.getElementById('profileSaveBtn');
@@ -1635,35 +1694,9 @@
           updateMainTopAvatar();
         };
       }
-      var av = document.getElementById('profileAvatarInput');
-      if (av){
-        av.onchange = function(e){
-          var f = e.target.files[0]; if (!f) return;
-          if (f.size > 800*1024){ if (window.toast) window.toast('حداکثر ۸۰۰KB','error'); return; }
-          var r = new FileReader();
-          r.onload = function(ev){
-            var p3 = getProfile();
-            p3.avatar = ev.target.result;
-            saveProfile(p3);
-            renderProfilePane();
-            updateMainTopAvatar();
-          };
-          r.readAsDataURL(f);
-        };
-      }
-      var cl = document.getElementById('profileAvatarClear');
-      if (cl){
-        cl.onclick = function(){
-          var p4 = getProfile();
-          delete p4.avatar;
-          saveProfile(p4);
-          renderProfilePane();
-          updateMainTopAvatar();
-        };
-      }
     }
 
-    /* ========== اسلایدر نوار پایین (بدون بونس) ============ */
+    /* ========== اسلایدر نوار پایین ============ */
     (function(){
       function ensureSlider(){
         var nav = document.getElementById('bottomNav'); if (!nav) return null;
@@ -1689,12 +1722,12 @@
         var isVert = pos === 'left' || pos === 'right';
         var newLeft, newTop, newW, newH, newRadius;
         if (isVert){
-          newLeft = 6; newW = navRect.width - 12;
+          newLeft = 4; newW = navRect.width - 8;
           newTop = btnRect.top - navRect.top; newH = btnRect.height;
-          newRadius = 18;
+          newRadius = 16;
         } else {
           newLeft = btnRect.left - navRect.left; newTop = btnRect.top - navRect.top;
-          newW = btnRect.width; newH = btnRect.height; newRadius = 22;
+          newW = btnRect.width; newH = btnRect.height; newRadius = 19;
         }
         if (animate === false) slider.style.transition = 'none';
         slider.style.left = newLeft + 'px';
@@ -1756,6 +1789,6 @@
       setTimeout(colorizeHours, 500);
     }, 200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v12)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v13)');
   }
 })();
