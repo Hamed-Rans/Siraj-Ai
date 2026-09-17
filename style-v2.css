@@ -3206,3 +3206,302 @@
   width:16px;height:16px;flex-shrink:0;
   stroke:currentColor;fill:none;stroke-width:2;
 }
+/* ============================================================
+   OVERRIDE PATCH v20 — Fix + Features
+   ============================================================ */
+
+/* ═══ ۱) هدرها راست‌چین ═══ */
+.planner-hero{
+  justify-content:flex-start !important;
+  padding:14px 20px !important;
+  text-align:right !important;
+}
+.planner-hero-icon{
+  position:static !important;
+  transform:none !important;
+}
+.planner-hero-text{
+  text-align:right !important;
+  padding-right:14px !important;
+  width:100%;
+}
+.planner-hero-title,
+.planner-hero-sub{
+  text-align:right !important;
+  width:100%;
+}
+.page-title-bar{
+  text-align:right !important;
+  padding:14px 22px !important;
+}
+.page-title-bar .page-title-text{
+  text-align:right !important;
+  width:100%;
+}
+.panel-header{
+  justify-content:flex-start !important;
+  text-align:right !important;
+  padding:12px 96px 12px 14px !important;
+}
+.panel-title-block,
+.panel-title-text,
+.panel-sub-text{
+  text-align:right !important;
+}
+
+/* ═══ ۲) آواتار + قفل داخل هدر (نه شناور) ═══ */
+.main-top-actions{
+  position:static !important;
+  display:flex !important;
+  flex-direction:row !important;
+  gap:6px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+.chat-header #mainTopActions,
+.chat-header .main-top-actions{
+  position:static !important;
+  top:auto !important;
+  left:auto !important;
+}
+.chat-header .header-left-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+.main-top-avatar,
+.main-top-icon-btn{
+  width:38px !important;
+  height:38px !important;
+  min-width:38px !important;
+}
+
+/* ═══ ۳) نوار منو — فیکس چپ/راست ═══ */
+/* برگشت حالت افقی به قبل */
+[data-nav-position="bottom"] .bottom-nav-btn,
+[data-nav-position="top"] .bottom-nav-btn{
+  flex-direction:row-reverse !important;
+  height:42px !important;
+  padding:0 12px !important;
+  max-width:48px !important;
+  min-width:48px !important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat){
+  max-width:160px !important;
+  padding:0 14px 0 10px !important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat)::after{
+  max-width:110px !important;
+  opacity:1 !important;
+  margin-right:8px !important;
+  margin-left:0 !important;
+}
+
+/* حالت عمودی — زیر آیکون، بدون تغییر عرض */
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat){
+  flex-direction:column !important;
+  height:auto !important;
+  min-height:44px !important;
+  max-height:72px !important;
+  padding:6px 6px 4px !important;
+  max-width:54px !important;
+  min-width:50px !important;
+  overflow:visible !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:2px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat)::after{
+  margin:0 !important;
+  font-size:10px !important;
+  max-width:0;
+  opacity:0;
+  transition:max-width .4s cubic-bezier(.22,1,.36,1),opacity .25s,margin .4s;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat).active::after,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat).active::after{
+  max-width:52px !important;
+  opacity:1 !important;
+  margin-top:2px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat).active,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat).active{
+  max-height:72px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn svg,
+[data-nav-position="right"] .bottom-nav-btn svg{
+  width:18px !important;
+  height:18px !important;
+}
+
+/* ═══ ۴) اسلایدر بدون فلش تیره ═══ */
+.nav-slider{
+  transition:none !important;
+  opacity:0;
+}
+.nav-slider.ready{
+  transition:
+    left .42s cubic-bezier(.22,1,.36,1),
+    top .42s cubic-bezier(.22,1,.36,1),
+    width .38s cubic-bezier(.22,1,.36,1),
+    height .38s cubic-bezier(.22,1,.36,1),
+    border-radius .35s cubic-bezier(.22,1,.36,1),
+    opacity .25s ease !important;
+}
+
+/* ═══ ۵) پنل واژه — بک‌گراند مات ═══ */
+.daily-article{
+  background:var(--panel-bg) !important;
+  border:1px solid var(--border-strong) !important;
+  box-shadow:0 8px 24px -14px rgba(0,0,0,.5);
+}
+[data-theme^="light"] .daily-article{
+  background:#FFFFFF !important;
+  border-color:rgba(0,0,0,.1) !important;
+}
+.daily-article .da-text,
+.daily-article .da-by{
+  position:relative;
+  z-index:1;
+}
+
+/* ═══ ۶) اهداف ماه — پایین‌تر، بلندتر، هم‌تراز ═══ */
+.monthly-side{
+  padding-top:74px !important;
+}
+.monthly-side .month-goals{
+  min-height:340px !important;
+}
+.monthly-layout{
+  align-items:stretch !important;
+}
+.monthly-main .cal-legend{
+  margin-top:0 !important;
+}
+
+/* ═══ ۷) انیمیشن دکمه‌های جدول هفتگی ═══ */
+.week-cell-edit .wc-btns{
+  display:flex !important;
+  gap:4px;
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  margin-top:0;
+  transition:
+    max-height .35s cubic-bezier(.22,1,.36,1),
+    opacity .3s cubic-bezier(.22,1,.36,1),
+    margin .35s cubic-bezier(.22,1,.36,1) !important;
+}
+.week-cell-edit .wc-btns.visible{
+  max-height:36px;
+  opacity:1;
+  margin-top:4px;
+}
+
+/* ═══ ۸) هایلایت سلول از زیر جدول ═══ */
+.week-cell-task.highlight{
+  animation:cellHighlight 1.6s ease;
+}
+@keyframes cellHighlight{
+  0%,100%{
+    background:linear-gradient(135deg,rgba(59,130,246,.14),rgba(59,130,246,.04));
+    box-shadow:none;
+  }
+  40%{
+    background:linear-gradient(135deg,rgba(59,130,246,.4),rgba(59,130,246,.18));
+    box-shadow:0 0 0 3px var(--accent),0 0 20px var(--accent-soft);
+  }
+}
+
+/* ═══ ۹) کارت آمار کلیک‌پذیر ═══ */
+.week-summary .ws-box{
+  cursor:pointer;
+  border-radius:12px;
+  padding:8px 6px;
+  transition:background .25s,transform .25s;
+}
+.week-summary .ws-box:hover{
+  background:var(--accent-soft);
+  transform:translateY(-2px);
+}
+
+/* ═══ ۱۰) بخش انتخاب سطح در پروفایل ═══ */
+.level-selector{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:12px;
+  border-radius:14px;
+  background:var(--panel-bg);
+  border:1px solid var(--border-strong);
+  margin-top:10px;
+}
+.level-selector-title{
+  font-size:12px;
+  font-weight:800;
+  color:var(--accent);
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding-bottom:8px;
+  border-bottom:1px dashed var(--border);
+}
+.level-options{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+}
+.level-opt{
+  padding:10px 6px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--text-muted);
+  font-family:var(--font-text);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  text-align:center;
+  transition:all .2s;
+}
+.level-opt:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  background:var(--accent-soft);
+}
+.level-opt.active{
+  border-color:var(--accent);
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
+  color:#fff;
+  box-shadow:0 4px 14px -4px var(--accent);
+}
+.level-determine-btn{
+  margin-top:4px;
+  padding:10px 14px;
+  border-radius:10px;
+  border:1px dashed var(--accent);
+  background:rgba(59,130,246,.06);
+  color:var(--accent);
+  font-family:var(--font-text);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  transition:all .2s;
+}
+.level-determine-btn:hover{
+  background:var(--accent-soft);
+  transform:translateY(-1px);
+}
+.level-determine-btn svg{
+  width:14px;height:14px;
+  stroke:currentColor;fill:none;stroke-width:2;
+}
