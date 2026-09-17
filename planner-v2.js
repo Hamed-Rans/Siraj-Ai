@@ -23,8 +23,15 @@
       var m = (btn.getAttribute('onclick')||'').match(/switchPlannerTab\(['"]([^'"]+)['"]\)/);
       return m ? m[1] : 'daily';
     }
+    /* تاریخ: ماه اول، بعد سال */
     function pDate(d){ try{ return d.toLocaleDateString('fa-IR',{day:'numeric',month:'long',year:'numeric'}); }catch(e){ return ''; } }
-    function pMonthYear(d){ try{ return d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}); }catch(e){ return ''; } }
+    function pMonthYear(d){
+      try{
+        var m = d.toLocaleDateString('fa-IR',{month:'long'});
+        var y = d.toLocaleDateString('fa-IR',{year:'numeric'});
+        return m + ' ' + y;
+      }catch(e){ return ''; }
+    }
     function pWeekday(d){ try{ return d.toLocaleDateString('fa-IR',{weekday:'long'}); }catch(e){ return ''; } }
     function weekOfMonth(){
       var d = window.plannerDate || new Date();
@@ -33,6 +40,48 @@
     }
     var ORD = ['اول','دوم','سوم','چهارم','پنجم','ششم'];
     function weekOrd(n){ n=Math.max(1,Math.min(6,n)); return ORD[n-1]; }
+
+    /* هفته‌ی خودمون که از window.plannerDate استفاده می‌کنه */
+    function myWeekDays(){
+      var d = new Date(window.plannerDate || new Date());
+      d.setHours(0,0,0,0);
+      var day = d.getDay();
+      var diff = (day+1)%7;
+      d.setDate(d.getDate() - diff);
+      var days = [];
+      for (var i=0;i<7;i++){
+        var dt = new Date(d);
+        dt.setDate(d.getDate() + i);
+        days.push({
+          key: window.dateKey(dt),
+          name: window.getDayName(dt),
+          date: dt.toLocaleDateString('fa-IR',{month:'short',day:'numeric'}),
+          dateObj: dt
+        });
+      }
+      return days;
+    }
+
+    /* ============ Smart Animation ============ */
+    var prevHero = {};
+    function applySmartAnim(tab){
+      setTimeout(function(){
+        var c = document.querySelector('.phc-center');
+        if (!c) return;
+        var cur = {};
+        c.querySelectorAll('[data-anim-key]').forEach(function(el){
+          var k = el.getAttribute('data-anim-key');
+          var v = el.textContent.trim();
+          cur[k] = v;
+          if (prevHero[k] !== undefined && prevHero[k] !== v){
+            el.classList.remove('heroRoll');
+            void el.offsetWidth;
+            el.classList.add('heroRoll');
+          }
+        });
+        prevHero = cur;
+      }, 25);
+    }
 
     function makeSelect(id, value, options){
       var cur = options.find(function(o){return o.value === value;}) || options[0];
@@ -92,14 +141,12 @@
       d.setDate(d.getDate() + dir);
       window.plannerDate = d;
       window.renderPlannerPane();
-      slideHero(dir > 0 ? 'slide-left' : 'slide-right');
     };
     window.__navWeek = function(dir){
       var d = new Date(window.plannerDate || new Date());
       d.setDate(d.getDate() + dir * 7);
       window.plannerDate = d;
       window.renderPlannerPane();
-      slideHero(dir > 0 ? 'slide-left' : 'slide-right');
     };
     window.__navMonth = function(dir){
       var d = new Date(window.plannerDate || new Date());
@@ -107,31 +154,27 @@
       d.setMonth(d.getMonth() + dir);
       window.plannerDate = d;
       window.renderPlannerPane();
-      slideHero(dir > 0 ? 'slide-left' : 'slide-right');
     };
-    function slideHero(cls){
-      setTimeout(function(){
-        var c = document.querySelector('.phc-center');
-        if (!c) return;
-        c.classList.add(cls);
-        setTimeout(function(){ c.classList.remove(cls); }, 550);
-      }, 15);
-    }
 
     window.switchPlannerTab = function(tab){
+      prevHero = {};
       document.querySelectorAll('.planner-tab').forEach(function(b){ b.classList.remove('active'); });
       var idx = {daily:0, weekly:1, monthly:2}[tab];
       var btns = document.querySelectorAll('.planner-tab');
       if (btns[idx]) btns[idx].classList.add('active');
       renderPane(tab);
     };
+
     function renderPane(tab){
       var pane = document.getElementById('plannerPane');
       if (!pane) return;
+      pane.innerHTML = '';
+      void pane.offsetWidth;
       if (tab === 'daily') pane.innerHTML = viewDaily();
       else if (tab === 'weekly') pane.innerHTML = viewWeekly();
       else if (tab === 'monthly') pane.innerHTML = viewMonthly();
       bindPaneEvents(tab);
+      applySmartAnim(tab);
     }
     window.renderPlannerPane = function(){ renderPane(getTab()); };
     function bindPaneEvents(tab){
@@ -207,8 +250,8 @@
       return '<div class="planner-hero-card">' +
           '<button class="phc-nav-btn" onclick="window.__navDay(-1)" title="روز قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
           '<div class="phc-center">' +
-            '<div class="phc-day">' + esc(pWeekday(d)) + (isToday ? ' <span class="phc-today">امروز</span>' : '') + '</div>' +
-            '<div class="phc-date">' + esc(pDate(d)) + '</div>' +
+            '<div class="phc-day"><span data-anim-key="dayName">' + esc(pWeekday(d)) + '</span>' + (isToday ? ' <span class="phc-today">امروز</span>' : '') + '</div>' +
+            '<div class="phc-date"><span data-anim-key="dateStr">' + esc(pDate(d)) + '</span></div>' +
             (goal
               ? '<div class="phc-goal"><span>🎯</span><span>هدف ماه: ' + esc(goal.text) + '</span></div>'
               : '<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>') +
@@ -269,7 +312,7 @@
     /* ============ نمای هفتگی ============ */
     function viewWeekly(){
       var pl = window.loadPlannerNew();
-      var days = window.getWeekDays();
+      var days = myWeekDays();
       var todayKey = window.dateKey(new Date());
       var d = new Date(window.plannerDate || new Date());
 
@@ -306,11 +349,13 @@
         return '<tr><td class="hour-cell">' + hk + ':۰۰</td>' + cells + '</tr>';
       }).join('');
 
+      var wRange = 'از ' + esc(days[0].date) + ' تا ' + esc(days[6].date);
+
       return '<div class="planner-hero-card">' +
           '<button class="phc-nav-btn" onclick="window.__navWeek(-1)" title="هفته قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
           '<div class="phc-center">' +
-            '<div class="phc-day">' + esc(pMonthYear(d)) + '</div>' +
-            '<div class="phc-date">هفته ' + weekOrd(weekOfMonth()) + ' ماه — از ' + esc(days[0].date) + ' تا ' + esc(days[6].date) + '</div>' +
+            '<div class="phc-day"><span data-anim-key="monthYear">' + esc(pMonthYear(d)) + '</span></div>' +
+            '<div class="phc-date"><span data-anim-key="weekNum">هفته ' + weekOrd(weekOfMonth()) + ' ماه</span> — <span data-anim-key="weekRange">' + wRange + '</span></div>' +
           '</div>' +
           '<button class="phc-nav-btn" onclick="window.__navWeek(1)" title="هفته بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
         '</div>' +
@@ -374,30 +419,44 @@
         cells.push('<div class="cal-day' + (isToday?' today':'') + (isSel?' selected':'') + (isFri?' friday':'') + '" onclick="selectMonthDay(' + dd + ')">' +
           '<span class="cal-day-num">' + dd + '</span>' + dots + '</div>');
       }
-      var goalsHTML = goals.length === 0
-        ? '<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:10px 0">هنوز هدفی ثبت نشده</div>'
-        : goals.map(function(g,i){
-            return '<div class="month-goal' + (g.done?' done':'') + '">' +
+
+      /* پنل اهداف بازطراحی شده */
+      var goalsHTML = '';
+      if (goals.length === 0){
+        goalsHTML = '<div class="mg-empty"><span class="mg-empty-icon">🎯</span><div class="mg-empty-text">هنوز هدفی ثبت نشده</div></div>';
+      } else {
+        goalsHTML = '<div class="month-goals-list">' + goals.map(function(g,i){
+          return '<div class="month-goal' + (g.done?' done':'') + '">' +
+            '<label class="mg-check-wrap">' +
               '<input type="checkbox" ' + (g.done?'checked':'') + ' onchange="toggleMonthGoal(\'' + monthKey + '\',' + i + ')">' +
-              '<span class="mg-text">' + esc(g.text) + '</span>' +
-              '<button class="mg-del" onclick="deleteMonthGoal(\'' + monthKey + '\',' + i + ')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>';
-          }).join('');
+              '<span class="mg-check"></span>' +
+            '</label>' +
+            '<span class="mg-text">' + esc(g.text) + '</span>' +
+            '<button class="mg-del" onclick="deleteMonthGoal(\'' + monthKey + '\',' + i + ')" title="حذف">' +
+              '<svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+            '</button></div>';
+        }).join('') + '</div>';
+      }
       var doneGoals = goals.filter(function(g){return g.done;}).length;
 
       return '<div class="planner-hero-card">' +
           '<button class="phc-nav-btn" onclick="window.__navMonth(-1)" title="ماه قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
           '<div class="phc-center">' +
-            '<div class="phc-day">' + esc(pMonthYear(d)) + '</div>' +
+            '<div class="phc-day"><span data-anim-key="monthYear">' + esc(pMonthYear(d)) + '</span></div>' +
             '<div class="phc-date">' + doneGoals + ' از ' + goals.length + ' هدف این ماه انجام شده</div>' +
           '</div>' +
           '<button class="phc-nav-btn" onclick="window.__navMonth(1)" title="ماه بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
         '</div>' +
         '<div class="month-goals">' +
-          '<div class="month-goals-title"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><span>اهداف این ماه</span></div>' +
-          (goals.length ? '<div class="month-goals-list">' + goalsHTML + '</div>' : goalsHTML) +
+          '<div class="month-goals-title">' +
+            '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>' +
+            '<span>اهداف این ماه</span>' +
+            (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
+          '</div>' +
+          goalsHTML +
           '<div class="month-goal-add">' +
             '<input type="text" id="newGoalInput" placeholder="هدف جدید..." onkeydown="if(event.key===\'Enter\')addMonthGoal(\'' + monthKey + '\')">' +
-            '<button onclick="addMonthGoal(\'' + monthKey + '\')">افزودن</button>' +
+            '<button onclick="addMonthGoal(\'' + monthKey + '\')"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>افزودن</span></button>' +
           '</div>' +
         '</div>' +
         '<div class="month-calendar">' +
@@ -428,11 +487,8 @@
         '</div>';
     };
 
-    /* ============ Ambient Sound Engine — نرم و ملایم ============ */
-    var audioCtx = null;
-    var audioNodes = null;
-    var currentSound = null;
-    var masterGain = null;
+    /* ============ Ambient Sound ============ */
+    var audioCtx = null, audioNodes = null, currentSound = null, masterGain = null;
 
     function stopAudio(){
       if (audioNodes && audioNodes.nodes){
@@ -444,29 +500,23 @@
       if (audioNodes && audioNodes.gain){
         try { audioNodes.gain.disconnect(); } catch(e){}
       }
-      audioNodes = null;
-      currentSound = null;
+      audioNodes = null; currentSound = null;
     }
-
     function makeNoise(type){
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
-
       if (!masterGain){
         masterGain = audioCtx.createGain();
         masterGain.gain.value = 0.4;
         masterGain.connect(audioCtx.destination);
       }
-
       var nodes = [];
       var filter = audioCtx.createBiquadFilter();
       var gain = audioCtx.createGain();
       gain.gain.value = 0.22;
-      filter.connect(gain);
-      gain.connect(masterGain);
+      filter.connect(gain); gain.connect(masterGain);
 
       if (type === 'nature'){
-        // موج دریا — نویز براون فیلترشده
         var bufferSize = audioCtx.sampleRate * 4;
         var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         var data = buffer.getChannelData(0);
@@ -474,29 +524,17 @@
         for (var i=0;i<bufferSize;i++){
           var white = Math.random()*2 - 1;
           data[i] = (last + 0.015 * white) / 1.015;
-          last = data[i];
-          data[i] *= 3.2;
+          last = data[i]; data[i] *= 3.2;
         }
         var src = audioCtx.createBufferSource();
-        src.buffer = buffer;
-        src.loop = true;
-        filter.type = 'lowpass';
-        filter.frequency.value = 550;
-        filter.Q.value = 0.7;
-        // موج آروم — LFO ملایم روی فرکانس
-        var lfo = audioCtx.createOscillator();
-        var lfoGain = audioCtx.createGain();
-        lfo.frequency.value = 0.08;
-        lfoGain.gain.value = 150;
-        lfo.connect(lfoGain);
-        lfoGain.connect(filter.frequency);
-        src.connect(filter);
-        lfo.start();
-        src.start();
+        src.buffer = buffer; src.loop = true;
+        filter.type = 'lowpass'; filter.frequency.value = 550; filter.Q.value = 0.7;
+        var lfo = audioCtx.createOscillator(), lfoGain = audioCtx.createGain();
+        lfo.frequency.value = 0.08; lfoGain.gain.value = 150;
+        lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+        src.connect(filter); lfo.start(); src.start();
         nodes.push(src, lfo, lfoGain);
-      }
-      else if (type === 'hall'){
-        // سکوت گرم — نویز براون درون پایین + تن ملایم
+      } else if (type === 'hall'){
         var bufSize = audioCtx.sampleRate * 3;
         var buffer2 = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
         var d = buffer2.getChannelData(0);
@@ -504,49 +542,30 @@
         for (var j=0;j<bufSize;j++){
           var w = Math.random()*2 - 1;
           d[j] = (lastV + 0.008 * w) / 1.008;
-          lastV = d[j];
-          d[j] *= 2.5;
+          lastV = d[j]; d[j] *= 2.5;
         }
         var src2 = audioCtx.createBufferSource();
-        src2.buffer = buffer2;
-        src2.loop = true;
-        filter.type = 'lowpass';
-        filter.frequency.value = 280;
-        // تن خیلی ملایم زیرش
-        var osc = audioCtx.createOscillator();
-        var oscGain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = 110;
-        oscGain.gain.value = 0.03;
-        osc.connect(oscGain);
-        oscGain.connect(gain);
-        src2.connect(filter);
-        osc.start();
-        src2.start();
+        src2.buffer = buffer2; src2.loop = true;
+        filter.type = 'lowpass'; filter.frequency.value = 280;
+        var osc = audioCtx.createOscillator(), oscGain = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.value = 110; oscGain.gain.value = 0.03;
+        osc.connect(oscGain); oscGain.connect(gain);
+        src2.connect(filter); osc.start(); src2.start();
         nodes.push(src2, osc, oscGain);
-      }
-      else if (type === 'rain'){
-        // بارش ملایم — نویز سفید خیلی فیلترشده
+      } else if (type === 'rain'){
         var bufSize3 = audioCtx.sampleRate * 2;
         var buffer3 = audioCtx.createBuffer(1, bufSize3, audioCtx.sampleRate);
         var d3 = buffer3.getChannelData(0);
         for (var k=0;k<bufSize3;k++) d3[k] = (Math.random()*2 - 1) * 0.6;
         var src3 = audioCtx.createBufferSource();
-        src3.buffer = buffer3;
-        src3.loop = true;
-        filter.type = 'lowpass';
-        filter.frequency.value = 700;
-        filter.Q.value = 1.2;
-        src3.connect(filter);
-        src3.start();
+        src3.buffer = buffer3; src3.loop = true;
+        filter.type = 'lowpass'; filter.frequency.value = 700; filter.Q.value = 1.2;
+        src3.connect(filter); src3.start();
         nodes.push(src3);
       }
-
       audioNodes = {nodes:nodes, gain:gain, filter:filter};
       currentSound = type;
-      return true;
     }
-
     function setMasterVolume(v){ if (masterGain) masterGain.gain.value = v; }
 
     /* ============ حالت مطالعه ============ */
@@ -576,9 +595,7 @@
               }).join('') +
             '</div>' +
           '</div>'
-        : '<div class="study-empty-box">' +
-            '📝 هنوز هیچ کار فعالی نداری<br>اول یه کار اضافه کن، بعد برگرد مطالعه' +
-          '</div>' +
+        : '<div class="study-empty-box">📝 هنوز هیچ کار فعالی نداری<br>اول یه کار اضافه کن</div>' +
           '<button class="study-btn" id="studyGoPlanBtn" style="width:100%">' +
             '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>برو به برنامه‌ریزی' +
           '</button>';
@@ -645,8 +662,7 @@
 
       var picker = el.querySelector('#studyTimePicker');
       var numEl = el.querySelector('#studyTimeNum');
-      var pickerVal = 25;
-      var dragStartY = 0, dragStartVal = 25, dragging = false;
+      var pickerVal = 25, dragStartY = 0, dragStartVal = 25, dragging = false;
 
       function setPickerVal(v){
         pickerVal = Math.max(1, Math.min(180, Math.round(v)));
@@ -680,10 +696,7 @@
       document.addEventListener('touchend', pointerUp);
       picker.addEventListener('dblclick', function(){
         var v = prompt('زمان مطالعه (۱ تا ۱۸۰ دقیقه):', pickerVal);
-        if (v !== null){
-          var n = parseInt(v);
-          if (!isNaN(n)) setPickerVal(n);
-        }
+        if (v !== null){ var n = parseInt(v); if (!isNaN(n)) setPickerVal(n); }
       });
       window.__studyMinutesGetter = function(){ return pickerVal; };
 
@@ -691,11 +704,7 @@
         btn.onclick = function(){
           var snd = btn.getAttribute('data-sound');
           el.querySelectorAll('.study-sound-btn').forEach(function(b){ b.classList.remove('on'); });
-          if (!snd){
-            stopAudio();
-            btn.classList.add('on');
-            return;
-          }
+          if (!snd){ stopAudio(); btn.classList.add('on'); return; }
           btn.classList.add('on');
           stopAudio();
           try { makeNoise(snd); } catch(e){ console.error(e); }
@@ -748,8 +757,7 @@
       if (!mins || mins < 1) mins = 25;
       if (mins > 180) mins = 180;
       studySeconds = mins * 60;
-      studyRunning = true;
-      studyPaused = false;
+      studyRunning = true; studyPaused = false;
 
       overlay.querySelector('#studySetup').style.display = 'none';
       overlay.querySelector('#studyRunning').style.display = 'flex';
@@ -761,9 +769,7 @@
         var names = {nature:'موج دریا 🌊', hall:'سکوت گرم 🌙', rain:'بارش ملایم ☔'};
         overlay.querySelector('#studyNowPlayingText').textContent = names[currentSound] || 'در حال پخش';
         nowPlaying.style.display = 'block';
-      } else if (nowPlaying){
-        nowPlaying.style.display = 'none';
-      }
+      } else if (nowPlaying){ nowPlaying.style.display = 'none'; }
 
       var pb = overlay.querySelector('#studyPauseBtn');
       if (pb){
@@ -772,7 +778,6 @@
         var lbl = pb.querySelector('#studyPauseLabel');
         if (lbl) lbl.textContent = 'توقف';
       }
-
       updateStudyTimer(true);
       startStudyTimer();
       lockSite();
@@ -786,8 +791,7 @@
         updateStudyTimer(false);
         if (studySeconds <= 0){
           clearInterval(studyTimer); studyTimer = null; studyRunning = false;
-          stopAudio();
-          unlockSite();
+          stopAudio(); unlockSite();
           showPopup('🎉', 'عالی بود!', 'زمان مطالعه تموم شد. حالا یه استراحت کوتاه به خودت بده ☕');
           closeStudy();
         }
@@ -846,12 +850,10 @@
     }
 
     function exitStudyConfirm(){
-      if (!confirm('مطمئنی می‌خوای از حالت مطالعه خارج شی؟ معمولاً بهتره تا آخر بمونی!')) return;
+      if (!confirm('مطمئنی می‌خوای از حالت مطالعه خارج شی؟')) return;
       if (studyTimer) clearInterval(studyTimer);
       studyTimer = null; studyRunning = false;
-      stopAudio();
-      unlockSite();
-      closeStudy();
+      stopAudio(); unlockSite(); closeStudy();
     }
     function closeStudy(){
       try { stopAudio(); } catch(e){}
@@ -880,9 +882,7 @@
     function blockContext(e){ if (studyRunning) e.preventDefault(); }
     function blockBeforeUnload(e){
       if (!studyRunning) return;
-      e.preventDefault();
-      e.returnValue = 'در حال مطالعه‌ای!';
-      return e.returnValue;
+      e.preventDefault(); e.returnValue = 'در حال مطالعه‌ای!'; return e.returnValue;
     }
     function lockSite(){
       document.addEventListener('keydown', blockKey, true);
@@ -908,7 +908,6 @@
 
     /* ============ چت مطالعه ============ */
     var studyChatHistory = [];
-
     function toggleStudyChat(){
       var existing = document.getElementById('studyChatPanel');
       if (existing){
@@ -943,8 +942,7 @@
       var q = inp.value.trim();
       if (!q) return;
       box.insertAdjacentHTML('beforeend', '<div class="sc-msg sc-user">' + esc(q) + '</div>');
-      inp.value = '';
-      box.scrollTop = box.scrollHeight;
+      inp.value = ''; box.scrollTop = box.scrollHeight;
       studyChatHistory.push({role:'user', content:q});
 
       var tid = 'sct_' + Date.now();
@@ -952,7 +950,6 @@
       box.scrollTop = box.scrollHeight;
 
       var sysPrompt = 'تو «سراج» هستی و الان در «حالت مطالعه» کاربر قرار داری. کاربر روی درسش تمرکز کرده. قوانین:\n۱. جواب‌ها کوتاه، مستقیم و مفید باشن.\n۲. اگه کاربر سؤال غیردرسی پرسید، با مهربونی بگو: «الان تو حالت مطالعه‌ای، بهتره تمرکزت رو روی درس نگه داری. بعد از تایمر با هم گپ می‌زنیم 😊».\n۳. از ستاره (*) برای پررنگ کردن استفاده نکن.\n۴. ایموجی‌های ملایم و کم.';
-
       try {
         var url = (window.APP_CONFIG && window.APP_CONFIG.baseURL) ? window.APP_CONFIG.baseURL : '/api/chat';
         var res = await fetch(url, {
@@ -961,8 +958,7 @@
           body: JSON.stringify({
             model: (window.settings && window.settings.model) ? window.settings.model : 'gemini-2.0-flash',
             messages: [{role:'system', content: sysPrompt}].concat(studyChatHistory.slice(-6)),
-            temperature: 0.7,
-            stream: true
+            temperature: 0.7, stream: true
           })
         });
         var typingEl = document.getElementById(tid);
@@ -1029,7 +1025,7 @@
     /* ============ لیبل دکمه‌های نوار ============ */
     setTimeout(function(){
       var labels = {
-        planner: 'برنامه‌ریز سراج',
+        planner: 'برنامه‌ریز',
         chat: 'گفتگو',
         tools: 'دستیار',
         videos: 'انجمن',
@@ -1057,9 +1053,7 @@
         if (!aboutContent) return;
         aboutContent.innerHTML =
           '<div class="about-hero">' +
-            '<div class="about-avatar">' +
-              '<img src="siraj-logo.png" alt="حامد" style="object-fit:contain;padding:14px">' +
-            '</div>' +
+            '<div class="about-avatar"><img src="siraj-logo.png" alt="حامد" style="object-fit:contain;padding:14px"></div>' +
             '<div class="about-name">حامد انصاری‌فر</div>' +
             '<div class="about-role">سازنده سراج</div>' +
           '</div>' +
@@ -1097,47 +1091,9 @@
               '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
             '</a>' +
           '</div>' +
-          '<div class="siraj-version-badge" style="text-align:center;padding:10px 0;font-size:11.5px;color:var(--text-muted);margin-top:16px">' +
-            '✨ نسخه‌ی فعلی: <span style="color:var(--accent);font-weight:900">v2.0</span>' +
-          '</div>';
+          '<div class="siraj-version-badge">✨ نسخه‌ی فعلی: <span>v2.0</span></div>';
       }, 250);
     };
-
-    /* ============ دکمه تفکر / سریع — متقابل ============ */
-    setTimeout(function(){
-      if (typeof window.toggleThink === 'function'){
-        window.toggleThink = function(){
-          window.settings.thinking = !window.settings.thinking;
-          if (window.settings.thinking && window.settings.quick){
-            window.settings.quick = false;
-            var qb = document.getElementById('quickBtn');
-            if (qb) qb.classList.remove('active');
-          }
-          window.saveSettings();
-          var tb = document.getElementById('thinkBtn');
-          if (tb) tb.classList.toggle('active', window.settings.thinking);
-          if (typeof window.toast === 'function'){
-            window.toast(window.settings.thinking?'🧠 حالت تفکر عمیق فعال شد':'حالت تفکر عمیق خاموش شد','info');
-          }
-        };
-      }
-      if (typeof window.toggleQuick === 'function'){
-        window.toggleQuick = function(){
-          window.settings.quick = !window.settings.quick;
-          if (window.settings.quick && window.settings.thinking){
-            window.settings.thinking = false;
-            var tb = document.getElementById('thinkBtn');
-            if (tb) tb.classList.remove('active');
-          }
-          window.saveSettings();
-          var qb = document.getElementById('quickBtn');
-          if (qb) qb.classList.toggle('active', window.settings.quick);
-          if (typeof window.toast === 'function'){
-            window.toast(window.settings.quick?'⚡ حالت پاسخ سریع فعال شد':'حالت پاسخ سریع خاموش شد','info');
-          }
-        };
-      }
-    }, 1200);
 
     /* ============ Retry اصلاح‌شده ============ */
     setTimeout(function(){
@@ -1149,37 +1105,27 @@
         var all = Array.from(document.querySelectorAll('#box .msg-wrap'));
         var myIdx = all.indexOf(w);
         if (myIdx >= 0){
-          // پیام‌های بعدی ربات رو حذف کن
           for (var i = all.length - 1; i > myIdx; i--){
-            var next = all[i];
-            if (next.classList.contains('bot')){
-              next.remove();
-            }
+            if (all[i].classList.contains('bot')) all[i].remove();
           }
         }
-        // از history هم پاک کن
         if (window.currentChatId){
           var h = window.loadHistory();
           if (h[window.currentChatId]){
-            // آخرین ربات‌ها رو حذف کن
             for (var j = h[window.currentChatId].messages.length - 1; j >= 0; j--){
-              if (h[window.currentChatId].messages[j].role === 'assistant'){
-                h[window.currentChatId].messages.splice(j, 1);
-              } else break;
+              if (h[window.currentChatId].messages[j].role === 'assistant') h[window.currentChatId].messages.splice(j, 1);
+              else break;
             }
           }
           window.saveHistory(h);
         }
-        // پیام کاربر رو حذف کن
         w.remove();
         if (window.currentChatId){
           var h2 = window.loadHistory();
           if (h2[window.currentChatId]){
             for (var k = h2[window.currentChatId].messages.length - 1; k >= 0; k--){
-              if (h2[window.currentChatId].messages[k].role === 'user' &&
-                  h2[window.currentChatId].messages[k].content === t){
-                h2[window.currentChatId].messages.splice(k, 1);
-                break;
+              if (h2[window.currentChatId].messages[k].role === 'user' && h2[window.currentChatId].messages[k].content === t){
+                h2[window.currentChatId].messages.splice(k, 1); break;
               }
             }
           }
