@@ -1,5 +1,5 @@
 /* ============================================================
-   Siraj v2.0 — style-v2.css (Complete Final — v16)
+   Siraj v2.0 — style-v2.css (v17 Final Debugged)
    ============================================================ */
 
 /* ============ ۰) VIEWها — چیدمان پایه ============ */
@@ -95,8 +95,13 @@
   border-color:var(--border);
 }
 
-/* ============ ۲) نوار پایین ============ */
-.bottom-nav{position:relative}
+/* ============ ۲) نوار پایین/بالا — باریک‌تر + گردتر ============ */
+.bottom-nav{
+  position:relative;
+  padding:5px 10px;
+  gap:5px;
+  border-radius:24px;
+}
 .bottom-nav::before{display:none}
 
 .bottom-nav::after{
@@ -115,36 +120,36 @@
   pointer-events:none;
   transition:opacity .35s,left .4s var(--ease-smooth),right .4s var(--ease-smooth);
 }
-.bottom-nav:hover::after{
-  opacity:.95;
-  left:15%;
-  right:15%;
-}
+.bottom-nav:hover::after{opacity:.95;left:15%;right:15%}
 
+/* پزودو المان‌های input — فقط روی focus */
 .input-bar-shell::before,
 .input-bar-shell::after{
   content:'';
   position:absolute;
   border-radius:inherit;
   pointer-events:none;
+  opacity:0;
+  transition:opacity .35s;
 }
 .input-bar-shell::before{
   inset:-2px;
   background:var(--accent-soft);
-  opacity:.5;
 }
 .input-bar-shell::after{
   inset:-3px;
   background:var(--accent);
-  opacity:.25;
   filter:blur(2px);
 }
+.input-bar-shell:focus-within::before{opacity:.45}
+.input-bar-shell:focus-within::after{opacity:.2}
 
+/* دکمه‌های نوار — کوچک‌تر و گردتر */
 .nav-collapse-tab,
 .bottom-nav-btn{
-  height:44px;
-  border-radius:22px;
-  padding:0 12px;
+  height:38px;
+  border-radius:19px;
+  padding:0 8px;
   box-sizing:border-box;
   border:1px solid transparent;
   display:flex;
@@ -152,9 +157,9 @@
   justify-content:center;
   gap:0;
   overflow:hidden;
-  min-width:48px;
+  min-width:42px;
   width:auto;
-  max-width:48px;
+  max-width:42px;
   transition:
     background .45s cubic-bezier(.22,1,.36,1),
     color .3s,
@@ -163,15 +168,14 @@
     border-color .3s,
     box-shadow .5s cubic-bezier(.22,1,.36,1);
 }
-
 .nav-collapse-tab{
-  max-width:48px;
+  max-width:42px;
   border:1px solid var(--border);
   background:var(--panel-bg);
 }
 .bottom-nav-btn[data-label]{
   flex-direction:row-reverse;
-  max-width:48px;
+  max-width:42px;
 }
 
 .bottom-nav-btn[data-label] .nav-btn-label{
@@ -180,7 +184,7 @@
   overflow:hidden;
   white-space:nowrap;
   font-family:var(--font-text);
-  font-size:12px;
+  font-size:11.5px;
   font-weight:700;
   color:currentColor;
   margin-left:0;
@@ -195,9 +199,9 @@
 }
 
 .bottom-nav-btn[data-label].active{
-  max-width:155px;
-  padding:0 14px 0 10px;
-  gap:8px;
+  max-width:150px;
+  padding:0 12px 0 8px;
+  gap:6px;
 }
 .bottom-nav-btn[data-label].active .nav-btn-label{
   max-width:110px;
@@ -205,7 +209,6 @@
   margin-left:6px;
   transform:translateX(0);
 }
-
 .bottom-nav-btn[data-label]:not(.active):hover .nav-btn-label{
   max-width:0;
   opacity:0;
@@ -225,6 +228,7 @@
   color:#fff;
 }
 
+/* دکمه چت */
 .bottom-nav-btn.nav-btn-chat,
 [data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
 [data-nav-position="right"] .bottom-nav-btn.nav-btn-chat,
@@ -232,13 +236,13 @@
 [data-nav-position="right"] .bottom-nav-btn.nav-btn-chat.active,
 [data-nav-position="left"] .bottom-nav-btn.nav-btn-chat:hover,
 [data-nav-position="right"] .bottom-nav-btn.nav-btn-chat:hover{
-  flex:0 0 54px;
-  width:54px;
-  min-width:54px;
-  max-width:54px;
-  height:54px;
-  min-height:54px;
-  max-height:54px;
+  flex:0 0 46px;
+  width:46px;
+  min-width:46px;
+  max-width:46px;
+  height:46px;
+  min-height:46px;
+  max-height:46px;
   padding:0;
   aspect-ratio:1/1;
   border-radius:50%;
@@ -248,7 +252,7 @@
   color:#fff;
   border:2px solid var(--panel-bg);
   box-shadow:0 0 0 2px var(--accent),0 6px 18px -6px var(--accent);
-  margin:6px auto;
+  margin:4px auto;
   transition:
     transform .45s cubic-bezier(.34,1.4,.64,1),
     box-shadow .4s cubic-bezier(.22,1,.36,1),
@@ -272,7 +276,7 @@
 
 .nav-slider{
   position:absolute;
-  border-radius:22px;
+  border-radius:19px;
   background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
   box-shadow:0 6px 20px -6px var(--accent);
   pointer-events:none;
@@ -288,6 +292,47 @@
     opacity .25s ease;
 }
 .bottom-nav-btn,.nav-collapse-tab{position:relative;z-index:1}
+
+/* ============ ۲.۵) نوار چپ/راست ============ */
+/* حفظ translateY(-50%) برای وسط‌چین موندن */
+[data-nav-position="left"] .nav-row.collapsed{
+  transform:translateY(-50%) translateX(calc(-100% + 26px));
+}
+[data-nav-position="right"] .nav-row.collapsed{
+  transform:translateY(-50%) translateX(calc(100% - 26px));
+}
+[data-nav-position="left"] .nav-row.collapsed:hover,
+[data-nav-position="right"] .nav-row.collapsed:hover{
+  transform:translateY(-50%) translateX(0);
+}
+
+/* نوار چپ/راست — جهت لیبل کنار آیکون، نه زیرش */
+[data-nav-position="left"] .bottom-nav-btn,
+[data-nav-position="right"] .bottom-nav-btn{
+  flex-direction:row-reverse;
+  max-width:42px;
+}
+[data-nav-position="left"] .bottom-nav-btn[data-label].active,
+[data-nav-position="right"] .bottom-nav-btn[data-label].active{
+  max-width:160px;
+  padding:0 10px 0 8px;
+  gap:6px;
+}
+[data-nav-position="left"] .bottom-nav-btn[data-label].active .nav-btn-label,
+[data-nav-position="right"] .bottom-nav-btn[data-label].active .nav-btn-label{
+  max-width:120px;
+  opacity:1;
+  margin-left:6px;
+  transform:translateX(0);
+}
+
+/* نوار کناری — همیشه عمودی بمون */
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav{
+  padding:6px 5px;
+  gap:3px;
+  border-radius:22px;
+}
 
 /* ============ ۳) هیرو برنامه‌ریز ============ */
 .planner-hero-card{
@@ -645,17 +690,23 @@
 
 /* ============ ۷) تقویم ============ */
 .month-calendar{
-  padding:14px;
+  padding:16px;
   margin:14px 20px 16px;
-  border-radius:20px;
-  background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.01));
-  border:1px solid var(--border);
+  border-radius:22px;
+  background:var(--panel-bg);
+  border:1px solid var(--border-strong);
+  box-shadow:0 8px 24px -14px rgba(0,0,0,.5);
   animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;
   animation-delay:.1s;
 }
-.cal-weekdays{gap:4px;margin-bottom:6px}
+[data-theme^="light"] .month-calendar{
+  background:#FFFFFF;
+  border-color:rgba(0,0,0,.1);
+}
+
+.cal-weekdays{gap:6px;margin-bottom:8px}
 .cal-weekday{
-  font-size:10px;
+  font-size:10.5px;
   padding:6px 2px;
   color:var(--text-muted);
   font-weight:800;
@@ -678,13 +729,13 @@
 .cal-weekday:last-child{color:#EF4444}
 .cal-weekday:last-child::after{background:#EF4444}
 
-.cal-grid{gap:4px}
+.cal-grid{gap:6px}
 .cal-day{
   min-height:58px;
   padding:6px 4px;
-  border-radius:12px;
+  border-radius:16px;   /* گردتر */
   aspect-ratio:auto;
-  background:linear-gradient(135deg,rgba(255,255,255,.025),rgba(255,255,255,.008));
+  background:rgba(255,255,255,.035);
   border:1px solid transparent;
   cursor:pointer;
   transition:all .22s cubic-bezier(.22,1,.36,1);
@@ -695,6 +746,9 @@
   gap:4px;
   position:relative;
   overflow:hidden;
+}
+[data-theme^="light"] .cal-day{
+  background:rgba(0,0,0,.025);
 }
 .cal-day:hover{
   border-color:var(--accent);
@@ -837,7 +891,7 @@
   margin:12px 20px 0;
   padding:8px 12px;
   border-radius:12px;
-  background:rgba(255,255,255,.02);
+  background:rgba(255,255,255,.025);
   border:1px solid var(--border);
   font-size:10px;
   color:var(--text-muted);
@@ -861,15 +915,16 @@
 /* ============ ۸) چیدمان ماهانه/سالانه ============ */
 .monthly-layout{
   display:grid;
-  grid-template-columns:240px 1fr;
+  grid-template-columns:260px 1fr;
   gap:14px;
   margin:14px 20px 16px;
   align-items:flex-start;
 }
 @media (max-width:900px){
   .monthly-layout{grid-template-columns:1fr}
-  .monthly-side{position:static}
+  .monthly-side{position:static;padding-top:0}
 }
+
 .monthly-main{display:flex;flex-direction:column;gap:12px;min-width:0}
 .monthly-side{
   display:flex;
@@ -877,6 +932,7 @@
   gap:12px;
   position:sticky;
   top:14px;
+  padding-top:38px;  /* هم‌تراز شدن با تقویم */
 }
 .monthly-layout .month-goals,
 .monthly-layout .month-calendar,
@@ -890,12 +946,15 @@
 .month-goals{
   padding:16px 18px;
   border-radius:20px;
-  background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
   border:1px solid var(--border);
   position:relative;
   overflow:visible;
   animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;
   animation-delay:.1s;
+}
+[data-theme^="light"] .month-goals{
+  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
 }
 .planner-pane > .month-goals{margin:14px 20px 0}
 
@@ -937,6 +996,9 @@
   background:rgba(255,255,255,.03);
   border:1px solid var(--border);
   transition:all .25s cubic-bezier(.22,1,.36,1);
+}
+[data-theme^="light"] .month-goal{
+  background:rgba(0,0,0,.02);
 }
 .month-goal:hover{
   border-color:var(--accent);
@@ -1151,10 +1213,13 @@
   padding:18px 20px;
   margin:14px 20px 20px;
   border-radius:20px;
-  background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.01));
+  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
   border:1px solid var(--border);
   animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;
   animation-delay:.1s;
+}
+[data-theme^="light"] .year-overview{
+  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
 }
 .year-overview-title{
   font-size:13px;
@@ -1185,6 +1250,9 @@
   cursor:pointer;
   user-select:none;
 }
+[data-theme^="light"] .year-month-card{
+  background:rgba(0,0,0,.02);
+}
 .year-month-card:hover{
   border-color:var(--accent);
   background:var(--accent-soft);
@@ -1208,6 +1276,9 @@
   background:rgba(255,255,255,.08);
   overflow:hidden;
   margin-bottom:6px;
+}
+[data-theme^="light"] .ymc-bar{
+  background:rgba(0,0,0,.08);
 }
 .ymc-fill{
   height:100%;
@@ -1323,58 +1394,90 @@
 .siraj-select-item .dot.yellow{background:linear-gradient(135deg,#F59E0B,#FBBF24)}
 .siraj-select-item .dot.green{background:linear-gradient(135deg,#10B981,#34D399)}
 
-/* ============ ۱۰) جدول هفتگی ============ */
+/* ============ ۱۰) جدول هفتگی — بازطراحی‌شده ============ */
 .week-grid-wrap{
   overflow-x:auto;
-  border-radius:16px;
-  border:1px solid var(--border);
-  background:var(--bubble-bot-bg);
+  border-radius:20px;
+  border:1px solid var(--border-strong);
+  background:var(--panel-bg);
+  box-shadow:0 8px 24px -14px rgba(0,0,0,.5);
   margin:14px 20px 20px;
   animation:paneLoad .45s cubic-bezier(.22,1,.36,1) both;
   animation-delay:.1s;
 }
+[data-theme^="light"] .week-grid-wrap{
+  background:#FFFFFF;
+  border-color:rgba(0,0,0,.1);
+}
+
 .week-table{
   width:100%;
-  border-collapse:collapse;
-  min-width:800px;
+  border-collapse:separate;
+  border-spacing:0;
+  min-width:820px;
   font-size:11.5px;
 }
+
 .week-table th,
 .week-table td{
-  border:1px solid var(--border);
+  border:none;
+  border-bottom:1px solid var(--border);
+  border-left:1px solid var(--border);
   padding:0;
   text-align:center;
   vertical-align:middle;
 }
+.week-table th:last-child,
+.week-table td:last-child{border-left:none}
+.week-table tr:last-child td{border-bottom:none}
+
 .week-table th{
-  background:var(--accent-soft);
-  color:var(--accent);
+  background:linear-gradient(180deg,rgba(59,130,246,.18),rgba(59,130,246,.06));
+  color:var(--accent-light);
   font-weight:800;
   font-size:11px;
-  padding:10px 6px;
+  padding:12px 6px;
   position:sticky;
   top:0;
   z-index:2;
+  border-bottom:2px solid rgba(59,130,246,.3);
 }
-.week-table th.hour-col{width:56px;font-size:10.5px}
+[data-theme^="light"] .week-table th{
+  background:linear-gradient(180deg,rgba(37,99,235,.14),rgba(37,99,235,.04));
+  color:var(--accent-dark);
+}
+
+.week-table th.hour-col{width:60px;font-size:10.5px}
 .week-table td.hour-cell{
-  background:var(--accent-soft);
+  background:rgba(59,130,246,.06);
   color:var(--accent);
   font-weight:800;
   font-size:10.5px;
   padding:6px;
-  width:56px;
+  width:60px;
+  border-right:2px solid rgba(59,130,246,.2);
 }
+[data-theme^="light"] .week-table td.hour-cell{
+  background:rgba(37,99,235,.05);
+}
+
 .week-table td.task-cell{
   padding:0;
   min-height:52px;
   position:relative;
   vertical-align:middle;
+  transition:background .2s;
 }
-.week-table td.task-cell.today{background:var(--accent-soft)}
+.week-table td.task-cell:hover{
+  background:rgba(59,130,246,.04);
+}
+.week-table td.task-cell.today{
+  background:rgba(59,130,246,.08);
+}
 .week-table td.task-cell.has-task input.cell-input{display:none}
+
 .week-cell-edit{
-  padding:2px;
+  padding:3px;
   display:flex;
   flex-direction:column;
   gap:3px;
@@ -1386,8 +1489,8 @@
 .week-cell-edit .wc-input{
   width:100%;
   padding:7px 9px;
-  border-radius:8px;
-  border:1px dashed var(--border);
+  border-radius:10px;
+  border:1px dashed rgba(120,150,200,.3);
   background:transparent;
   color:var(--text-main);
   font-family:var(--font-text);
@@ -1399,7 +1502,7 @@
 }
 .week-cell-edit .wc-input::placeholder{
   color:var(--text-muted);
-  opacity:.45;
+  opacity:.5;
   font-size:10px;
 }
 .week-cell-edit .wc-input:focus{
@@ -1411,7 +1514,7 @@
 .week-cell-edit .wc-btn{
   flex:1;
   padding:4px 6px;
-  border-radius:6px;
+  border-radius:8px;
   border:none;
   font-family:var(--font-text);
   font-size:9.5px;
@@ -1432,14 +1535,15 @@
   color:var(--text-muted);
   border:1px solid var(--border);
 }
+
 .week-cell-task{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:6px;
   padding:6px 8px;
-  border-radius:9px;
-  background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.04));
+  border-radius:11px;
+  background:linear-gradient(135deg,rgba(59,130,246,.14),rgba(59,130,246,.04));
   border:1px solid rgba(59,130,246,.22);
   font-size:11px;
   direction:rtl;
@@ -1511,8 +1615,11 @@
   margin:14px 20px 20px;
   padding:14px 16px;
   border-radius:16px;
-  background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
   border:1px solid var(--border);
+}
+[data-theme^="light"] .week-summary{
+  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
 }
 .ws-box{text-align:center}
 .ws-num{
@@ -1736,7 +1843,7 @@
 }
 .cal-rem-add button:hover{transform:translateY(-1px)}
 
-/* ============ ۱۲) حالت مطالعه ============ */
+/* ============ ۱۲) حالت مطالعه — با انیمیشن ورود ============ */
 .study-overlay{
   position:fixed;
   inset:0;
@@ -1749,12 +1856,20 @@
   gap:18px;
   opacity:0;
   visibility:hidden;
-  transition:opacity .5s,visibility .5s;
+  transform:scale(.94);
+  transition:
+    opacity .4s cubic-bezier(.22,1,.36,1),
+    visibility .4s,
+    transform .55s cubic-bezier(.34,1.4,.64,1);
   padding:24px;
   text-align:center;
   overflow-y:auto;
 }
-.study-overlay.open{opacity:1;visibility:visible}
+.study-overlay.open{
+  opacity:1;
+  visibility:visible;
+  transform:scale(1);
+}
 .study-overlay > *{flex-shrink:0}
 .study-overlay::before,
 .study-overlay::after{
@@ -1895,7 +2010,7 @@
   flex-direction:column;
   gap:14px;
   align-items:center;
-  max-width:460px;
+  max-width:520px;
   width:100%;
 }
 .study-empty-box{
@@ -1973,6 +2088,139 @@
   transition:color .2s;
 }
 .stp-wrap.dragging .stp-hint{color:var(--accent)}
+
+/* ★★★ دکمه‌های صدا — قبلاً استایل نداشتن ★★★ */
+.study-music-section{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:6px;
+  padding:14px 12px;
+  border-radius:16px;
+  background:var(--panel-bg);
+  border:1px solid var(--border);
+}
+.study-music-title{
+  font-size:12.5px;
+  font-weight:800;
+  color:var(--text-main);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding-bottom:8px;
+  border-bottom:1px dashed var(--border);
+}
+.study-sound-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px;
+  width:100%;
+}
+@media (max-width:560px){
+  .study-sound-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+.study-sound-btn{
+  padding:10px 6px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--text-muted);
+  font-family:var(--font-text);
+  font-size:10.5px;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  transition:all .25s cubic-bezier(.22,1,.36,1);
+  white-space:nowrap;
+  overflow:hidden;
+  min-width:0;
+  text-align:center;
+  line-height:1.2;
+}
+.study-sound-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  background:var(--accent-soft);
+  transform:translateY(-2px);
+}
+.study-sound-btn.on{
+  border-color:var(--accent);
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
+  color:#fff;
+  box-shadow:0 6px 18px -6px var(--accent);
+}
+.study-sound-btn.on.off-btn{
+  background:rgba(239,68,68,.15);
+  border-color:rgba(239,68,68,.4);
+  color:#F87171;
+  box-shadow:none;
+}
+.study-sound-btn .ss-icon{
+  font-size:18px;
+  line-height:1;
+}
+.study-volume-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border-radius:12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+}
+.study-volume-row input[type="range"]{
+  flex:1;
+  -webkit-appearance:none;
+  appearance:none;
+  height:6px;
+  border-radius:6px;
+  background:linear-gradient(90deg,var(--accent) 0%,var(--accent) var(--vp,40%),rgba(255,255,255,.08) var(--vp,40%),rgba(255,255,255,.08) 100%);
+  outline:none;
+  cursor:pointer;
+  direction:ltr;
+}
+.study-volume-row input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--accent);
+  border:3px solid var(--panel-bg);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+  cursor:grab;
+  transition:transform .15s var(--ease-spring);
+}
+.study-volume-row input[type="range"]::-webkit-slider-thumb:hover{
+  transform:scale(1.15);
+}
+.study-volume-row input[type="range"]::-moz-range-thumb{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--accent);
+  border:3px solid var(--panel-bg);
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+  cursor:grab;
+}
+.study-now-playing{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 14px;
+  border-radius:12px;
+  background:var(--accent-soft);
+  border:1px solid var(--accent);
+  color:var(--accent);
+  font-size:11.5px;
+  font-weight:700;
+}
 
 /* ============ ۱۳) چت مطالعه ============ */
 .study-chat-panel{
@@ -2142,7 +2390,7 @@
   opacity:.75;
 }
 
-/* ============ ۱۵) Contact rows ============ */
+/* ============ ۱۵) Contact rows — بدون دکمه کپی ============ */
 .contact-row-v2{
   display:flex;
   align-items:center;
@@ -2157,6 +2405,9 @@
   color:var(--text-main);
   position:relative;
   overflow:hidden;
+}
+[data-theme^="light"] .contact-row-v2{
+  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
 }
 .contact-row-v2::before{
   content:'';
@@ -2175,6 +2426,12 @@
   transform:translateX(-4px);
 }
 .contact-row-v2:hover::before{opacity:1}
+
+/* مخفی کردن دکمه کپی */
+.contact-copy,
+.contact-row .contact-copy,
+.contact-row-v2 .contact-copy{display:none !important}
+
 .contact-row-v2 .contact-icon{
   width:44px;
   height:44px;
@@ -2364,10 +2621,11 @@
 }
 #panelHeaderPinBtn{display:none}
 
+/* ★ آواتار بالای چت — موقعیت بهتر، بدون گوشه‌چسبیدن ★ */
 .main-top-actions{
   position:absolute;
-  top:14px;
-  left:14px;
+  top:20px;
+  left:24px;
   z-index:45;
   display:flex;
   align-items:center;
@@ -2376,9 +2634,9 @@
   pointer-events:auto;
 }
 .main-top-avatar{
-  width:38px;
-  height:38px;
-  min-width:38px;
+  width:40px;
+  height:40px;
+  min-width:40px;
   border-radius:50%;
   background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
   display:flex;
@@ -2402,9 +2660,9 @@
   display:block;
 }
 .main-top-icon-btn{
-  width:38px;
-  height:38px;
-  min-width:38px;
+  width:40px;
+  height:40px;
+  min-width:40px;
   border-radius:50%;
   border:1px solid var(--border);
   background:var(--panel-bg);
@@ -2429,6 +2687,9 @@
   stroke-width:2.2;
 }
 
+/* ★ مخفی کردن قفل تکراری در هدر چت (JS یکی دیگه اضافه می‌کنه) ★ */
+.chat-header .header-icon-btn#headerLockBtn{display:none !important}
+
 .profile-section{
   padding:16px;
   border:1px solid var(--border);
@@ -2439,6 +2700,10 @@
 .profile-section .about-avatar{margin:0 auto}
 .profile-section input:focus,
 .profile-section textarea:focus{border-color:var(--accent)}
+
+/* ★ مخفی کردن تب پروفایل در تنظیمات ★ */
+.settings-tab-btn[data-cat="profile"]{display:none !important}
+.settings-content[data-cat="profile"]{display:none !important}
 
 /* ============ ۱۷) قفل ============ */
 .lock-screen.open .lock-box{animation:lockIn .55s cubic-bezier(.34,1.4,.64,1)}
@@ -2498,8 +2763,8 @@
   justify-content:flex-start;
   gap:12px;
   width:100%;
-  padding:16px 20px;
-  border-radius:22px;
+  padding:14px 18px;
+  border-radius:18px;
   border:1px solid var(--border);
   background:rgba(255,255,255,.02);
   color:var(--text-muted);
@@ -2508,6 +2773,9 @@
   font-weight:800;
   cursor:pointer;
   transition:all .3s cubic-bezier(.22,1,.36,1);
+}
+[data-theme^="light"] .panel-planner-tab{
+  background:rgba(0,0,0,.02);
 }
 .panel-planner-tab svg{
   width:18px;
@@ -2537,8 +2805,8 @@
   align-items:center;
   gap:12px;
   width:100%;
-  padding:18px 20px;
-  border-radius:22px;
+  padding:16px 18px;
+  border-radius:18px;
   border:none;
   background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
   color:#fff;
@@ -2572,13 +2840,22 @@
   color:var(--text-main);
   justify-content:flex-start;
 }
+[data-theme^="light"] .guide-card .guide-item{
+  background:rgba(0,0,0,.02);
+}
 .guide-card .guide-item span{font-size:14px;line-height:1}
 .guide-card,
 .guide-card .card-title,
 .guide-card .guide-item{direction:rtl;text-align:right}
 
-/* ============ ۲۰) مقالات و انجمن — وسط‌چین ============ */
-/* فقط روی view فعال اعمال می‌شه — نه غیرفعال */
+/* ★★★ مخفی کردن تب‌های برنامه‌ریز جا افتاده ★★★ */
+/* اگه .planner-tabs جایی رندر شد، حذف کن چون توی پنل راست هستن */
+.planner-tabs,
+.planner-tab{display:none !important}
+.planner-pane > .panel-planner-tabs{display:none !important}
+.planner-body > .planner-tabs{display:none !important}
+
+/* ============ ۲۰) مقالات و انجمن ============ */
 .blog-view.active,
 .videos-view.active{
   align-items:center;
@@ -2599,10 +2876,13 @@
   margin:30px auto;
   padding:38px 30px;
   border-radius:22px;
-  background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+  background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
   border:1px solid var(--border);
   width:calc(100% - 60px);
   box-sizing:border-box;
+}
+[data-theme^="light"] .community-hero{
+  background:linear-gradient(135deg,rgba(0,0,0,.03),rgba(0,0,0,.01));
 }
 .community-hero .community-icon{margin:0 auto 14px}
 .community-hero .community-title{
@@ -2686,16 +2966,6 @@
 [data-nav-position="right"] .nav-row,
 [data-nav-position="left"] .nav-row{
   transition:transform .42s cubic-bezier(.22,1,.36,1),opacity .3s ease;
-}
-[data-nav-position="right"] .nav-row.collapsed{
-  transform:translateX(calc(100% - 22px));
-}
-[data-nav-position="left"] .nav-row.collapsed{
-  transform:translateX(calc(-100% + 22px));
-}
-[data-nav-position="right"] .nav-row.collapsed:hover,
-[data-nav-position="left"] .nav-row.collapsed:hover{
-  transform:translateX(0);
 }
 [data-nav-position="right"] .nav-row{padding-right:0}
 [data-nav-position="left"] .nav-row{padding-left:0}
