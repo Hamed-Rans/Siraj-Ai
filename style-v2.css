@@ -2398,3 +2398,135 @@
 .profile-section{padding:16px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.02)}
 .profile-section .about-avatar{margin:0 auto}
 .profile-section input:focus,.profile-section textarea:focus{border-color:var(--accent)!important}
+/* ============ v2.7 ============ */
+
+/* انیمیشن پیام عادی: از پایین‌راست به بالاچپ، و برعکس */
+@keyframes msgUserInNew{
+  from{opacity:0;transform:translate(40px,40px) scale(.9);filter:blur(6px)}
+  to{opacity:1;transform:translate(0,0) scale(1);filter:blur(0)}
+}
+@keyframes msgBotInNew{
+  from{opacity:0;transform:translate(-40px,40px) scale(.9);filter:blur(6px)}
+  to{opacity:1;transform:translate(0,0) scale(1);filter:blur(0)}
+}
+.msg-wrap.me:not(.no-anim){animation:msgUserInNew .55s var(--ease-smooth) both!important}
+.msg-wrap.bot:not(.no-anim){animation:msgBotInNew .55s var(--ease-smooth) both!important}
+
+/* انیمیشن پیام برگی: از بالاراست به پایینچپ، و برعکس */
+@keyframes msgUserInLeafNew{
+  from{opacity:0;transform:translate(40px,-40px) scale(.9);filter:blur(6px)}
+  to{opacity:1;transform:translate(0,0) scale(1);filter:blur(0)}
+}
+@keyframes msgBotInLeafNew{
+  from{opacity:0;transform:translate(-40px,-40px) scale(.9);filter:blur(6px)}
+  to{opacity:1;transform:translate(0,0) scale(1);filter:blur(0)}
+}
+[data-bubble-shape="leaf"] .msg-wrap.me:not(.no-anim){animation:msgUserInLeafNew .55s var(--ease-smooth) both!important}
+[data-bubble-shape="leaf"] .msg-wrap.bot:not(.no-anim){animation:msgBotInLeafNew .55s var(--ease-smooth) both!important}
+
+/* پروفایل هدر */
+.header-user-avatar{
+  width:40px;height:40px;min-width:40px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:'Lalezar','Vazirmatn',sans-serif;
+  font-size:15px;font-weight:900;
+  cursor:pointer;flex-shrink:0;
+  border:2px solid var(--panel-bg);
+  box-shadow:0 0 0 1.5px var(--accent);
+  overflow:hidden;
+  transition:transform .3s var(--ease-spring);
+}
+.header-user-avatar:hover{transform:scale(1.08)}
+.header-user-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* لوگوی بزرگ‌تر پایین چپ */
+.site-credit img{
+  width:22px!important;height:22px!important;
+  filter:brightness(1.15)!important;opacity:.9!important;
+}
+
+/* حذف کادر نسخه */
+.siraj-version-badge{
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+}
+.siraj-version-badge span{background:transparent!important;padding:0!important;border:none!important}
+
+/* پنل راهنما راست‌چین */
+.guide-card, .guide-card .card-title, .guide-card .guide-item{direction:rtl;text-align:right}
+.guide-card .guide-item{justify-content:flex-start}
+
+/* اهداف ماه/سال — چیدمان ستونی، سمت راست */
+.monthly-layout{
+  display:grid;
+  grid-template-columns:1fr 240px;
+  gap:14px;
+  margin:14px 20px 16px;
+  align-items:flex-start;
+}
+.monthly-main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.monthly-side{display:flex;flex-direction:column;gap:12px;position:sticky;top:14px}
+
+@media (max-width:900px){
+  .monthly-layout{grid-template-columns:1fr}
+  .monthly-side{position:static}
+}
+
+.monthly-layout .month-goals,
+.monthly-layout .month-calendar,
+.monthly-layout .year-overview{margin:0!important}
+.monthly-layout .cal-legend{margin:0 0 8px 0!important;padding:6px 10px!important;width:max-content!important;margin-left:auto!important;margin-right:auto!important}
+
+/* اهداف فشرده‌تر در ستون */
+.monthly-side .month-goals{padding:12px!important}
+.monthly-side .month-goals-list{gap:5px!important}
+.monthly-side .month-goal{padding:8px 10px!important}
+.monthly-side .mg-text{font-size:11px!important}
+.monthly-side .month-goal-add{gap:5px!important}
+.monthly-side .month-goal-add input{padding:8px 10px!important;font-size:11px!important}
+.monthly-side .month-goal-add button{padding:8px 12px!important;font-size:13px!important}
+
+/* تقویم — ارتفاع کمتر، فشرده‌تر */
+.monthly-layout .month-calendar{padding:12px!important}
+.monthly-layout .cal-day{min-height:44px!important}
+
+/* افسانه کوچک‌تر */
+.cal-legend{gap:8px!important;font-size:9.5px!important;padding:6px 10px!important}
+.cl-dot{width:8px!important;height:8px!important}
+
+/* روز تعطیل (جمعه) — قرمز */
+.cal-day.friday.day-pending{
+  background:linear-gradient(135deg,rgba(239,68,68,.25),rgba(239,68,68,.1))!important;
+}
+.cal-day.friday.day-done{
+  background:linear-gradient(135deg,rgba(16,185,129,.22),rgba(239,68,68,.08))!important;
+}
+.cal-day.friday.day-partial{
+  background:linear-gradient(135deg,rgba(245,158,11,.22),rgba(239,68,68,.08))!important;
+}
+
+/* رویداد ملی */
+.cal-day-national::before{
+  content:'';
+  position:absolute;
+  top:2px;left:2px;
+  width:5px;height:5px;
+  border-radius:50%;
+  background:#A855F7;
+  box-shadow:0 0 4px #A855F7;
+}
+
+/* انیمیشن هوشمند افقی */
+@keyframes heroSlideFromRight{
+  0%{opacity:0;transform:translateX(35px);filter:blur(3px)}
+  100%{opacity:1;transform:translateX(0);filter:blur(0)}
+}
+@keyframes heroSlideFromLeft{
+  0%{opacity:0;transform:translateX(-35px);filter:blur(3px)}
+  100%{opacity:1;transform:translateX(0);filter:blur(0)}
+}
+.heroRollRight{display:inline-block;animation:heroSlideFromRight .45s cubic-bezier(.22,1,.36,1)!important;will-change:transform,opacity}
+.heroRollLeft{display:inline-block;animation:heroSlideFromLeft .45s cubic-bezier(.22,1,.36,1)!important;will-change:transform,opacity}
