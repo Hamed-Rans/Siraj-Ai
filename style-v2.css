@@ -1694,3 +1694,278 @@
 
 /* حالت مطالعه دکمه‌ها */
 .study-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:640px}
+/* ============ v2.4 — اصلاحات ============ */
+
+/* z-index درست برای select اولویت */
+.task-add-form{position:relative;z-index:60}
+.siraj-select{position:relative;z-index:1}
+.siraj-select.open{z-index:900}
+.task-item,.tasks-list{position:relative;z-index:1}
+
+/* لیبل «اولویت» قبل از select */
+.siraj-select.opt-priority .siraj-select-trigger::before{
+  content:'⚡';
+  font-size:12px;
+  opacity:.75;
+  margin-left:4px;
+}
+
+/* راهنمای کوچک زیر select */
+.priority-hint{
+  font-size:9.5px;
+  color:var(--text-muted);
+  padding:2px 6px;
+  opacity:.7;
+}
+
+/* ============ جدول هفتگی — inline edit ============ */
+.week-cell-edit{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:4px;
+  width:100%;
+  height:100%;
+  min-height:42px;
+  justify-content:center;
+}
+.week-cell-edit .wc-input{
+  width:100%;
+  padding:5px 8px;
+  border-radius:7px;
+  border:1px solid var(--accent);
+  background:var(--primary);
+  color:var(--text-main);
+  font-family:var(--font-text);
+  font-size:10.5px;
+  outline:none;
+  text-align:right;
+  min-height:26px;
+}
+.week-cell-edit .wc-input::placeholder{color:var(--text-muted);opacity:.5;font-size:10px}
+.week-cell-edit .wc-btns{
+  display:flex;
+  gap:4px;
+  justify-content:center;
+}
+.week-cell-edit .wc-btn{
+  flex:1;
+  padding:3px 6px;
+  border-radius:6px;
+  border:none;
+  font-family:var(--font-text);
+  font-size:9.5px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  min-height:20px;
+}
+.week-cell-edit .wc-btn.save{
+  background:linear-gradient(135deg,#10B981,#059669);
+  color:#fff;
+}
+.week-cell-edit .wc-btn.save:hover{transform:translateY(-1px);box-shadow:0 4px 10px -4px #10B981}
+.week-cell-edit .wc-btn.cancel{
+  background:rgba(255,255,255,.05);
+  color:var(--text-muted);
+  border:1px solid var(--border);
+}
+.week-cell-edit .wc-btn.cancel:hover{background:rgba(239,68,68,.15);color:#EF4444;border-color:#EF4444}
+.week-cell-edit .wc-btn svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5}
+
+/* سلول هفتگی — حالت نمایش تسک */
+.week-cell-task{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:6px;
+  padding:6px 8px!important;
+  border-radius:9px!important;
+  background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.04))!important;
+  border:1px solid rgba(59,130,246,.22);
+  font-size:11px!important;
+  direction:rtl!important;
+  min-height:38px;
+  margin:2px;
+  position:relative;
+  transition:all .22s cubic-bezier(.22,1,.36,1);
+}
+.week-cell-task:hover{
+  border-color:var(--accent);
+  box-shadow:0 3px 10px -5px var(--accent);
+}
+.week-cell-task.done{
+  opacity:.55;
+  background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(16,185,129,.04))!important;
+  border-color:rgba(16,185,129,.25);
+}
+.week-cell-task.done .wt-title{text-decoration:line-through;color:var(--text-muted)}
+.week-cell-task .wt-title{
+  flex:1!important;
+  text-align:right!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  color:var(--text-main)!important;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  line-height:1.35;
+  order:1;
+}
+.week-cell-task .wt-actions{
+  display:flex!important;
+  gap:2px!important;
+  flex-shrink:0!important;
+  order:2;
+  opacity:0;
+  transition:opacity .22s;
+}
+.week-cell-task:hover .wt-actions{opacity:1}
+.week-cell-task .wt-btn{
+  width:20px!important;
+  height:20px!important;
+  border-radius:6px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0!important;
+  background:rgba(255,255,255,.06);
+  border:none;
+  cursor:pointer;
+  transition:all .2s cubic-bezier(.34,1.4,.64,1);
+}
+.week-cell-task .wt-btn:hover{transform:scale(1.15)}
+.week-cell-task .wt-btn.tick{color:#10B981}
+.week-cell-task .wt-btn.tick.on{background:#10B981;color:#fff}
+.week-cell-task .wt-btn.edit{color:#F59E0B}
+.week-cell-task .wt-btn.edit:hover{background:rgba(245,158,11,.25)}
+.week-cell-task .wt-btn.del{color:#EF4444}
+.week-cell-task .wt-btn.del:hover{background:rgba(239,68,68,.25)}
+.week-cell-task .wt-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.6}
+
+/* ============ تقویم بازطراحی کامل ============ */
+.month-calendar{
+  padding:12px!important;
+  margin:12px 20px 16px!important;
+  border-radius:20px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.015))!important;
+  border:1px solid var(--border)!important;
+}
+.cal-weekdays{gap:4px!important;margin-bottom:6px!important}
+.cal-weekday{
+  font-size:10px!important;
+  padding:6px 2px!important;
+  color:var(--text-muted)!important;
+  font-weight:800!important;
+  letter-spacing:.4px;
+  position:relative;
+}
+.cal-weekday::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:30%;right:30%;
+  height:2px;
+  background:var(--accent);
+  opacity:.35;
+  border-radius:2px;
+}
+.cal-weekday:first-child{color:#EF4444!important}
+.cal-weekday:first-child::after{background:#EF4444}
+.cal-weekday:last-child{color:#10B981!important}
+.cal-weekday:last-child::after{background:#10B981}
+
+.cal-grid{gap:4px!important}
+.cal-day{
+  min-height:34px!important;
+  padding:4px!important;
+  border-radius:11px!important;
+  aspect-ratio:auto!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.025),rgba(255,255,255,.008))!important;
+  border:1px solid transparent!important;
+  cursor:pointer;
+  transition:all .22s cubic-bezier(.22,1,.36,1)!important;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+.cal-day::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 50% 0%,var(--accent-soft),transparent 70%);
+  opacity:0;
+  transition:opacity .22s;
+  pointer-events:none;
+}
+.cal-day:hover{
+  border-color:var(--accent)!important;
+  transform:translateY(-2px) scale(1.04)!important;
+  box-shadow:0 6px 16px -8px var(--accent);
+  z-index:2;
+}
+.cal-day:hover::before{opacity:1}
+.cal-day.empty{background:transparent!important;border-color:transparent!important;cursor:default;pointer-events:none}
+.cal-day.empty:hover{transform:none;box-shadow:none}
+.cal-day-num{
+  font-size:12px!important;
+  font-weight:700!important;
+  color:var(--text-main)!important;
+  line-height:1;
+  position:relative;
+  z-index:1;
+}
+.cal-day.today{
+  background:linear-gradient(135deg,var(--accent-soft),rgba(59,130,246,.06))!important;
+  border-color:var(--accent)!important;
+  box-shadow:inset 0 0 0 1px var(--accent-soft);
+}
+.cal-day.today .cal-day-num{
+  color:var(--accent)!important;
+  font-weight:900!important;
+}
+.cal-day.today::after{
+  content:'';
+  position:absolute;
+  top:4px;right:4px;
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--accent);
+  animation:pulseDot 1.6s ease-in-out infinite;
+}
+.cal-day.selected{
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 6px 18px -6px var(--accent)!important;
+  transform:scale(1.05)!important;
+}
+.cal-day.selected .cal-day-num{color:#fff!important;font-weight:900!important}
+.cal-day.selected::after{background:#fff!important;animation:none}
+.cal-day.friday .cal-day-num{color:#EF4444!important}
+.cal-day.selected.friday .cal-day-num{color:#fff!important}
+.cal-day-dots{
+  gap:2px!important;
+  margin-top:2px!important;
+  position:relative;
+  z-index:1;
+}
+.cal-day-dot{
+  width:2.5px!important;
+  height:2.5px!important;
+  border-radius:50%!important;
+}
+.cal-day.selected .cal-day-dot{background:#fff!important}
+
+/* ============ آیکون اهداف سالانه ============ */
+.year-goals .month-goals-title svg{display:none}
+.year-goals .month-goals-title::before{
+  content:'🏅';
+  font-size:16px;
+  line-height:1;
+}
