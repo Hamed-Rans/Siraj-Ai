@@ -1029,7 +1029,7 @@
       var el = document.createElement('div');
       el.id = 'calDayPopup'; el.className = 'siraj-popup-overlay';
       el.innerHTML = '<div class="siraj-popup cal-popup-wide">' +
-        '<div class="siraj-popup-title">📅 ' + toFa(day) + ' ' + d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}) + '</div>' +
+                '<div class="siraj-popup-title">📅 <bdi dir="rtl" style="unicode-bidi:isolate">' + toFa(day) + ' ' + d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}) + '</bdi></div>' +
         (nationalEvt ? '<div class="cal-national-badge">🇮🇷 ' + esc(nationalEvt) + '</div>' : '') +
         '<div class="cal-popup-section">' +
           '<div class="cal-popup-label">🎯 کارها</div>' +
@@ -1228,10 +1228,10 @@
       document.getElementById('panelSubText').textContent = p.name ? ('خوش آمدی ' + p.name + ' 👋') : 'خوش آمدی 👋';
       var tab = getTab();
       var tabs = [
-        {id:'daily', label:'روزانه', icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
-        {id:'weekly', label:'هفتگی', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},
-        {id:'monthly', label:'ماهانه', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01"/>'},
-        {id:'yearly', label:'سالانه', icon:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>'}
+        {id:'daily', label:'روزانه', icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'},
+        {id:'weekly', label:'هفتگی', icon:'<path d="M3 21h18"/><path d="M5 21v-6M9 21v-10M13 21v-7M17 21v-13M21 21v-4"/>'},
+        {id:'monthly', label:'ماهانه', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/><circle cx="8" cy="19" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/>'},
+        {id:'yearly', label:'سالانه', icon:'<path d="M3 20h18"/><path d="m7 20 5-14 5 14"/><path d="M9.5 13h5"/>'}
       ];
       var tabsHTML = '<div class="panel-planner-tabs">' + tabs.map(function(t){
         return '<button class="panel-planner-tab' + (t.id===tab?' active':'') + '" onclick="window.switchPlannerTab(\'' + t.id + '\')">' +
@@ -1841,15 +1841,28 @@
     }, 900);
 
     /* ============ پروفایل شناور همه‌جا ============ */
-    function injectFloatingProfile(){
-      if (document.getElementById('floatingTopBar')) return;
-      var bar = document.createElement('div');
-      bar.id = 'floatingTopBar';
-      bar.className = 'floating-top-bar';
+       function injectFloatingProfile(){
+      /* پاک کردن شناور قدیمی اگه مونده */
+      var oldBar = document.getElementById('floatingTopBar');
+      if (oldBar) oldBar.remove();
+
+      var header = document.querySelector('.panel-header');
+      if (!header) return;
+      if (header.querySelector('.panel-header-actions')) return;
+
+      var actions = document.createElement('div');
+      actions.className = 'panel-header-actions';
+
+      var lockBtn = document.createElement('button');
+      lockBtn.id = 'panelHeaderLockBtn';
+      lockBtn.className = 'panel-header-icon-btn';
+      lockBtn.title = 'قفل کردن سایت';
+      lockBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+      lockBtn.onclick = function(){ if (typeof window.lockNow === 'function') window.lockNow(); };
 
       var av = document.createElement('div');
-      av.id = 'floatingUserAvatar';
-      av.className = 'header-user-avatar';
+      av.id = 'panelHeaderAvatar';
+      av.className = 'panel-header-avatar';
       var p = getProfile();
       av.title = p.name ? p.name : 'مشخصات من';
       if (p.avatar) av.innerHTML = '<img src="' + p.avatar + '" alt="">';
@@ -1862,21 +1875,16 @@
         }, 400);
       };
 
-      var lockBtn = document.createElement('button');
-      lockBtn.id = 'floatingLockBtn';
-      lockBtn.className = 'header-icon-btn';
-      lockBtn.title = 'قفل کردن سایت';
-      lockBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
-      lockBtn.onclick = function(){ if (typeof window.lockNow === 'function') window.lockNow(); };
-
-      bar.appendChild(av);
-      bar.appendChild(lockBtn);
-      document.body.appendChild(bar);
+      actions.appendChild(lockBtn);
+      actions.appendChild(av);
+      header.appendChild(actions);
     }
-    setTimeout(injectFloatingProfile, 500);
+    setTimeout(injectFloatingProfile, 400);
+    setTimeout(injectFloatingProfile, 1200);
+    setTimeout(injectFloatingProfile, 2000);
 
     function updateFloatingProfile(){
-      var av = document.getElementById('floatingUserAvatar');
+      var av = document.getElementById('panelHeaderAvatar');
       if (!av) return;
       var p = getProfile();
       av.title = p.name ? p.name : 'مشخصات من';
