@@ -3505,3 +3505,230 @@
   width:14px;height:14px;
   stroke:currentColor;fill:none;stroke-width:2;
 }
+/* ═══════════════════════════════════════════════════════════
+   PATCH v22 — Fixes
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── ۱) اهداف ماه/سال — تراز با تقویم، ارتفاع کمتر، input پایین ─── */
+.monthly-layout {
+  align-items: flex-start !important;
+}
+.monthly-side {
+  padding-top: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-self: flex-start !important;
+}
+.monthly-side .month-goals,
+.monthly-side .month-goals.compact,
+.monthly-side .year-goals {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: auto !important;
+  max-height: none !important;
+  padding: 14px 16px !important;
+  margin: 0 !important;
+  flex: 0 0 auto !important;
+}
+.monthly-side .month-goals-list {
+  flex: 1 1 auto !important;
+  max-height: 220px !important;
+  overflow-y: auto !important;
+  margin-bottom: 12px !important;
+}
+.monthly-side .month-goal-add {
+  margin-top: auto !important;
+}
+.monthly-main {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+.monthly-main .cal-legend {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* ─── ۲) اسلایدر — بدون فلش تیره ─── */
+.nav-slider {
+  opacity: 0 !important;
+  transition: none !important;
+}
+.nav-slider.ready {
+  transition:
+    left .4s cubic-bezier(.22,1,.36,1),
+    top .4s cubic-bezier(.22,1,.36,1),
+    width .35s cubic-bezier(.22,1,.36,1),
+    height .35s cubic-bezier(.22,1,.36,1),
+    border-radius .3s,
+    opacity .15s !important;
+}
+.nav-slider.visible {
+  opacity: 1 !important;
+}
+
+/* ─── ۳) نوار عمودی (چپ/راست) — تمیز و بدون باگ ─── */
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav {
+  padding: 6px 5px !important;
+  gap: 3px !important;
+  border-radius: 24px !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat) {
+  width: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  gap: 0 !important;
+  transition: all .3s cubic-bezier(.22,1,.36,1) !important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat).active,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat).active {
+  height: 62px !important;
+  max-height: 62px !important;
+  padding: 5px 3px !important;
+  gap: 2px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat)::after {
+  position: static !important;
+  max-width: 0 !important;
+  opacity: 0 !important;
+  margin: 0 !important;
+  font-size: 9.5px !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  transition: max-width .35s cubic-bezier(.22,1,.36,1), opacity .2s !important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat).active::after,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat).active::after {
+  max-width: 44px !important;
+  opacity: 1 !important;
+  margin-top: 1px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn svg,
+[data-nav-position="right"] .bottom-nav-btn svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  margin: 4px 0 !important;
+}
+
+/* نوار افقی (پایین/بالا) — لیبل سمت چپ آیکون با فاصله */
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+  margin-left: 8px !important;
+  margin-right: 0 !important;
+}
+
+/* ─── ۴) هدر همه تب‌ها — راست‌چین، آیکون تب ─── */
+.page-title-bar {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  padding: 14px 20px !important;
+  padding-left: 110px !important;
+  text-align: right !important;
+  position: relative !important;
+}
+.page-title-bar .page-title-text {
+  flex: 1 1 auto !important;
+  text-align: right !important;
+  font-size: 22px !important;
+}
+.page-title-bar .page-title-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 8px 22px -8px var(--accent);
+  flex-shrink: 0;
+}
+.page-title-bar .page-title-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+/* ─── ۵) دکمه‌های پروفایل+قفل در همه هدرها ─── */
+.header-left-actions {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 50;
+}
+.chat-header,
+.planner-hero,
+.page-title-bar {
+  position: relative !important;
+}
+.chat-header,
+.planner-hero {
+  padding-left: 110px !important;
+}
+.header-left-actions .main-top-avatar,
+.header-left-actions .main-top-icon-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+}
+
+/* ─── ۶) انیمیشن پنل برنامه‌ریز ─── */
+#plannerPane {
+  position: relative;
+  overflow: hidden;
+}
+#plannerPane.heroOutRight {
+  animation: pOutRight .32s cubic-bezier(.4,0,1,1) forwards;
+}
+#plannerPane.heroOutLeft {
+  animation: pOutLeft .32s cubic-bezier(.4,0,1,1) forwards;
+}
+#plannerPane.heroInFromLeft {
+  animation: pInFromLeft .42s cubic-bezier(0,0,.4,1) forwards;
+}
+#plannerPane.heroInFromRight {
+  animation: pInFromRight .42s cubic-bezier(0,0,.4,1) forwards;
+}
+@keyframes pOutRight  { to { opacity: 0; transform: translateX(60px); } }
+@keyframes pOutLeft   { to { opacity: 0; transform: translateX(-60px); } }
+@keyframes pInFromLeft {
+  from { opacity: 0; transform: translateX(-60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pInFromRight {
+  from { opacity: 0; transform: translateX(60px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
