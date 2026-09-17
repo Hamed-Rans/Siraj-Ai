@@ -17,13 +17,30 @@
         return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
       });
     }
+    /* دسترسی به APP_CONFIG — با احتیاط به خاطر const در script.js */
+    function getBaseURL(){
+      try{
+        if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG && APP_CONFIG.baseURL && APP_CONFIG.baseURL.trim()) return APP_CONFIG.baseURL;
+      }catch(e){}
+      try{
+        if (window.APP_CONFIG && window.APP_CONFIG.baseURL && window.APP_CONFIG.baseURL.trim()) return window.APP_CONFIG.baseURL;
+      }catch(e){}
+      return '/api/chat';
+    }
+    function getModel(){
+      try{
+        if (typeof settings !== 'undefined' && settings && settings.model) return settings.model;
+      }catch(e){}
+      try{ if (window.settings && window.settings.model) return window.settings.model; }catch(e){}
+      return 'gemini-2.0-flash';
+    }
+
     function getTab(){
       var btn = document.querySelector('.planner-tab.active');
       if (!btn) return 'daily';
       var m = (btn.getAttribute('onclick')||'').match(/switchPlannerTab\(['"]([^'"]+)['"]\)/);
       return m ? m[1] : 'daily';
     }
-    /* تاریخ: ماه اول، بعد سال */
     function pDate(d){ try{ return d.toLocaleDateString('fa-IR',{day:'numeric',month:'long',year:'numeric'}); }catch(e){ return ''; } }
     function pMonthYear(d){
       try{
@@ -41,7 +58,6 @@
     var ORD = ['اول','دوم','سوم','چهارم','پنجم','ششم'];
     function weekOrd(n){ n=Math.max(1,Math.min(6,n)); return ORD[n-1]; }
 
-    /* هفته‌ی خودمون که از window.plannerDate استفاده می‌کنه */
     function myWeekDays(){
       var d = new Date(window.plannerDate || new Date());
       d.setHours(0,0,0,0);
@@ -62,25 +78,36 @@
       return days;
     }
 
-    /* ============ Smart Animation ============ */
-    var prevHero = {};
-    function applySmartAnim(tab){
-      setTimeout(function(){
-        var c = document.querySelector('.phc-center');
-        if (!c) return;
-        var cur = {};
-        c.querySelectorAll('[data-anim-key]').forEach(function(el){
-          var k = el.getAttribute('data-anim-key');
-          var v = el.textContent.trim();
-          cur[k] = v;
-          if (prevHero[k] !== undefined && prevHero[k] !== v){
-            el.classList.remove('heroRoll');
-            void el.offsetWidth;
-            el.classList.add('heroRoll');
-          }
-        });
-        prevHero = cur;
-      }, 25);
+    /* ============ انیمیشن هوشمند — فقط متن‌های تغییرکرده ============ */
+    function smartHeroUpdate(tab){
+      var c = document.querySelector('.phc-center');
+      if (!c) return;
+      var d = new Date(window.plannerDate || new Date());
+      var map = {};
+      if (tab === 'daily'){
+        map.dayName = pWeekday(d);
+        map.dateStr = pDate(d);
+      } else if (tab === 'weekly'){
+        map.monthYear = pMonthYear(d);
+        map.weekNum = 'هفته ' + weekOrd(weekOfMonth()) + ' ماه';
+        var days = myWeekDays();
+        map.weekRange = 'از ' + days[0].date + ' تا ' + days[6].date;
+      } else if (tab === 'monthly'){
+        map.monthYear = pMonthYear(d);
+      } else if (tab === 'yearly'){
+        map.yearNum = d.toLocaleDateString('fa-IR',{year:'numeric'});
+      }
+      c.querySelectorAll('[data-anim-key]').forEach(function(el){
+        var k = el.getAttribute('data-anim-key');
+        if (map[k] === undefined) return;
+        var newVal = map[k];
+        if (el.textContent.trim() === newVal) return;
+        /* ست کردن با انیمیشن */
+        el.classList.remove('heroRoll');
+        void el.offsetWidth;
+        el.textContent = newVal;
+        el.classList.add('heroRoll');
+      });
     }
 
     function makeSelect(id, value, options){
@@ -136,30 +163,66 @@
     }
     window.__sirajPopup = showPopup;
 
+    /* ============ ناوبری — فقط هیرو رو آپدیت می‌کنه ============ */
     window.__navDay = function(dir){
       var d = new Date(window.plannerDate || new Date());
       d.setDate(d.getDate() + dir);
       window.plannerDate = d;
-      window.renderPlannerPane();
+      // اگر توی نمای روزانه هستیم فقط روز رو آپدیت کن، ولی چون تسک‌ها عوض میشن کامل رندر کن
+      // اما هیرو رو با انیمیشن آپدیت کن (نه کل پنل)
+      refreshCurrentTab(true);
     };
     window.__navWeek = function(dir){
       var d = new Date(window.plannerDate || new Date());
       d.setDate(d.getDate() + dir * 7);
       window.plannerDate = d;
-      window.renderPlannerPane();
+      refreshCurrentTab(true);
     };
     window.__navMonth = function(dir){
       var d = new Date(window.plannerDate || new Date());
       d.setDate(1);
       d.setMonth(d.getMonth() + dir);
       window.plannerDate = d;
-      window.renderPlannerPane();
+      refreshCurrentTab(true);
+    };
+    window.__navYear = function(dir){
+      var d = new Date(window.plannerDate || new Date());
+      d.setFullYear(d.getFullYear() + dir);
+      window.plannerDate = d;
+      refreshCurrentTab(true);
     };
 
+    /* فقط محتوای زیر هیرو رو آپدیت می‌کنه (نه هیرو) */
+    function refreshCurrentTab(isNav){
+      var tab = getTab();
+      var hero = document.querySelector('.planner-hero-card');
+      var pane = document.getElementById('plannerPane');
+      if (!pane) return;
+      if (isNav && hero){
+        // انیمیشن فقط روی متن‌های تغییرکرده
+        smartHeroUpdate(tab);
+        // محتوای زیر هیرو رو دوباره بساز
+        var keepHero = hero;
+        // حذف همه چیز به جز hero
+        Array.from(pane.children).forEach(function(child){
+          if (child !== keepHero) child.remove();
+        });
+        // محتوای جدید رو اضافه کن (بدون hero)
+        var temp = document.createElement('div');
+        if (tab === 'daily') temp.innerHTML = viewDailyNoHero();
+        else if (tab === 'weekly') temp.innerHTML = viewWeeklyNoHero();
+        else if (tab === 'monthly') temp.innerHTML = viewMonthlyNoHero();
+        else if (tab === 'yearly') temp.innerHTML = viewYearlyNoHero();
+        Array.from(temp.children).forEach(function(child){ pane.appendChild(child); });
+        bindPaneEvents(tab);
+      } else {
+        renderPane(tab);
+      }
+    }
+
     window.switchPlannerTab = function(tab){
-      prevHero = {};
       document.querySelectorAll('.planner-tab').forEach(function(b){ b.classList.remove('active'); });
-      var idx = {daily:0, weekly:1, monthly:2}[tab];
+      var idx = {daily:0, weekly:1, monthly:2, yearly:3}[tab];
       var btns = document.querySelectorAll('.planner-tab');
       if (btns[idx]) btns[idx].classList.add('active');
       renderPane(tab);
@@ -173,8 +236,8 @@
       if (tab === 'daily') pane.innerHTML = viewDaily();
       else if (tab === 'weekly') pane.innerHTML = viewWeekly();
       else if (tab === 'monthly') pane.innerHTML = viewMonthly();
+      else if (tab === 'yearly') pane.innerHTML = viewYearly();
       bindPaneEvents(tab);
-      applySmartAnim(tab);
     }
     window.renderPlannerPane = function(){ renderPane(getTab()); };
     function bindPaneEvents(tab){
@@ -203,10 +266,18 @@
         var txt = b.textContent || '';
         if (txt.indexOf('کارها') >= 0 || b.getAttribute('data-ptab') === 'tasks') b.remove();
       });
+      if (!tabsEl.querySelector('[data-ptab="yearly"]')){
+        var yb = document.createElement('button');
+        yb.className = 'planner-tab';
+        yb.setAttribute('data-ptab','yearly');
+        yb.setAttribute('onclick',"switchPlannerTab('yearly')");
+        yb.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="9"/></svg><span>سالانه</span>';
+        tabsEl.appendChild(yb);
+      }
     }
 
-    /* ============ نمای روزانه ============ */
-    function viewDaily(){
+    /* ============ بخش هیرو مشترک ============ */
+    function heroDaily(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
       var key = window.dateKey(d);
@@ -215,6 +286,69 @@
       if (!pl.months[monthKey]) pl.months[monthKey] = {goals:[]};
       var goals = pl.months[monthKey].goals || [];
       var goal = goals.length ? (goals.find(function(g){return !g.done;}) || goals[0]) : null;
+      return '<div class="planner-hero-card">' +
+        '<button class="phc-nav-btn" onclick="window.__navDay(-1)" title="روز قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
+        '<div class="phc-center">' +
+          '<div class="phc-day"><span data-anim-key="dayName">' + esc(pWeekday(d)) + '</span>' + (isToday ? ' <span class="phc-today">امروز</span>' : '') + '</div>' +
+          '<div class="phc-date"><span data-anim-key="dateStr">' + esc(pDate(d)) + '</span></div>' +
+          (goal
+            ? '<div class="phc-goal"><span>🎯</span><span>هدف ماه: ' + esc(goal.text) + '</span></div>'
+            : '<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>') +
+        '</div>' +
+        '<button class="phc-nav-btn" onclick="window.__navDay(1)" title="روز بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
+      '</div>';
+    }
+    function heroWeekly(){
+      var d = new Date(window.plannerDate || new Date());
+      var days = myWeekDays();
+      return '<div class="planner-hero-card">' +
+        '<button class="phc-nav-btn" onclick="window.__navWeek(-1)" title="هفته قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
+        '<div class="phc-center">' +
+          '<div class="phc-day"><span data-anim-key="monthYear">' + esc(pMonthYear(d)) + '</span></div>' +
+          '<div class="phc-date"><span data-anim-key="weekNum">هفته ' + weekOrd(weekOfMonth()) + ' ماه</span> — <span data-anim-key="weekRange">از ' + esc(days[0].date) + ' تا ' + esc(days[6].date) + '</span></div>' +
+        '</div>' +
+        '<button class="phc-nav-btn" onclick="window.__navWeek(1)" title="هفته بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
+      '</div>';
+    }
+    function heroMonthly(){
+      var pl = window.loadPlannerNew();
+      var d = new Date(window.plannerDate || new Date());
+      var monthKey = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      if (!pl.months[monthKey]) pl.months[monthKey] = {goals:[]};
+      var goals = pl.months[monthKey].goals || [];
+      var doneGoals = goals.filter(function(g){return g.done;}).length;
+      return '<div class="planner-hero-card">' +
+        '<button class="phc-nav-btn" onclick="window.__navMonth(-1)" title="ماه قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
+        '<div class="phc-center">' +
+          '<div class="phc-day"><span data-anim-key="monthYear">' + esc(pMonthYear(d)) + '</span></div>' +
+          '<div class="phc-date">' + doneGoals + ' از ' + goals.length + ' هدف این ماه انجام شده</div>' +
+        '</div>' +
+        '<button class="phc-nav-btn" onclick="window.__navMonth(1)" title="ماه بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
+      '</div>';
+    }
+    function heroYearly(){
+      var d = new Date(window.plannerDate || new Date());
+      var y = d.getFullYear();
+      var pl = window.loadPlannerNew();
+      if (!pl.years) pl.years = {};
+      if (!pl.years[y]) pl.years[y] = {goals:[]};
+      var goals = pl.years[y].goals || [];
+      var done = goals.filter(function(g){return g.done;}).length;
+      return '<div class="planner-hero-card">' +
+        '<button class="phc-nav-btn" onclick="window.__navYear(-1)" title="سال قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
+        '<div class="phc-center">' +
+          '<div class="phc-day"><span data-anim-key="yearNum">' + esc(d.toLocaleDateString('fa-IR',{year:'numeric'})) + '</span></div>' +
+          '<div class="phc-date">' + done + ' از ' + goals.length + ' هدف سالانه انجام شده</div>' +
+        '</div>' +
+        '<button class="phc-nav-btn" onclick="window.__navYear(1)" title="سال بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
+      '</div>';
+    }
+
+    /* ============ محتوای روزانه ============ */
+    function dailyContentHTML(){
+      var pl = window.loadPlannerNew();
+      var d = new Date(window.plannerDate || new Date());
+      var key = window.dateKey(d);
       var dd = window.getDayData(pl, key);
       var tasks = (dd.tasks || []).slice();
 
@@ -247,18 +381,7 @@
       window.__pendingTime = '';
       window.__pendingPri = 'med';
 
-      return '<div class="planner-hero-card">' +
-          '<button class="phc-nav-btn" onclick="window.__navDay(-1)" title="روز قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
-          '<div class="phc-center">' +
-            '<div class="phc-day"><span data-anim-key="dayName">' + esc(pWeekday(d)) + '</span>' + (isToday ? ' <span class="phc-today">امروز</span>' : '') + '</div>' +
-            '<div class="phc-date"><span data-anim-key="dateStr">' + esc(pDate(d)) + '</span></div>' +
-            (goal
-              ? '<div class="phc-goal"><span>🎯</span><span>هدف ماه: ' + esc(goal.text) + '</span></div>'
-              : '<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>') +
-          '</div>' +
-          '<button class="phc-nav-btn" onclick="window.__navDay(1)" title="روز بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
-        '</div>' +
-        '<div class="task-add-form">' +
+      return '<div class="task-add-form">' +
           '<input type="text" id="pNewTitle" placeholder="عنوان کار جدید..." onkeydown="if(event.key===\'Enter\')window.__dAddTask()">' +
           makeSelect('pNewTime', '', hourOpt) +
           makeSelect('pNewPri', 'med', priOpt) +
@@ -266,6 +389,8 @@
         '</div>' +
         '<div class="tasks-list-title">کارهای این روز:</div>' + tasksHTML;
     }
+    function viewDaily(){ return heroDaily() + dailyContentHTML(); }
+    function viewDailyNoHero(){ return dailyContentHTML(); }
 
     window.__dAddTask = function(){
       var inp = document.getElementById('pNewTitle');
@@ -283,7 +408,7 @@
       });
       window.savePlanner(pl);
       inp.value = ''; window.__pendingTime = ''; window.__pendingPri = 'med';
-      window.renderPlannerPane();
+      refreshCurrentTab(false);
     };
     window.__dToggleTask = function(i){
       var pl = window.loadPlannerNew();
@@ -297,7 +422,7 @@
         var p = arr[Math.floor(Math.random()*arr.length)];
         showPopup(p[0], p[1], p[2]);
       }
-      window.renderPlannerPane();
+      refreshCurrentTab(false);
     };
     window.__dDeleteTask = function(i){
       var pl = window.loadPlannerNew();
@@ -306,15 +431,14 @@
       if (!dd.tasks[i]) return;
       dd.tasks.splice(i,1);
       window.savePlanner(pl);
-      window.renderPlannerPane();
+      refreshCurrentTab(false);
     };
 
-    /* ============ نمای هفتگی ============ */
-    function viewWeekly(){
+    /* ============ محتوای هفتگی ============ */
+    function weeklyContentHTML(){
       var pl = window.loadPlannerNew();
       var days = myWeekDays();
       var todayKey = window.dateKey(new Date());
-      var d = new Date(window.plannerDate || new Date());
 
       var headerRow = '<tr><th class="hour-col">ساعت</th>' + days.map(function(day){
         var isToday = day.key === todayKey;
@@ -335,13 +459,17 @@
           var firstTask = hourTasks[0];
           var tasksHTML = firstTask
             ? '<div class="week-cell-task' + (firstTask.done?' done':'') + '">' +
+                '<span class="wt-title">' + esc(firstTask.title) + '</span>' +
                 '<div class="wt-actions">' +
+                  '<button class="wt-btn edit" onclick="event.stopPropagation();window.__wEditTask(\'' + day.key + '\',\'' + firstTask.id + '\')" title="ویرایش">' +
+                    '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
                   '<button class="wt-btn cross" onclick="event.stopPropagation();window.__wCrossTask(\'' + day.key + '\',\'' + firstTask.id + '\')" title="انجام نشد">' +
                     '<svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>' +
                   '<button class="wt-btn tick' + (firstTask.done?' on':'') + '" onclick="event.stopPropagation();window.__wTickTask(\'' + day.key + '\',\'' + firstTask.id + '\')" title="انجام شد">' +
                     '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>' +
+                  '<button class="wt-btn del" onclick="event.stopPropagation();window.__wDeleteTask(\'' + day.key + '\',\'' + firstTask.id + '\')" title="حذف">' +
+                    '<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
                 '</div>' +
-                '<span class="wt-title">' + esc(firstTask.title) + '</span>' +
               '</div>' : '';
           return '<td class="task-cell' + (isToday?' today':'') + (firstTask?' has-task':'') + '">' + tasksHTML +
             '<input type="text" class="cell-input" value="' + esc(val) + '" placeholder="—" oninput="saveHour(\'' + day.key + '\',\'' + hk + '\',this.value)"></td>';
@@ -349,18 +477,10 @@
         return '<tr><td class="hour-cell">' + hk + ':۰۰</td>' + cells + '</tr>';
       }).join('');
 
-      var wRange = 'از ' + esc(days[0].date) + ' تا ' + esc(days[6].date);
-
-      return '<div class="planner-hero-card">' +
-          '<button class="phc-nav-btn" onclick="window.__navWeek(-1)" title="هفته قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
-          '<div class="phc-center">' +
-            '<div class="phc-day"><span data-anim-key="monthYear">' + esc(pMonthYear(d)) + '</span></div>' +
-            '<div class="phc-date"><span data-anim-key="weekNum">هفته ' + weekOrd(weekOfMonth()) + ' ماه</span> — <span data-anim-key="weekRange">' + wRange + '</span></div>' +
-          '</div>' +
-          '<button class="phc-nav-btn" onclick="window.__navWeek(1)" title="هفته بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
-        '</div>' +
-        '<div class="week-grid-wrap"><table class="week-table"><thead>' + headerRow + '</thead><tbody>' + bodyRows + '</tbody></table></div>';
+      return '<div class="week-grid-wrap"><table class="week-table"><thead>' + headerRow + '</thead><tbody>' + bodyRows + '</tbody></table></div>';
     }
+    function viewWeekly(){ return heroWeekly() + weeklyContentHTML(); }
+    function viewWeeklyNoHero(){ return weeklyContentHTML(); }
 
     window.__wTickTask = function(dayKey, taskId){
       var pl = window.loadPlannerNew();
@@ -372,7 +492,7 @@
       var arr = [['🎉','آفرین!','کار انجام شد!'],['🌟','درخشیدی!','یکی دیگه فتح شد!'],['🚀','عالی!','ادامه بده!']];
       var p = arr[Math.floor(Math.random()*arr.length)];
       showPopup(p[0], p[1], p[2]);
-      window.renderPlannerPane();
+      refreshCurrentTab(false);
     };
     window.__wCrossTask = function(dayKey, taskId){
       var pl = window.loadPlannerNew();
@@ -384,11 +504,34 @@
       var arr = [['😐','یادت نره!','هنوز انجام نشده!'],['🤔','چرا؟','وقت داری هنوز!'],['⏰','یادت باشه!','این کار منتظرته!']];
       var m = arr[Math.floor(Math.random()*arr.length)];
       showPopup(m[0], m[1], m[2]);
-      window.renderPlannerPane();
+      refreshCurrentTab(false);
+    };
+    window.__wDeleteTask = function(dayKey, taskId){
+      var pl = window.loadPlannerNew();
+      var dd = window.getDayData(pl, dayKey);
+      var idx = (dd.tasks||[]).findIndex(function(tk){return tk.id === taskId;});
+      if (idx < 0) return;
+      dd.tasks.splice(idx,1);
+      window.savePlanner(pl);
+      refreshCurrentTab(false);
+    };
+    window.__wEditTask = function(dayKey, taskId){
+      var pl = window.loadPlannerNew();
+      var dd = window.getDayData(pl, dayKey);
+      var idx = (dd.tasks||[]).findIndex(function(tk){return tk.id === taskId;});
+      if (idx < 0) return;
+      var cur = dd.tasks[idx];
+      var newTitle = prompt('عنوان جدید:', cur.title);
+      if (newTitle === null) return;
+      newTitle = newTitle.trim();
+      if (!newTitle) return;
+      dd.tasks[idx].title = newTitle;
+      window.savePlanner(pl);
+      refreshCurrentTab(false);
     };
 
-    /* ============ نمای ماهانه ============ */
-    function viewMonthly(){
+    /* ============ محتوای ماهانه ============ */
+    function monthlyContentHTML(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
       var year = d.getFullYear(), month = d.getMonth();
@@ -420,7 +563,6 @@
           '<span class="cal-day-num">' + dd + '</span>' + dots + '</div>');
       }
 
-      /* پنل اهداف بازطراحی شده */
       var goalsHTML = '';
       if (goals.length === 0){
         goalsHTML = '<div class="mg-empty"><span class="mg-empty-icon">🎯</span><div class="mg-empty-text">هنوز هدفی ثبت نشده</div></div>';
@@ -439,17 +581,9 @@
       }
       var doneGoals = goals.filter(function(g){return g.done;}).length;
 
-      return '<div class="planner-hero-card">' +
-          '<button class="phc-nav-btn" onclick="window.__navMonth(-1)" title="ماه قبل"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>' +
-          '<div class="phc-center">' +
-            '<div class="phc-day"><span data-anim-key="monthYear">' + esc(pMonthYear(d)) + '</span></div>' +
-            '<div class="phc-date">' + doneGoals + ' از ' + goals.length + ' هدف این ماه انجام شده</div>' +
-          '</div>' +
-          '<button class="phc-nav-btn" onclick="window.__navMonth(1)" title="ماه بعد"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
-        '</div>' +
-        '<div class="month-goals">' +
+      return '<div class="month-goals">' +
           '<div class="month-goals-title">' +
-            '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>' +
+            '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>' +
             '<span>اهداف این ماه</span>' +
             (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
           '</div>' +
@@ -464,6 +598,70 @@
           '<div class="cal-grid">' + cells.join('') + '</div>' +
         '</div>';
     }
+    function viewMonthly(){ return heroMonthly() + monthlyContentHTML(); }
+    function viewMonthlyNoHero(){ return monthlyContentHTML(); }
+
+    /* ============ محتوای سالانه ============ */
+    function yearlyContentHTML(){
+      var pl = window.loadPlannerNew();
+      var d = new Date(window.plannerDate || new Date());
+      var y = d.getFullYear();
+      if (!pl.years) pl.years = {};
+      if (!pl.years[y]) pl.years[y] = {goals:[]};
+      var goals = pl.years[y].goals || [];
+
+      var goalsHTML = '';
+      if (goals.length === 0){
+        goalsHTML = '<div class="mg-empty"><span class="mg-empty-icon">🏆</span><div class="mg-empty-text">هنوز هدف بلندمدتی برای این سال ثبت نکردی</div></div>';
+      } else {
+        goalsHTML = '<div class="month-goals-list">' + goals.map(function(g,i){
+          return '<div class="month-goal' + (g.done?' done':'') + '">' +
+            '<label class="mg-check-wrap">' +
+              '<input type="checkbox" ' + (g.done?'checked':'') + ' onchange="toggleYearGoal(' + y + ',' + i + ')">' +
+              '<span class="mg-check"></span>' +
+            '</label>' +
+            '<span class="mg-text">' + esc(g.text) + '</span>' +
+            '<button class="mg-del" onclick="deleteYearGoal(' + y + ',' + i + ')" title="حذف">' +
+              '<svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+            '</button></div>';
+        }).join('') + '</div>';
+      }
+      var doneGoals = goals.filter(function(g){return g.done;}).length;
+
+      /* ۱۲ ماه خلاصه */
+      var months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+      var monthCards = months.map(function(mName, idx){
+        var mk = y + '-' + String(idx+1).padStart(2,'0');
+        var mg = (pl.months[mk] && pl.months[mk].goals) || [];
+        var md = mg.filter(function(g){return g.done;}).length;
+        var pct = mg.length ? Math.round((md/mg.length)*100) : 0;
+        return '<div class="year-month-card">' +
+          '<div class="ymc-name">' + mName + '</div>' +
+          '<div class="ymc-bar"><div class="ymc-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="ymc-stat">' + md + '/' + mg.length + '</div>' +
+        '</div>';
+      }).join('');
+
+      return '<div class="month-goals year-goals">' +
+          '<div class="month-goals-title">' +
+            '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>' +
+            '<span>اهداف سالانه</span>' +
+            (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
+          '</div>' +
+          '<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.9">اهداف بلندمدتت رو اینجا بنویس — چیزهایی که می‌خوای توی کل این سال بهشون برسی 💫</div>' +
+          goalsHTML +
+          '<div class="month-goal-add">' +
+            '<input type="text" id="newYearGoalInput" placeholder="هدف بلندمدت جدید..." onkeydown="if(event.key===\'Enter\')addYearGoal(' + y + ')">' +
+            '<button onclick="addYearGoal(' + y + ')"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>افزودن</span></button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="year-overview">' +
+          '<div class="year-overview-title">📊 نگاه کلی به ماه‌ها</div>' +
+          '<div class="year-months-grid">' + monthCards + '</div>' +
+        '</div>';
+    }
+    function viewYearly(){ return heroYearly() + yearlyContentHTML(); }
+    function viewYearlyNoHero(){ return yearlyContentHTML(); }
 
     /* ============ پنل راست ============ */
     window.renderPanelForPlanner = function(){
@@ -489,7 +687,6 @@
 
     /* ============ Ambient Sound ============ */
     var audioCtx = null, audioNodes = null, currentSound = null, masterGain = null;
-
     function stopAudio(){
       if (audioNodes && audioNodes.nodes){
         audioNodes.nodes.forEach(function(n){
@@ -497,9 +694,7 @@
           try { n.disconnect(); } catch(e){}
         });
       }
-      if (audioNodes && audioNodes.gain){
-        try { audioNodes.gain.disconnect(); } catch(e){}
-      }
+      if (audioNodes && audioNodes.gain){ try { audioNodes.gain.disconnect(); } catch(e){} }
       audioNodes = null; currentSound = null;
     }
     function makeNoise(type){
@@ -523,8 +718,7 @@
         var last = 0;
         for (var i=0;i<bufferSize;i++){
           var white = Math.random()*2 - 1;
-          data[i] = (last + 0.015 * white) / 1.015;
-          last = data[i]; data[i] *= 3.2;
+          data[i] = (last + 0.015 * white) / 1.015; last = data[i]; data[i] *= 3.2;
         }
         var src = audioCtx.createBufferSource();
         src.buffer = buffer; src.loop = true;
@@ -541,8 +735,7 @@
         var lastV = 0;
         for (var j=0;j<bufSize;j++){
           var w = Math.random()*2 - 1;
-          d[j] = (lastV + 0.008 * w) / 1.008;
-          lastV = d[j]; d[j] *= 2.5;
+          d[j] = (lastV + 0.008 * w) / 1.008; lastV = d[j]; d[j] *= 2.5;
         }
         var src2 = audioCtx.createBufferSource();
         src2.buffer = buffer2; src2.loop = true;
@@ -663,31 +856,23 @@
       var picker = el.querySelector('#studyTimePicker');
       var numEl = el.querySelector('#studyTimeNum');
       var pickerVal = 25, dragStartY = 0, dragStartVal = 25, dragging = false;
-
       function setPickerVal(v){
         pickerVal = Math.max(1, Math.min(180, Math.round(v)));
         numEl.textContent = pickerVal;
       }
       setPickerVal(25);
-
       function pointerDown(e){
         dragging = true;
         dragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
         dragStartVal = pickerVal;
-        picker.classList.add('dragging');
-        e.preventDefault();
+        picker.classList.add('dragging'); e.preventDefault();
       }
       function pointerMove(e){
         if (!dragging) return;
         var y = (e.touches ? e.touches[0].clientY : e.clientY);
-        var change = Math.round((dragStartY - y) / 6);
-        setPickerVal(dragStartVal + change);
+        setPickerVal(dragStartVal + Math.round((dragStartY - y) / 6));
       }
-      function pointerUp(){
-        if (!dragging) return;
-        dragging = false;
-        picker.classList.remove('dragging');
-      }
+      function pointerUp(){ if (!dragging) return; dragging = false; picker.classList.remove('dragging'); }
       picker.addEventListener('mousedown', pointerDown);
       document.addEventListener('mousemove', pointerMove);
       document.addEventListener('mouseup', pointerUp);
@@ -705,8 +890,7 @@
           var snd = btn.getAttribute('data-sound');
           el.querySelectorAll('.study-sound-btn').forEach(function(b){ b.classList.remove('on'); });
           if (!snd){ stopAudio(); btn.classList.add('on'); return; }
-          btn.classList.add('on');
-          stopAudio();
+          btn.classList.add('on'); stopAudio();
           try { makeNoise(snd); } catch(e){ console.error(e); }
         };
       });
@@ -773,8 +957,7 @@
 
       var pb = overlay.querySelector('#studyPauseBtn');
       if (pb){
-        pb.classList.remove('resume-mode');
-        pb.classList.add('pause-mode');
+        pb.classList.remove('resume-mode'); pb.classList.add('pause-mode');
         var lbl = pb.querySelector('#studyPauseLabel');
         if (lbl) lbl.textContent = 'توقف';
       }
@@ -807,15 +990,13 @@
       var sub = overlay.querySelector('#studyRunningSub');
       if (studyPaused){
         overlay.classList.add('paused');
-        btn.classList.remove('pause-mode');
-        btn.classList.add('resume-mode');
+        btn.classList.remove('pause-mode'); btn.classList.add('resume-mode');
         if (lbl) lbl.textContent = 'ادامه';
         if (masterGain) try { masterGain.gain.value = 0; } catch(e){}
         if (sub) sub.textContent = '⏸️ متوقف شده — برای ادامه روی «ادامه» بزن';
       } else {
         overlay.classList.remove('paused');
-        btn.classList.remove('resume-mode');
-        btn.classList.add('pause-mode');
+        btn.classList.remove('resume-mode'); btn.classList.add('pause-mode');
         if (lbl) lbl.textContent = 'توقف';
         var vol = overlay.querySelector('#studyVolume');
         var v = vol ? (parseInt(vol.value)/100) : 0.4;
@@ -835,7 +1016,6 @@
       }
       el.textContent = String(val);
     }
-
     function updateStudyTimer(initial){
       if (studySeconds < 0) studySeconds = 0;
       var m = Math.floor(studySeconds / 60);
@@ -906,7 +1086,7 @@
       requestAnimationFrame(function(){ overlay.classList.add('open'); });
     };
 
-    /* ============ چت مطالعه ============ */
+    /* ============ چت مطالعه — با رفع باگ ۴۰۵ ============ */
     var studyChatHistory = [];
     function toggleStudyChat(){
       var existing = document.getElementById('studyChatPanel');
@@ -950,15 +1130,18 @@
       box.scrollTop = box.scrollHeight;
 
       var sysPrompt = 'تو «سراج» هستی و الان در «حالت مطالعه» کاربر قرار داری. کاربر روی درسش تمرکز کرده. قوانین:\n۱. جواب‌ها کوتاه، مستقیم و مفید باشن.\n۲. اگه کاربر سؤال غیردرسی پرسید، با مهربونی بگو: «الان تو حالت مطالعه‌ای، بهتره تمرکزت رو روی درس نگه داری. بعد از تایمر با هم گپ می‌زنیم 😊».\n۳. از ستاره (*) برای پررنگ کردن استفاده نکن.\n۴. ایموجی‌های ملایم و کم.';
+
       try {
-        var url = (window.APP_CONFIG && window.APP_CONFIG.baseURL) ? window.APP_CONFIG.baseURL : '/api/chat';
+        /* ★ رفع باگ: استفاده از getBaseURL() به‌جای window.APP_CONFIG */
+        var url = getBaseURL();
         var res = await fetch(url, {
           method:'POST',
           headers:{'Content-Type':'application/json','Accept':'text/event-stream'},
           body: JSON.stringify({
-            model: (window.settings && window.settings.model) ? window.settings.model : 'gemini-2.0-flash',
+            model: getModel(),
             messages: [{role:'system', content: sysPrompt}].concat(studyChatHistory.slice(-6)),
-            temperature: 0.7, stream: true
+            temperature: 0.7,
+            stream: true
           })
         });
         var typingEl = document.getElementById(tid);
@@ -993,6 +1176,35 @@
         var te = document.getElementById(tid);
         if (te) te.textContent = 'خطا: ' + err.message;
       }
+    };
+
+    /* ============ اهداف سالانه — توابع ============ */
+    window.addYearGoal = function(y){
+      var inp = document.getElementById('newYearGoalInput');
+      if (!inp) return;
+      var v = inp.value.trim();
+      if (!v) return;
+      var pl = window.loadPlannerNew();
+      if (!pl.years) pl.years = {};
+      if (!pl.years[y]) pl.years[y] = {goals:[]};
+      pl.years[y].goals.push({text:v, done:false});
+      window.savePlanner(pl);
+      inp.value = '';
+      refreshCurrentTab(false);
+    };
+    window.toggleYearGoal = function(y, i){
+      var pl = window.loadPlannerNew();
+      if (!pl.years || !pl.years[y] || !pl.years[y].goals[i]) return;
+      pl.years[y].goals[i].done = !pl.years[y].goals[i].done;
+      window.savePlanner(pl);
+      refreshCurrentTab(false);
+    };
+    window.deleteYearGoal = function(y, i){
+      var pl = window.loadPlannerNew();
+      if (!pl.years || !pl.years[y] || !pl.years[y].goals) return;
+      pl.years[y].goals.splice(i,1);
+      window.savePlanner(pl);
+      refreshCurrentTab(false);
     };
 
     /* ============ مقالات ============ */
@@ -1044,7 +1256,7 @@
       });
     }, 900);
 
-    /* ============ بازنویسی درباره ما ============ */
+    /* ============ درباره ما ============ */
     var origOpenSettings = window.openSettings;
     window.openSettings = function(){
       origOpenSettings.apply(this, arguments);
@@ -1061,7 +1273,7 @@
             'سلام 👋\n' +
             'من حامد هستم — ۲۰ سالمه و عاشق میهن. الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و کنار درس، به هوش مصنوعی، برنامه‌نویسی و تاریخ هم علاقه‌ی زیادی دارم.\n\n' +
             'ایده سراج یهویی وقتی مثل همیشه تو فکر بودم به ذهنم اومد — اینکه به آموزش و تربیت هم علاقه‌مند هستم شاید بی‌تاثیر نبود. اینکه بتونم به یادگیری بچه‌های کشورم کمک کنم و بتونیم آینده‌ای خوش برای سرزمینمون رقم بزنیم.\n' +
-            'شاید سراج با یه ایده کوچیک و ساده شروع شده باشه ولی روز به روز در حال گسترش و پیشرفته و قطعاً محدود به رشته ادبیات عربی نخواهد موند.\n' +
+            'شاید سراج با یه ایده کوچیک و کوچیک شروع شده باشه ولی روز به روز در حال گسترش و پیشرفته و قطعاً محدود به رشته ادبیات عربی نخواهد موند.\n' +
             'کلی چیز برای کشف کردن هست 🌱\n' +
             'منتظر بروزرسانی‌های جدید باشید ☝️💕' +
           '</div>' +
@@ -1095,7 +1307,7 @@
       }, 250);
     };
 
-    /* ============ Retry اصلاح‌شده ============ */
+    /* ============ Retry ============ */
     setTimeout(function(){
       window.retryMsg = function(e, btn){
         e.stopPropagation();
