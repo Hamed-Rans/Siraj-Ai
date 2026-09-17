@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (Full v4) */
+/* Siraj v2.0 — planner-v2.js (Full v5) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -29,7 +29,7 @@
     function getModel(){
       try{ if (typeof settings !== 'undefined' && settings && settings.model) return settings.model; }catch(e){}
       try{ if (window.settings && window.settings.model) return window.settings.model; }catch(e){}
-      return 'gemini-2.0-flash';
+      return 'gemini-2.5-flash';
     }
     function getProfile(){
       try{ return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}'); }catch(e){ return {}; }
@@ -57,8 +57,61 @@
       saveReminders(r);
     }
 
+    /* ============ رویدادهای مناسبتی ایران (تقریبی) ============ */
+    var IRAN_EVENTS = {
+      '01-01': 'نوروز — آغاز سال نو',
+      '01-02': 'عید نوروز',
+      '01-03': 'عید نوروز',
+      '01-04': 'عید نوروز',
+      '01-12': 'روز جمهوری اسلامی',
+      '01-13': 'سیزده‌بدر',
+      '01-25': 'روز بزرگداشت عطار',
+      '02-02': 'روز زمین پاک',
+      '02-10': 'روز ملی خلیج فارس',
+      '02-25': 'روز بزرگداشت فردوسی',
+      '03-01': 'روز بهره‌وری',
+      '03-14': 'رحلت امام خمینی',
+      '03-15': 'قیام ۱۵ خرداد',
+      '04-01': 'روز اصناف',
+      '04-07': 'روز قوه قضائیه',
+      '04-10': 'روز صنعت و معدن',
+      '04-14': 'روز قلم',
+      '04-25': 'روز بهزیستی',
+      '05-05': 'روز کارمند',
+      '05-08': 'روز بزرگداشت سهروردی',
+      '05-14': 'روز بزرگداشت خیام',
+      '06-05': 'روز بزرگداشت رازی',
+      '06-27': 'روز شعر و ادب فارسی',
+      '06-31': 'آغاز هفته دفاع مقدس',
+      '07-13': 'روز نیروی انتظامی',
+      '07-20': 'روز حافظ',
+      '08-13': 'روز دانش‌آموز',
+      '08-24': 'روز کتاب و کتابخوانی',
+      '09-16': 'روز دانشجو',
+      '10-05': 'روز خانواده',
+      '10-19': 'روز بزرگداشت مولوی',
+      '11-12': 'پیروزی انقلاب اسلامی',
+      '11-22': 'روز بزرگداشت خواجه نصیر',
+      '12-05': 'روز بزرگداشت خواجه نصیرالدین طوسی',
+      '12-20': 'روز بزرگداشت نظامی گنجوی',
+      '12-29': 'روز ملی شدن صنعت نفت'
+    };
+    function getIranianEvent(dayKey){
+      try{
+        var parts = dayKey.split('-');
+        var gDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+        var faMonth, faDay;
+        try{
+          faMonth = new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(gDate);
+          faDay = new Intl.DateTimeFormat('en-US-u-ca-persian',{day:'numeric'}).format(gDate);
+        }catch(e){ return ''; }
+        var key = String(faMonth).padStart(2,'0') + '-' + String(faDay).padStart(2,'0');
+        return IRAN_EVENTS[key] || '';
+      }catch(e){ return ''; }
+    }
+
     function getTab(){
-      var btn = document.querySelector('.panel-planner-tab.active') || document.querySelector('.planner-tab.active');
+      var btn = document.querySelector('.panel-planner-tab.active');
       if (!btn) return 'daily';
       var m = (btn.getAttribute('onclick')||'').match(/switchPlannerTab\(['"]([^'"]+)['"]\)/);
       return m ? m[1] : 'daily';
@@ -205,7 +258,7 @@
       document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});
     });
 
-    /* ============ انیمیشن هیرو ============ */
+    /* ============ انیمیشن هوشمند ============ */
     function smartUpdateHero(tab, direction){
       var c = document.querySelector('.phc-center');
       if (!c) return;
@@ -248,28 +301,50 @@
       else if (unit === 'month'){ d.setDate(1); d.setMonth(d.getMonth() + dir); }
       else if (unit === 'year') d.setFullYear(d.getFullYear() + dir);
       window.plannerDate = d;
-      renderPane(getTab());
+      refreshBody(dir > 0 ? 'left' : 'right');
     }
     window.__navDay = function(dir){ moveDate(dir, 'day'); };
     window.__navWeek = function(dir){ moveDate(dir, 'week'); };
     window.__navMonth = function(dir){ moveDate(dir, 'month'); };
     window.__navYear = function(dir){ moveDate(dir, 'year'); };
-    window.__goToday = function(){ window.plannerDate = new Date(); renderPane('daily'); };
-    window.__goThisWeek = function(){ window.plannerDate = new Date(); renderPane('weekly'); };
-    window.__goThisMonth = function(){ window.plannerDate = new Date(); renderPane('monthly'); };
-    window.__goThisYear = function(){ window.plannerDate = new Date(); renderPane('yearly'); };
+    window.__goToday = function(){ window.plannerDate = new Date(); refreshBody('left'); };
+    window.__goThisWeek = function(){ window.plannerDate = new Date(); refreshBody('left'); };
+    window.__goThisMonth = function(){ window.plannerDate = new Date(); refreshBody('left'); };
+    window.__goThisYear = function(){ window.plannerDate = new Date(); refreshBody('left'); };
 
-    /* ============ Tabs ============ */
+    function refreshBody(direction){
+      var tab = getTab();
+      var pane = document.getElementById('plannerPane');
+      if (!pane) return;
+      var hero = pane.querySelector('.planner-hero-card');
+      var body = pane.querySelector('.planner-body-content');
+      if (!hero || !body){ renderPane(tab); return; }
+      smartUpdateHero(tab, direction || 'left');
+      body.style.transition = 'opacity .15s ease';
+      body.style.opacity = '0';
+      setTimeout(function(){
+        var html = '';
+        if (tab === 'daily') html = dailyContentHTML();
+        else if (tab === 'weekly') html = weeklyContentHTML();
+        else if (tab === 'monthly') html = monthlyContentHTML();
+        else if (tab === 'yearly') html = yearlyContentHTML();
+        body.innerHTML = html;
+        bindPaneEvents(tab);
+        body.style.transition = 'opacity .3s ease';
+        body.style.opacity = '1';
+      }, 150);
+    }
+    window.__refreshCurrentTab = refreshBody;
+
+    /* ============ تب‌ها ============ */
     window.switchPlannerTab = function(tab){
-      document.querySelectorAll('.planner-tab, .panel-planner-tab').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.panel-planner-tab').forEach(function(b){ b.classList.remove('active'); });
       var idx = {daily:0, weekly:1, monthly:2, yearly:3}[tab];
       var btns = document.querySelectorAll('.panel-planner-tab');
       if (btns[idx]) btns[idx].classList.add('active');
       renderPane(tab);
-      /* آپدیت پنل راست برای حالت active */
       window.renderPanelForPlanner();
     };
-
     function renderPane(tab){
       var pane = document.getElementById('plannerPane');
       if (!pane) return;
@@ -282,7 +357,6 @@
       bindPaneEvents(tab);
     }
     window.renderPlannerPane = function(){ renderPane(getTab()); };
-
     function bindPaneEvents(tab){
       var pane = document.getElementById('plannerPane');
       if (!pane) return;
@@ -502,24 +576,24 @@
         task.done = !task.done;
         if (!task.done){ delete task.studiedMinutes; }
         window.savePlanner(pl);
-        renderPane('daily');
+        refreshBody('left');
         return;
       }
       showTriple('✅', 'کار انجام شد!', 'ولی زمانش ثبت نشد ⏱️ چطور ثبت کنیم؟',
         {text:'همینطور ثبت', onClick: function(){
           task.done = true;
           window.savePlanner(pl);
-          renderPane('daily');
+          refreshBody('left');
         }},
         {text:'دقیقه بزنم', onClick: function(){
           var mins = prompt('چند دقیقه وقت گذاشتی؟', '25');
-          if (mins === null){ renderPane('daily'); return; }
+          if (mins === null){ refreshBody('left'); return; }
           mins = parseInt(mins);
           if (isNaN(mins) || mins < 1) mins = 25;
           task.done = true;
           task.studiedMinutes = mins;
           window.savePlanner(pl);
-          renderPane('daily');
+          refreshBody('left');
         }},
         {text:'بریم مطالعه 🎯', onClick: function(){
           window.__studyTask = task.title;
@@ -548,7 +622,7 @@
       inp.value = '';
       window.__pendingTime = '';
       window.__pendingPri = 'med';
-      renderPane('daily');
+      refreshBody('left');
     };
     window.__dDeleteTask = function(i){
       var pl = window.loadPlannerNew();
@@ -557,10 +631,10 @@
       if (!dd.tasks[i]) return;
       dd.tasks.splice(i,1);
       window.savePlanner(pl);
-      renderPane('daily');
+      refreshBody('left');
     };
 
-    /* ============ هفتگی (نسخه اصلاح‌شده) ============ */
+    /* ============ هفتگی ============ */
     function buildWeekCell(day, hk, pl){
       var dd = window.getDayData(pl, day.key);
       var hourTasks = (dd.tasks||[]).filter(function(tk){
@@ -584,11 +658,10 @@
       return '<div class="week-cell-edit" data-day="' + day.key + '" data-hour="' + hk + '">' +
         '<input type="text" class="wc-input" placeholder="+ افزودن..." ' +
           'onkeydown="if(event.key===\'Enter\'){event.preventDefault();window.__wQuickSave(this)}else if(event.key===\'Escape\'){this.value=\'\';this.blur()}" ' +
-          'oninput="window.__wInputChange(this)" ' +
-          'onblur="window.__wInputBlur(this)">' +
+          'oninput="window.__wInputChange(this)">' +
         '<div class="wc-btns" style="display:none">' +
-          '<button type="button" class="wc-btn save" onclick="event.preventDefault();window.__wQuickSave(this.closest(\'.week-cell-edit\').querySelector(\'.wc-input\'))">✓ ثبت</button>' +
-          '<button type="button" class="wc-btn cancel" onclick="event.preventDefault();window.__wQuickCancel(this)">✕ لغو</button>' +
+          '<button type="button" class="wc-btn save" onclick="event.preventDefault();event.stopPropagation();window.__wQuickSave(this.closest(\'.week-cell-edit\').querySelector(\'.wc-input\'))">✓ ثبت</button>' +
+          '<button type="button" class="wc-btn cancel" onclick="event.preventDefault();event.stopPropagation();window.__wQuickCancel(this)">✕ لغو</button>' +
         '</div>' +
       '</div>';
     }
@@ -609,10 +682,8 @@
         var hk = String(h).padStart(2,'0');
         var cells = days.map(function(day){
           var isToday = day.key === todayKey;
-          var hasTask = (function(){
-            var dd = window.getDayData(pl, day.key);
-            return (dd.tasks||[]).some(function(tk){ return tk.time && tk.time.indexOf(hk+':00') === 0; });
-          })();
+          var dd = window.getDayData(pl, day.key);
+          var hasTask = (dd.tasks||[]).some(function(tk){ return tk.time && tk.time.indexOf(hk+':00') === 0; });
           return '<td class="task-cell' + (isToday?' today':'') + (hasTask?' has-task':'') + '">' + buildWeekCell(day, hk, pl) + '</td>';
         }).join('');
         return '<tr><td class="hour-cell">' + hk + ':۰۰</td>' + cells + '</tr>';
@@ -644,17 +715,6 @@
       if (!btns) return;
       btns.style.display = (inp.value.trim().length > 0) ? 'flex' : 'none';
     };
-    window.__wInputBlur = function(inp){
-      /* تاخیر تا اگه روی دکمه ثبت کلیک شد، blur قبل از click نباشه */
-      setTimeout(function(){
-        var wrap = inp.closest('.week-cell-edit');
-        if (!wrap) return;
-        var val = (inp.value||'').trim();
-        if (val){
-          window.__wQuickSave(inp);
-        }
-      }, 250);
-    };
     window.__wQuickCancel = function(btn){
       var wrap = btn.closest('.week-cell-edit');
       if (!wrap) return;
@@ -681,7 +741,6 @@
         priority: 'med', done: false, createdAt: Date.now()
       });
       window.savePlanner(pl);
-      /* فقط همون سلول رو آپدیت کن، بدون رفرش کل */
       var td = wrap.closest('td');
       if (td){
         var days = myWeekDays();
@@ -691,7 +750,6 @@
           td.innerHTML = buildWeekCell(day, hourKey, pl);
         }
       }
-      /* آپدیت آمار */
       updateWeekStats();
     };
     function updateWeekStats(){
@@ -726,24 +784,24 @@
         task.done = false;
         delete task.studiedMinutes;
         window.savePlanner(pl);
-        renderPane('weekly');
+        refreshBody('left');
         return;
       }
       showTriple('✅', 'کار انجام شد!', 'چطور ثبت کنیم؟',
         {text:'همینطور ثبت', onClick: function(){
           task.done = true;
           window.savePlanner(pl);
-          renderPane('weekly');
+          refreshBody('left');
         }},
         {text:'دقیقه بزنم', onClick: function(){
           var mins = prompt('چند دقیقه؟', '25');
-          if (mins === null){ renderPane('weekly'); return; }
+          if (mins === null){ refreshBody('left'); return; }
           mins = parseInt(mins);
           if (isNaN(mins) || mins < 1) mins = 25;
           task.done = true;
           task.studiedMinutes = mins;
           window.savePlanner(pl);
-          renderPane('weekly');
+          refreshBody('left');
         }},
         {text:'بریم مطالعه 🎯', onClick: function(){
           window.__studyTask = task.title;
@@ -760,7 +818,7 @@
       if (idx < 0) return;
       dd.tasks.splice(idx,1);
       window.savePlanner(pl);
-      renderPane('weekly');
+      refreshBody('left');
     };
     window.__wEditTask = function(dayKey, taskId){
       var pl = window.loadPlannerNew();
@@ -774,10 +832,10 @@
       if (!newTitle) return;
       dd.tasks[idx].title = newTitle;
       window.savePlanner(pl);
-      renderPane('weekly');
+      refreshBody('left');
     };
 
-    /* ============ ماهانه ============ */
+    /* ============ ماهانه — چیدمان دو ستونه ============ */
     function monthlyContentHTML(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -801,16 +859,17 @@
         var doneC = (dayData.tasks||[]).filter(function(x){return x.done;}).length;
         var total = (dayData.tasks||[]).length;
         var rems = getDayReminders(k);
+        var nationalEvt = getIranianEvent(k);
         var dayClass = '';
-        var dayTitle = '';
         if (total > 0){
           var ratio = doneC / total;
-          if (ratio >= 1){ dayClass = 'day-done'; dayTitle = 'همه انجام شده ✓'; }
-          else if (ratio > 0){ dayClass = 'day-partial'; dayTitle = doneC + ' از ' + total + ' انجام شده'; }
-          else { dayClass = 'day-pending'; dayTitle = total + ' کار در انتظار'; }
+          if (ratio >= 1) dayClass = 'day-done';
+          else if (ratio > 0) dayClass = 'day-partial';
+          else dayClass = 'day-pending';
         }
         if (rems.length) dayClass += ' has-reminders';
-        cells.push('<div class="cal-day' + (isToday?' today':'') + (isSel?' selected':'') + (isFri?' friday':'') + (dayClass?' '+dayClass:'') + '" title="' + dayTitle + '" onclick="window.__calDayClick(' + dd + ')">' +
+        if (nationalEvt) dayClass += ' cal-day-national';
+        cells.push('<div class="cal-day' + (isToday?' today':'') + (isSel?' selected':'') + (isFri?' friday':'') + (dayClass?' '+dayClass:'') + '" title="' + (nationalEvt || '') + '" onclick="window.__calDayClick(' + dd + ')">' +
           '<span class="cal-day-num">' + dd + '</span>' +
           (total > 0 ? '<span class="cal-day-count">' + doneC + '/' + total + '</span>' : '') +
           (rems.length ? '<span class="cal-day-rem">🔔</span>' : '') +
@@ -835,27 +894,35 @@
       }
       var doneGoals = goals.filter(function(g){return g.done;}).length;
 
-      return '<div class="cal-legend">' +
-          '<span class="cl-item"><span class="cl-dot day-done-bg"></span>کامل</span>' +
-          '<span class="cl-item"><span class="cl-dot day-partial-bg"></span>نیمه</span>' +
-          '<span class="cl-item"><span class="cl-dot day-pending-bg"></span>انجام نشده</span>' +
-          '<span class="cl-item"><span>🔔</span>یادآور</span>' +
-        '</div>' +
-        '<div class="month-goals compact">' +
-          '<div class="month-goals-title">' +
-            '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>' +
-            '<span>اهداف این ماه</span>' +
-            (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
+      return '<div class="monthly-layout">' +
+          '<div class="monthly-main">' +
+            '<div class="cal-legend">' +
+              '<span class="cl-item"><span class="cl-dot day-done-bg"></span>کامل</span>' +
+              '<span class="cl-item"><span class="cl-dot day-partial-bg"></span>نیمه</span>' +
+              '<span class="cl-item"><span class="cl-dot day-pending-bg"></span>انجام نشده</span>' +
+              '<span class="cl-item"><span style="color:#EF4444">🔴</span>جمعه</span>' +
+              '<span class="cl-item"><span style="color:#A855F7">🟣</span>مناسب</span>' +
+              '<span class="cl-item"><span>🔔</span>یادآور</span>' +
+            '</div>' +
+            '<div class="month-calendar">' +
+              '<div class="cal-weekdays">' + weekdays.map(function(w){return '<div class="cal-weekday">'+w+'</div>';}).join('') + '</div>' +
+              '<div class="cal-grid">' + cells.join('') + '</div>' +
+            '</div>' +
           '</div>' +
-          goalsHTML +
-          '<div class="month-goal-add compact">' +
-            '<input type="text" id="newGoalInput" placeholder="هدف جدید..." onkeydown="if(event.key===\'Enter\')addMonthGoal(\'' + monthKey + '\')">' +
-            '<button onclick="addMonthGoal(\'' + monthKey + '\')">+</button>' +
+          '<div class="monthly-side">' +
+            '<div class="month-goals compact">' +
+              '<div class="month-goals-title">' +
+                '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>' +
+                '<span>اهداف این ماه</span>' +
+                (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
+              '</div>' +
+              goalsHTML +
+              '<div class="month-goal-add compact">' +
+                '<input type="text" id="newGoalInput" placeholder="هدف جدید..." onkeydown="if(event.key===\'Enter\')addMonthGoal(\'' + monthKey + '\')">' +
+                '<button onclick="addMonthGoal(\'' + monthKey + '\')">+</button>' +
+              '</div>' +
+            '</div>' +
           '</div>' +
-        '</div>' +
-        '<div class="month-calendar">' +
-          '<div class="cal-weekdays">' + weekdays.map(function(w){return '<div class="cal-weekday">'+w+'</div>';}).join('') + '</div>' +
-          '<div class="cal-grid">' + cells.join('') + '</div>' +
         '</div>';
     }
     function viewMonthly(){ return heroMonthly() + '<div class="planner-body-content">' + monthlyContentHTML() + '</div>'; }
@@ -869,6 +936,7 @@
       var tasks = dd.tasks||[];
       var doneC = tasks.filter(function(t){return t.done;}).length;
       var rems = getDayReminders(k);
+      var nationalEvt = getIranianEvent(k);
 
       var tasksList = tasks.length ? tasks.map(function(t){
         return '<div class="cal-popup-task' + (t.done?' done':'') + '">' + (t.done?'✓':'○') + ' ' + esc(t.title) + '</div>';
@@ -892,6 +960,7 @@
       el.className = 'siraj-popup-overlay';
       el.innerHTML = '<div class="siraj-popup cal-popup-wide">' +
         '<div class="siraj-popup-title">📅 ' + day + ' ' + d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'}) + '</div>' +
+        (nationalEvt ? '<div class="cal-national-badge">🇮🇷 ' + esc(nationalEvt) + '</div>' : '') +
         '<div class="cal-popup-section">' +
           '<div class="cal-popup-label">🎯 کارها</div>' +
           (tasks.length === 0
@@ -943,7 +1012,7 @@
       window.__calDayClick(parseInt(key.split('-')[2],10));
     };
 
-    /* ============ سالانه ============ */
+    /* ============ سالانه — چیدمان دو ستونه ============ */
     function yearlyContentHTML(){
       var pl = window.loadPlannerNew();
       var d = new Date(window.plannerDate || new Date());
@@ -954,7 +1023,7 @@
 
       var goalsHTML = '';
       if (goals.length === 0){
-        goalsHTML = '<div class="mg-empty"><span class="mg-empty-icon">🏆</span><div class="mg-empty-text">هنوز هدف بلندمدتی ثبت نکردی</div></div>';
+        goalsHTML = '<div class="mg-empty-compact">🏆 هنوز هدفی نداری</div>';
       } else {
         goalsHTML = '<div class="month-goals-list">' + goals.map(function(g,i){
           return '<div class="month-goal' + (g.done?' done':'') + '" data-ygoal-i="' + i + '">' +
@@ -973,8 +1042,8 @@
       var months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
       var currentMonthIdx = -1;
       try{
-        var faDate = new Date().toLocaleDateString('fa-IR',{month:'numeric'});
-        var faMonthNum = parseInt(faDate.split('/')[1],10);
+        var faMonth = new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(new Date());
+        var faMonthNum = parseInt(faMonth);
         if (faMonthNum >= 1 && faMonthNum <= 12) currentMonthIdx = faMonthNum - 1;
       }catch(e){}
 
@@ -991,32 +1060,49 @@
         '</div>';
       }).join('');
 
-      return '<div class="month-goals year-goals">' +
-          '<div class="month-goals-title">' +
-            '<span style="font-size:16px">🏅</span>' +
-            '<span>اهداف سالانه</span>' +
-            (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
+      return '<div class="monthly-layout">' +
+          '<div class="monthly-main">' +
+            '<div class="year-overview">' +
+              '<div class="year-overview-title">📊 نگاه کلی به ماه‌ها</div>' +
+              '<div class="year-months-grid">' + monthCards + '</div>' +
+            '</div>' +
           '</div>' +
-          '<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.9">اهداف بلندمدتت 💫</div>' +
-          goalsHTML +
-          '<div class="month-goal-add">' +
-            '<input type="text" id="newYearGoalInput" placeholder="هدف بلندمدت جدید..." onkeydown="if(event.key===\'Enter\')addYearGoal(' + y + ')">' +
-            '<button onclick="addYearGoal(' + y + ')">+ افزودن</button>' +
+          '<div class="monthly-side">' +
+            '<div class="month-goals year-goals compact">' +
+              '<div class="month-goals-title">' +
+                '<span style="font-size:16px">🏅</span>' +
+                '<span>اهداف سالانه</span>' +
+                (goals.length > 0 ? '<span class="mg-counter">' + doneGoals + '/' + goals.length + '</span>' : '') +
+              '</div>' +
+              goalsHTML +
+              '<div class="month-goal-add compact">' +
+                '<input type="text" id="newYearGoalInput" placeholder="هدف جدید..." onkeydown="if(event.key===\'Enter\')addYearGoal(' + y + ')">' +
+                '<button onclick="addYearGoal(' + y + ')">+</button>' +
+              '</div>' +
+            '</div>' +
           '</div>' +
-        '</div>' +
-        '<div class="year-overview">' +
-          '<div class="year-overview-title">📊 نگاه کلی به ماه‌ها</div>' +
-          '<div class="year-months-grid">' + monthCards + '</div>' +
         '</div>';
     }
     function viewYearly(){ return heroYearly() + '<div class="planner-body-content">' + yearlyContentHTML() + '</div>'; }
 
+    /* ============ پرش به ماه درست ============ */
     window.__goToMonth = function(monthIdx){
-      var d = new Date(window.plannerDate || new Date());
-      d.setDate(1); /* FIRST */
-      d.setMonth(monthIdx);
-      window.plannerDate = d;
-      window.switchPlannerTab('monthly');
+      /* monthIdx: 0..11 (فروردین تا اسفند) */
+      var now = new Date();
+      var found = null;
+      /* از ابتدای امسال شمسی بگرد تا ماه مورد نظر رو پیدا کن */
+      /* شروع از ۲ ماه قبل از امروز */
+      var ref = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+      for (var i=0;i<500;i++){
+        var faM = -1;
+        try{ faM = parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(ref)); }catch(e){ break; }
+        if (faM === (monthIdx + 1)){ found = new Date(ref); break; }
+        ref.setDate(ref.getDate() + 1);
+      }
+      if (found){
+        window.plannerDate = found;
+        window.switchPlannerTab('monthly');
+      }
     };
 
     window.__toggleMonthGoalLocal = function(monthKey, i, checkbox){
@@ -1044,7 +1130,7 @@
       window.savePlanner(pl);
       var p = document.querySelector('[data-goal-i="' + i + '"]');
       if (p){ p.style.transition = 'all .3s'; p.style.opacity = '0'; p.style.transform = 'translateX(20px)'; }
-      setTimeout(function(){ renderPane('monthly'); }, 300);
+      setTimeout(function(){ refreshBody('left'); }, 300);
     };
     window.__toggleYearGoalLocal = function(y, i, checkbox){
       var pl = window.loadPlannerNew();
@@ -1061,7 +1147,7 @@
       window.savePlanner(pl);
       var p = document.querySelector('[data-ygoal-i="' + i + '"]');
       if (p){ p.style.transition = 'all .3s'; p.style.opacity = '0'; p.style.transform = 'translateX(20px)'; }
-      setTimeout(function(){ renderPane('yearly'); }, 300);
+      setTimeout(function(){ refreshBody('left'); }, 300);
     };
 
     /* ============ پنل راست ============ */
@@ -1092,10 +1178,10 @@
         '<div class="panel-card guide-card" style="margin-top:14px">' +
           '<div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>راهنما</span></div>' +
           '<div class="guide-list">' +
-            '<div class="guide-item"><span>✨</span>روی دکمه حالت مطالعه بزن</div>' +
+            '<div class="guide-item"><span>✨</span>روی حالت مطالعه بزن</div>' +
             '<div class="guide-item"><span>📚</span>یه کار انتخاب کن</div>' +
             '<div class="guide-item"><span>⏱️</span>زمان تنظیم کن</div>' +
-            '<div class="guide-item"><span>🎯</span>تا آخر تایمر قفلی</div>' +
+            '<div class="guide-item"><span>🎯</span>تا آخر قفلی</div>' +
             '<div class="guide-item"><span>🔔</span>توی تقویم یادآور بذار</div>' +
           '</div>' +
         '</div>';
@@ -1524,7 +1610,7 @@
       setTimeout(function(){ overlay.remove(); }, 500);
       setTimeout(function(){
         if (typeof window.renderPanelForPlanner === 'function') window.renderPanelForPlanner();
-        renderPane(getTab());
+        refreshBody('left');
       }, 300);
     }
     function blockKey(e){
@@ -1658,7 +1744,7 @@
       pl.months[monthKey].goals.push({text:v, done:false});
       window.savePlanner(pl);
       inp.value = '';
-      renderPane('monthly');
+      refreshBody('left');
     };
     window.addYearGoal = function(y){
       var inp = document.getElementById('newYearGoalInput');
@@ -1671,7 +1757,7 @@
       pl.years[y].goals.push({text:v, done:false});
       window.savePlanner(pl);
       inp.value = '';
-      renderPane('yearly');
+      refreshBody('left');
     };
 
     /* ============ مقالات ============ */
@@ -1690,12 +1776,12 @@
     var origRenderPlanner = window.renderPlanner;
     window.renderPlanner = function(){
       origRenderPlanner.apply(this, arguments);
-      setTimeout(function(){ renderPane(getTab()); }, 30);
+      setTimeout(function(){ renderPane(getTab()); window.renderPanelForPlanner(); }, 30);
     };
     var origSwitchView = window.switchView;
     window.switchView = function(v){
       origSwitchView.apply(this, arguments);
-      if (v === 'planner'){ setTimeout(function(){ renderPane(getTab()); }, 50); }
+      if (v === 'planner'){ setTimeout(function(){ renderPane(getTab()); window.renderPanelForPlanner(); }, 50); }
     };
 
     /* Labels */
@@ -1714,7 +1800,7 @@
       });
     }, 900);
 
-    /* ============ درباره ما + مشخصات من ============ */
+    /* ============ Settings: مشخصات من + درباره ما ============ */
     var origOpenSettings = window.openSettings;
     window.openSettings = function(){
       origOpenSettings.apply(this, arguments);
@@ -1723,14 +1809,14 @@
     function injectProfileTab(){
       var tabsWrap = document.getElementById('settingsTabs');
       if (!tabsWrap) return;
-      if (tabsWrap.querySelector('[data-cat="profile"]')) return;
-      var btn = document.createElement('button');
-      btn.className = 'settings-tab-btn';
-      btn.setAttribute('data-cat','profile');
-      btn.setAttribute('onclick',"switchSettingsCat('profile')");
-      btn.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
-      tabsWrap.insertBefore(btn, tabsWrap.children[6] || null);
-
+      if (!tabsWrap.querySelector('[data-cat="profile"]')){
+        var btn = document.createElement('button');
+        btn.className = 'settings-tab-btn';
+        btn.setAttribute('data-cat','profile');
+        btn.setAttribute('onclick',"switchSettingsCat('profile')");
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
+        tabsWrap.insertBefore(btn, tabsWrap.children[6] || null);
+      }
       var contentWrap = document.getElementById('settingsContentWrap');
       if (contentWrap && !contentWrap.querySelector('[data-cat="profile"]')){
         var pane = document.createElement('div');
@@ -1739,6 +1825,7 @@
         contentWrap.appendChild(pane);
       }
       renderProfilePane();
+      renderAboutPane();
     }
     function renderProfilePane(){
       var pane = document.querySelector('.settings-content[data-cat="profile"]');
@@ -1750,14 +1837,11 @@
           '<div class="about-avatar" style="margin:14px auto">' +
             (p.avatar ? '<img src="' + p.avatar + '" alt="">' : '<span style="font-size:44px">' + (p.name ? esc(p.name).substring(0,2) : 'من') + '</span>') +
           '</div>' +
-          '<div style="font-size:11px;color:var(--text-muted);line-height:1.9;text-align:center;padding:2px 0 10px">' +
-            'سراج اسم و بیوگرافی تو رو می‌خونه و تو جواب‌هاش ازش استفاده می‌کنه.' +
-          '</div>' +
+          '<div style="font-size:11px;color:var(--text-muted);line-height:1.9;text-align:center;padding:2px 0 10px">سراج اسم و بیوگرافی تو رو می‌خونه و تو جواب‌هاش ازش استفاده می‌کنه.</div>' +
           '<input type="text" id="profileName" placeholder="اسمت چیه؟" value="' + (p.name ? esc(p.name) : '') + '" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;margin-bottom:8px">' +
           '<textarea id="profileBio" placeholder="یه توضیح کوتاه از خودت..." style="width:100%;min-height:90px;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;resize:vertical;line-height:1.8;margin-bottom:8px">' + (p.bio ? esc(p.bio) : '') + '</textarea>' +
           '<label class="btn-secondary" style="cursor:pointer;width:100%;justify-content:center">' +
-            '<input type="file" accept="image/*" id="profileAvatarInput" style="display:none">' +
-            '📷 انتخاب عکس' +
+            '<input type="file" accept="image/*" id="profileAvatarInput" style="display:none">📷 انتخاب عکس' +
           '</label>' +
           (p.avatar ? '<button class="btn-secondary" id="profileAvatarClear" style="width:100%;margin-top:6px">حذف عکس</button>' : '') +
           '<button class="btn-primary" id="profileSaveBtn" style="width:100%;justify-content:center;margin-top:10px">💾 ذخیره</button>' +
@@ -1771,6 +1855,7 @@
           saveProfile(p2);
           if (window.toast) window.toast('مشخصات ذخیره شد ✓','success');
           if (typeof window.renderPanelForPlanner === 'function') window.renderPanelForPlanner();
+          updateHeaderAvatar();
         };
       }
       var av = document.getElementById('profileAvatarInput');
@@ -1786,6 +1871,7 @@
             saveProfile(p3);
             if (window.toast) window.toast('عکس ذخیره شد ✓','success');
             renderProfilePane();
+            updateHeaderAvatar();
           };
           r.readAsDataURL(f);
         };
@@ -1798,56 +1884,62 @@
           saveProfile(p4);
           if (window.toast) window.toast('عکس حذف شد','info');
           renderProfilePane();
+          updateHeaderAvatar();
         };
       }
     }
-
-    /* درباره ما — فقط اطلاعات سازنده */
-    var origOpen = window.openSettings;
-    window.openSettings = function(){
-      origOpen.apply(this, arguments);
-      setTimeout(function(){
-        var aboutContent = document.querySelector('.settings-content[data-cat="about"]');
-        if (!aboutContent) return;
-        aboutContent.innerHTML =
-          '<div class="about-hero">' +
-            '<div class="about-avatar"><img src="siraj-logo.png" alt="سازنده" style="object-fit:contain;padding:14px"></div>' +
-            '<div class="about-name">حامد انصاری‌فر</div>' +
-            '<div class="about-role">سازنده سراج</div>' +
-          '</div>' +
-          '<div class="about-bio-card" style="line-height:2;white-space:pre-line;text-align:right">' +
-            'سلام 👋\n' +
-            'من حامد هستم — ۲۰ سالمه و عاشق میهن. الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و کنار درس، به هوش مصنوعی، برنامه‌نویسی و تاریخ هم علاقه‌ی زیادی دارم.\n\n' +
-            'ایده سراج یهویی وقتی مثل همیشه تو فکر بودم به ذهنم اومد. اینکه بتونم به یادگیری بچه‌های کشورم کمک کنم و بتونیم آینده‌ای خوش برای سرزمینمون رقم بزنیم.\n' +
-            'کلی چیز برای کشف کردن هست 🌱\n' +
-            'منتظر بروزرسانی‌های جدید باشید ☝️💕' +
-          '</div>' +
-          '<div class="about-section-title">راه‌های ارتباطی</div>' +
-          '<div style="display:flex;flex-direction:column;gap:10px">' +
-            '<a class="contact-row-v2" href="mailto:ranshamed.fr@gmail.com">' +
-              '<div class="contact-icon ci-email"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg></div>' +
-              '<div class="contact-info"><div class="contact-label">ایمیل</div><div class="contact-value">ranshamed.fr@gmail.com</div></div>' +
-              '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
-            '</a>' +
-            '<a class="contact-row-v2" href="https://t.me/Ra_Nsss" target="_blank" rel="noopener">' +
-              '<div class="contact-icon ci-telegram"><svg viewBox="0 0 24 24"><path d="M21 3 3 10l6 3 3 6 9-16z"/><path d="M9 13 21 3"/></svg></div>' +
-              '<div class="contact-info"><div class="contact-label">تلگرام</div><div class="contact-value">@Ra_Nsss</div></div>' +
-              '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
-            '</a>' +
-            '<a class="contact-row-v2" href="https://instagram.com/Hamed_Rans" target="_blank" rel="noopener">' +
-              '<div class="contact-icon ci-instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div>' +
-              '<div class="contact-info"><div class="contact-label">اینستاگرام</div><div class="contact-value">Hamed_Rans</div></div>' +
-              '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
-            '</a>' +
-            '<a class="contact-row-v2" href="https://x.com/Hamed_Rans" target="_blank" rel="noopener">' +
-              '<div class="contact-icon ci-x"><svg viewBox="0 0 24 24" style="stroke:none;fill:#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>' +
-              '<div class="contact-info"><div class="contact-label">ایکس</div><div class="contact-value">Hamed_Rans</div></div>' +
-              '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
-            '</a>' +
-          '</div>' +
-          '<div class="siraj-version-badge">✨ نسخه: <span>v2.0</span></div>';
-      }, 250);
-    };
+    function updateHeaderAvatar(){
+      var av = document.getElementById('headerUserAvatar');
+      if (!av) return;
+      var p = getProfile();
+      av.title = p.name ? p.name : 'مشخصات من';
+      if (p.avatar){
+        av.innerHTML = '<img src="' + p.avatar + '" alt="">';
+      } else {
+        av.textContent = p.name ? p.name.substring(0,1) : '👤';
+      }
+    }
+    function renderAboutPane(){
+      var aboutContent = document.querySelector('.settings-content[data-cat="about"]');
+      if (!aboutContent) return;
+      aboutContent.innerHTML =
+        '<div class="about-hero">' +
+          '<div class="about-avatar"><img src="siraj-logo.png" alt="سازنده" style="object-fit:contain;padding:14px"></div>' +
+          '<div class="about-name">حامد انصاری‌فر</div>' +
+          '<div class="about-role">سازنده سراج</div>' +
+        '</div>' +
+        '<div class="about-bio-card" style="line-height:2;white-space:pre-line;text-align:right">' +
+          'سلام 👋\n' +
+          'من حامد هستم — ۲۰ سالمه و عاشق میهن. الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و کنار درس، به هوش مصنوعی، برنامه‌نویسی و تاریخ هم علاقه‌ی زیادی دارم.\n\n' +
+          'ایده سراج یهویی وقتی مثل همیشه تو فکر بودم به ذهنم اومد. اینکه بتونم به یادگیری بچه‌های کشورم کمک کنم و بتونیم آینده‌ای خوش برای سرزمینمون رقم بزنیم.\n' +
+          'کلی چیز برای کشف کردن هست 🌱\n' +
+          'منتظر بروزرسانی‌های جدید باشید ☝️💕' +
+        '</div>' +
+        '<div class="about-section-title">راه‌های ارتباطی</div>' +
+        '<div style="display:flex;flex-direction:column;gap:10px">' +
+          '<a class="contact-row-v2" href="mailto:ranshamed.fr@gmail.com">' +
+            '<div class="contact-icon ci-email"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg></div>' +
+            '<div class="contact-info"><div class="contact-label">ایمیل</div><div class="contact-value">ranshamed.fr@gmail.com</div></div>' +
+            '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
+          '</a>' +
+          '<a class="contact-row-v2" href="https://t.me/Ra_Nsss" target="_blank" rel="noopener">' +
+            '<div class="contact-icon ci-telegram"><svg viewBox="0 0 24 24"><path d="M21 3 3 10l6 3 3 6 9-16z"/><path d="M9 13 21 3"/></svg></div>' +
+            '<div class="contact-info"><div class="contact-label">تلگرام</div><div class="contact-value">@Ra_Nsss</div></div>' +
+            '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
+          '</a>' +
+          '<a class="contact-row-v2" href="https://instagram.com/Hamed_Rans" target="_blank" rel="noopener">' +
+            '<div class="contact-icon ci-instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div>' +
+            '<div class="contact-info"><div class="contact-label">اینستاگرام</div><div class="contact-value">Hamed_Rans</div></div>' +
+            '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
+          '</a>' +
+          '<a class="contact-row-v2" href="https://x.com/Hamed_Rans" target="_blank" rel="noopener">' +
+            '<div class="contact-icon ci-x"><svg viewBox="0 0 24 24" style="stroke:none;fill:#fff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>' +
+            '<div class="contact-info"><div class="contact-label">ایکس</div><div class="contact-value">Hamed_Rans</div></div>' +
+            '<svg class="contact-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>' +
+          '</a>' +
+        '</div>' +
+        '<div class="siraj-version-badge">✨ نسخه: <span>v2.0</span></div>';
+    }
 
     /* Retry */
     setTimeout(function(){
