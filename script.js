@@ -1068,6 +1068,11 @@ function getSystemPrompt(){
     const dm={fusha:'العربية الفصحى',iraqi:'اللهجة العراقية',levantine:'اللهجة الشامية',egyptian:'اللهجة المصرية',maghrebi:'اللهجة المغربية'};
     const dialect=dm[settings.dialect]||'العربية الفصحى';
     let extra='';
+        try{
+        var prof = JSON.parse(localStorage.getItem('siraj-profile')||'{}');
+        if(prof.name) extra += '\n\n👤 اسم کاربر: ' + prof.name;
+        if(prof.bio) extra += '\n📝 درباره‌ی خودش: ' + prof.bio + '\nاسمش رو تو جواب‌هات صدا بزن.';
+    }catch(e){}
         // پروفایل کاربر
     try{
         var prof = JSON.parse(localStorage.getItem('siraj-profile')||'{}');
@@ -1175,7 +1180,7 @@ function toggleThink(){
     }
     saveSettings();
     document.getElementById('thinkBtn').classList.toggle('active',settings.thinking);
-    toast(settings.thinking?'🧠 حالت تفکر عمیق فعال شد':'حالت تفکر عمیق خاموش شد','info');
+    toast(settings.thinking?'🧠 تفکر عمیق فعال':'تفکر خاموش','info');
 }
 function toggleQuick(){
     settings.quick=!settings.quick;
@@ -1185,7 +1190,7 @@ function toggleQuick(){
     }
     saveSettings();
     document.getElementById('quickBtn').classList.toggle('active',settings.quick);
-    toast(settings.quick?'⚡ حالت پاسخ سریع فعال شد':'حالت پاسخ سریع خاموش شد','info');
+    toast(settings.quick?'⚡ پاسخ سریع فعال':'پاسخ سریع خاموش','info');
 }
 function handleFilePick(ev){const f=ev.target.files?.[0];if(!f)return;if(f.size>8*1024*1024){toast('حجم بیش از ۸ مگابایت','error');return;}const isImg=f.type.startsWith('image/');const r=new FileReader();r.onload=e=>{currentFile=e.target.result;currentFileType=isImg?'image':'file';renderFilePreview(f.name,currentFileType);handleInput();};r.readAsDataURL(f);ev.target.value='';}
 function renderFilePreview(name,type){const w=document.getElementById('imagePreviewWrap');if(!currentFile){w.innerHTML='';return;}if(type==='image')w.innerHTML=`<div class="image-preview"><img src="${currentFile}"><button class="remove-img" onclick="removeFile()">✕</button></div>`;else w.innerHTML=`<div class="image-preview"><div class="audio-preview">📎 ${escapeHtml(name||'فایل')}</div><button class="remove-img" onclick="removeFile()">✕</button></div>`;}
@@ -1901,6 +1906,29 @@ function unregisterMySession(){
 }
 
 window.addEventListener('load',()=>{
+        // آواتار کاربر در هدر
+    (function injectUserAvatar(){
+      var headerBrand = document.querySelector('.chat-header .header-brand');
+      var lockBtn = document.getElementById('headerLockBtn');
+      if (!headerBrand || !lockBtn) return;
+      if (document.getElementById('headerUserAvatar')) return;
+      var p = {};
+      try{ p = JSON.parse(localStorage.getItem('siraj-profile')||'{}'); }catch(e){}
+      var av = document.createElement('div');
+      av.id = 'headerUserAvatar';
+      av.className = 'header-user-avatar';
+      av.title = p.name ? p.name : 'مشخصات من';
+      if (p.avatar) av.innerHTML = '<img src="' + p.avatar + '" alt="">';
+      else av.textContent = p.name ? p.name.substring(0,1) : '👤';
+      av.onclick = function(){
+        if (typeof window.openSettings === 'function') window.openSettings();
+        setTimeout(function(){
+          var b = document.querySelector('.settings-tab-btn[data-cat="profile"]');
+          if (b) b.click();
+        }, 400);
+      };
+      lockBtn.parentNode.insertBefore(av, lockBtn);
+    })();
     setTimeout(()=>{const sl=document.getElementById('splashLoader');if(sl)sl.classList.add('hidden');},400);
     try{const savedImg=localStorage.getItem(PROFILE_IMG_KEY);if(savedImg&&!settings.profileImage)settings.profileImage=savedImg;}catch(e){}
     initNavState();
