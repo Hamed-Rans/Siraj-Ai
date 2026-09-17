@@ -2100,6 +2100,138 @@
       new MutationObserver(colorizeHours).observe(document.body, {childList:true, subtree:true});
       setTimeout(colorizeHours, 500);
     }, 200);
+    /* ============ اسلایدر نوار پایین — override کامل ============ */
+    (function(){
+      function ensureSlider(){
+        var nav = document.getElementById('bottomNav');
+        if (!nav) return null;
+        var slider = document.getElementById('navSlider');
+        if (!slider){
+          slider = document.createElement('div');
+          slider.id = 'navSlider';
+          slider.className = 'nav-slider';
+          nav.insertBefore(slider, nav.firstChild);
+        }
+        return slider;
+      }
+
+      function moveSlider(animate){
+        var nav = document.getElementById('bottomNav');
+        var slider = ensureSlider();
+        if (!nav || !slider) return;
+
+        var active = document.querySelector('.bottom-nav-btn.active');
+        if (!active) { slider.style.opacity = '0'; return; }
+
+        // دکمه چت — اسلایدر مخفی
+        if (active.classList.contains('nav-btn-chat')){
+          slider.style.opacity = '0';
+          return;
+        }
+
+        var navRect = nav.getBoundingClientRect();
+        var btnRect = active.getBoundingClientRect();
+        var pos = document.documentElement.getAttribute('data-nav-position') || 'bottom';
+        var isVert = pos === 'left' || pos === 'right';
+
+        // موقعیت جدید
+        var newLeft, newTop, newW, newH, newRadius;
+        if (isVert){
+          newLeft = 6;
+          newW = navRect.width - 12;
+          newTop = btnRect.top - navRect.top;
+          newH = btnRect.height;
+          newRadius = 18;
+        } else {
+          newLeft = btnRect.left - navRect.left;
+          newTop = btnRect.top - navRect.top;
+          newW = btnRect.width;
+          newH = btnRect.height;
+          newRadius = 22;
+        }
+
+        if (animate === false){
+          slider.style.transition = 'none';
+        }
+
+        slider.style.left = newLeft + 'px';
+        slider.style.top = newTop + 'px';
+        slider.style.width = newW + 'px';
+        slider.style.height = newH + 'px';
+        slider.style.borderRadius = newRadius + 'px';
+        slider.style.opacity = '1';
+
+        if (animate === false){
+          void slider.offsetWidth;
+          slider.style.transition = '';
+        }
+      }
+
+      // اکسپوز سراسری
+      window.__moveNavSlider = moveSlider;
+
+      // Override switchView
+      var origSwitch = window.switchView;
+      window.switchView = function(v){
+        origSwitch.apply(this, arguments);
+        setTimeout(function(){ moveSlider(true); }, 30);
+        setTimeout(function(){ moveSlider(true); }, 160);
+      };
+
+      // Override toggleNavCollapse
+      var origToggleCollapse = window.toggleNavCollapse;
+      if (origToggleCollapse){
+        window.toggleNavCollapse = function(){
+          origToggleCollapse.apply(this, arguments);
+          setTimeout(function(){ moveSlider(true); }, 30);
+          setTimeout(function(){ moveSlider(true); }, 350);
+          setTimeout(function(){ moveSlider(true); }, 650);
+        };
+      }
+
+      // Override openSettings (وقتی بسته میشه باید اسلایدر برگرده)
+      var origCloseSettings = window.closeSettings;
+      if (origCloseSettings){
+        window.closeSettings = function(){
+          origCloseSettings.apply(this, arguments);
+          setTimeout(function(){ moveSlider(false); }, 360);
+        };
+      }
+
+      // MutationObserver روی تغییرات کلاس دکمه‌ها
+      var navEl = document.getElementById('bottomNav');
+      if (navEl){
+        new MutationObserver(function(muts){
+          var should = false;
+          for (var i=0;i<muts.length;i++){
+            var m = muts[i];
+            if (m.type === 'attributes' && m.attributeName === 'class' &&
+                m.target.classList && m.target.classList.contains('bottom-nav-btn')){
+              should = true; break;
+            }
+          }
+          if (should) setTimeout(function(){ moveSlider(true); }, 20);
+        }).observe(navEl, {attributes:true, attributeFilter:['class'], subtree:true});
+      }
+
+      // وقتی موقعیت نوار عوض میشه
+      new MutationObserver(function(){
+        setTimeout(function(){ moveSlider(false); }, 30);
+        setTimeout(function(){ moveSlider(true); }, 200);
+        setTimeout(function(){ moveSlider(true); }, 500);
+      }).observe(document.documentElement, {attributes:true, attributeFilter:['data-nav-position']});
+
+      // اندازه‌ی صفحه
+      window.addEventListener('resize', function(){ moveSlider(false); });
+      window.addEventListener('orientationchange', function(){
+        setTimeout(function(){ moveSlider(false); }, 300);
+      });
+
+      // راه‌اندازی اولیه
+      setTimeout(function(){ moveSlider(false); }, 700);
+      setTimeout(function(){ moveSlider(true); }, 1100);
+      setTimeout(function(){ moveSlider(true); }, 1700);
+    })();
 
     console.log('[Siraj v2.0] planner loaded ✓ (v7 — transitions + floating profile + icons)');
   }
