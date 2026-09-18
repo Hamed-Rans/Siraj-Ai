@@ -1,4 +1,4 @@
-/* Siraj v2.0 — script.js (v41 Final + v42 patch) */
+/* Siraj v2.0 — script.js (v43 Final) */
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
@@ -6,6 +6,7 @@ const APP_CONFIG={
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
         animation:'normal',model:'gemini-3.6-flash',dialect:'fusha',
         thinking:false,quick:false,inputStyle:'solid',headerStyle:'glass',
+        elementStyle:'solid',
         pattern:'boteh',patternPosition:'both',
         patternSize:180,patternOpacity:45,patternPerCorner:2,
         patternColor1:'#2AA5B8',patternColor2:'#F5A623',
@@ -38,6 +39,10 @@ const APP_CONFIG={
         {id:'solid',name:'ساده',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/>'},
         {id:'glass',name:'شیشه‌ای',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 6v12M18 6v12" opacity=".4"/>'}
     ],
+    elementStyles:[
+        {id:'solid',name:'ساده',icon:'<rect x="3" y="3" width="18" height="18" rx="3"/>'},
+        {id:'glass',name:'شیشه‌ای',icon:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 3v18M17 3v18" opacity=".4"/>'}
+    ],
     navPositions:[
         {id:'right',name:'راست',icon:'<rect x="17" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="12" height="18" rx="2"/>'},
         {id:'bottom',name:'پایین',icon:'<rect x="3" y="17" width="18" height="4" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="18" height="12" rx="2"/>'},
@@ -69,7 +74,6 @@ const APP_CONFIG={
             value:'radial-gradient(rgba(120,150,200,.18) 1px,transparent 1px) 0 0/20px 20px repeat #0B0E14',
             valueLight:'radial-gradient(rgba(70,100,150,.3) 1px,transparent 1px) 0 0/20px 20px repeat #F0F4FA'}
     ],
-    /* ★ فونت‌ها کم شد */
     fonts:{
         persian:[
             {id:'vazirmatn',name:'وزیرمتن'},{id:'estedad',name:'استعداد'},
@@ -453,6 +457,7 @@ function applySettingsToUI(s){
     document.documentElement.setAttribute('data-pattern',t.pattern||'boteh');
     document.documentElement.setAttribute('data-input-style',t.inputStyle||'solid');
     document.documentElement.setAttribute('data-header-style',t.headerStyle||'glass');
+    document.documentElement.setAttribute('data-element-style',t.elementStyle||'solid');
     document.documentElement.setAttribute('data-font',t.fontFamily||'vazirmatn');
     document.documentElement.setAttribute('data-lang',t.uiLang||'fa');
     document.documentElement.setAttribute('data-nav-position',t.navPosition||'bottom');
@@ -661,7 +666,6 @@ function renderPanelForTools(){
         </div>`;
 }
 
-/* ★★★ تغییر ۱: renderPlanner با هدر برگشت ★★★ */
 function renderPlanner(){
     const view=document.getElementById('view-planner');
     if(!view) return;
@@ -691,20 +695,60 @@ function switchPlannerTab(tab){
     }
 }
 
+/* ★★★ بازطراحی مقالات با هدر پلنر ★★★ */
 function renderBlog(){
     const v=document.getElementById('view-blog');
     if(!v) return;
-    if(v.querySelector('.blog-v2-hero')) return;
-    v.innerHTML='<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>';
+    v.innerHTML='<div class="planner-hero">'
+      +'<div class="planner-hero-icon" style="background:linear-gradient(135deg,#F4D03F,#B8860B)">'
+      +'<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>'
+      +'</div>'
+      +'<div class="planner-hero-text">'
+      +'<div class="planner-hero-title" style="background:linear-gradient(135deg,#F4D03F,#D4AF37,#B8860B);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">مقالات سراج</div>'
+      +'<div class="planner-hero-sub">جایی برای یادداشت‌ها، تحلیل‌ها و مقالات شما در زبان و ادبیات عربی</div>'
+      +'</div>'
+      +'</div>'
+      +'<div class="page-empty-card new-style">'
+      +'<div class="page-empty-icon gold"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
+      +'<div class="page-empty-title gold">به‌زودی در دسترس</div>'
+      +'<div class="page-empty-desc">قراره اینجا بتونید مقالات خودتون رو بنویسید و منتشر کنید، نوشته‌های دیگران رو بخونید و با بقیه به اشتراک بگذارید. جایی برای به اشتراک گذاشتن اندیشه‌ها و تحلیل‌ها 🌱</div>'
+      +'<div class="page-empty-soon gold"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>در حال آماده‌سازی</div>'
+      +'<div class="page-empty-features">'
+      +'<div class="page-empty-feature"><span>✍️</span>نوشتن مقاله</div>'
+      +'<div class="page-empty-feature"><span>📖</span>خواندن مقالات</div>'
+      +'<div class="page-empty-feature"><span>💬</span>نظرات</div>'
+      +'<div class="page-empty-feature"><span>⭐</span>ذخیره‌سازی</div>'
+      +'</div>'
+      +'</div>';
 }
 function addBlogPost(){const t=document.getElementById('blogTitle')?.value.trim();const b=document.getElementById('blogBody')?.value.trim();if(!t||!b){toast('عنوان و متن لازمه','error');return;}const p=loadBlog();p.unshift({title:t,body:b,ts:Date.now()});saveBlog(p);renderBlog();renderPanelForBlog();toast('مقاله منتشر شد','success');}
 function deleteBlogPost(i){const p=loadBlog();p.splice(i,1);saveBlog(p);renderBlog();renderPanelForBlog();}
 
+/* ★★★ بازطراحی انجمن با هدر پلنر ★★★ */
 function renderCommunity(){
     const v=document.getElementById('view-videos');
     if(!v) return;
-    if(v.querySelector('.community-v2-hero')) return;
-    v.innerHTML='<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="page-title-text">انجمن سراج</div></div>';
+    v.innerHTML='<div class="planner-hero">'
+      +'<div class="planner-hero-icon">'
+      +'<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+      +'</div>'
+      +'<div class="planner-hero-text">'
+      +'<div class="planner-hero-title">انجمن سراج</div>'
+      +'<div class="planner-hero-sub">فضایی برای پرسش و پاسخ، تبادل تجربه و هم‌اندیشی</div>'
+      +'</div>'
+      +'</div>'
+      +'<div class="page-empty-card new-style">'
+      +'<div class="page-empty-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'
+      +'<div class="page-empty-title">به‌زودی در دسترس</div>'
+      +'<div class="page-empty-desc">اینجا می‌تونید سؤال بپرسید، تجربیاتتون رو با مدرسین و سایر علاقه‌مندان به اشتراک بگذارید و از هم یاد بگیرید. جایی برای هم‌اندیشی و رشد با هم 🌿</div>'
+      +'<div class="page-empty-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>در حال آماده‌سازی</div>'
+      +'<div class="page-empty-features">'
+      +'<div class="page-empty-feature"><span>❓</span>پرسش و پاسخ</div>'
+      +'<div class="page-empty-feature"><span>👥</span>ارتباط با مدرسین</div>'
+      +'<div class="page-empty-feature"><span>💡</span>تبادل تجربه</div>'
+      +'<div class="page-empty-feature"><span>🎯</span>چالش گروهی</div>'
+      +'</div>'
+      +'</div>';
 }
 
 function renderTools(){
@@ -770,7 +814,6 @@ function renameChat(id){
 function saveRename(id,newTitle){const h=loadHistory();if(!h[id])return;const t=(newTitle||'').trim()||'گفتگو';h[id].title=t;saveHistory(h);renderHistory();}
 function formatTime(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'الان';if(m<60)return m+' د';const hr=Math.floor(m/60);if(hr<24)return hr+' س';const day=Math.floor(hr/24);if(day<7)return day+' روز';return new Date(ts).toLocaleDateString('fa-IR');}
 
-/* ★★★ تغییر ۲: loadChat با فیکس welcome ★★★ */
 function loadChat(id){
     const c = loadHistory()[id];
     if(!c) return;
@@ -778,7 +821,6 @@ function loadChat(id){
     const box = document.getElementById('box');
     const myToken = id;
 
-    /* ★ فیکس: مخفی کردن صفحه خوش‌آمدگویی فوراً */
     const w=document.getElementById('welcomeScreen');
     if(w) w.classList.add('hidden');
 
@@ -1281,6 +1323,7 @@ function updatePreview(){
     pz.style.fontFamily=getFontCSS(settingsDraft.fontFamily);
     pz.setAttribute('data-header-style',settingsDraft.headerStyle||'glass');
     pz.setAttribute('data-input-style',settingsDraft.inputStyle||'solid');
+    pz.setAttribute('data-element-style',settingsDraft.elementStyle||'solid');
     const shape=settingsDraft.bubbleShape;
     let rU='20px 20px 10px 20px',rB='20px 20px 20px 10px';
     if(shape==='cloud'){rU=rB='26px';}
@@ -1387,7 +1430,6 @@ function renderSessionsList(){
     }).join('');
 }
 
-/* ★ بایند کردن کلیک روی لینک‌های شبکه اجتماعی */
 function bindContactLinks(){
     document.querySelectorAll('.contact-row[data-link], .contact-row-v2[data-link]').forEach(function(row){
         if(row.dataset.bound==='1') return;
@@ -1462,8 +1504,8 @@ function renderSettingsControls(){
             <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>نوار نوشتن پیام</label>
                 <div class="row-btns">${APP_CONFIG.inputStyles.map(i=>`<button class="row-btn${s.inputStyle===i.id?' active':''}" data-key="inputStyle" data-value="${i.id}" onclick="updateDraft('inputStyle','${i.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${i.icon}</svg><span class="rb-label">${i.name}</span></button>`).join('')}</div>
             </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>استایل پس‌زمینه نوار</label>
-                <div class="row-btns">${APP_CONFIG.navStyles.map(st=>`<button class="row-btn${s.navStyle===st.id?' active':''}" data-key="navStyle" data-value="${st.id}" onclick="updateDraft('navStyle','${st.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${st.icon}</svg><span class="rb-label">${st.name}</span></button>`).join('')}</div>
+            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>استایل المان‌ها (کارت‌ها، تقویم و ...)</label>
+                <div class="row-btns">${APP_CONFIG.elementStyles.map(el=>`<button class="row-btn${s.elementStyle===el.id?' active':''}" data-key="elementStyle" data-value="${el.id}" onclick="updateDraft('elementStyle','${el.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${el.icon}</svg><span class="rb-label">${el.name}</span></button>`).join('')}</div>
             </div>
         </div>
 
@@ -1519,6 +1561,9 @@ function renderSettingsControls(){
             </div>
             <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>شدت سایه نوار</label>
                 <div class="slider-row"><input type="range" min="0" max="100" step="5" value="${s.navShadowLevel||0}" oninput="updateDraft('navShadowLevel',this.value)"><span class="slider-val">${s.navShadowLevel||0}%</span></div>
+            </div>
+            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>استایل پس‌زمینه نوار</label>
+                <div class="row-btns">${APP_CONFIG.navStyles.map(st=>`<button class="row-btn${s.navStyle===st.id?' active':''}" data-key="navStyle" data-value="${st.id}" onclick="updateDraft('navStyle','${st.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${st.icon}</svg><span class="rb-label">${st.name}</span></button>`).join('')}</div>
             </div>
         </div>
 
