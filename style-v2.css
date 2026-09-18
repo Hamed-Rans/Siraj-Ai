@@ -4270,3 +4270,91 @@
 
 /* ─── ۹) badge امروز ─── */
 .phc-today.hidden { display: none !important; }
+/* ═══════════════════════════════════════════════════════════════
+   PATCH v26 — Final Fixes
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── ۱) غیرفعال کردن انیمیشن پایه view ─── */
+.view.active { animation: none !important; }
+.view.active.view-in-from-left  { animation: viewInFromLeft .42s cubic-bezier(.22,1,.36,1) both !important; }
+.view.active.view-in-from-right { animation: viewInFromRight .42s cubic-bezier(.22,1,.36,1) both !important; }
+.view.leaving.view-out-left  { animation: viewOutLeft .4s cubic-bezier(.4,0,1,1) forwards !important; }
+.view.leaving.view-out-right { animation: viewOutRight .4s cubic-bezier(.4,0,1,1) forwards !important; }
+
+/* ─── ۲) پیش‌نمایش نوار چپ/راست ─── */
+.preview-zone[data-nav-position="left"]  { padding-left: 56px !important; }
+.preview-zone[data-nav-position="right"] { padding-right: 56px !important; }
+.preview-zone[data-nav-position="left"] .pv-nav-preview  { left: 4px !important; top: 50% !important; transform: translateY(-50%) !important; flex-direction: column !important; padding: 6px 4px !important; }
+.preview-zone[data-nav-position="right"] .pv-nav-preview { right: 4px !important; top: 50% !important; transform: translateY(-50%) !important; flex-direction: column !important; padding: 6px 4px !important; }
+.preview-zone[data-nav-position="left"] .pv-input-bar-zone,
+.preview-zone[data-nav-position="right"] .pv-input-bar-zone {
+  left: 10px !important; right: 10px !important;
+}
+
+/* ─── ۳) آواتار — بدون ریپ ─── */
+.main-top-avatar {
+  box-shadow: 0 0 0 1.5px var(--accent), 0 4px 14px -6px var(--accent) !important;
+  transition: transform .3s cubic-bezier(.34,1.4,.64,1) !important;
+  will-change: transform !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
+.main-top-avatar:hover {
+  transform: scale(1.06) translateZ(0) !important;
+  /* box-shadow عوض نمی‌شه */
+}
+.main-top-avatar img {
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-drag: none !important;
+}
+
+/* ─── ۴) اندازه‌گیری دکمه‌های نوار (برای اسلایدر) ─── */
+.bottom-nav-btn.measuring {
+  max-width: 170px !important;
+  padding: 0 14px 0 10px !important;
+  transition: none !important;
+}
+.bottom-nav-btn.measuring::after {
+  max-width: 110px !important;
+  opacity: 1 !important;
+  margin-right: 8px !important;
+  transition: none !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.measuring,
+[data-nav-position="right"] .bottom-nav-btn.measuring {
+  max-width: 56px !important;
+  height: 62px !important;
+  max-height: 62px !important;
+  padding: 5px 3px !important;
+  flex-direction: column !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.measuring::after,
+[data-nav-position="right"] .bottom-nav-btn.measuring::after {
+  max-width: 44px !important;
+  opacity: 1 !important;
+  margin-top: 1px !important;
+  margin-right: 0 !important;
+}
+
+/* ─── ۵) اسلایدر نوار — آماده ─── */
+.nav-slider {
+  opacity: 0;
+  transition: none;
+  pointer-events: none;
+}
+.nav-slider.ready {
+  transition: left .42s cubic-bezier(.22,1,.36,1),
+              top .42s cubic-bezier(.22,1,.36,1),
+              width .4s cubic-bezier(.22,1,.36,1),
+              height .4s cubic-bezier(.22,1,.36,1),
+              border-radius .3s,
+              opacity .2s !important;
+}
+.nav-slider.visible { opacity: 1; }
+.nav-slider.grow { animation: sliderGrow .55s cubic-bezier(.34,1.4,.64,1) both; }
+@keyframes sliderGrow {
+  0%   { transform: scale(.35); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
