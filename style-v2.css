@@ -4459,3 +4459,66 @@
 .page-title-bar > .main-top-avatar:not(:first-child) {
   display: none !important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   PATCH v30
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── رنگ متن دکمه فعال نوار ── */
+.bottom-nav-btn.active:not(.nav-btn-chat),
+.bottom-nav-btn.active:not(.nav-btn-chat)::after {
+  color: #fff !important;
+}
+.bottom-nav-btn.active:not(.nav-btn-chat) svg {
+  stroke: #fff !important;
+  color: #fff !important;
+}
+
+/* ── هماهنگ‌سازی زمان انیمیشن دکمه با اسلایدر ── */
+.bottom-nav-btn,
+.nav-collapse-tab {
+  transition:
+    background .3s cubic-bezier(.22,1,.36,1),
+    color .25s,
+    padding .38s cubic-bezier(.22,1,.36,1),
+    max-width .38s cubic-bezier(.22,1,.36,1),
+    border-color .3s,
+    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
+}
+
+/* ── اندازه‌گیری دکمه مطابق با حالت active ── */
+[data-nav-position] .bottom-nav-btn.measuring {
+  max-width: 155px !important;
+  padding: 0 14px 0 10px !important;
+  transition: none !important;
+}
+[data-nav-position] .bottom-nav-btn.measuring::after {
+  max-width: 110px !important;
+  opacity: 1 !important;
+  margin: 0 6px 0 0 !important;
+  transition: none !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.measuring,
+[data-nav-position="right"] .bottom-nav-btn.measuring {
+  max-width: 56px !important;
+  min-width: 56px !important;
+  height: 62px !important;
+  max-height: 62px !important;
+  padding: 5px 3px !important;
+  flex-direction: column !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.measuring::after,
+[data-nav-position="right"] .bottom-nav-btn.measuring::after {
+  max-width: 44px !important;
+  margin: 1px 0 0 0 !important;
+}
+
+/* ── مسدودسازی دائمی نمونه‌های تکراری ── */
+.chat-header > .main-top-avatar ~ .main-top-avatar,
+.chat-header > .main-top-icon-btn ~ .main-top-icon-btn,
+.planner-hero > .main-top-avatar ~ .main-top-avatar,
+.page-title-bar > .main-top-avatar ~ .main-top-avatar,
+.chat-header > .header-left-actions ~ .header-left-actions,
+.planner-hero > .header-left-actions ~ .header-left-actions,
+.page-title-bar > .header-left-actions ~ .header-left-actions {
+  display: none !important;
+}
