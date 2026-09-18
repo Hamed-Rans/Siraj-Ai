@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v33 Final) */
+/* Siraj v2.0 — planner-v2.js (v34 Final) */
 (function(){
   'use strict';
 
@@ -35,9 +35,7 @@
     var LEVEL_LABELS = {beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته'};
     var VIEW_LABELS  = {chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'انجمن', tools:'دستیار'};
 
-    /* ═══════════════════════════════════════════════════════════════
-       DAILY CONTENT POOLS
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── DAILY POOLS ─── */
     var DAILY_POEMS = [
       {text:'وَمَا نَيْلُ الْمَطَالِبِ بِالتَّمَنِّي ۞ وَلَكِنْ تُؤْخَذُ الدُّنْيَا غِلَابَا', by:'أحمد شوقي', meaning:'به آرزو کردن به هدف نمی‌رسی، بلکه دنیا با غلبه و تلاش به دست میاد.'},
       {text:'وَمَنْ يَتَصَبَّرْ يَجِدْ خَيْراً بِصَبْرِهِ ۞ وَمَنْ يَتَعَجَّلْ يَجْنِ غَيْرَ مَا يَشْتَهي', by:'متنبی', meaning:'هر کس شکیبایی کنه، با صبرش خیر می‌بینه؛ هر کس عجله کنه، چیزی جز آرزوش به دست نمیاره.'},
@@ -77,128 +75,76 @@
       {text:'اسم تفضیل بر وزن «أفعَل» و اسم مبالغه بر وزن «فَعّال».'}
     ];
 
-    /* ─── helpers ─── */
-    function _hashStr(s){
-      var h=0;
-      for(var i=0;i<s.length;i++){ h=((h<<5)-h)+s.charCodeAt(i); h=h&h; }
-      return Math.abs(h);
-    }
-
-    /* ★ تک آیتم چرخشی روزانه */
+    function _hashStr(s){var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h=h&h;}return Math.abs(h);}
     function getTodayItem(dateKey){
       var seed=_hashStr(dateKey);
-      var mode = seed % 3; /* 0=بیت، 1=سه کلمه، 2=قاعده */
+      var mode=seed%3;
       if(mode===0){
-        var p=DAILY_POEMS[seed % DAILY_POEMS.length];
-        return {
-          type:'بیت',
-          badge:'📖 بیت و معنی امروز',
-          text:p.text, by:p.by, meaning:p.meaning,
-          isAr:true
-        };
+        var p=DAILY_POEMS[seed%DAILY_POEMS.length];
+        return {type:'بیت',badge:'📖 بیت و معنی امروز',text:p.text,by:p.by,meaning:p.meaning,isAr:true};
       } else if(mode===1){
         var words=[];
-        for(var i=0;i<3;i++){
-          words.push(DAILY_WORDS[(seed+i) % DAILY_WORDS.length].text);
-        }
-        return {
-          type:'کلمه',
-          badge:'📚 سه کلمه امروز',
-          words:words,
-          text:words.join(' | ')
-        };
+        for(var i=0;i<3;i++) words.push(DAILY_WORDS[(seed+i)%DAILY_WORDS.length].text);
+        return {type:'کلمه',badge:'📚 سه کلمه امروز',words:words,text:words.join(' | ')};
       } else {
-        var r=DAILY_RULES[seed % DAILY_RULES.length];
-        return {
-          type:'قواعد',
-          badge:'✏️ قاعده امروز',
-          text:r.text
-        };
+        var r=DAILY_RULES[seed%DAILY_RULES.length];
+        return {type:'قواعد',badge:'✏️ قاعده امروز',text:r.text};
       }
     }
-
-    /* ─── state ─── */
-    function loadDailyState(){
-      try{ return JSON.parse(localStorage.getItem(DAILY_STATE_KEY)||'{}'); }catch(e){ return {}; }
-    }
-    function saveDailyState(s){
-      try{ localStorage.setItem(DAILY_STATE_KEY,JSON.stringify(s)); }catch(e){}
-    }
-    function setItemState(dateKey, state){
-      /* state: 'learned' | 'learned-review' | 'practice' | null (حذف) */
+    function loadDailyState(){ try{return JSON.parse(localStorage.getItem(DAILY_STATE_KEY)||'{}');}catch(e){return{};} }
+    function saveDailyState(s){ try{localStorage.setItem(DAILY_STATE_KEY,JSON.stringify(s));}catch(e){} }
+    function setItemState(dateKey,state){
       var s=loadDailyState();
-      if(state===null){ delete s[dateKey]; }
-      else { s[dateKey]=state; }
+      if(state===null) delete s[dateKey];
+      else s[dateKey]=state;
       saveDailyState(s);
     }
     function getItemState(dateKey){
       var s=loadDailyState();
-      return s[dateKey] || null;
+      return s[dateKey]||null;
     }
     function getAllLearned(){
-      var s=loadDailyState();
-      var out=[];
+      var s=loadDailyState(); var out=[];
       Object.keys(s).sort().reverse().forEach(function(dk){
         if(s[dk]==='learned'||s[dk]==='learned-review'){
           var it=getTodayItem(dk);
-          if(it) out.push({dateKey:dk, item:it, state:s[dk]});
+          if(it) out.push({dateKey:dk,item:it,state:s[dk]});
         }
       });
       return out;
     }
     function getAllPractice(){
-      var s=loadDailyState();
-      var out=[];
+      var s=loadDailyState(); var out=[];
       Object.keys(s).sort().reverse().forEach(function(dk){
         if(s[dk]==='practice'){
           var it=getTodayItem(dk);
-          if(it) out.push({dateKey:dk, item:it, state:s[dk]});
+          if(it) out.push({dateKey:dk,item:it,state:s[dk]});
         }
       });
       return out;
     }
 
     /* ─── utilities ─── */
-    function toFa(n){
-      var fa=['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
-      return String(n).replace(/\d/g,function(d){return fa[+d];});
-    }
-    function formatMinutes(mins){
-      mins=Math.max(0,Math.round(mins));
-      if(mins<60) return toFa(mins)+' دقیقه';
-      var h=Math.floor(mins/60),m=mins%60;
-      if(m===0) return toFa(h)+' ساعت';
-      return toFa(h)+' ساعت و '+toFa(m)+' دقیقه';
-    }
-    function formatTimer(mins){
-      mins=Math.max(0,Math.round(mins));
-      var h=Math.floor(mins/60),m=mins%60;
-      return toFa(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'));
-    }
-    function esc(s){
-      return String(s||'').replace(/[&<>"']/g,function(c){
-        return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-      });
-    }
-    function getUserLevel(){ try{ return localStorage.getItem(LEVEL_KEY)||'beginner'; }catch(e){ return 'beginner'; } }
-    function setUserLevel(l){ try{ localStorage.setItem(LEVEL_KEY,l); }catch(e){} }
-    function getDefaultView(){ try{ return localStorage.getItem(DEFAULT_VIEW_KEY)||'chat'; }catch(e){ return 'chat'; } }
-    function setDefaultView(v){ try{ localStorage.setItem(DEFAULT_VIEW_KEY,v); }catch(e){} }
-
+    function toFa(n){var fa=['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];return String(n).replace(/\d/g,function(d){return fa[+d];});}
+    function formatMinutes(mins){mins=Math.max(0,Math.round(mins));if(mins<60)return toFa(mins)+' دقیقه';var h=Math.floor(mins/60),m=mins%60;if(m===0)return toFa(h)+' ساعت';return toFa(h)+' ساعت و '+toFa(m)+' دقیقه';}
+    function formatTimer(mins){mins=Math.max(0,Math.round(mins));var h=Math.floor(mins/60),m=mins%60;return toFa(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'));}
+    function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    function getUserLevel(){try{return localStorage.getItem(LEVEL_KEY)||'beginner';}catch(e){return 'beginner';}}
+    function setUserLevel(l){try{localStorage.setItem(LEVEL_KEY,l);}catch(e){}}
+    function getDefaultView(){try{return localStorage.getItem(DEFAULT_VIEW_KEY)||'chat';}catch(e){return 'chat';}}
+    function setDefaultView(v){try{localStorage.setItem(DEFAULT_VIEW_KEY,v);}catch(e){}}
     function getBaseURL(){
-      try{ if(typeof APP_CONFIG!=='undefined'&&APP_CONFIG&&APP_CONFIG.baseURL) return APP_CONFIG.baseURL; }catch(e){}
-      try{ if(window.APP_CONFIG&&window.APP_CONFIG.baseURL) return window.APP_CONFIG.baseURL; }catch(e){}
+      try{if(typeof APP_CONFIG!=='undefined'&&APP_CONFIG&&APP_CONFIG.baseURL)return APP_CONFIG.baseURL;}catch(e){}
+      try{if(window.APP_CONFIG&&window.APP_CONFIG.baseURL)return window.APP_CONFIG.baseURL;}catch(e){}
       return '/api/chat';
     }
     function getModel(){
-      try{ if(typeof settings!=='undefined'&&settings&&settings.model) return settings.model; }catch(e){}
-      try{ if(window.settings&&window.settings.model) return window.settings.model; }catch(e){}
+      try{if(typeof settings!=='undefined'&&settings&&settings.model)return settings.model;}catch(e){}
+      try{if(window.settings&&window.settings.model)return window.settings.model;}catch(e){}
       return 'gemini-2.5-flash';
     }
-    function getProfile(){
-      try{ return JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}'); }catch(e){ return {}; }
-    }
-    function saveProfile(p){ try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(p)); }catch(e){} }
+    function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}');}catch(e){return{};}}
+    function saveProfile(p){try{localStorage.setItem(PROFILE_KEY,JSON.stringify(p));}catch(e){}}
     function profilePrompt(){
       var p=getProfile();
       if(!p.name&&!p.bio) return '';
@@ -208,29 +154,19 @@
       out+='• سطح عربیش: '+LEVEL_LABELS[getUserLevel()]+'\n';
       return out;
     }
-
-    /* ─── reminders ─── */
-    function loadReminders(){ try{ return JSON.parse(localStorage.getItem(REMINDER_KEY)||'{}'); }catch(e){ return {}; } }
-    function saveReminders(r){ try{ localStorage.setItem(REMINDER_KEY,JSON.stringify(r)); }catch(e){} }
-    function getDayReminders(k){ return loadReminders()[k]||[]; }
-    function setDayReminders(k,list){
-      var r=loadReminders();
-      if(list.length) r[k]=list; else delete r[k];
-      saveReminders(r);
-    }
-
-    /* ─── time until end of day ─── */
+    function loadReminders(){try{return JSON.parse(localStorage.getItem(REMINDER_KEY)||'{}');}catch(e){return{};}}
+    function saveReminders(r){try{localStorage.setItem(REMINDER_KEY,JSON.stringify(r));}catch(e){}}
+    function getDayReminders(k){return loadReminders()[k]||[];}
+    function setDayReminders(k,list){var r=loadReminders();if(list.length)r[k]=list;else delete r[k];saveReminders(r);}
     function timeUntilEndOfDay(){
       var now=new Date();
-      var end=new Date();
-      end.setHours(23,59,59,999);
+      var end=new Date(); end.setHours(23,59,59,999);
       var ms=end-now;
       var h=Math.floor(ms/3600000);
       var m=Math.floor((ms%3600000)/60000);
-      return {h:h, m:m, text: h>0 ? toFa(h)+' ساعت و '+toFa(m)+' دقیقه' : toFa(m)+' دقیقه'};
+      return {h:h,m:m,text:h>0?toFa(h)+' ساعت و '+toFa(m)+' دقیقه':toFa(m)+' دقیقه'};
     }
 
-    /* ─── Iranian events ─── */
     var IRAN_EVENTS = {
       '01-01':'نوروز','01-02':'عید نوروز','01-03':'عید نوروز','01-04':'عید نوروز',
       '01-06':'روز امید','01-12':'روز جمهوری اسلامی','01-13':'سیزده‌بدر',
@@ -257,10 +193,9 @@
         var faDay  =new Intl.DateTimeFormat('en-US-u-ca-persian',{day:'numeric'}).format(gDate);
         var key=String(faMonth).padStart(2,'0')+'-'+String(faDay).padStart(2,'0');
         return IRAN_EVENTS[key]||'';
-      }catch(e){ return ''; }
+      }catch(e){return '';}
     }
 
-    /* ─── date helpers ─── */
     function getTab(){
       var btn=document.querySelector('.panel-planner-tab.active');
       if(!btn) return 'daily';
@@ -268,89 +203,67 @@
       return m?m[1]:'daily';
     }
     function dateParts(d){
-      try{
-        return {
-          weekday:  d.toLocaleDateString('fa-IR',{weekday:'long'}),
-          dayNum:   d.toLocaleDateString('fa-IR',{day:'numeric'}),
-          monthName:d.toLocaleDateString('fa-IR',{month:'long'}),
-          yearNum:  d.toLocaleDateString('fa-IR',{year:'numeric'})
-        };
-      }catch(e){ return {weekday:'',dayNum:'',monthName:'',yearNum:''}; }
+      try{return{
+        weekday:d.toLocaleDateString('fa-IR',{weekday:'long'}),
+        dayNum:d.toLocaleDateString('fa-IR',{day:'numeric'}),
+        monthName:d.toLocaleDateString('fa-IR',{month:'long'}),
+        yearNum:d.toLocaleDateString('fa-IR',{year:'numeric'})
+      };}catch(e){return{weekday:'',dayNum:'',monthName:'',yearNum:''};}
     }
     function weekOfMonth(){
       var d=window.plannerDate||new Date();
       try{
         var day=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{day:'numeric'}).format(d));
         return Math.ceil(day/7);
-      }catch(e){ return 1; }
+      }catch(e){return 1;}
     }
     var ORD=['اول','دوم','سوم','چهارم','پنجم','ششم'];
-    function weekOrd(n){ n=Math.max(1,Math.min(6,n)); return ORD[n-1]; }
-    function weekStart(d){
-      var x=new Date(d); x.setHours(0,0,0,0);
-      var diff=(x.getDay()+1)%7;
-      x.setDate(x.getDate()-diff);
-      return x;
-    }
+    function weekOrd(n){n=Math.max(1,Math.min(6,n));return ORD[n-1];}
+    function weekStart(d){var x=new Date(d);x.setHours(0,0,0,0);var diff=(x.getDay()+1)%7;x.setDate(x.getDate()-diff);return x;}
     function myWeekDays(){
       var d=weekStart(window.plannerDate||new Date());
       var days=[];
       for(var i=0;i<7;i++){
         var dt=new Date(d); dt.setDate(d.getDate()+i);
-        days.push({
-          key:  window.dateKey(dt),
-          name: window.getDayName(dt),
-          date: dt.toLocaleDateString('fa-IR',{month:'short',day:'numeric'}),
-          dateObj: dt
-        });
+        days.push({key:window.dateKey(dt),name:window.getDayName(dt),date:dt.toLocaleDateString('fa-IR',{month:'short',day:'numeric'}),dateObj:dt});
       }
       return days;
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       POPUPS
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── popups ─── */
     function showPopup(emoji,title,text){
       var old=document.getElementById('sirajPopup'); if(old) old.remove();
-      var el=document.createElement('div');
-      el.id='sirajPopup'; el.className='siraj-popup-overlay';
+      var el=document.createElement('div');el.id='sirajPopup';el.className='siraj-popup-overlay';
       el.innerHTML='<div class="siraj-popup"><span class="siraj-popup-emoji">'+emoji+'</span><div class="siraj-popup-title">'+title+'</div><div class="siraj-popup-text">'+text+'</div><button class="siraj-popup-btn" id="sirajPopupOk">متوجه شدم</button></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){ el.classList.add('open'); });
-      el.querySelector('#sirajPopupOk').onclick=function(){
-        el.classList.remove('open');
-        setTimeout(function(){ el.remove(); },320);
-      };
+      requestAnimationFrame(function(){el.classList.add('open');});
+      el.querySelector('#sirajPopupOk').onclick=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
     }
     function showConfirm(emoji,title,text,onYes,yesText,noText){
       var old=document.getElementById('sirajConfirmPopup'); if(old) old.remove();
-      var el=document.createElement('div');
-      el.id='sirajConfirmPopup'; el.className='siraj-popup-overlay';
+      var el=document.createElement('div');el.id='sirajConfirmPopup';el.className='siraj-popup-overlay';
       el.innerHTML='<div class="siraj-popup"><span class="siraj-popup-emoji">'+emoji+'</span><div class="siraj-popup-title">'+title+'</div><div class="siraj-popup-text">'+text+'</div><div class="siraj-popup-actions"><button class="siraj-popup-btn secondary" id="sirajConfirmNo">'+(noText||'نه')+'</button><button class="siraj-popup-btn" id="sirajConfirmYes">'+(yesText||'بله')+'</button></div></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){ el.classList.add('open'); });
-      var close=function(){ el.classList.remove('open'); setTimeout(function(){ el.remove(); },320); };
-      el.querySelector('#sirajConfirmYes').onclick=function(){ close(); if(onYes) onYes(); };
+      requestAnimationFrame(function(){el.classList.add('open');});
+      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+      el.querySelector('#sirajConfirmYes').onclick=function(){close();if(onYes)onYes();};
       el.querySelector('#sirajConfirmNo').onclick=close;
     }
     function showTriple(emoji,title,text,opt1,opt2,opt3){
       var old=document.getElementById('sirajTriplePopup'); if(old) old.remove();
-      var el=document.createElement('div');
-      el.id='sirajTriplePopup'; el.className='siraj-popup-overlay';
+      var el=document.createElement('div');el.id='sirajTriplePopup';el.className='siraj-popup-overlay';
       el.innerHTML='<div class="siraj-popup"><span class="siraj-popup-emoji">'+emoji+'</span><div class="siraj-popup-title">'+title+'</div><div class="siraj-popup-text">'+text+'</div><div class="siraj-popup-actions-3"><button class="siraj-popup-btn secondary" id="sirajTriple1">'+opt1.text+'</button><button class="siraj-popup-btn secondary" id="sirajTriple2">'+opt2.text+'</button><button class="siraj-popup-btn" id="sirajTriple3">'+opt3.text+'</button></div></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){ el.classList.add('open'); });
-      var close=function(){ el.classList.remove('open'); setTimeout(function(){ el.remove(); },320); };
-      el.querySelector('#sirajTriple1').onclick=function(){ close(); if(opt1.onClick) opt1.onClick(); };
-      el.querySelector('#sirajTriple2').onclick=function(){ close(); if(opt2.onClick) opt2.onClick(); };
-      el.querySelector('#sirajTriple3').onclick=function(){ close(); if(opt3.onClick) opt3.onClick(); };
+      requestAnimationFrame(function(){el.classList.add('open');});
+      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+      el.querySelector('#sirajTriple1').onclick=function(){close();if(opt1.onClick)opt1.onClick();};
+      el.querySelector('#sirajTriple2').onclick=function(){close();if(opt2.onClick)opt2.onClick();};
+      el.querySelector('#sirajTriple3').onclick=function(){close();if(opt3.onClick)opt3.onClick();};
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       SELECT
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── select ─── */
     function makeSelect(id,value,options,label){
-      var cur=options.find(function(o){ return o.value===value; })||options[0];
+      var cur=options.find(function(o){return o.value===value;})||options[0];
       var items=options.map(function(o){
         return '<div class="siraj-select-item '+(o.value===value?'active':'')+'" data-value="'+o.value+'">'+(o.dot?'<span class="dot '+o.dot+'"></span>':'')+'<span>'+esc(o.label)+'</span></div>';
       }).join('');
@@ -363,7 +276,7 @@
         trig.onclick=function(e){
           e.stopPropagation();
           var was=sel.classList.contains('open');
-          document.querySelectorAll('.siraj-select.open').forEach(function(s){ s.classList.remove('open'); });
+          document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});
           if(!was) sel.classList.add('open');
         };
         sel.querySelectorAll('.siraj-select-item').forEach(function(item){
@@ -377,34 +290,29 @@
       });
     }
     document.addEventListener('click',function(){
-      document.querySelectorAll('.siraj-select.open').forEach(function(s){ s.classList.remove('open'); });
+      document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});
     });
 
-    /* ═══════════════════════════════════════════════════════════════
-       HERO smart update
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── smart update hero ─── */
     function smartUpdateHero(tab,direction){
       var c=document.querySelector('.phc-center'); if(!c) return;
       var d=new Date(window.plannerDate||new Date());
       var map={};
       if(tab==='daily'){
         var p=dateParts(d);
-        map.weekday=p.weekday; map.dayNum=p.dayNum;
-        map.monthName=p.monthName; map.yearNum=p.yearNum;
+        map.weekday=p.weekday;map.dayNum=p.dayNum;map.monthName=p.monthName;map.yearNum=p.yearNum;
       } else if(tab==='weekly'){
-        var days=myWeekDays();
-        var p2=dateParts(d);
-        map.monthName2=p2.monthName; map.yearNum2=p2.yearNum;
+        var days=myWeekDays();var p2=dateParts(d);
+        map.monthName2=p2.monthName;map.yearNum2=p2.yearNum;
         map.weekOrdinal='هفته '+weekOrd(weekOfMonth())+' ماه';
         map.weekRange='از '+days[0].date+' تا '+days[6].date;
       } else if(tab==='monthly'){
-        var p3=dateParts(d);
-        map.monthName3=p3.monthName; map.yearNum3=p3.yearNum;
+        var p3=dateParts(d);map.monthName3=p3.monthName;map.yearNum3=p3.yearNum;
         var pl=window.loadPlannerNew();
         var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
         var goals=(pl.months[mk]&&pl.months[mk].goals)||[];
-        var doneGoals=goals.filter(function(g){ return g.done; }).length;
-        map.monthStat=toFa(doneGoals)+' از '+toFa(goals.length)+' هدف این ماه انجام شده';
+        var dg=goals.filter(function(g){return g.done;}).length;
+        map.monthStat=toFa(dg)+' از '+toFa(goals.length)+' هدف این ماه انجام شده';
       } else if(tab==='yearly'){
         map.yearNum4=d.toLocaleDateString('fa-IR',{year:'numeric'});
       }
@@ -422,47 +330,43 @@
           el.textContent=nv;
           void el.offsetWidth;
           el.classList.add(isNext?'heroInFromLeft':'heroInFromRight');
-          setTimeout(function(){ el.classList.remove('heroInFromLeft','heroInFromRight'); },400);
+          setTimeout(function(){el.classList.remove('heroInFromLeft','heroInFromRight');},400);
         },220);
       });
-      var todayBadge=c.querySelector('.phc-today');
-      if(todayBadge){
-        var isTodayNow=window.dateKey(d)===window.dateKey(new Date());
-        if(isTodayNow){
-          if(todayBadge.style.display==='none'||!todayBadge.style.display){
-            todayBadge.style.display='';
-            todayBadge.classList.remove('phc-today-anim');
-            void todayBadge.offsetWidth;
-            todayBadge.classList.add('phc-today-anim');
+      var tb=c.querySelector('.phc-today');
+      if(tb){
+        var isT=window.dateKey(d)===window.dateKey(new Date());
+        if(isT){
+          if(tb.style.display==='none'||!tb.style.display){
+            tb.style.display='';
+            tb.classList.remove('phc-today-anim');
+            void tb.offsetWidth;
+            tb.classList.add('phc-today-anim');
           }
-        } else { todayBadge.style.display='none'; }
+        } else tb.style.display='none';
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       NAVIGATION
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── navigation ─── */
     function moveDate(dir,unit){
       var d=new Date(window.plannerDate||new Date());
-      if(unit==='day')   d.setDate(d.getDate()+dir);
-      else if(unit==='week')  d.setDate(d.getDate()+dir*7);
-      else if(unit==='month'){ d.setDate(1); d.setMonth(d.getMonth()+dir); }
-      else if(unit==='year')  d.setFullYear(d.getFullYear()+dir);
+      if(unit==='day') d.setDate(d.getDate()+dir);
+      else if(unit==='week') d.setDate(d.getDate()+dir*7);
+      else if(unit==='month'){d.setDate(1);d.setMonth(d.getMonth()+dir);}
+      else if(unit==='year') d.setFullYear(d.getFullYear()+dir);
       window.plannerDate=d;
       refreshBody(dir>0?'left':'right');
     }
-    window.__navDay   = function(d){ moveDate(d,'day'); };
-    window.__navWeek  = function(d){ moveDate(d,'week'); };
-    window.__navMonth = function(d){ moveDate(d,'month'); };
-    window.__navYear  = function(d){ moveDate(d,'year'); };
-    window.__goToday  = function(){ window.plannerDate=new Date(); refreshBody('left'); };
-    window.__goThisWeek  = window.__goToday;
-    window.__goThisMonth = window.__goToday;
-    window.__goThisYear  = window.__goToday;
+    window.__navDay=function(d){moveDate(d,'day');};
+    window.__navWeek=function(d){moveDate(d,'week');};
+    window.__navMonth=function(d){moveDate(d,'month');};
+    window.__navYear=function(d){moveDate(d,'year');};
+    window.__goToday=function(){window.plannerDate=new Date();refreshBody('left');};
+    window.__goThisWeek=window.__goToday;
+    window.__goThisMonth=window.__goToday;
+    window.__goThisYear=window.__goToday;
 
-    /* ═══════════════════════════════════════════════════════════════
-       REFRESH
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── refresh ─── */
     function refreshBody(direction){
       var pane=document.getElementById('plannerPane'); if(!pane) return;
       if(pane.dataset.animating==='1') return;
@@ -473,7 +377,7 @@
       if(isSameTab){
         smartUpdateHero(tab,dir);
         var body=pane.querySelector('.planner-body-content');
-        if(!body){ renderPane(tab); return; }
+        if(!body){renderPane(tab);return;}
         if(tab==='monthly'){
           var cal=pane.querySelector('.month-calendar');
           if(cal){
@@ -489,14 +393,14 @@
                 newCal.classList.remove('cal-in-from-left','cal-in-from-right');
                 void newCal.offsetWidth;
                 newCal.classList.add(inC);
-                setTimeout(function(){ newCal.classList.remove(inC); },420);
+                setTimeout(function(){newCal.classList.remove(inC);},420);
               }
             },220);
             return;
           }
         }
         var html='';
-        if(tab==='daily')       html=dailyContentHTML();
+        if(tab==='daily') html=dailyContentHTML();
         else if(tab==='weekly') html=weeklyContentHTML();
         else if(tab==='yearly') html=yearlyContentHTML();
         body.innerHTML=html;
@@ -510,23 +414,20 @@
       pane.dataset.animating='1';
       pane.style.pointerEvents='none';
       var html='';
-      if(tab==='daily')       html=viewDaily();
+      if(tab==='daily') html=viewDaily();
       else if(tab==='weekly') html=viewWeekly();
-      else if(tab==='monthly')html=viewMonthly();
+      else if(tab==='monthly') html=viewMonthly();
       else if(tab==='yearly') html=viewYearly();
       pane.innerHTML=html;
       bindPaneEvents(tab);
       if(tab==='weekly') setTimeout(setupWeekSummaryClicks,50);
-      setTimeout(function(){
-        pane.style.pointerEvents='';
-        delete pane.dataset.animating;
-      },50);
+      setTimeout(function(){pane.style.pointerEvents='';delete pane.dataset.animating;},50);
     }
     window.__refreshCurrentTab=refreshBody;
 
     window.switchPlannerTab=function(tab){
       _lastTab=tab;
-      document.querySelectorAll('.panel-planner-tab').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.panel-planner-tab').forEach(function(b){b.classList.remove('active');});
       var idx={daily:0,weekly:1,monthly:2,yearly:3}[tab];
       var btns=document.querySelectorAll('.panel-planner-tab');
       if(btns[idx]) btns[idx].classList.add('active');
@@ -540,37 +441,27 @@
       var pane=document.getElementById('plannerPane'); if(!pane) return;
       pane.innerHTML='';
       void pane.offsetWidth;
-      if(tab==='daily')       pane.innerHTML=viewDaily();
+      if(tab==='daily') pane.innerHTML=viewDaily();
       else if(tab==='weekly') pane.innerHTML=viewWeekly();
-      else if(tab==='monthly')pane.innerHTML=viewMonthly();
+      else if(tab==='monthly') pane.innerHTML=viewMonthly();
       else if(tab==='yearly') pane.innerHTML=viewYearly();
       bindPaneEvents(tab);
       if(tab==='weekly') setTimeout(setupWeekSummaryClicks,50);
       pane.dataset.lastTab=tab;
     }
-    window.renderPlannerPane=function(){ renderPane(getTab()); };
+    window.renderPlannerPane=function(){renderPane(getTab());};
 
     function bindPaneEvents(tab){
       var pane=document.getElementById('plannerPane'); if(!pane) return;
       if(tab==='daily'){
         bindSelects(pane,{
-          pNewTime:function(val,item){
-            var el=pane.querySelector('#pNewTime .siraj-select-value');
-            if(el) el.textContent=item.textContent.trim();
-            window.__pendingTime=val;
-          },
-          pNewPri:function(val,item){
-            var el=pane.querySelector('#pNewPri .siraj-select-value');
-            if(el) el.innerHTML=item.innerHTML;
-            window.__pendingPri=val;
-          }
+          pNewTime:function(val,item){var el=pane.querySelector('#pNewTime .siraj-select-value');if(el)el.textContent=item.textContent.trim();window.__pendingTime=val;},
+          pNewPri:function(val,item){var el=pane.querySelector('#pNewPri .siraj-select-value');if(el)el.innerHTML=item.innerHTML;window.__pendingPri=val;}
         });
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       HEROES
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── heroes ─── */
     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -579,7 +470,7 @@
       var monthKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
       if(!pl.months[monthKey]) pl.months[monthKey]={goals:[]};
       var goals=pl.months[monthKey].goals||[];
-      var goal=goals.length?(goals.find(function(g){ return !g.done; })||goals[0]):null;
+      var goal=goals.length?(goals.find(function(g){return !g.done;})||goals[0]):null;
       var p=dateParts(d);
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
@@ -611,12 +502,12 @@
       var monthKey=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
       if(!pl.months[monthKey]) pl.months[monthKey]={goals:[]};
       var goals=pl.months[monthKey].goals||[];
-      var doneGoals=goals.filter(function(g){ return g.done; }).length;
+      var dg=goals.filter(function(g){return g.done;}).length;
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
         +'<div class="phc-day"><span data-anim-key="monthName3">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum3">'+esc(p.yearNum)+'</span></div>'
-        +'<div class="phc-date" data-anim-key="monthStat">'+toFa(doneGoals)+' از '+toFa(goals.length)+' هدف این ماه انجام شده</div>'
+        +'<div class="phc-date" data-anim-key="monthStat">'+toFa(dg)+' از '+toFa(goals.length)+' هدف این ماه انجام شده</div>'
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
@@ -628,7 +519,7 @@
       if(!pl.years) pl.years={};
       if(!pl.years[y]) pl.years[y]={goals:[]};
       var goals=pl.years[y].goals||[];
-      var done=goals.filter(function(g){ return g.done; }).length;
+      var done=goals.filter(function(g){return g.done;}).length;
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
@@ -639,18 +530,15 @@
         +'</div>';
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       DAILY
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── daily ─── */
     function weekStatsHTML(){
-      var pl=window.loadPlannerNew();
-      var days=myWeekDays();
+      var pl=window.loadPlannerNew();var days=myWeekDays();
       var sm=0,dw=0,dwo=0;
       days.forEach(function(day){
         var dd=window.getDayData(pl,day.key);
         (dd.tasks||[]).forEach(function(tk){
           if(tk.done){
-            if(tk.studiedMinutes){ sm+=tk.studiedMinutes; dw++; } else dwo++;
+            if(tk.studiedMinutes){sm+=tk.studiedMinutes;dw++;}else dwo++;
           }
         });
       });
@@ -663,12 +551,12 @@
     }
     function getStreakDays(){
       var pl=window.loadPlannerNew();
-      var d=new Date(); d.setHours(0,0,0,0);
+      var d=new Date();d.setHours(0,0,0,0);
       var streak=0,isToday=true;
       for(var i=0;i<365;i++){
         var key=window.dateKey(d);
         var dd=window.getDayData(pl,key);
-        var hasDone=(dd.tasks||[]).some(function(tk){ return tk.done; });
+        var hasDone=(dd.tasks||[]).some(function(tk){return tk.done;});
         if(hasDone) streak++;
         else if(!isToday) break;
         isToday=false;
@@ -683,12 +571,10 @@
       return '<div class="daily-streak"><span class="ds-fire">🔥</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
     }
 
-    /* ★ تک کارت چرخشی روزانه */
     function dailyWordHTML(){
       var d=new Date(window.plannerDate||new Date());
       var dk=window.dateKey(d);
       var state=getItemState(dk);
-      /* اگه قبلا یاد گرفته یا practice شده، نمایش نده */
       if(state!==null) return '';
       var it=getTodayItem(dk);
       if(!it) return '';
@@ -698,10 +584,11 @@
         +'<div class="daily-card-actions">'
         +'<button class="daily-action-btn learn-yes" onclick="window.__dailyLearn(\'learned\')">✓ یاد گرفتم</button>'
         +'<button class="daily-action-btn learn-no" onclick="window.__dailyLearn(\'practice\')">✗ یاد نگرفتم</button>'
+        +'<button class="daily-action-btn learn-study" onclick="window.__dailyStudy()">🎯 مطالعه با سراج</button>'
         +'</div></div>';
       if(it.words){
         html+='<div class="daily-card-words">';
-        it.words.forEach(function(w, i){
+        it.words.forEach(function(w,i){
           html+='<div class="dcw-item"><span class="dcw-num">'+toFa(i+1)+'</span><span class="dcw-text">'+esc(w)+'</span></div>';
         });
         html+='</div>';
@@ -714,16 +601,13 @@
       return html;
     }
 
-    /* ★ فلوی «یاد گرفتم» و «یاد نگرفتم» */
     window.__dailyLearn=function(mode){
       var d=new Date(window.plannerDate||new Date());
       var dk=window.dateKey(d);
       var remain=timeUntilEndOfDay();
       if(mode==='learned'){
-        /* پاپ‌آپ با دو گزینه */
         var old=document.getElementById('sirajPopup'); if(old) old.remove();
-        var el=document.createElement('div');
-        el.id='sirajPopup'; el.className='siraj-popup-overlay';
+        var el=document.createElement('div');el.id='sirajPopup';el.className='siraj-popup-overlay';
         el.innerHTML='<div class="siraj-popup">'
           +'<span class="siraj-popup-emoji">🎉</span>'
           +'<div class="siraj-popup-title">آفرین!</div>'
@@ -733,60 +617,62 @@
           +'<button class="siraj-popup-btn" id="dLearnKeep">📚 بذار مرور کنم</button>'
           +'</div></div>';
         document.body.appendChild(el);
-        requestAnimationFrame(function(){ el.classList.add('open'); });
-        var close=function(){ el.classList.remove('open'); setTimeout(function(){ el.remove(); },320); };
+        requestAnimationFrame(function(){el.classList.add('open');});
+        var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
         el.querySelector('#dLearnDelete').onclick=function(){
           close();
-          setItemState(dk, null);
+          setItemState(dk,null);
           if(window.toast) window.toast('از یادگرفته‌ها حذف شد','info');
           refreshBody('left');
           if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
         };
         el.querySelector('#dLearnKeep').onclick=function(){
           close();
-          setItemState(dk, 'learned-review');
+          setItemState(dk,'learned-review');
           if(window.toast) window.toast('به یادگرفته‌ها اضافه شد ✓','success');
           refreshBody('left');
           if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
         };
       } else {
-        /* یاد نگرفتم */
-        setItemState(dk, 'practice');
+        setItemState(dk,'practice');
         var old2=document.getElementById('sirajPopup'); if(old2) old2.remove();
-        var el2=document.createElement('div');
-        el2.id='sirajPopup'; el2.className='siraj-popup-overlay';
+        var el2=document.createElement('div');el2.id='sirajPopup';el2.className='siraj-popup-overlay';
         el2.innerHTML='<div class="siraj-popup">'
           +'<span class="siraj-popup-emoji">💪</span>'
           +'<div class="siraj-popup-title">نگران نباش</div>'
           +'<div class="siraj-popup-text">هنوز '+remain.text+' تا آخر امروز مونده — هنوز می‌تونی یادش بگیری 🌱<br><br>توی «کتابخانه یادگیری» هست برات.</div>'
-          +'<button class="siraj-popup-btn" id="dPracOk">باشه</button>'
-          +'</div>';
+          +'<button class="siraj-popup-btn" id="dPracOk">باشه</button></div>';
         document.body.appendChild(el2);
-        requestAnimationFrame(function(){ el2.classList.add('open'); });
-        el2.querySelector('#dPracOk').onclick=function(){
-          el2.classList.remove('open');
-          setTimeout(function(){ el2.remove(); },320);
-        };
+        requestAnimationFrame(function(){el2.classList.add('open');});
+        el2.querySelector('#dPracOk').onclick=function(){el2.classList.remove('open');setTimeout(function(){el2.remove();},320);};
         refreshBody('left');
         if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
       }
     };
 
+    window.__dailyStudy=function(){
+      var d=new Date(window.plannerDate||new Date());
+      var dk=window.dateKey(d);
+      var it=getTodayItem(dk);
+      if(!it) return;
+      var title='مرور '+it.type+' امروز';
+      window.__openStudy(title);
+    };
+
     function showConfetti(){
-      var old=document.getElementById('sirajConfetti'); if(old) old.remove();
-      var el=document.createElement('div');
-      el.id='sirajConfetti'; el.className='confetti-wrap';
+      var old=document.getElementById('sirajConfetti');if(old) old.remove();
+      var el=document.createElement('div');el.id='sirajConfetti';el.className='confetti-wrap';
       var colors=['#F59E0B','#10B981','#3B82F6','#EF4444','#A855F7','#EC4899','#FBBF24','#06B6D4'];
       var html='';
       for(var i=0;i<80;i++){
-        var l=Math.random()*100, de=Math.random()*0.6, du=2.2+Math.random()*1.6;
+        var l=Math.random()*100,de=Math.random()*0.6,du=2.2+Math.random()*1.6;
         var c=colors[Math.floor(Math.random()*colors.length)];
         var sz=6+Math.random()*8;
         html+='<span class="confetti-piece" style="left:'+l+'%;background:'+c+';width:'+sz+'px;height:'+sz+'px;animation-delay:'+de+'s;animation-duration:'+du+'s"></span>';
       }
       el.innerHTML=html;
       document.body.appendChild(el);
-      setTimeout(function(){ if(el.parentNode) el.remove(); },4200);
+      setTimeout(function(){if(el.parentNode)el.remove();},4200);
     }
     function maybeCelebrate(dayKey){
       dayKey=dayKey||window.dateKey(window.plannerDate||new Date());
@@ -794,9 +680,9 @@
       var dd=window.getDayData(pl,dayKey);
       var tasks=(dd.tasks||[]);
       if(tasks.length===0) return;
-      if(tasks.every(function(t){ return t.done; })){
+      if(tasks.every(function(t){return t.done;})){
         showConfetti();
-        setTimeout(function(){ showPopup('🎉','آفرین!','همه‌ی کارهای امروز رو انجام دادی! 🏆'); },400);
+        setTimeout(function(){showPopup('🎉','آفرین!','همه‌ی کارهای امروز رو انجام دادی! 🏆');},400);
       }
     }
 
@@ -806,8 +692,8 @@
       var key=window.dateKey(d);
       var dd=window.getDayData(pl,key);
       var allTasks=(dd.tasks||[]);
-      var active=allTasks.filter(function(tk){ return !tk.done; });
-      var done=allTasks.filter(function(tk){ return tk.done; });
+      var active=allTasks.filter(function(tk){return !tk.done;});
+      var done=allTasks.filter(function(tk){return tk.done;});
 
       var activeHTML = active.length===0
         ? '<div class="tasks-empty"><span class="emoji">📝</span>کاری در جریان نداری<br>از کادر بالا کار جدید اضافه کن</div>'
@@ -841,13 +727,8 @@
           return {value:h+':00 تا '+(h+1)+':00',label:'ساعت '+h+' تا '+(h+1)};
         })
       );
-      var po=[
-        {value:'high',label:'بالا',dot:'red'},
-        {value:'med', label:'متوسط',dot:'yellow'},
-        {value:'low', label:'پایین',dot:'green'}
-      ];
-      window.__pendingTime='';
-      window.__pendingPri='med';
+      var po=[{value:'high',label:'بالا',dot:'red'},{value:'med',label:'متوسط',dot:'yellow'},{value:'low',label:'پایین',dot:'green'}];
+      window.__pendingTime='';window.__pendingPri='med';
 
       return streakHTML()+dailyWordHTML()+weekStatsHTML()
         +'<div class="task-add-form">'
@@ -858,18 +739,15 @@
         +'<div class="tasks-list-title">🎯 در جریان:</div>'+activeHTML
         +'<div class="tasks-list-title done-title">✅ انجام شده ('+toFa(done.length)+'):</div>'+doneHTML;
     }
-    function viewDaily(){ return heroDaily()+'<div class="planner-body-content">'+dailyContentHTML()+'</div>'; }
+    function viewDaily(){return heroDaily()+'<div class="planner-body-content">'+dailyContentHTML()+'</div>';}
 
-    /* ═══════════════════════════════════════════════════════════════
-       LIBRARY OVERLAY (کتابخانه یادگیری)
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── library ─── */
     var _libCat='all';
     var _libState='learned';
 
     window.__openLibrary=function(){
-      var old=document.getElementById('learnLibrary'); if(old) old.remove();
-      var el=document.createElement('div');
-      el.id='learnLibrary'; el.className='learn-library-overlay';
+      var old=document.getElementById('learnLibrary');if(old) old.remove();
+      var el=document.createElement('div');el.id='learnLibrary';el.className='learn-library-overlay';
       el.innerHTML='<div class="learn-library-box">'
         +'<div class="learn-library-header">'
         +'<div class="learn-library-title"><span>📚</span> کتابخانه یادگیری</div>'
@@ -890,20 +768,27 @@
         +'</div>'
         +'</div>'
         +'<div class="learn-library-list" id="libList"></div>'
+        +'<button class="lib-study-btn" id="libStudyBtn"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg> ورود به حالت مطالعه</button>'
         +'</div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){ el.classList.add('open'); });
+      requestAnimationFrame(function(){el.classList.add('open');});
       el.querySelector('#libClose').onclick=closeLibrary;
-      el.addEventListener('click',function(e){ if(e.target===el) closeLibrary(); });
+      el.addEventListener('click',function(e){if(e.target===el) closeLibrary();});
+      el.querySelector('#libStudyBtn').onclick=function(){
+        var catName = _libCat==='all'?'همه':_libCat;
+        var stateName = _libState==='learned'?'یادگرفته‌ها':'تمرین‌ها';
+        closeLibrary();
+        window.__openStudy('مرور '+stateName+' — '+catName);
+      };
       el.querySelectorAll('.ll-filter').forEach(function(b){
         b.onclick=function(){
           if(b.dataset.cat){
             _libCat=b.dataset.cat;
-            el.querySelectorAll('.ll-filter[data-cat]').forEach(function(x){ x.classList.remove('active'); });
+            el.querySelectorAll('.ll-filter[data-cat]').forEach(function(x){x.classList.remove('active');});
             b.classList.add('active');
           } else if(b.dataset.state){
             _libState=b.dataset.state;
-            el.querySelectorAll('.ll-filter[data-state]').forEach(function(x){ x.classList.remove('active'); });
+            el.querySelectorAll('.ll-filter[data-state]').forEach(function(x){x.classList.remove('active');});
             b.classList.add('active');
           }
           renderLibList();
@@ -913,99 +798,87 @@
     };
 
     function closeLibrary(){
-      var el=document.getElementById('learnLibrary'); if(!el) return;
+      var el=document.getElementById('learnLibrary');if(!el) return;
       el.classList.remove('open');
-      setTimeout(function(){ el.remove(); },320);
+      setTimeout(function(){el.remove();},320);
     }
 
     function renderLibList(){
-      var listEl=document.getElementById('libList'); if(!listEl) return;
-      var items = _libState==='learned' ? getAllLearned() : getAllPractice();
-      /* فیلتر دسته */
-      if(_libCat!=='all'){
-        items = items.filter(function(x){ return x.item.type === _libCat; });
-      }
+      var listEl=document.getElementById('libList');if(!listEl) return;
+      var items = _libState==='learned'?getAllLearned():getAllPractice();
+      if(_libCat!=='all') items=items.filter(function(x){return x.item.type===_libCat;});
       if(items.length===0){
-        var label = _libState==='learned' ? 'یادگرفته' : 'یادنگرفته';
-        listEl.innerHTML='<div class="ll-empty"><span class="emoji">' + (_libState==='learned'?'🎓':'📚') + '</span>هنوز چیزی تو بخش '+label+' نداری</div>';
+        var label = _libState==='learned'?'یادگرفته':'یادنگرفته';
+        listEl.innerHTML='<div class="ll-empty"><span class="emoji">'+(_libState==='learned'?'🎓':'📚')+'</span>هنوز چیزی تو بخش '+label+' نداری</div>';
         return;
       }
-      listEl.innerHTML = items.map(function(x){
-        var it = x.item;
-        var dObj = new Date(x.dateKey);
-        var faDate = toFa(dObj.toLocaleDateString('fa-IR',{day:'numeric',month:'long'}));
-        var text = it.words ? it.words.join(' | ') : it.text;
-        var html = '<div class="ll-item">'
+      listEl.innerHTML=items.map(function(x){
+        var it=x.item;
+        var dObj=new Date(x.dateKey);
+        var faDate=toFa(dObj.toLocaleDateString('fa-IR',{day:'numeric',month:'long'}));
+        var html='<div class="ll-item">'
           +'<div class="ll-item-head">'
           +'<span class="ll-item-type">'+esc(it.type)+'</span>'
           +'<span class="ll-item-date">'+faDate+'</span>'
           +'</div>';
         if(it.words){
-          html += '<div class="ll-item-text">' + it.words.map(function(w,i){
-            return toFa(i+1)+'. '+esc(w);
-          }).join('<br>') + '</div>';
+          html+='<div class="ll-item-text">'+it.words.map(function(w,i){return toFa(i+1)+'. '+esc(w);}).join('<br>')+'</div>';
         } else {
-          html += '<div class="ll-item-text'+(it.isAr?' ar':'')+'">'+esc(it.text)+'</div>';
-          if(it.meaning) html += '<div class="ll-item-by" style="font-style:normal">📝 '+esc(it.meaning)+'</div>';
-          if(it.by) html += '<div class="ll-item-by">— '+esc(it.by)+'</div>';
+          html+='<div class="ll-item-text'+(it.isAr?' ar':'')+'">'+esc(it.text)+'</div>';
+          if(it.meaning) html+='<div class="ll-item-by" style="font-style:normal">📝 '+esc(it.meaning)+'</div>';
+          if(it.by) html+='<div class="ll-item-by">— '+esc(it.by)+'</div>';
         }
-        /* دکمه‌ها */
-        html += '<div class="ll-item-actions">';
+        html+='<div class="ll-item-actions">';
         if(_libState==='practice'){
-          html += '<button class="ll-action ask-siraj" onclick="window.__askSiraj(\''+x.dateKey+'\')"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>رفع مشکل با سراج</button>';
-          html += '<button class="ll-action mark-learned" onclick="window.__markLearned(\''+x.dateKey+'\')">✓ یاد گرفتم</button>';
+          html+='<button class="ll-action ask-siraj" onclick="window.__askSiraj(\''+x.dateKey+'\')"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>رفع مشکل با سراج</button>';
+          html+='<button class="ll-action mark-learned" onclick="window.__markLearned(\''+x.dateKey+'\')">✓ یاد گرفتم</button>';
         } else {
-          html += '<button class="ll-action ask-siraj" onclick="window.__askSiraj(\''+x.dateKey+'\')"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>مرور با سراج</button>';
+          html+='<button class="ll-action ask-siraj" onclick="window.__askSiraj(\''+x.dateKey+'\')"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>مرور با سراج</button>';
         }
-        html += '<button class="ll-action delete" onclick="window.__deleteLearned(\''+x.dateKey+'\')">🗑️ حذف</button>';
-        html += '</div>';
-        html += '</div>';
+        html+='<button class="ll-action delete" onclick="window.__deleteLearned(\''+x.dateKey+'\')">🗑️ حذف</button>';
+        html+='</div></div>';
         return html;
       }).join('');
     }
 
     window.__markLearned=function(dk){
-      setItemState(dk, 'learned-review');
+      setItemState(dk,'learned-review');
       if(window.toast) window.toast('✓ به یادگرفته‌ها اضافه شد','success');
       renderLibList();
       if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
     };
     window.__deleteLearned=function(dk){
-      setItemState(dk, null);
+      setItemState(dk,null);
       if(window.toast) window.toast('حذف شد','info');
       renderLibList();
       if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
       refreshBody('left');
     };
-
-    /* ★ رفع مشکل با سراج — می‌ره به chat با متن آماده */
     window.__askSiraj=function(dk){
       var it=getTodayItem(dk);
       if(!it) return;
       closeLibrary();
       var promptText;
       if(it.words){
-        promptText = 'این کلمات رو برام توضیح بده و کمکم کن یادشون بگیرم:\n\n' + it.words.map(function(w,i){ return (i+1)+'. '+w; }).join('\n');
+        promptText='این کلمات رو برام توضیح بده و کمکم کن یادشون بگیرم:\n\n'+it.words.map(function(w,i){return (i+1)+'. '+w;}).join('\n');
       } else {
-        promptText = 'درباره این ' + it.type + ' کمکم کن یاد بگیرم:\n\n' + it.text;
-        if(it.meaning) promptText += '\n\nمعنی: ' + it.meaning;
-        if(it.by) promptText += '\n— ' + it.by;
-        promptText += '\n\nبرام توضیح بده و با چند مثال کمکم کن یادش بگیرم.';
+        promptText='درباره این '+it.type+' کمکم کن یاد بگیرم:\n\n'+it.text;
+        if(it.meaning) promptText+='\n\nمعنی: '+it.meaning;
+        if(it.by) promptText+='\n— '+it.by;
+        promptText+='\n\nبرام توضیح بده و با چند مثال کمکم کن یادش بگیرم.';
       }
-      if(typeof window.switchView === 'function') window.switchView('chat');
+      if(typeof window.switchView==='function') window.switchView('chat');
       setTimeout(function(){
-        var q = document.getElementById('q');
+        var q=document.getElementById('q');
         if(q){
-          q.value = promptText;
-          if(typeof window.handleInput === 'function') window.handleInput();
+          q.value=promptText;
+          if(typeof window.handleInput==='function') window.handleInput();
           q.focus();
         }
-      }, 500);
+      },500);
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       TASK OPS
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── task ops ─── */
     window.__taskClick=function(e,dayKey,idx){
       e.stopPropagation();
       var pl=window.loadPlannerNew();
@@ -1036,15 +909,13 @@
         return;
       }
       showTriple('✅','کار انجام شد!','زمانش ثبت نشد ⏱️ چطور ثبت کنیم؟',
-        {text:'همینطور ثبت',onClick:function(){
-          task.done=true; window.savePlanner(pl); maybeCelebrate(key); refreshBody('left');
-        }},
+        {text:'همینطور ثبت',onClick:function(){task.done=true;window.savePlanner(pl);maybeCelebrate(key);refreshBody('left');}},
         {text:'دقیقه بزن',onClick:function(){
           var m=prompt('چند دقیقه؟','25');
-          if(m===null){ refreshBody('left'); return; }
-          m=parseInt(m); if(isNaN(m)||m<1) m=25;
-          task.done=true; task.studiedMinutes=m;
-          window.savePlanner(pl); maybeCelebrate(key); refreshBody('left');
+          if(m===null){refreshBody('left');return;}
+          m=parseInt(m);if(isNaN(m)||m<1) m=25;
+          task.done=true;task.studiedMinutes=m;
+          window.savePlanner(pl);maybeCelebrate(key);refreshBody('left');
         }},
         {text:'بریم مطالعه 🎯',onClick:function(){
           window.__studyTask=task.title;
@@ -1056,20 +927,19 @@
     };
 
     window.__dAddTask=function(){
-      var inp=document.getElementById('pNewTitle'); if(!inp) return;
-      var t=inp.value.trim(); if(!t) return;
+      var inp=document.getElementById('pNewTitle');if(!inp) return;
+      var t=inp.value.trim();if(!t) return;
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
       var dd=window.getDayData(pl,window.dateKey(d));
       dd.tasks.push({
         id:'tk_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
-        title:t, time:window.__pendingTime||'', priority:window.__pendingPri||'med',
-        done:false, createdAt:Date.now()
+        title:t,time:window.__pendingTime||'',priority:window.__pendingPri||'med',
+        done:false,createdAt:Date.now()
       });
       window.savePlanner(pl);
       inp.value='';
-      window.__pendingTime='';
-      window.__pendingPri='med';
+      window.__pendingTime='';window.__pendingPri='med';
       refreshBody('left');
     };
     window.__dDeleteTask=function(i){
@@ -1082,12 +952,10 @@
       refreshBody('left');
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       WEEKLY
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── weekly ─── */
     function buildWeekCell(day,hk,pl){
       var dd=window.getDayData(pl,day.key);
-      var ht=(dd.tasks||[]).filter(function(tk){ return tk.time&&tk.time.indexOf(hk+':00')===0; });
+      var ht=(dd.tasks||[]).filter(function(tk){return tk.time&&tk.time.indexOf(hk+':00')===0;});
       var ft=ht[0];
       if(ft){
         var isDone=ft.done;
@@ -1121,7 +989,7 @@
         var cells=days.map(function(day){
           var isT=day.key===tk;
           var dd=window.getDayData(pl,day.key);
-          var hasT=(dd.tasks||[]).some(function(x){ return x.time&&x.time.indexOf(hk+':00')===0; });
+          var hasT=(dd.tasks||[]).some(function(x){return x.time&&x.time.indexOf(hk+':00')===0;});
           return '<td class="task-cell'+(isT?' today':'')+(hasT?' has-task':'')+'">'+buildWeekCell(day,hk,pl)+'</td>';
         }).join('');
         return '<tr><td class="hour-cell">'+toFa(hk)+':۰۰</td>'+cells+'</tr>';
@@ -1129,7 +997,7 @@
       var tt=0,dc=0;
       days.forEach(function(day){
         var dd=window.getDayData(pl,day.key);
-        (dd.tasks||[]).forEach(function(x){ tt++; if(x.done) dc++; });
+        (dd.tasks||[]).forEach(function(x){tt++;if(x.done)dc++;});
       });
       var pct=tt?Math.round((dc/tt)*100):0;
       var sh='<div class="week-summary">'
@@ -1139,58 +1007,52 @@
         +'</div>';
       return '<div class="week-grid-wrap"><table class="week-table"><thead>'+hr+'</thead><tbody>'+br+'</tbody></table></div>'+sh;
     }
-    function viewWeekly(){ return heroWeekly()+'<div class="planner-body-content">'+weeklyContentHTML()+'</div>'; }
+    function viewWeekly(){return heroWeekly()+'<div class="planner-body-content">'+weeklyContentHTML()+'</div>';}
 
     window.__wInputChange=function(inp){
-      var w=inp.closest('.week-cell-edit'); if(!w) return;
-      var b=w.querySelector('.wc-btns'); if(!b) return;
-      if(inp.value.trim().length>0) b.classList.add('visible');
-      else b.classList.remove('visible');
+      var w=inp.closest('.week-cell-edit');if(!w) return;
+      var b=w.querySelector('.wc-btns');if(!b) return;
+      if(inp.value.trim().length>0) b.classList.add('visible');else b.classList.remove('visible');
     };
     window.__wQuickCancel=function(btn){
-      var w=btn.closest('.week-cell-edit'); if(!w) return;
-      var i=w.querySelector('.wc-input'); if(i){ i.value=''; i.blur(); }
-      var b=w.querySelector('.wc-btns'); if(b) b.classList.remove('visible');
+      var w=btn.closest('.week-cell-edit');if(!w) return;
+      var i=w.querySelector('.wc-input');if(i){i.value='';i.blur();}
+      var b=w.querySelector('.wc-btns');if(b)b.classList.remove('visible');
     };
     window.__wQuickSave=function(inp){
       if(!inp) return;
-      var v=(inp.value||'').trim(); if(!v) return;
-      var w=inp.closest('.week-cell-edit'); if(!w) return;
-      var dk=w.getAttribute('data-day');
-      var hk=w.getAttribute('data-hour');
+      var v=(inp.value||'').trim();if(!v) return;
+      var w=inp.closest('.week-cell-edit');if(!w) return;
+      var dk=w.getAttribute('data-day'),hk=w.getAttribute('data-hour');
       var pl=window.loadPlannerNew();
       var dd=window.getDayData(pl,dk);
       if(!dd.tasks) dd.tasks=[];
       dd.tasks.push({
         id:'tk_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
-        title:v, time:hk+':00 تا '+(parseInt(hk)+1)+':00',
-        priority:'med', done:false, createdAt:Date.now()
+        title:v,time:hk+':00 تا '+(parseInt(hk)+1)+':00',
+        priority:'med',done:false,createdAt:Date.now()
       });
       window.savePlanner(pl);
       var td=w.closest('td');
       if(td){
         var days=myWeekDays();
-        var day=days.find(function(x){ return x.key===dk; });
-        if(day){ td.classList.add('has-task'); td.innerHTML=buildWeekCell(day,hk,pl); }
+        var day=days.find(function(x){return x.key===dk;});
+        if(day){td.classList.add('has-task');td.innerHTML=buildWeekCell(day,hk,pl);}
       }
       updateWeekStats();
     };
     function updateWeekStats(){
-      var sw=document.querySelector('.week-summary'); if(!sw) return;
+      var sw=document.querySelector('.week-summary');if(!sw) return;
       var pl=window.loadPlannerNew();
       var days=myWeekDays();
       var tt=0,dc=0;
       days.forEach(function(day){
         var dd=window.getDayData(pl,day.key);
-        (dd.tasks||[]).forEach(function(x){ tt++; if(x.done) dc++; });
+        (dd.tasks||[]).forEach(function(x){tt++;if(x.done)dc++;});
       });
       var pct=tt?Math.round((dc/tt)*100):0;
       var nums=sw.querySelectorAll('.ws-num');
-      if(nums.length>=3){
-        nums[0].textContent=toFa(tt);
-        nums[1].textContent=toFa(dc);
-        nums[2].textContent=toFa(pct)+'%';
-      }
+      if(nums.length>=3){nums[0].textContent=toFa(tt);nums[1].textContent=toFa(dc);nums[2].textContent=toFa(pct)+'%';}
     }
     function setupWeekSummaryClicks(){
       document.querySelectorAll('.week-summary .ws-box').forEach(function(box){
@@ -1200,12 +1062,12 @@
           if(s==='total') cells=document.querySelectorAll('.week-cell-task');
           else if(s==='done') cells=document.querySelectorAll('.week-cell-task.done');
           else cells=document.querySelectorAll('.week-cell-task:not(.done)');
-          if(!cells.length){ if(window.toast) window.toast('چیزی برای نمایش نیست','info'); return; }
+          if(!cells.length){if(window.toast) window.toast('چیزی برای نمایش نیست','info');return;}
           cells.forEach(function(c){
             c.classList.remove('highlight');
             void c.offsetWidth;
             c.classList.add('highlight');
-            setTimeout(function(){ c.classList.remove('highlight'); },1700);
+            setTimeout(function(){c.classList.remove('highlight');},1700);
           });
           var first=cells[0];
           if(first&&first.scrollIntoView) first.scrollIntoView({behavior:'smooth',block:'center'});
@@ -1215,23 +1077,21 @@
     window.__wTickTask=function(dk,ti){
       var pl=window.loadPlannerNew();
       var dd=window.getDayData(pl,dk);
-      var idx=(dd.tasks||[]).findIndex(function(x){ return x.id===ti; });
+      var idx=(dd.tasks||[]).findIndex(function(x){return x.id===ti;});
       if(idx<0) return;
       var t=dd.tasks[idx];
       if(t.done){
-        t.done=false; delete t.studiedMinutes;
-        window.savePlanner(pl); refreshBody('left'); return;
+        t.done=false;delete t.studiedMinutes;
+        window.savePlanner(pl);refreshBody('left');return;
       }
       showTriple('✅','کار انجام شد!','چطور ثبت کنیم؟',
-        {text:'همینطور ثبت',onClick:function(){
-          t.done=true; window.savePlanner(pl); maybeCelebrate(dk); refreshBody('left');
-        }},
+        {text:'همینطور ثبت',onClick:function(){t.done=true;window.savePlanner(pl);maybeCelebrate(dk);refreshBody('left');}},
         {text:'دقیقه بزن',onClick:function(){
           var m=prompt('چند دقیقه؟','25');
-          if(m===null){ refreshBody('left'); return; }
-          m=parseInt(m); if(isNaN(m)||m<1) m=25;
-          t.done=true; t.studiedMinutes=m;
-          window.savePlanner(pl); maybeCelebrate(dk); refreshBody('left');
+          if(m===null){refreshBody('left');return;}
+          m=parseInt(m);if(isNaN(m)||m<1) m=25;
+          t.done=true;t.studiedMinutes=m;
+          window.savePlanner(pl);maybeCelebrate(dk);refreshBody('left');
         }},
         {text:'بریم مطالعه 🎯',onClick:function(){
           window.__studyTask=t.title;
@@ -1244,27 +1104,25 @@
     window.__wDeleteTask=function(dk,ti){
       var pl=window.loadPlannerNew();
       var dd=window.getDayData(pl,dk);
-      var idx=(dd.tasks||[]).findIndex(function(x){ return x.id===ti; });
+      var idx=(dd.tasks||[]).findIndex(function(x){return x.id===ti;});
       if(idx<0) return;
       dd.tasks.splice(idx,1);
-      window.savePlanner(pl); refreshBody('left');
+      window.savePlanner(pl);refreshBody('left');
     };
     window.__wEditTask=function(dk,ti){
       var pl=window.loadPlannerNew();
       var dd=window.getDayData(pl,dk);
-      var idx=(dd.tasks||[]).findIndex(function(x){ return x.id===ti; });
+      var idx=(dd.tasks||[]).findIndex(function(x){return x.id===ti;});
       if(idx<0) return;
       var c=dd.tasks[idx];
       var nt=prompt('عنوان جدید:',c.title);
       if(nt===null) return;
-      nt=nt.trim(); if(!nt) return;
+      nt=nt.trim();if(!nt) return;
       dd.tasks[idx].title=nt;
-      window.savePlanner(pl); refreshBody('left');
+      window.savePlanner(pl);refreshBody('left');
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       MONTHLY
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── monthly ─── */
     function monthlyContentHTML(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -1285,7 +1143,7 @@
         var k=window.dateKey(dt);
         var isT=k===tk,isS=k===sk,isF=dt.getDay()===5;
         var dData=window.getDayData(pl,k);
-        var dC=(dData.tasks||[]).filter(function(x){ return x.done; }).length;
+        var dC=(dData.tasks||[]).filter(function(x){return x.done;}).length;
         var total=(dData.tasks||[]).length;
         var rems=getDayReminders(k);
         var evt=getIranianEvent(k);
@@ -1318,7 +1176,7 @@
           +'<button class="mg-del" onclick="window.__deleteMonthGoalLocal(\''+mk+'\','+i+')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>'
           +'</div>';
       }).join('')+'</div>';
-      var dg=goals.filter(function(g){ return g.done; }).length;
+      var dg=goals.filter(function(g){return g.done;}).length;
       return '<div class="monthly-layout">'
         +'<div class="monthly-side"><div class="month-goals compact">'
         +'<div class="month-goals-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg><span>اهداف این ماه</span>'+(goals.length>0?'<span class="mg-counter">'+toFa(dg)+'/'+toFa(goals.length)+'</span>':'')+'</div>'
@@ -1333,11 +1191,11 @@
         +'<span class="cl-item occ"><svg class="cl-icon-svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>مناسبت</span>'
         +'</div>'
         +'<div class="month-calendar">'
-        +'<div class="cal-weekdays">'+wd.map(function(w){ return '<div class="cal-weekday">'+w+'</div>'; }).join('')+'</div>'
+        +'<div class="cal-weekdays">'+wd.map(function(w){return '<div class="cal-weekday">'+w+'</div>';}).join('')+'</div>'
         +'<div class="cal-grid">'+cells.join('')+'</div>'
         +'</div></div></div>';
     }
-    function viewMonthly(){ return heroMonthly()+'<div class="planner-body-content">'+monthlyContentHTML()+'</div>'; }
+    function viewMonthly(){return heroMonthly()+'<div class="planner-body-content">'+monthlyContentHTML()+'</div>';}
 
     window.__calDayClick=function(day){
       var pl=window.loadPlannerNew();
@@ -1345,7 +1203,7 @@
       var k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
       var dd=window.getDayData(pl,k);
       var tasks=dd.tasks||[];
-      var dC=tasks.filter(function(t){ return t.done; }).length;
+      var dC=tasks.filter(function(t){return t.done;}).length;
       var rems=getDayReminders(k);
       var ne=getIranianEvent(k);
       var tl=tasks.length?tasks.map(function(t){
@@ -1358,9 +1216,8 @@
           +'<button class="cal-rem-del" onclick="window.__delReminder(\''+k+'\','+i+')">✕</button>'
           +'</div>';
       }).join(''):'';
-      var old=document.getElementById('calDayPopup'); if(old) old.remove();
-      var el=document.createElement('div');
-      el.id='calDayPopup'; el.className='siraj-popup-overlay';
+      var old=document.getElementById('calDayPopup');if(old) old.remove();
+      var el=document.createElement('div');el.id='calDayPopup';el.className='siraj-popup-overlay';
       el.innerHTML='<div class="siraj-popup cal-popup-wide">'
         +'<div class="siraj-popup-title">📅 '+toFa(day)+' '+d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'})+'</div>'
         +(ne?'<div class="cal-national-badge">🇮🇷 '+esc(ne)+'</div>':'')
@@ -1378,10 +1235,10 @@
         +'<button class="siraj-popup-btn" id="calPopupGo">برو به این روز</button>'
         +'</div></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){ el.classList.add('open'); });
-      var close=function(){ el.classList.remove('open'); setTimeout(function(){ el.remove(); },320); };
+      requestAnimationFrame(function(){el.classList.add('open');});
+      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
       el.querySelector('#calPopupClose').onclick=close;
-      el.querySelector('#calPopupGo').onclick=function(){ close(); selectMonthDay(day); };
+      el.querySelector('#calPopupGo').onclick=function(){close();selectMonthDay(day);};
     };
 
     function selectMonthDay(day){
@@ -1392,7 +1249,7 @@
       var inp=document.getElementById('newRemText');
       var tInp=document.getElementById('newRemTime');
       if(!inp) return;
-      var v=inp.value.trim(); if(!v) return;
+      var v=inp.value.trim();if(!v) return;
       var list=getDayReminders(key);
       list.push({text:v,time:(tInp?tInp.value.trim():''),done:false});
       setDayReminders(key,list);
@@ -1411,9 +1268,7 @@
       window.__calDayClick(parseInt(key.split('-')[2],10));
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       YEARLY
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── yearly ─── */
     function yearlyContentHTML(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -1430,7 +1285,7 @@
           +'<button class="mg-del" onclick="window.__deleteYearGoalLocal('+y+','+i+')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>'
           +'</div>';
       }).join('')+'</div>';
-      var dg=goals.filter(function(g){ return g.done; }).length;
+      var dg=goals.filter(function(g){return g.done;}).length;
       var months=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
       var cmi=-1;
       try{
@@ -1440,7 +1295,7 @@
       var mc=months.map(function(mName,idx){
         var mk=y+'-'+String(idx+1).padStart(2,'0');
         var mg=(pl.months[mk]&&pl.months[mk].goals)||[];
-        var md=mg.filter(function(g){ return g.done; }).length;
+        var md=mg.filter(function(g){return g.done;}).length;
         var pct=mg.length?Math.round((md/mg.length)*100):0;
         var isC=idx===cmi;
         return '<div class="year-month-card'+(isC?' current':'')+'" onclick="window.__goToMonth('+idx+')">'
@@ -1460,18 +1315,18 @@
         +'<div class="year-months-grid">'+mc+'</div>'
         +'</div></div></div>';
     }
-    function viewYearly(){ return heroYearly()+'<div class="planner-body-content">'+yearlyContentHTML()+'</div>'; }
+    function viewYearly(){return heroYearly()+'<div class="planner-body-content">'+yearlyContentHTML()+'</div>';}
 
     window.__goToMonth=function(mi){
       var base=new Date(window.plannerDate||new Date());
       var faYear=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(base));
-      var ref=new Date(faYear+621, 2, 15);
+      var ref=new Date(faYear+621,2,15);
       for(var i=0;i<40;i++){
         try{
           var fY=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(ref));
           var fM=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(ref));
           var fD=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{day:'numeric'}).format(ref));
-          if(fY===faYear && fM===1 && fD===1) break;
+          if(fY===faYear&&fM===1&&fD===1) break;
         }catch(e){}
         ref.setDate(ref.getDate()+1);
       }
@@ -1479,7 +1334,7 @@
         try{
           var fY2=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(ref));
           var fM2=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{month:'numeric'}).format(ref));
-          if(fY2===faYear && fM2===(mi+1)){
+          if(fY2===faYear&&fM2===(mi+1)){
             window.plannerDate=new Date(ref);
             window.switchPlannerTab('monthly');
             return;
@@ -1494,53 +1349,48 @@
       if(!pl.months[mk]||!pl.months[mk].goals[i]) return;
       pl.months[mk].goals[i].done=!!cb.checked;
       window.savePlanner(pl);
-      var p=cb.closest('.month-goal'); if(p) p.classList.toggle('done',!!cb.checked);
+      var p=cb.closest('.month-goal');if(p)p.classList.toggle('done',!!cb.checked);
       var t=document.querySelector('.month-goals-title .mg-counter');
-      if(t){
-        var gs=pl.months[mk].goals;
-        t.textContent=toFa(gs.filter(function(g){ return g.done; }).length)+'/'+toFa(gs.length);
-      }
+      if(t){var gs=pl.months[mk].goals;t.textContent=toFa(gs.filter(function(g){return g.done;}).length)+'/'+toFa(gs.length);}
     };
     window.__deleteMonthGoalLocal=function(mk,i){
       var pl=window.loadPlannerNew();
       if(!pl.months[mk]||!pl.months[mk].goals) return;
       pl.months[mk].goals.splice(i,1);
-      window.savePlanner(pl); refreshBody('left');
+      window.savePlanner(pl);refreshBody('left');
     };
     window.__toggleYearGoalLocal=function(y,i,cb){
       var pl=window.loadPlannerNew();
       if(!pl.years||!pl.years[y]||!pl.years[y].goals[i]) return;
       pl.years[y].goals[i].done=!!cb.checked;
       window.savePlanner(pl);
-      var p=cb.closest('.month-goal'); if(p) p.classList.toggle('done',!!cb.checked);
+      var p=cb.closest('.month-goal');if(p)p.classList.toggle('done',!!cb.checked);
     };
     window.__deleteYearGoalLocal=function(y,i){
       var pl=window.loadPlannerNew();
       if(!pl.years||!pl.years[y]||!pl.years[y].goals) return;
       pl.years[y].goals.splice(i,1);
-      window.savePlanner(pl); refreshBody('left');
+      window.savePlanner(pl);refreshBody('left');
     };
     window.addMonthGoal=function(mk){
-      var inp=document.getElementById('newGoalInput'); if(!inp) return;
-      var v=inp.value.trim(); if(!v) return;
+      var inp=document.getElementById('newGoalInput');if(!inp) return;
+      var v=inp.value.trim();if(!v) return;
       var pl=window.loadPlannerNew();
       if(!pl.months[mk]) pl.months[mk]={goals:[]};
       pl.months[mk].goals.push({text:v,done:false});
-      window.savePlanner(pl); inp.value=''; refreshBody('left');
+      window.savePlanner(pl);inp.value='';refreshBody('left');
     };
     window.addYearGoal=function(y){
-      var inp=document.getElementById('newYearGoalInput'); if(!inp) return;
-      var v=inp.value.trim(); if(!v) return;
+      var inp=document.getElementById('newYearGoalInput');if(!inp) return;
+      var v=inp.value.trim();if(!v) return;
       var pl=window.loadPlannerNew();
       if(!pl.years) pl.years={};
       if(!pl.years[y]) pl.years[y]={goals:[]};
       pl.years[y].goals.push({text:v,done:false});
-      window.savePlanner(pl); inp.value=''; refreshBody('left');
+      window.savePlanner(pl);inp.value='';refreshBody('left');
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       PANEL — right side
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── panel ─── */
     window.renderPanelForPlanner=function(){
       var p=getProfile();
       var te=document.getElementById('panelTitleText');
@@ -1549,37 +1399,29 @@
       if(se) se.textContent=p.name?('سلام '+p.name+'، خوشومدی 👋'):'سلام، خوشومدی 👋';
       var tab=getTab();
       var tabs=[
-        {id:'daily',  label:'روزانه',  icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'},
-        {id:'weekly', label:'هفتگی',  icon:'<path d="M3 21h18"/><path d="M5 21v-6M9 21v-10M13 21v-7M17 21v-13M21 21v-4"/>'},
-        {id:'monthly',label:'ماهانه', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},
-        {id:'yearly', label:'سالانه', icon:'<path d="M3 20h18"/><path d="m7 20 5-14 5 14"/>'}
+        {id:'daily',label:'روزانه',icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'},
+        {id:'weekly',label:'هفتگی',icon:'<path d="M3 21h18"/><path d="M5 21v-6M9 21v-10M13 21v-7M17 21v-13M21 21v-4"/>'},
+        {id:'monthly',label:'ماهانه',icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},
+        {id:'yearly',label:'سالانه',icon:'<path d="M3 20h18"/><path d="m7 20 5-14 5 14"/>'}
       ];
       var th='<div class="panel-planner-tabs">'+tabs.map(function(t){
         return '<button class="panel-planner-tab'+(t.id===tab?' active':'')+'" onclick="window.switchPlannerTab(\''+t.id+'\')"><svg viewBox="0 0 24 24">'+t.icon+'</svg><span>'+t.label+'</span></button>';
       }).join('')+'</div>';
+
       var learned=getAllLearned();
       var practice=getAllPractice();
-      var lc=learned.length, pc=practice.length;
-      var pc2=document.getElementById('panelContent');
-      if(!pc2) return;
+      var lc=learned.length,pc=practice.length;
+
+      var pc2=document.getElementById('panelContent');if(!pc2) return;
       pc2.innerHTML=th
         +'<button onclick="window.__openStudy()" class="panel-study-btn" style="margin-top:14px">'
         +'<svg viewBox="0 0 24 24" style="width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>'
         +'<div style="text-align:right;flex:1"><div>حالت مطالعه</div><div style="font-size:11px;opacity:.85;font-weight:600;margin-top:3px">با تایمر و تمرکز</div></div>'
         +'</button>'
-        +'<div class="panel-card library-open-card" onclick="window.__openLibrary()">'
-        +'<div class="library-open-inner">'
-        +'<div class="library-open-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>'
-        +'<div class="library-open-info">'
-        +'<div class="library-open-title">📚 کتابخانه یادگیری</div>'
-        +'<div class="library-open-sub">یادگرفته‌ها و تمرین‌ها</div>'
-        +'</div>'
-        +'<div class="library-open-count">'
-        +(lc>0?'<span class="loc-pill learned">'+toFa(lc)+' ✓</span>':'')
-        +(pc>0?'<span class="loc-pill practice">'+toFa(pc)+' 📚</span>':'')
-        +'</div>'
-        +'</div>'
-        +'</div>'
+        +'<button onclick="window.__openLibrary()" class="panel-library-btn">'
+        +'<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'
+        +'<div style="text-align:right;flex:1"><div>کتابخانه یادگیری</div><div style="font-size:11px;opacity:.85;font-weight:600;margin-top:3px">یادگرفته‌ها و تمرین‌ها'+(lc+pc>0?' · '+toFa(lc+pc)+' آیتم':'')+'</div></div>'
+        +'</button>'
         +'<div class="panel-card guide-card" style="margin-top:10px">'
         +'<div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>راهنما</span></div>'
         +'<div class="guide-list">'
@@ -1590,23 +1432,21 @@
         +'</div></div>';
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       SOUND
-       ═══════════════════════════════════════════════════════════════ */
-    var currentAudio=null, masterVolume=0.4;
+    /* ─── sound ─── */
+    var currentAudio=null,masterVolume=0.4;
     function stopAudio(){
       if(currentAudio){
-        try{ currentAudio.pause(); currentAudio.currentTime=0; }catch(e){}
-        try{ currentAudio.src=''; }catch(e){}
+        try{currentAudio.pause();currentAudio.currentTime=0;}catch(e){}
+        try{currentAudio.src='';}catch(e){}
         currentAudio=null;
       }
     }
     function playSound(t){
       stopAudio();
-      var u=SOUND_FILES[t]; if(!u) return;
+      var u=SOUND_FILES[t];if(!u) return;
       var a=new Audio(u);
-      a.loop=true; a.volume=masterVolume; a.preload='auto';
-      a.play().catch(function(err){ console.warn('[Sound]',err.message); });
+      a.loop=true;a.volume=masterVolume;a.preload='auto';
+      a.play().catch(function(err){console.warn('[Sound]',err.message);});
       currentAudio=a;
     }
     function setMasterVolume(v){
@@ -1614,22 +1454,20 @@
       if(currentAudio) currentAudio.volume=masterVolume;
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       STUDY CHAT
-       ═══════════════════════════════════════════════════════════════ */
-    function loadStudyChat(){ try{ return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY)||'[]'); }catch(e){ return []; } }
-    function saveStudyChat(){ try{ sessionStorage.setItem(STUDY_CHAT_KEY,JSON.stringify(studyChatHistory)); }catch(e){} }
-    function clearStudyChat(){ studyChatHistory=[]; try{ sessionStorage.removeItem(STUDY_CHAT_KEY); }catch(e){} }
+    /* ─── study ─── */
+    function loadStudyChat(){try{return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY)||'[]');}catch(e){return[];}}
+    function saveStudyChat(){try{sessionStorage.setItem(STUDY_CHAT_KEY,JSON.stringify(studyChatHistory));}catch(e){}}
+    function clearStudyChat(){studyChatHistory=[];try{sessionStorage.removeItem(STUDY_CHAT_KEY);}catch(e){}}
     var studyChatHistory=loadStudyChat();
-    var studyTimer=null, studySeconds=0, studyRunning=false, studyPaused=false, studyTotalMinutes=0;
+    var studyTimer=null,studySeconds=0,studyRunning=false,studyPaused=false,studyTotalMinutes=0;
 
     function buildStudyOverlay(){
-      var old=document.getElementById('studyOverlay'); if(old) old.remove();
+      var old=document.getElementById('studyOverlay');if(old) old.remove();
       var pl=window.loadPlannerNew();
       var tk=window.dateKey(new Date());
       var ddT=window.getDayData(pl,tk);
-      var aTasks=(ddT.tasks||[]).filter(function(x){ return !x.done; }).map(function(x){
-        return {id:x.id, title:x.title, dayKey:tk};
+      var aTasks=(ddT.tasks||[]).filter(function(x){return !x.done;}).map(function(x){
+        return {id:x.id,title:x.title,dayKey:tk};
       });
       var hT=aTasks.length>0;
       var tf=hT
@@ -1637,8 +1475,9 @@
             return '<div class="siraj-select-item" data-value="'+esc(x.title)+'" data-id="'+esc(x.id)+'" data-day="'+esc(x.dayKey)+'"><span>'+esc(x.title)+'</span></div>';
           }).join('')+'</div></div>'
         : '<div class="study-empty-box">📝 کاری برای امروز نداری</div>';
+
       var el=document.createElement('div');
-      el.id='studyOverlay'; el.className='study-overlay';
+      el.id='studyOverlay';el.className='study-overlay';
       el.innerHTML=
         '<div id="studySetup" class="study-setup">'
         +'<div class="study-icon"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg></div>'
@@ -1664,23 +1503,23 @@
         +'<div class="study-mode-badge">🎯 در حال تمرکز</div>'
         +'<div class="study-timer" id="studyTimer"><span class="study-digit" data-k="m1">۰</span><span class="study-digit" data-k="m2">۰</span><span class="study-colon">:</span><span class="study-digit" data-k="s1">۰</span><span class="study-digit" data-k="s2">۰</span></div>'
         +'<div class="study-task" id="studyTaskName">—</div>'
-        +'<div id="studyNowPlaying" style="display:none"><span class="study-now-playing">در حال پخش</span></div>'
         +'<div class="study-sub" id="studyRunningSub">تا اتمام تایمر نمیتونی خارج شی 💪</div>'
         +'<div class="study-actions">'
         +'<button class="study-btn pause-mode" id="studyPauseBtn"><span id="studyPauseLabel">توقف</span></button>'
-        +'<button class="study-btn" id="studyChatBtn">مطالعه با سراج</button>'
+        +'<button class="study-btn" id="studyChatBtn">دستیار هوشمند</button>'
         +'<button class="study-btn finish-mode" id="studyFinishBtn" disabled>پایان و ثبت</button>'
         +'<button class="study-btn secondary" id="studyExitBtn">خروج</button>'
         +'</div></div>';
       document.body.appendChild(el);
+
       var picker=el.querySelector('#studyTimePicker');
       var numEl=el.querySelector('#studyTimeNum');
       var pv=25,dSY=0,dSV=25,dg=false;
-      function setPV(v){ pv=Math.max(1,Math.min(180,Math.round(v))); numEl.textContent=formatTimer(pv); }
+      function setPV(v){pv=Math.max(1,Math.min(180,Math.round(v)));numEl.textContent=formatTimer(pv);}
       setPV(25);
-      function pd(e){ dg=true; dSY=(e.touches?e.touches[0].clientY:e.clientY); dSV=pv; picker.classList.add('dragging'); e.preventDefault(); }
-      function pm(e){ if(!dg) return; var y=(e.touches?e.touches[0].clientY:e.clientY); setPV(dSV+Math.round((dSY-y)/6)); }
-      function pu(){ if(!dg) return; dg=false; picker.classList.remove('dragging'); }
+      function pd(e){dg=true;dSY=(e.touches?e.touches[0].clientY:e.clientY);dSV=pv;picker.classList.add('dragging');e.preventDefault();}
+      function pm(e){if(!dg) return;var y=(e.touches?e.touches[0].clientY:e.clientY);setPV(dSV+Math.round((dSY-y)/6));}
+      function pu(){if(!dg) return;dg=false;picker.classList.remove('dragging');}
       picker.addEventListener('mousedown',pd);
       picker.addEventListener('touchstart',pd,{passive:false});
       document.addEventListener('mousemove',pm);
@@ -1688,39 +1527,39 @@
       document.addEventListener('touchmove',pm,{passive:false});
       document.addEventListener('touchend',pu);
       _studyDragHandlers={move:pm,up:pu};
-      window.__studyMinutesGetter=function(){ return pv; };
+      window.__studyMinutesGetter=function(){return pv;};
+
       el.querySelectorAll('.study-sound-btn').forEach(function(b){
         b.onclick=function(){
           var s=b.getAttribute('data-sound');
-          el.querySelectorAll('.study-sound-btn').forEach(function(x){ x.classList.remove('on'); });
-          if(!s){ stopAudio(); b.classList.add('on'); return; }
-          b.classList.add('on');
-          playSound(s);
+          el.querySelectorAll('.study-sound-btn').forEach(function(x){x.classList.remove('on');});
+          if(!s){stopAudio();b.classList.add('on');return;}
+          b.classList.add('on');playSound(s);
         };
       });
       var vol=el.querySelector('#studyVolume');
-      if(vol){ vol.oninput=function(){ var pct=this.value; this.style.setProperty('--vp',pct+'%'); setMasterVolume(pct/100); }; }
+      if(vol){vol.oninput=function(){var pct=this.value;this.style.setProperty('--vp',pct+'%');setMasterVolume(pct/100);};}
       var tSel=el.querySelector('#studyTaskSelect');
       if(tSel){
         var tr=tSel.querySelector('.siraj-select-trigger');
         tr.onclick=function(e){
           e.stopPropagation();
           var w=tSel.classList.contains('open');
-          document.querySelectorAll('.siraj-select.open').forEach(function(s){ s.classList.remove('open'); });
+          document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});
           if(!w) tSel.classList.add('open');
         };
         tSel.querySelectorAll('.siraj-select-item').forEach(function(it){
           it.onclick=function(e){
             e.stopPropagation();
-            var v=it.getAttribute('data-value'), id=it.getAttribute('data-id'), dk=it.getAttribute('data-day');
-            window.__studyTask=v; window.__studyTaskSourceId=id||null; window.__studyTaskSourceDay=dk||null;
+            var v=it.getAttribute('data-value'),id=it.getAttribute('data-id'),dk=it.getAttribute('data-day');
+            window.__studyTask=v;window.__studyTaskSourceId=id||null;window.__studyTaskSourceDay=dk||null;
             tSel.querySelector('.siraj-select-value').textContent=v;
             tSel.classList.remove('open');
           };
         });
       }
       el.querySelector('#studyStartBtn').onclick=startStudy;
-      el.querySelector('#studyCancelBtn').onclick=function(){ stopAudio(); closeStudy(); };
+      el.querySelector('#studyCancelBtn').onclick=function(){stopAudio();closeStudy();};
       el.querySelector('#studyExitBtn').onclick=exitStudyConfirm;
       el.querySelector('#studyChatBtn').onclick=toggleStudyChat;
       el.querySelector('#studyPauseBtn').onclick=toggleStudyPause;
@@ -1728,29 +1567,29 @@
     }
 
     function startStudy(){
-      var o=document.getElementById('studyOverlay'); if(!o) return;
+      var o=document.getElementById('studyOverlay');if(!o) return;
       var t=window.__studyTask||'';
       var m=window.__studyMinutesGetter?window.__studyMinutesGetter():25;
       if(!m||m<1) m=25;
       if(m>180) m=180;
-      studySeconds=m*60; studyTotalMinutes=m;
-      studyRunning=true; studyPaused=false;
+      studySeconds=m*60;studyTotalMinutes=m;
+      studyRunning=true;studyPaused=false;
       o.querySelector('#studySetup').style.display='none';
       o.querySelector('#studyRunning').style.display='flex';
       o.querySelector('#studyTaskName').textContent=t||'مطالعه آزاد';
       o.classList.remove('paused');
-      var fb=o.querySelector('#studyFinishBtn'); if(fb) fb.disabled=true;
+      var fb=o.querySelector('#studyFinishBtn');if(fb) fb.disabled=true;
       updateStudyTimer(true);
       startStudyTimer();
       lockSite();
     }
-    function elapsedMinutes(){ return Math.max(1,studyTotalMinutes-Math.floor(studySeconds/60)); }
+    function elapsedMinutes(){return Math.max(1,studyTotalMinutes-Math.floor(studySeconds/60));}
     function markSourceTaskDone(){
       if(!window.__studyTaskSourceId||!window.__studyTaskSourceDay) return;
       var pl=window.loadPlannerNew();
       var dd=window.getDayData(pl,window.__studyTaskSourceDay);
-      var idx=(dd.tasks||[]).findIndex(function(x){ return x.id===window.__studyTaskSourceId; });
-      if(idx>=0){ dd.tasks[idx].done=true; dd.tasks[idx].studiedMinutes=elapsedMinutes(); window.savePlanner(pl); }
+      var idx=(dd.tasks||[]).findIndex(function(x){return x.id===window.__studyTaskSourceId;});
+      if(idx>=0){dd.tasks[idx].done=true;dd.tasks[idx].studiedMinutes=elapsedMinutes();window.savePlanner(pl);}
     }
     function startStudyTimer(){
       if(studyTimer) clearInterval(studyTimer);
@@ -1759,39 +1598,39 @@
         studySeconds--;
         updateStudyTimer(false);
         if(studySeconds<=0){
-          clearInterval(studyTimer); studyTimer=null; studyRunning=false;
-          var fb=document.getElementById('studyFinishBtn'); if(fb) fb.disabled=false;
+          clearInterval(studyTimer);studyTimer=null;studyRunning=false;
+          var fb=document.getElementById('studyFinishBtn');if(fb) fb.disabled=false;
           stopAudio();
           try{
             var ac=new (window.AudioContext||window.webkitAudioContext)();
             var o=ac.createOscillator(),g=ac.createGain();
-            o.type='sine'; o.frequency.value=880;
+            o.type='sine';o.frequency.value=880;
             g.gain.setValueAtTime(0,ac.currentTime);
             g.gain.linearRampToValueAtTime(0.2,ac.currentTime+0.05);
             g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.8);
-            o.connect(g); g.connect(ac.destination);
-            o.start(); o.stop(ac.currentTime+0.85);
-            setTimeout(function(){ try{ ac.close(); }catch(e){} },1200);
+            o.connect(g);g.connect(ac.destination);
+            o.start();o.stop(ac.currentTime+0.85);
+            setTimeout(function(){try{ac.close();}catch(e){}},1200);
           }catch(e){}
           showPopup('🎉','عالی بود!','زمان مطالعه تموم شد.');
         }
       },1000);
     }
     function toggleStudyPause(){
-      var o=document.getElementById('studyOverlay'); if(!o) return;
+      var o=document.getElementById('studyOverlay');if(!o) return;
       studyPaused=!studyPaused;
       var b=o.querySelector('#studyPauseBtn');
       var l=o.querySelector('#studyPauseLabel');
       var s=o.querySelector('#studyRunningSub');
       if(studyPaused){
         o.classList.add('paused');
-        if(b){ b.classList.remove('pause-mode'); b.classList.add('resume-mode'); }
+        if(b){b.classList.remove('pause-mode');b.classList.add('resume-mode');}
         if(l) l.textContent='ادامه';
         if(currentAudio) currentAudio.volume=0;
         if(s) s.textContent='⏸️ متوقف شده';
       } else {
         o.classList.remove('paused');
-        if(b){ b.classList.remove('resume-mode'); b.classList.add('pause-mode'); }
+        if(b){b.classList.remove('resume-mode');b.classList.add('pause-mode');}
         if(l) l.textContent='توقف';
         var vol=o.querySelector('#studyVolume');
         var v=vol?(parseInt(vol.value)/100):0.4;
@@ -1800,45 +1639,41 @@
       }
     }
     function setDigit(k,v,a){
-      var el=document.querySelector('.study-digit[data-k="'+k+'"]'); if(!el) return;
-      var f=toFa(v);
-      if(el.textContent===f) return;
-      if(a){ el.classList.remove('roll'); void el.offsetWidth; el.classList.add('roll'); }
+      var el=document.querySelector('.study-digit[data-k="'+k+'"]');if(!el) return;
+      var f=toFa(v);if(el.textContent===f) return;
+      if(a){el.classList.remove('roll');void el.offsetWidth;el.classList.add('roll');}
       el.textContent=f;
     }
     function updateStudyTimer(i){
       if(studySeconds<0) studySeconds=0;
       var m=Math.floor(studySeconds/60),s=studySeconds%60;
-      var mS=(m<10?'0':'')+m;
-      var sS=(s<10?'0':'')+s;
+      var mS=(m<10?'0':'')+m;var sS=(s<10?'0':'')+s;
       var a=!i;
-      setDigit('m1',mS[0],a);
-      setDigit('m2',mS[1],a);
-      setDigit('s1',sS[0],a);
-      setDigit('s2',sS[1],a);
+      setDigit('m1',mS[0],a);setDigit('m2',mS[1],a);
+      setDigit('s1',sS[0],a);setDigit('s2',sS[1],a);
     }
     function finishAndRecord(){
       var m=elapsedMinutes();
       var sd=window.__studyTaskSourceDay;
       var st=window.__studyTask;
       markSourceTaskDone();
-      if(st) showPopup('🏆','کار انجام شد!','«'+st+'» با '+formatMinutes(m)+' ثبت شد.');
+      if(st) showPopup('🏆','جلسه تموم شد!','«'+st+'» با '+formatMinutes(m)+' ثبت شد.');
       else showPopup('✨','خوب بود!',formatMinutes(m)+' ثبت شد.');
       if(studyTimer) clearInterval(studyTimer);
-      studyTimer=null; studyRunning=false;
-      window.__studyTask=''; window.__studyTaskSourceId=null; window.__studyTaskSourceDay=null;
-      clearStudyChat(); stopAudio(); unlockSite(); closeStudy();
-      if(sd) setTimeout(function(){ maybeCelebrate(sd); },500);
+      studyTimer=null;studyRunning=false;
+      window.__studyTask='';window.__studyTaskSourceId=null;window.__studyTaskSourceDay=null;
+      clearStudyChat();stopAudio();unlockSite();closeStudy();
+      if(sd) setTimeout(function(){maybeCelebrate(sd);},500);
     }
     function exitStudyConfirm(){
       if(!confirm('مطمئنی خارج شی؟')) return;
       if(studyTimer) clearInterval(studyTimer);
-      studyTimer=null; studyRunning=false;
-      window.__studyTask=''; window.__studyTaskSourceId=null; window.__studyTaskSourceDay=null;
-      stopAudio(); unlockSite(); closeStudy();
+      studyTimer=null;studyRunning=false;
+      window.__studyTask='';window.__studyTaskSourceId=null;window.__studyTaskSourceDay=null;
+      stopAudio();unlockSite();closeStudy();
     }
     function closeStudy(){
-      try{ stopAudio(); }catch(e){}
+      try{stopAudio();}catch(e){}
       var o=document.getElementById('studyOverlay');
       var chat=document.getElementById('studyChatPanel');
       if(chat) chat.remove();
@@ -1853,7 +1688,7 @@
       }
       if(!o) return;
       o.classList.remove('open');
-      setTimeout(function(){ o.remove(); },500);
+      setTimeout(function(){o.remove();},500);
       setTimeout(function(){
         if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
         refreshBody('left');
@@ -1861,14 +1696,13 @@
     }
     function blockKey(e){
       if(!studyRunning) return;
-      var k=e.key||'';
-      var c=e.ctrlKey||e.metaKey;
+      var k=e.key||'';var c=e.ctrlKey||e.metaKey;
       if(k==='F5'||k==='F11'||k==='Escape'||(c&&['r','R','w','W','n','N','t','T','p','P'].indexOf(k)>=0)){
-        e.preventDefault(); e.stopPropagation(); return false;
+        e.preventDefault();e.stopPropagation();return false;
       }
     }
-    function blockContext(e){ if(studyRunning) e.preventDefault(); }
-    function blockUnload(e){ if(!studyRunning) return; e.preventDefault(); e.returnValue='در حال مطالعه'; return e.returnValue; }
+    function blockContext(e){if(studyRunning) e.preventDefault();}
+    function blockUnload(e){if(!studyRunning) return;e.preventDefault();e.returnValue='در حال مطالعه';return e.returnValue;}
     function lockSite(){
       document.addEventListener('keydown',blockKey,true);
       document.addEventListener('contextmenu',blockContext,true);
@@ -1879,7 +1713,8 @@
       document.removeEventListener('contextmenu',blockContext,true);
       window.removeEventListener('beforeunload',blockUnload);
     }
-    window.__openStudy=function(){
+    window.__openStudy=function(customTitle){
+      if(customTitle) window.__studyTask=customTitle;
       buildStudyOverlay();
       var o=document.getElementById('studyOverlay');
       if(!o) return;
@@ -1897,7 +1732,7 @@
     };
 
     function renderStudyChat(){
-      var box=document.getElementById('studyChatMessages'); if(!box) return;
+      var box=document.getElementById('studyChatMessages');if(!box) return;
       var p=getProfile();
       var greeting=p.name?'سلام '+esc(p.name)+' 👋':'سلام 👋';
       var html='<div class="sc-msg sc-bot">'+greeting+' من سراجم.</div>';
@@ -1910,29 +1745,26 @@
     }
     function toggleStudyChat(){
       var ex=document.getElementById('studyChatPanel');
-      if(ex){ ex.classList.remove('open'); setTimeout(function(){ ex.remove(); },320); return; }
+      if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
       var p=document.createElement('div');
-      p.id='studyChatPanel'; p.className='study-chat-panel';
-      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">سراج — همیار مطالعه</div><button class="study-chat-close" id="studyChatCloseBtn">✕</button></div>'
+      p.id='studyChatPanel';p.className='study-chat-panel';
+      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">سراج — دستیار مطالعه</div><button class="study-chat-close" id="studyChatCloseBtn">✕</button></div>'
         +'<div class="study-chat-messages" id="studyChatMessages"></div>'
         +'<div class="study-chat-input-row">'
         +'<input type="text" class="study-chat-input" id="studyChatInput" placeholder="سؤالت رو بپرس..." onkeydown="if(event.key===\'Enter\')window.__studyChatSend()">'
         +'<button class="study-chat-send" onclick="window.__studyChatSend()">➤</button>'
         +'</div>';
       document.body.appendChild(p);
-      p.querySelector('#studyChatCloseBtn').onclick=function(){
-        p.classList.remove('open');
-        setTimeout(function(){ p.remove(); },320);
-      };
+      p.querySelector('#studyChatCloseBtn').onclick=function(){p.classList.remove('open');setTimeout(function(){p.remove();},320);};
       renderStudyChat();
-      requestAnimationFrame(function(){ p.classList.add('open'); });
-      setTimeout(function(){ var i=document.getElementById('studyChatInput'); if(i) i.focus(); },350);
+      requestAnimationFrame(function(){p.classList.add('open');});
+      setTimeout(function(){var i=document.getElementById('studyChatInput');if(i) i.focus();},350);
     }
     window.__studyChatSend=async function(){
       var inp=document.getElementById('studyChatInput');
       var box=document.getElementById('studyChatMessages');
       if(!inp||!box) return;
-      var q=inp.value.trim(); if(!q) return;
+      var q=inp.value.trim();if(!q) return;
       box.insertAdjacentHTML('beforeend','<div class="sc-msg sc-user">'+esc(q)+'</div>');
       inp.value='';
       box.scrollTop=box.scrollHeight;
@@ -1949,40 +1781,38 @@
           body:JSON.stringify({
             model:getModel(),
             messages:[{role:'system',content:sysPrompt}].concat(studyChatHistory.slice(-10)),
-            temperature:0.7, stream:true
+            temperature:0.7,stream:true
           })
         });
         var te=document.getElementById(tid);
-        if(!res.ok){ if(te) te.textContent='خطا ('+res.status+')'; return; }
+        if(!res.ok){if(te) te.textContent='خطا ('+res.status+')';return;}
         if(te) te.remove();
         var botId='scb_'+Date.now();
         box.insertAdjacentHTML('beforeend','<div class="sc-msg sc-bot" id="'+botId+'"></div>');
         var botEl=document.getElementById(botId);
         var reader=res.body.getReader(),dec=new TextDecoder(),buf='',full='';
         while(true){
-          var r=await reader.read(); if(r.done) break;
+          var r=await reader.read();if(r.done) break;
           buf+=dec.decode(r.value,{stream:true});
-          var lines=buf.split('\n'); buf=lines.pop();
+          var lines=buf.split('\n');buf=lines.pop();
           for(var i=0;i<lines.length;i++){
-            var tr=lines[i].trim(); if(!tr.startsWith('data:')) continue;
-            var dd=tr.slice(5).trim(); if(!dd||dd==='[DONE]') continue;
+            var tr=lines[i].trim();if(!tr.startsWith('data:')) continue;
+            var dd=tr.slice(5).trim();if(!dd||dd==='[DONE]') continue;
             try{
               var j=JSON.parse(dd);
               var delta=j.choices&&j.choices[0]&&j.choices[0].delta&&j.choices[0].delta.content;
-              if(delta){ full+=delta; botEl.textContent=full; box.scrollTop=box.scrollHeight; }
+              if(delta){full+=delta;botEl.textContent=full;box.scrollTop=box.scrollHeight;}
             }catch(e){}
           }
         }
         studyChatHistory.push({role:'assistant',content:full});
         saveStudyChat();
       }catch(err){
-        var t2=document.getElementById(tid); if(t2) t2.textContent='خطا: '+err.message;
+        var t2=document.getElementById(tid);if(t2) t2.textContent='خطا: '+err.message;
       }
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       BLOG + COMMUNITY — فقط هدر
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── blog/community ─── */
     function blogHTML(){
       return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>';
     }
@@ -2005,37 +1835,41 @@
     setTimeout(fillViews,1500);
     setTimeout(fillViews,2500);
 
-    /* ═══════════════════════════════════════════════════════════════
-       INPUT BAR — focus scroll
-       ═══════════════════════════════════════════════════════════════ */
-    (function(){
-      function setupInputFocus(){
-        var inputEl=document.getElementById('q');
-        var viewChat=document.getElementById('view-chat');
-        if(!inputEl||!viewChat) return false;
-        if(inputEl.dataset.focusSetup==='1') return true;
-        inputEl.dataset.focusSetup='1';
-        inputEl.addEventListener('focus',function(){
-          viewChat.classList.add('input-focused');
-          setTimeout(function(){
-            var box=document.getElementById('box');
-            if(box) box.scrollTop=box.scrollHeight;
-          },300);
-        });
-        inputEl.addEventListener('blur',function(){
-          viewChat.classList.remove('input-focused');
-        });
-        return true;
-      }
-      if(!setupInputFocus()){
-        var t=setInterval(function(){ if(setupInputFocus()) clearInterval(t); },300);
-        setTimeout(function(){ clearInterval(t); },8000);
-      }
-    })();
+    function linkifyContacts(){
+      document.querySelectorAll('.contact-row-v2, .contact-row').forEach(function(row){
+        if(row.tagName==='A'||row.dataset.linkified==='1') return;
+        row.dataset.linkified='1';
+        row.querySelectorAll('.contact-copy, [data-copy], .copy-btn').forEach(function(b){b.remove();});
+        var le=row.querySelector('.contact-label');
+        var ve=row.querySelector('.contact-value');
+        var l=(le?le.textContent:'').trim();
+        var v=(ve?ve.textContent:'').trim();
+        var vv=v.replace(/^[@\s]+/,'').trim();
+        var h='';
+        if(/تلگرام|telegram/i.test(l)) h='https://t.me/'+vv;
+        else if(/ایمیل|email/i.test(l)) h='mailto:'+v;
+        else if(/اینستاگرام|instagram/i.test(l)) h='https://instagram.com/'+vv;
+        else if(/^X$|توییتر|twitter/i.test(l)) h='https://x.com/'+vv;
+        else if(/سایت|وب/i.test(l)) h=/^https?:/.test(v)?v:('https://'+v);
+        if(h){
+          row.style.cursor='pointer';
+          row.setAttribute('role','link');
+          row.setAttribute('tabindex','0');
+          var o=function(e){
+            if(e.target.closest('a')) return;
+            e.preventDefault();
+            window.open(h,'_blank','noopener');
+          };
+          row.addEventListener('click',o);
+          row.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ') o(e);});
+        }
+      });
+    }
+    new MutationObserver(linkifyContacts).observe(document.body,{childList:true,subtree:true});
+    setTimeout(linkifyContacts,800);
+    setTimeout(linkifyContacts,1800);
 
-    /* ═══════════════════════════════════════════════════════════════
-       HEADER ACTIONS
-       ═══════════════════════════════════════════════════════════════ */
+    /* ─── header actions ─── */
     function injectMainTopActions(){
       if(_injectingHeaderActions) return;
       _injectingHeaderActions=true;
@@ -2043,8 +1877,8 @@
         var p=getProfile();
         var src=p.avatar||USER_AVATAR_URL;
         var name=p.name?p.name:'مشخصات من';
-        document.querySelectorAll('.main-top-avatar, .main-top-icon-btn, .header-left-actions, #sirajHeaderActions, #mainProfileAvatar, #mainLockBtn, #mainTopActions, .main-top-actions').forEach(function(el){ el.remove(); });
-        document.querySelectorAll('#headerLockBtn').forEach(function(el){ el.style.display='none'; });
+        document.querySelectorAll('.main-top-avatar, .main-top-icon-btn, .header-left-actions, #sirajHeaderActions, #mainProfileAvatar, #mainLockBtn, #mainTopActions, .main-top-actions').forEach(function(el){el.remove();});
+        document.querySelectorAll('#headerLockBtn').forEach(function(el){el.style.display='none';});
         document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
           var w=document.createElement('div');
           w.id='sirajHeaderActions';
@@ -2053,16 +1887,13 @@
           h.appendChild(w);
           w.querySelector('.main-top-avatar').onclick=function(){
             if(typeof window.openSettings==='function') window.openSettings();
-            setTimeout(function(){
-              var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');
-              if(b) b.click();
-            },400);
+            setTimeout(function(){var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');if(b) b.click();},400);
           };
           w.querySelector('.main-top-icon-btn').onclick=function(){
             if(typeof window.lockNow==='function') window.lockNow();
           };
         });
-      }finally{ _injectingHeaderActions=false; }
+      }finally{_injectingHeaderActions=false;}
     }
     setTimeout(injectMainTopActions,500);
     setTimeout(injectMainTopActions,1500);
@@ -2092,12 +1923,12 @@
     if(typeof window.openSettings==='function'){
       var origOS=window.openSettings;
       window.openSettings=function(){
-        try{ origOS.apply(this,arguments); }catch(e){}
+        try{origOS.apply(this,arguments);}catch(e){}
         setTimeout(injectProfileTab,250);
       };
     }
     function injectProfileTab(){
-      var tw=document.getElementById('settingsTabs'); if(!tw) return;
+      var tw=document.getElementById('settingsTabs');if(!tw) return;
       if(!tw.querySelector('[data-cat="profile"]')){
         var btn=document.createElement('button');
         btn.className='settings-tab-btn';
@@ -2105,7 +1936,7 @@
         btn.setAttribute('onclick',"switchSettingsCat('profile')");
         btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
         var aboutBtn=tw.querySelector('[data-cat="about"]');
-        tw.insertBefore(btn, aboutBtn||null);
+        tw.insertBefore(btn,aboutBtn||null);
       }
       var cw=document.getElementById('settingsContentWrap');
       if(cw&&!cw.querySelector('[data-cat="profile"]')){
@@ -2117,19 +1948,15 @@
       renderProfilePane();
     }
     function renderProfilePane(){
-      var pane=document.querySelector('.settings-content[data-cat="profile"]'); if(!pane) return;
+      var pane=document.querySelector('.settings-content[data-cat="profile"]');if(!pane) return;
       var p=getProfile();
       var src=p.avatar||USER_AVATAR_URL;
       var lvl=getUserLevel();
       var dv=getDefaultView();
       var lo=['beginner','intermediate','advanced'];
-      var lh=lo.map(function(k){
-        return '<button class="level-opt'+(k===lvl?' active':'')+'" data-level="'+k+'">'+LEVEL_LABELS[k]+'</button>';
-      }).join('');
+      var lh=lo.map(function(k){return '<button class="level-opt'+(k===lvl?' active':'')+'" data-level="'+k+'">'+LEVEL_LABELS[k]+'</button>';}).join('');
       var vo=['chat','planner','blog','videos','tools'];
-      var vh=vo.map(function(k){
-        return '<button class="default-view-opt'+(k===dv?' active':'')+'" data-view="'+k+'">'+VIEW_LABELS[k]+'</button>';
-      }).join('');
+      var vh=vo.map(function(k){return '<button class="default-view-opt'+(k===dv?' active':'')+'" data-view="'+k+'">'+VIEW_LABELS[k]+'</button>';}).join('');
       pane.innerHTML=
         '<div class="setting-group profile-section">'
         +'<label style="font-size:13px;font-weight:800;color:var(--accent)">👤 مشخصات شخصی</label>'
@@ -2148,7 +1975,7 @@
         b.onclick=function(){
           var l=b.getAttribute('data-level');
           setUserLevel(l);
-          pane.querySelectorAll('.level-opt').forEach(function(x){ x.classList.remove('active'); });
+          pane.querySelectorAll('.level-opt').forEach(function(x){x.classList.remove('active');});
           b.classList.add('active');
           if(window.toast) window.toast('سطح '+LEVEL_LABELS[l]+' انتخاب شد ✓','success');
         };
@@ -2157,7 +1984,7 @@
         b.onclick=function(){
           var v=b.getAttribute('data-view');
           setDefaultView(v);
-          pane.querySelectorAll('.default-view-opt').forEach(function(x){ x.classList.remove('active'); });
+          pane.querySelectorAll('.default-view-opt').forEach(function(x){x.classList.remove('active');});
           b.classList.add('active');
           if(window.toast) window.toast('تب دیفالت: '+VIEW_LABELS[v],'success');
         };
@@ -2170,11 +1997,7 @@
           if(typeof window.switchView==='function') window.switchView('chat');
           setTimeout(function(){
             var q=document.getElementById('q');
-            if(q){
-              q.value='میخوام سطح عربیم رو تعیین کنی. چند سوال از آسون به سخت ازم بپرس و آخرش سطحم رو مشخص کن.';
-              if(typeof window.handleInput==='function') window.handleInput();
-              q.focus();
-            }
+            if(q){q.value='میخوام سطح عربیم رو تعیین کنی. چند سوال از آسون به سخت ازم بپرس و آخرش سطحم رو مشخص کن.';if(typeof window.handleInput==='function') window.handleInput();q.focus();}
           },500);
         };
       }
@@ -2183,7 +2006,7 @@
         s.onclick=function(){
           var p2=getProfile();
           p2.name=(pane.querySelector('#profileName')||{}).value||'';
-          p2.bio =(pane.querySelector('#profileBio') ||{}).value||'';
+          p2.bio=(pane.querySelector('#profileBio')||{}).value||'';
           saveProfile(p2);
           if(window.toast) window.toast('ذخیره شد ✓','success');
           if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
@@ -2193,7 +2016,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NAV SLIDER — نسخه robust
+       NAV SLIDER — v34 with wrapper + grow + slide
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null;
@@ -2203,71 +2026,81 @@
         slider=document.createElement('div');
         slider.id='navSlider';
         slider.className='nav-slider';
-        slider.style.position='absolute';
-        slider.style.left='0';
-        slider.style.top='0';
-        slider.style.background='var(--accent)';
-        slider.style.borderRadius='22px';
-        slider.style.pointerEvents='none';
-        slider.style.zIndex='0';
-        slider.style.opacity='0';
-        slider.style.boxShadow='0 6px 20px -6px var(--accent)';
-        slider.style.willChange='transform,width,height';
+        slider.innerHTML='<div class="nav-slider-fill"></div>';
         nav.insertBefore(slider,nav.firstChild);
 
-        /* ★ handler برای کلیک روی دکمه‌های نوار */
         nav.addEventListener('click',function(e){
           var btn=e.target.closest('.bottom-nav-btn[data-view]');
           if(!btn) return;
           nav.classList.add('nav-floating');
           clearTimeout(nav.__floatT);
-          nav.__floatT=setTimeout(function(){ nav.classList.remove('nav-floating'); },380);
+          nav.__floatT=setTimeout(function(){nav.classList.remove('nav-floating');},380);
           if(btn.classList.contains('nav-btn-chat')){
-            if(slider) slider.style.opacity='0';
+            slider.classList.remove('visible');
             return;
           }
-          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+          var wasActive=btn.classList.contains('active');
+          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
           btn.classList.add('active');
-          setTimeout(function(){ track(600); }, 30);
+          setTimeout(function(){track();},30);
         },true);
 
-        setTimeout(function(){ track(0); }, 100);
-        new MutationObserver(function(){ track(0); }).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position']});
-        window.addEventListener('resize',function(){ track(0); });
+        setTimeout(function(){track(true);},150);
+        new MutationObserver(function(){track();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position','data-nav-style']});
+        window.addEventListener('resize',function(){track();});
         return true;
       }
 
-      function track(duration){
+      function track(forceGrow){
         if(!nav||!slider) return;
         var btn=nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
-        if(!btn){ slider.style.opacity='0'; return; }
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
         var vert=(pos==='left'||pos==='right');
-        if(vert){ slider.style.opacity='0'; return; }
 
-        slider.style.transition='none';
-        var endTime=performance.now()+(duration||0);
-
-        function tick(){
-          if(!btn.isConnected) return;
-          var nr=nav.getBoundingClientRect();
-          var br=btn.getBoundingClientRect();
-          slider.style.transform='translate3d('+(br.left-nr.left)+'px,'+(br.top-nr.top)+'px,0)';
-          slider.style.width=br.width+'px';
-          slider.style.height=br.height+'px';
-          slider.style.opacity='1';
-          if(duration>0 && performance.now()<endTime){
-            requestAnimationFrame(tick);
-          }
+        /* اگه دکمه فعال chat باشه یا نوار مخفی باشه → مخفی */
+        var navCollapsed = document.getElementById('navRow').classList.contains('collapsed');
+        if(!btn || btn.classList.contains('nav-btn-chat')){
+          slider.classList.remove('visible');
+          return;
         }
-        requestAnimationFrame(tick);
+
+        /* موقعیت دکمه */
+        var nr=nav.getBoundingClientRect();
+        var br=btn.getBoundingClientRect();
+        var x=br.left-nr.left;
+        var y=br.top-nr.top;
+        var w=br.width;
+        var h=br.height;
+
+        var fill=slider.querySelector('.nav-slider-fill');
+        if(fill) fill.style.borderRadius = vert ? '18px' : '22px';
+
+        var wasVisible = slider.classList.contains('visible');
+
+        if(!wasVisible || forceGrow){
+          /* ★ اولین نمایش — از حالت grow */
+          slider.style.transition='none';
+          slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
+          slider.style.width=w+'px';
+          slider.style.height=h+'px';
+          void slider.offsetWidth;
+          slider.style.transition='';
+          slider.classList.add('visible','grow');
+          setTimeout(function(){slider.classList.remove('grow');},600);
+        } else {
+          /* ★ اسلاید نرم */
+          slider.style.transition='';
+          slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
+          slider.style.width=w+'px';
+          slider.style.height=h+'px';
+        }
       }
 
-      window.__moveNavSlider=function(){ track(0); };
-      window.updateNavSlider=function(animate){ track(animate===false?0:600); };
+      window.__moveNavSlider=function(){track();};
+      window.updateNavSlider=function(animate){track(animate===false);};
 
       var tries=0;
-      var iv=setInterval(function(){ if(init()||++tries>100) clearInterval(iv); },100);
+      var iv=setInterval(function(){if(init()||++tries>100) clearInterval(iv);},100);
     })();
 
     /* ═══════════════════════════════════════════════════════════════
@@ -2286,7 +2119,7 @@
             return;
           }
           var oldName=_currentMainView;
-          if(oldName===view){ _currentMainView=view; return; }
+          if(oldName===view){_currentMainView=view;return;}
           var oldEl=document.getElementById('view-'+oldName);
           var newEl=document.getElementById('view-'+view);
           var oldIdx=VIEW_ORDER.indexOf(oldName);
@@ -2294,7 +2127,7 @@
           if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){
             orig.apply(this,arguments);
             _currentMainView=view;
-            if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,50);
+            if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,60);
             return;
           }
           if(window.switchView.__t1) clearTimeout(window.switchView.__t1);
@@ -2314,7 +2147,7 @@
             _currentMainView=view;
             newEl.classList.add(inClass);
             setTimeout(injectMainTopActions,10);
-            if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,50);
+            if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,60);
             window.switchView.__t2=setTimeout(function(){
               oldEl.classList.remove('leaving',outClass);
               oldEl.style.pointerEvents='';
@@ -2326,17 +2159,27 @@
         return true;
       }
       if(!hook()){
-        var t=setInterval(function(){ if(hook()) clearInterval(t); },300);
-        setTimeout(function(){ clearInterval(t); },8000);
+        var t=setInterval(function(){if(hook()) clearInterval(t);},300);
+        setTimeout(function(){clearInterval(t);},8000);
       }
       setTimeout(function(){
         var a=document.querySelector('.view.active');
-        if(a){
-          var n=a.id.replace('view-','');
-          if(VIEW_ORDER.indexOf(n)!==-1) _currentMainView=n;
-        }
+        if(a){var n=a.id.replace('view-','');if(VIEW_ORDER.indexOf(n)!==-1) _currentMainView=n;}
       },1000);
     })();
+
+    /* ═══════════════════════════════════════════════════════════════
+       PIN BUTTON — override برای اطمینان
+       ═══════════════════════════════════════════════════════════════ */
+    if(typeof window.toggleNavCollapse==='function'){
+      var origToggle=window.toggleNavCollapse;
+      window.toggleNavCollapse=function(){
+        try{origToggle.apply(this,arguments);}catch(e){}
+        setTimeout(function(){
+          if(typeof window.__moveNavSlider==='function') window.__moveNavSlider();
+        },520);
+      };
+    }
 
     /* ═══════════════════════════════════════════════════════════════
        START
@@ -2348,6 +2191,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v33 Final)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v34 Final)');
   }
 })();
