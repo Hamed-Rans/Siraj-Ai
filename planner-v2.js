@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v25 Fixed Freeze) */
+/* Siraj v2.0 — planner-v2.js (v26 Final) */
 (function(){
   'use strict';
   var boot=setInterval(function(){
@@ -20,6 +20,112 @@
     var _currentWord=null;
     var _lastTab='daily';
     var SOUND_FILES={nature:'sounds/ocean.mp3',forest:'sounds/forest.mp3',hall:'sounds/hall.mp3',rain:'sounds/rain.mp3'};
+
+    /* ═══ Inject CSS از JS ═══ */
+    (function injectCSS(){
+      var s=document.createElement('style');
+      s.textContent=`
+        /* اطمینان از visible بودن اسلایدر */
+        .nav-slider{
+          background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+          box-shadow:0 6px 20px -6px var(--accent)!important;
+          opacity:0;transition:none;pointer-events:none;z-index:0;
+        }
+        .nav-slider.ready{
+          transition:left .5s cubic-bezier(.22,1,.36,1),
+                     top .5s cubic-bezier(.22,1,.36,1),
+                     width .5s cubic-bezier(.22,1,.36,1),
+                     height .5s cubic-bezier(.22,1,.36,1),
+                     border-radius .3s,opacity .15s!important;
+        }
+        .nav-slider.visible{opacity:1!important}
+        .nav-slider.grow{animation:sliderGrow .55s cubic-bezier(.34,1.4,.64,1) both}
+        @keyframes sliderGrow{0%{transform:scale(.3);opacity:0}60%{opacity:1}100%{transform:scale(1);opacity:1}}
+
+        /* سرعت انیمیشن دکمه نوار — کندتر برای هماهنگی با تب */
+        .bottom-nav-btn,.nav-collapse-tab{
+          transition:background .4s cubic-bezier(.22,1,.36,1),
+                     color .3s,
+                     padding .5s cubic-bezier(.22,1,.36,1),
+                     max-width .5s cubic-bezier(.22,1,.36,1),
+                     border-color .3s,
+                     box-shadow .4s cubic-bezier(.22,1,.36,1)!important;
+        }
+        [data-nav-position] .bottom-nav-btn.measuring{
+          max-width:155px!important;padding:0 14px 0 10px!important;transition:none!important;
+        }
+        [data-nav-position] .bottom-nav-btn.measuring::after{
+          max-width:110px!important;opacity:1!important;margin:0 6px 0 0!important;transition:none!important;
+        }
+        [data-nav-position="left"] .bottom-nav-btn.measuring,
+        [data-nav-position="right"] .bottom-nav-btn.measuring{
+          max-width:46px!important;min-width:46px!important;height:62px!important;
+          max-height:62px!important;padding:5px 3px!important;flex-direction:column!important;
+        }
+        [data-nav-position="left"] .bottom-nav-btn.measuring::after,
+        [data-nav-position="right"] .bottom-nav-btn.measuring::after{
+          max-width:44px!important;margin:1px 0 0 0!important;
+        }
+
+        /* فیکس اندازه نوار */
+        [data-nav-position="bottom"] .bottom-nav,
+        [data-nav-position="top"] .bottom-nav{padding:4px 16px!important;min-height:48px!important}
+        [data-nav-position="left"] .bottom-nav,
+        [data-nav-position="right"] .bottom-nav{padding:6px 3px!important;gap:3px!important}
+
+        /* انیمیشن تب‌ها — سریع‌تر */
+        .view.leaving{display:flex!important;position:absolute;inset:0;pointer-events:none;z-index:1}
+        .view.active{animation:none!important}
+        .view.active.view-in-from-left{animation:viewInFromLeft .34s cubic-bezier(.22,1,.36,1) both!important}
+        .view.active.view-in-from-right{animation:viewInFromRight .34s cubic-bezier(.22,1,.36,1) both!important}
+        .view.leaving.view-out-left{animation:viewOutLeft .3s cubic-bezier(.4,0,1,1) forwards!important}
+        .view.leaving.view-out-right{animation:viewOutRight .3s cubic-bezier(.4,0,1,1) forwards!important}
+        @keyframes viewOutLeft{to{opacity:0;transform:translateX(-60px);filter:blur(5px)}}
+        @keyframes viewOutRight{to{opacity:0;transform:translateX(60px);filter:blur(5px)}}
+        @keyframes viewInFromLeft{from{opacity:0;transform:translateX(-60px);filter:blur(5px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
+        @keyframes viewInFromRight{from{opacity:0;transform:translateX(60px);filter:blur(5px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
+
+        /* انیمیشن تقویم ماهانه */
+        .month-calendar.cal-out-right{animation:calOutRight .24s cubic-bezier(.4,0,1,1) forwards}
+        .month-calendar.cal-out-left{animation:calOutLeft .24s cubic-bezier(.4,0,1,1) forwards}
+        .month-calendar.cal-in-from-left{animation:calInFromLeft .38s cubic-bezier(.22,1,.36,1) both}
+        .month-calendar.cal-in-from-right{animation:calInFromRight .38s cubic-bezier(.22,1,.36,1) both}
+        @keyframes calOutRight{to{opacity:0;transform:translateX(50px)}}
+        @keyframes calOutLeft{to{opacity:0;transform:translateX(-50px)}}
+        @keyframes calInFromLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes calInFromRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+
+        /* انیمیشن hero */
+        [data-anim-key]{display:inline-block;will-change:transform,opacity,filter}
+        [data-anim-key].heroOutRight{animation:heroOutRight .22s cubic-bezier(.4,0,1,1) forwards}
+        [data-anim-key].heroOutLeft{animation:heroOutLeft .22s cubic-bezier(.4,0,1,1) forwards}
+        [data-anim-key].heroInFromLeft{animation:heroInFromLeft .38s cubic-bezier(.22,1,.36,1) both}
+        [data-anim-key].heroInFromRight{animation:heroInFromRight .38s cubic-bezier(.22,1,.36,1) both}
+        @keyframes heroOutRight{to{opacity:0;transform:translateX(40px);filter:blur(3px)}}
+        @keyframes heroOutLeft{to{opacity:0;transform:translateX(-40px);filter:blur(3px)}}
+        @keyframes heroInFromLeft{from{opacity:0;transform:translateX(-40px);filter:blur(3px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
+        @keyframes heroInFromRight{from{opacity:0;transform:translateX(40px);filter:blur(3px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
+        @keyframes bodyFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+        /* ★ مسدودسازی avatar/قفل تکراری ★ */
+        .chat-header > .main-top-avatar ~ .main-top-avatar,
+        .chat-header > .main-top-icon-btn ~ .main-top-icon-btn,
+        .planner-hero > .main-top-avatar ~ .main-top-avatar,
+        .page-title-bar > .main-top-avatar ~ .main-top-avatar,
+        .chat-header > .header-left-actions ~ .header-left-actions,
+        .planner-hero > .header-left-actions ~ .header-left-actions,
+        .page-title-bar > .header-left-actions ~ .header-left-actions,
+        .chat-header > .main-top-avatar ~ .header-left-actions,
+        .chat-header > .main-top-icon-btn ~ .header-left-actions,
+        .chat-header > #headerLockBtn:not(:only-of-type){display:none!important}
+
+        /* رنگ متن دکمه فعال */
+        .bottom-nav-btn.active:not(.nav-btn-chat),
+        .bottom-nav-btn.active:not(.nav-btn-chat)::after{color:#fff!important}
+        .bottom-nav-btn.active:not(.nav-btn-chat) svg{stroke:#fff!important}
+      `;
+      document.head.appendChild(s);
+    })();
 
     var WORDS_BY_LEVEL={
       beginner:[
@@ -65,7 +171,6 @@
     var LEVEL_LABELS={beginner:'مبتدی',intermediate:'متوسط',advanced:'پیشرفته'};
     var VIEW_LABELS={chat:'گفتگو',planner:'برنامه‌ریز',blog:'مقالات',videos:'انجمن',tools:'دستیار'};
 
-    /* ═══ helpers ═══ */
     function toFa(n){var fa=['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];return String(n).replace(/\d/g,function(d){return fa[+d];});}
     function formatMinutes(mins){mins=Math.max(0,Math.round(mins));if(mins<60)return toFa(mins)+' دقیقه';var h=Math.floor(mins/60),m=mins%60;if(m===0)return toFa(h)+' ساعت';return toFa(h)+' ساعت و '+toFa(m)+' دقیقه';}
     function formatTimer(mins){mins=Math.max(0,Math.round(mins));var h=Math.floor(mins/60),m=mins%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
@@ -126,8 +231,8 @@
           el.textContent=nv;
           void el.offsetWidth;
           el.classList.add(isNext?'heroInFromLeft':'heroInFromRight');
-          setTimeout(function(){el.classList.remove('heroInFromLeft','heroInFromRight');},440);
-        },230);
+          setTimeout(function(){el.classList.remove('heroInFromLeft','heroInFromRight');},400);
+        },220);
       });
       var todayBadge=c.querySelector('.phc-today');
       if(todayBadge){todayBadge.style.display=window.dateKey(d)===window.dateKey(new Date())?'':'none';}
@@ -159,6 +264,7 @@
     window.__goThisMonth=window.__goToday;
     window.__goThisYear=window.__goToday;
 
+    /* ★ refreshBody — هوشمند: انیمیشن تقویم مخصوص monthly ★ */
     function refreshBody(direction){
       var pane=document.getElementById('plannerPane');if(!pane)return;
       if(pane.dataset.animating==='1')return;
@@ -166,25 +272,50 @@
       var isSameTab=pane.dataset.lastTab===tab;
       pane.dataset.lastTab=tab;
       var dir=direction||'left';
+
       if(isSameTab){
         smartUpdateHero(tab,dir);
         var body=pane.querySelector('.planner-body-content');
-        if(body){
-          var html='';
-          if(tab==='daily')html=dailyContentHTML();
-          else if(tab==='weekly')html=weeklyContentHTML();
-          else if(tab==='monthly')html=monthlyContentHTML();
-          else if(tab==='yearly')html=yearlyContentHTML();
-          body.innerHTML=html;
-          bindPaneEvents(tab);
-          if(tab==='weekly')setTimeout(setupWeekSummaryClicks,50);
-          body.style.transition='none';body.style.opacity='0';
-          void body.offsetWidth;
-          body.style.transition='opacity .28s ease';body.style.opacity='1';
-          setTimeout(function(){body.style.transition='';},300);
-        } else { renderPane(tab); }
+        if(!body){renderPane(tab);return;}
+
+        /* ★★★ مخصوص تقویم ماهانه — اسلاید فقط برای calendar ★ */
+        if(tab==='monthly'){
+          var cal=pane.querySelector('.month-calendar');
+          if(cal){
+            var outC=dir==='left'?'cal-out-right':'cal-out-left';
+            var inC=dir==='left'?'cal-in-from-left':'cal-in-from-right';
+            cal.classList.add(outC);
+            setTimeout(function(){
+              var html=monthlyContentHTML();
+              body.innerHTML=html;
+              bindPaneEvents(tab);
+              var newCal=body.querySelector('.month-calendar');
+              if(newCal){
+                newCal.classList.remove('cal-in-from-left','cal-in-from-right');
+                void newCal.offsetWidth;
+                newCal.classList.add(inC);
+                setTimeout(function(){newCal.classList.remove(inC);},420);
+              }
+            },220);
+            return;
+          }
+        }
+
+        /* عادی — fade */
+        var html='';
+        if(tab==='daily')html=dailyContentHTML();
+        else if(tab==='weekly')html=weeklyContentHTML();
+        else if(tab==='yearly')html=yearlyContentHTML();
+        body.innerHTML=html;
+        bindPaneEvents(tab);
+        if(tab==='weekly')setTimeout(setupWeekSummaryClicks,50);
+        body.style.animation='none';
+        void body.offsetWidth;
+        body.style.animation='bodyFadeIn .3s ease';
         return;
       }
+
+      /* سوییچ تب — انیمیشن کل pane */
       pane.dataset.animating='1';
       pane.style.pointerEvents='none';
       var html='';
@@ -233,7 +364,6 @@
       }
     }
 
-    /* ═══ HEROES ═══ */
     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -244,30 +374,13 @@
       var goals=pl.months[monthKey].goals||[];
       var goal=goals.length?(goals.find(function(g){return !g.done;})||goals[0]):null;
       var p=dateParts(d);
-      return '<div class="planner-hero-card">'+
-        '<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'+
-        '<div class="phc-center">'+
-          '<div class="phc-day"><span data-anim-key="weekday">'+esc(p.weekday)+'</span> <span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span></div>'+
-          '<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'+
-          (goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')+
-          (!isToday?'<button class="phc-back-btn" onclick="window.__goToday()">↩ برگرد به امروز</button>':'')+
-        '</div>'+
-        '<button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'+
-      '</div>';
+      return '<div class="planner-hero-card"><button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button><div class="phc-center"><div class="phc-day"><span data-anim-key="weekday">'+esc(p.weekday)+'</span> <span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span></div><div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'+(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')+(!isToday?'<button class="phc-back-btn" onclick="window.__goToday()">↩ برگرد به امروز</button>':'')+'</div><button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button></div>';
     }
     function heroWeekly(){
       var d=new Date(window.plannerDate||new Date());
       var days=myWeekDays();var p=dateParts(d);
       var isCurrentWeek=days[0].key===window.dateKey(weekStart(new Date()));
-      return '<div class="planner-hero-card">'+
-        '<button class="phc-nav-btn" onclick="window.__navWeek(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'+
-        '<div class="phc-center">'+
-          '<div class="phc-day"><span data-anim-key="monthName2">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum2">'+esc(p.yearNum)+'</span></div>'+
-          '<div class="phc-date"><span data-anim-key="weekOrdinal">هفته '+weekOrd(weekOfMonth())+' ماه</span> — <span data-anim-key="weekRange">از '+esc(days[0].date)+' تا '+esc(days[6].date)+'</span></div>'+
-          (!isCurrentWeek?'<button class="phc-back-btn" onclick="window.__goThisWeek()">↩ برگرد به این هفته</button>':'')+
-        '</div>'+
-        '<button class="phc-nav-btn" onclick="window.__navWeek(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'+
-      '</div>';
+      return '<div class="planner-hero-card"><button class="phc-nav-btn" onclick="window.__navWeek(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button><div class="phc-center"><div class="phc-day"><span data-anim-key="monthName2">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum2">'+esc(p.yearNum)+'</span></div><div class="phc-date"><span data-anim-key="weekOrdinal">هفته '+weekOrd(weekOfMonth())+' ماه</span> — <span data-anim-key="weekRange">از '+esc(days[0].date)+' تا '+esc(days[6].date)+'</span></div>'+(!isCurrentWeek?'<button class="phc-back-btn" onclick="window.__goThisWeek()">↩ برگرد به این هفته</button>':'')+'</div><button class="phc-nav-btn" onclick="window.__navWeek(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button></div>';
     }
     function heroMonthly(){
       var pl=window.loadPlannerNew();
@@ -279,15 +392,7 @@
       var doneGoals=goals.filter(function(g){return g.done;}).length;
       var now=new Date();
       var isCurrentMonth=(d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth());
-      return '<div class="planner-hero-card">'+
-        '<button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'+
-        '<div class="phc-center">'+
-          '<div class="phc-day"><span data-anim-key="monthName3">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum3">'+esc(p.yearNum)+'</span></div>'+
-          '<div class="phc-date">'+toFa(doneGoals)+' از '+toFa(goals.length)+' هدف این ماه انجام شده</div>'+
-          (!isCurrentMonth?'<button class="phc-back-btn" onclick="window.__goThisMonth()">↩ برگرد به این ماه</button>':'')+
-        '</div>'+
-        '<button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'+
-      '</div>';
+      return '<div class="planner-hero-card"><button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button><div class="phc-center"><div class="phc-day"><span data-anim-key="monthName3">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum3">'+esc(p.yearNum)+'</span></div><div class="phc-date">'+toFa(doneGoals)+' از '+toFa(goals.length)+' هدف این ماه انجام شده</div>'+(!isCurrentMonth?'<button class="phc-back-btn" onclick="window.__goThisMonth()">↩ برگرد به این ماه</button>':'')+'</div><button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button></div>';
     }
     function heroYearly(){
       var d=new Date(window.plannerDate||new Date());
@@ -298,15 +403,7 @@
       var goals=pl.years[y].goals||[];
       var done=goals.filter(function(g){return g.done;}).length;
       var isCurrentYear=y===new Date().getFullYear();
-      return '<div class="planner-hero-card">'+
-        '<button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'+
-        '<div class="phc-center">'+
-          '<div class="phc-day"><span data-anim-key="yearNum4">'+esc(d.toLocaleDateString('fa-IR',{year:'numeric'}))+'</span></div>'+
-          '<div class="phc-date">'+toFa(done)+' از '+toFa(goals.length)+' هدف سالانه انجام شده</div>'+
-          (!isCurrentYear?'<button class="phc-back-btn" onclick="window.__goThisYear()">↩ برگرد به امسال</button>':'')+
-        '</div>'+
-        '<button class="phc-nav-btn" onclick="window.__navYear(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'+
-      '</div>';
+      return '<div class="planner-hero-card"><button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button><div class="phc-center"><div class="phc-day"><span data-anim-key="yearNum4">'+esc(d.toLocaleDateString('fa-IR',{year:'numeric'}))+'</span></div><div class="phc-date">'+toFa(done)+' از '+toFa(goals.length)+' هدف سالانه انجام شده</div>'+(!isCurrentYear?'<button class="phc-back-btn" onclick="window.__goThisYear()">↩ برگرد به امسال</button>':'')+'</div><button class="phc-nav-btn" onclick="window.__navYear(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button></div>';
     }
 
     function weekStatsHTML(){
@@ -403,7 +500,7 @@
         if(total>0){var r=dC/total;if(r>=1)dc='day-done';else if(r>0)dc='day-partial';else dc='day-pending';}
         if(isF)dc+=' friday';
         var ic='';
-        if(rems.length)ic+='<span class="cal-day-icon icon-evt"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg></span>';
+        if(rems.length)ic+='<span class="cal-day-icon icon-evt"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>'+(rems.length>1?'<b>'+toFa(rems.length)+'</b>':'')+'</span>';
         if(evt)ic+='<span class="cal-day-icon icon-occ"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>';
         var si='';
         if(total>0){if(dC===total)si='<span class="cal-day-status st-done"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>';else if(dC>0)si='<span class="cal-day-status st-partial"><svg viewBox="0 0 24 24"><path d="M12 6v6l4 2"/></svg></span>';else si='<span class="cal-day-status st-pending"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></span>';}
@@ -469,7 +566,6 @@
     window.addMonthGoal=function(mk){var inp=document.getElementById('newGoalInput');if(!inp)return;var v=inp.value.trim();if(!v)return;var pl=window.loadPlannerNew();if(!pl.months[mk])pl.months[mk]={goals:[]};pl.months[mk].goals.push({text:v,done:false});window.savePlanner(pl);inp.value='';refreshBody('left');};
     window.addYearGoal=function(y){var inp=document.getElementById('newYearGoalInput');if(!inp)return;var v=inp.value.trim();if(!v)return;var pl=window.loadPlannerNew();if(!pl.years)pl.years={};if(!pl.years[y])pl.years[y]={goals:[]};pl.years[y].goals.push({text:v,done:false});window.savePlanner(pl);inp.value='';refreshBody('left');};
 
-    /* ═══ پنل راست ═══ */
     window.renderPanelForPlanner=function(){
       var p=getProfile();
       var te=document.getElementById('panelTitleText');
@@ -489,13 +585,11 @@
       pc.innerHTML=th+'<button onclick="window.__openStudy()" class="panel-study-btn" style="margin-top:14px"><svg viewBox="0 0 24 24" style="width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg><div style="text-align:right;flex:1"><div>حالت مطالعه</div><div style="font-size:11px;opacity:.85;font-weight:600;margin-top:3px">با تایمر و تمرکز</div></div></button><div class="panel-card guide-card" style="margin-top:14px"><div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>راهنما</span></div><div class="guide-list"><div class="guide-item"><span>✨</span>روی حالت مطالعه بزن</div><div class="guide-item"><span>📚</span>یه کار انتخاب کن</div><div class="guide-item"><span>⏱️</span>زمان تنظیم کن</div><div class="guide-item"><span>🎯</span>تا آخر قفل</div><div class="guide-item"><span>🔔</span>توی تقویم یادآور بذار</div></div></div>';
     };
 
-    /* ═══ Sound ═══ */
     var currentAudio=null,masterVolume=0.4;
     function stopAudio(){if(currentAudio){try{currentAudio.pause();currentAudio.currentTime=0;}catch(e){}try{currentAudio.src='';}catch(e){}currentAudio=null;}}
     function playSound(t){stopAudio();var u=SOUND_FILES[t];if(!u)return;var a=new Audio(u);a.loop=true;a.volume=masterVolume;a.preload='auto';a.play().catch(function(err){console.warn('[Sound]',err.message);});currentAudio=a;}
     function setMasterVolume(v){masterVolume=Math.max(0,Math.min(1,v));if(currentAudio)currentAudio.volume=masterVolume;}
 
-    /* ═══ Study ═══ */
     function loadStudyChat(){try{return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY)||'[]');}catch(e){return [];}}
     function saveStudyChat(){try{sessionStorage.setItem(STUDY_CHAT_KEY,JSON.stringify(studyChatHistory));}catch(e){}}
     function clearStudyChat(){studyChatHistory=[];try{sessionStorage.removeItem(STUDY_CHAT_KEY);}catch(e){}}
@@ -585,40 +679,60 @@
       }catch(err){var t2=document.getElementById(tid);if(t2)t2.textContent='خطا: '+err.message;}
     };
 
-    /* ═══ Blog + Community ═══ */
     function blogHTML(){return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div><div class="community-hero"><div class="community-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="community-title">مقالات سراج</div><div class="community-desc">اینجا قراره مطالب آموزشی، تحلیل‌های ادبی، نکات دستوری و یادداشت‌های کوتاه درباره‌ی زبان و ادبیات عربی منتشر بشه.</div><div class="community-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>به‌زودی راه‌اندازی می‌شه</div></div>';}
     function communityHTML(){return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="page-title-text">انجمن سراج</div></div><div class="community-hero"><div class="community-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="community-title">انجمن گفتگوی سراج</div><div class="community-desc">یه فضای صمیمی که کاربرا، مدرسین و من بتونیم با هم درباره‌ی عربی، ادبیات، برنامه‌ریزی درسی و یادگیری حرف بزنیم.</div><div class="community-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>به‌زودی راه‌اندازی می‌شه</div></div>';}
     function fillViews(){var b=document.getElementById('view-blog');if(b&&b.classList.contains('active')&&!b.querySelector('.community-hero'))b.innerHTML=blogHTML();var c=document.getElementById('view-videos');if(c&&c.classList.contains('active')){var h=c.querySelector('.community-hero');if(!h){c.innerHTML=communityHTML();}else{var d=h.querySelector('.community-desc');if(d&&d.textContent.length<40)c.innerHTML=communityHTML();}}}
     new MutationObserver(fillViews).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
     setTimeout(fillViews,1500);setTimeout(fillViews,2500);
 
-    /* Contacts */
     function linkifyContacts(){document.querySelectorAll('.contact-row-v2, .contact-row').forEach(function(row){if(row.tagName==='A'||row.dataset.linkified==='1')return;row.dataset.linkified='1';row.querySelectorAll('.contact-copy, [data-copy], .copy-btn').forEach(function(b){b.remove();});var le=row.querySelector('.contact-label');var ve=row.querySelector('.contact-value');var l=(le?le.textContent:'').trim();var v=(ve?ve.textContent:'').trim();var vv=v.replace(/^[@\s]+/,'').trim();var h='';if(/تلگرام|telegram/i.test(l))h='https://t.me/'+vv;else if(/ایمیل|email/i.test(l))h='mailto:'+v;else if(/اینستاگرام|instagram/i.test(l))h='https://instagram.com/'+vv;else if(/^X$|توییتر|twitter/i.test(l))h='https://x.com/'+vv;else if(/سایت|وب/i.test(l))h=/^https?:/.test(v)?v:('https://'+v);if(h){row.style.cursor='pointer';row.setAttribute('role','link');row.setAttribute('tabindex','0');var o=function(e){if(e.target.closest('a'))return;e.preventDefault();window.open(h,'_blank','noopener');};row.addEventListener('click',o);row.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')o(e);});}});}
     new MutationObserver(linkifyContacts).observe(document.body,{childList:true,subtree:true});
     setTimeout(linkifyContacts,800);setTimeout(linkifyContacts,1800);
 
-    /* ★ پروفایل + قفل ★ */
+    /* ═══════════════════════════════════════════════════════
+       ★ پروفایل — با Force Removal و نگهبان امن ★
+       ═══════════════════════════════════════════════════════ */
     function injectMainTopActions(){
       var p=getProfile();
       var src=p.avatar||USER_AVATAR_URL;
       var name=p.name?p.name:'مشخصات من';
+
+      /* ★ گام ۱: حذف همه‌چیز مرتبط با پروفایل — در کل صفحه ★ */
+      document.querySelectorAll('.main-top-avatar, .main-top-icon-btn, .header-left-actions, #sirajHeaderActions, #mainProfileAvatar, #mainLockBtn, #mainTopActions, .main-top-actions').forEach(function(el){el.remove();});
+      document.querySelectorAll('#headerLockBtn').forEach(function(el){el.style.display='none';});
+
+      /* ★ گام ۲: ساخت تازه در هر هدر ★ */
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
-        h.querySelectorAll('.header-left-actions, .main-top-avatar, .main-top-icon-btn, #mainProfileAvatar, #mainLockBtn, #mainTopActions, .main-top-actions').forEach(function(el){el.remove();});
-        h.querySelectorAll('#headerLockBtn').forEach(function(el){el.style.display='none';});
         var w=document.createElement('div');
+        w.id='sirajHeaderActions';
         w.className='header-left-actions';
-        w.innerHTML='<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div><button type="button" class="main-top-icon-btn" title="قفل کردن سایت"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>';
+        w.innerHTML='<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div>'+
+                    '<button type="button" class="main-top-icon-btn" title="قفل کردن سایت"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>';
         h.appendChild(w);
         w.querySelector('.main-top-avatar').onclick=function(){if(typeof window.openSettings==='function')window.openSettings();setTimeout(function(){var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');if(b)b.click();},400);};
         w.querySelector('.main-top-icon-btn').onclick=function(){if(typeof window.lockNow==='function')window.lockNow();};
       });
     }
-    setTimeout(injectMainTopActions,600);
-    setTimeout(injectMainTopActions,1800);
-    setTimeout(injectMainTopActions,3500);
+    setTimeout(injectMainTopActions,500);
+    setTimeout(injectMainTopActions,1500);
+    setTimeout(injectMainTopActions,3000);
+
+    /* ★ نگهبان امن — فقط اگر وضعیت خراب بود ★ */
+    setInterval(function(){
+      var needsFix=false;
+      document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
+        var wraps=h.querySelectorAll('#sirajHeaderActions, .header-left-actions');
+        var avs=h.querySelectorAll('.main-top-avatar');
+        var lks=h.querySelectorAll('.main-top-icon-btn');
+        if(wraps.length!==1||avs.length!==1||lks.length!==1){needsFix=true;}
+      });
+      var stray=document.querySelectorAll('body > .main-top-avatar, body > .main-top-icon-btn, body > .header-left-actions');
+      if(stray.length)needsFix=true;
+      if(needsFix)injectMainTopActions();
+    }, 900);
+
     function updateMainTopAvatar(){var p=getProfile();var s=p.avatar||USER_AVATAR_URL;document.querySelectorAll('.main-top-avatar').forEach(function(a){a.title=p.name?p.name:'مشخصات من';a.innerHTML='<img src="'+s+'" alt="" draggable="false">';});}
 
-    /* Profile tab */
     if(typeof window.openSettings==='function'){
       var origOS=window.openSettings;
       window.openSettings=function(){try{origOS.apply(this,arguments);}catch(e){}setTimeout(injectProfileTab,250);};
@@ -641,11 +755,10 @@
     }
 
     /* ═══════════════════════════════════════════════════════
-       ★ اسلایدر نوار — نسخه ساده و امن ★
-       هرگز داخل observer، DOM دستکاری نمی‌کنه → بدون حلقه
+       ★ اسلایدر نوار — هماهنگ با انیمیشن دکمه ★
        ═══════════════════════════════════════════════════════ */
     (function(){
-      var nav=null, slider=null, ready=false, rafPending=false;
+      var nav=null, slider=null, ready=false;
 
       function init(){
         nav=document.getElementById('bottomNav');
@@ -658,46 +771,50 @@
         nav.insertBefore(slider, nav.firstChild);
         ready=true;
 
-        /* اولین رنگ */
         requestAnimationFrame(function(){
           paint(false);
           slider.classList.add('grow');
           setTimeout(function(){ slider.classList.remove('grow'); }, 560);
         });
 
-        /* ★ روی کلیک کاربر ★ */
+        /* کلیک روی دکمه — اندازه‌گیری با کلاس measuring (فوراً مقادیر نهایی) */
         nav.addEventListener('click', function(e){
           var btn=e.target.closest('.bottom-nav-btn');
-          if(!btn) return;
-          /* صبر کن تا کلاس active اعمال شه و دکمه باز شه */
-          setTimeout(function(){ paint(true); }, 420);
+          if(!btn||btn.classList.contains('nav-btn-chat')) return;
+          /* فوری مقادیر نهایی رو با measuring بگیر */
+          requestAnimationFrame(function(){ paint(true); });
         }, true);
 
-        /* ★ وقتی داده-nav-position عوض شه ★ */
+        /* تغییر جهت نوار */
         new MutationObserver(function(){
           requestAnimationFrame(function(){ paint(false); });
-        }).observe(document.documentElement, {
-          attributes:true, attributeFilter:['data-nav-position']
-        });
+        }).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position']});
 
         window.addEventListener('resize', function(){
           requestAnimationFrame(function(){ paint(false); });
         });
 
-        /* رفرش بعد از لود */
         setTimeout(function(){ paint(true); }, 700);
         return true;
       }
 
       function paint(animate){
-        if(!nav || !slider) return;
+        if(!nav||!slider) return;
         var active=nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
-        if(!active){
-          slider.classList.remove('visible');
-          return;
-        }
+        if(!active){ slider.classList.remove('visible'); return; }
+
         var nr=nav.getBoundingClientRect();
-        var br=active.getBoundingClientRect();
+
+        /* ★ اندازه‌گیری نهایی با کلاس measuring ★ */
+        var wasActive = active.classList.contains('active');
+        if(wasActive) active.classList.remove('active');
+        active.classList.add('measuring');
+        void active.offsetWidth;
+        var ar = active.getBoundingClientRect();
+        active.classList.remove('measuring');
+        if(wasActive) active.classList.add('active');
+        void active.offsetWidth;
+
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
         var vert=(pos==='left'||pos==='right');
 
@@ -708,10 +825,10 @@
           slider.classList.add('ready');
         }
 
-        slider.style.left=(br.left-nr.left)+'px';
-        slider.style.top=(br.top-nr.top)+'px';
-        slider.style.width=br.width+'px';
-        slider.style.height=br.height+'px';
+        slider.style.left=(ar.left-nr.left)+'px';
+        slider.style.top=(ar.top-nr.top)+'px';
+        slider.style.width=ar.width+'px';
+        slider.style.height=ar.height+'px';
         slider.style.borderRadius=vert?'16px':'21px';
 
         if(!animate){
@@ -723,12 +840,7 @@
       }
 
       window.__moveNavSlider=function(a){
-        if(rafPending) return;
-        rafPending=true;
-        requestAnimationFrame(function(){
-          rafPending=false;
-          paint(a!==false);
-        });
+        requestAnimationFrame(function(){ paint(a!==false); });
       };
 
       var tries=0;
@@ -737,7 +849,7 @@
       }, 100);
     })();
 
-    /* ═══ سوییچ بین تب‌ها ═══ */
+    /* ═══ سوییچ بین تب‌ها — سریع‌تر ═══ */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function')return false;
@@ -768,8 +880,8 @@
               oldEl.style.pointerEvents='';
               newEl.classList.remove(inClass);
               window.switchView.__busy=false;
-            },440);
-          },400);
+            },360);
+          },320);
         };
         window.switchView.__hooked=true;
         return true;
@@ -782,6 +894,6 @@
 
     setTimeout(function(){try{var dv=getDefaultView();if(dv&&dv!=='chat'&&typeof window.switchView==='function')window.switchView(dv);}catch(e){}},1200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v25 Fixed Freeze)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v26 Final)');
   }
 })();
