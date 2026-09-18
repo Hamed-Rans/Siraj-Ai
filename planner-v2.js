@@ -655,16 +655,22 @@
         nav.insertBefore(slider,nav.firstChild);ready=true;
         requestAnimationFrame(function(){track(0);slider.classList.add('grow');setTimeout(function(){slider.classList.remove('grow');},560);});
         nav.addEventListener('click',function(e){
-          var btn=e.target.closest('.bottom-nav-btn[data-view]');
-          if(!btn)return;
-          if(btn.classList.contains('nav-btn-chat')){
-            if(slider)slider.classList.remove('visible');
-            return;
-          }
-          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
-          btn.classList.add('active');
-          track(650);
-        },true);
+        var btn=e.target.closest('.bottom-nav-btn[data-view]');
+        if(!btn)return;
+        
+        /* افکت شناور */
+        nav.classList.add('nav-floating');
+        clearTimeout(nav.__floatT);
+        nav.__floatT=setTimeout(function(){nav.classList.remove('nav-floating');},380);
+        
+        if(btn.classList.contains('nav-btn-chat')){
+          if(slider)slider.classList.remove('visible');
+          return;
+        }
+        nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        track(650);
+      },true);
         new MutationObserver(function(){track(0);}).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position']});
         window.addEventListener('resize',function(){track(0);});
         setTimeout(function(){track(0);},800);
