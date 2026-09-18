@@ -4726,3 +4726,176 @@
 .view.active.view-in-from-right { animation: viewInFromRight .26s cubic-bezier(.22,1,.36,1) both !important; }
 .view.leaving.view-out-left  { animation: viewOutLeft .2s cubic-bezier(.4,0,1,1) forwards !important; }
 .view.leaving.view-out-right { animation: viewOutRight .2s cubic-bezier(.4,0,1,1) forwards !important; }
+/* ═══════════════════════════════════════════════════
+   PATCH v31 — Nav + Chat + Animations + Yearly
+   ═══════════════════════════════════════════════════ */
+
+/* ─── ۱) حذف افکت زیر نوار روی hover ─── */
+.bottom-nav::after { display: none !important; }
+
+/* ─── ۲) نوار — ارتفاع کمی بیشتر، gap مناسب ─── */
+.bottom-nav {
+  padding: 6px 12px !important;
+  gap: 4px !important;
+}
+
+/* فاصله بین پین و دکمه برنامه‌ریز */
+.nav-collapse-tab {
+  margin-inline-end: 8px !important;
+}
+
+/* ─── ۳) دکمه چت — بدون کادر، hover ملایم ─── */
+.bottom-nav-btn.nav-btn-chat {
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-dark)) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 4px 14px -6px var(--accent) !important;
+  transition: background .25s ease,
+              box-shadow .25s ease,
+              filter .2s ease !important;
+}
+.bottom-nav-btn.nav-btn-chat:hover {
+  transform: none !important;
+  filter: brightness(1.15) !important;
+  box-shadow: 0 4px 18px -4px var(--accent), 0 0 22px var(--accent-soft) !important;
+}
+.bottom-nav-btn.nav-btn-chat.active {
+  transform: none !important;
+  box-shadow: 0 4px 14px -6px var(--accent) !important;
+}
+.bottom-nav-btn.nav-btn-chat:active {
+  transform: scale(.95) !important;
+}
+
+/* ─── ۴) دکمه‌های نوار — فاصله‌ی کمتر وقتی active ─── */
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat) {
+  max-width: 130px !important;
+  padding: 0 12px 0 8px !important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+  max-width: 82px !important;
+  margin-left: 4px !important;
+  margin-right: 0 !important;
+}
+
+/* ─── ۵) انیمیشن تب‌ها — پایان نرم ─── */
+.view.active.view-in-from-left {
+  animation: viewInFromLeftSmooth .34s cubic-bezier(.16,1,.3,1) both !important;
+}
+.view.active.view-in-from-right {
+  animation: viewInFromRightSmooth .34s cubic-bezier(.16,1,.3,1) both !important;
+}
+.view.leaving.view-out-left {
+  animation: viewOutLeftSmooth .22s cubic-bezier(.4,0,.8,.6) forwards !important;
+}
+.view.leaving.view-out-right {
+  animation: viewOutRightSmooth .22s cubic-bezier(.4,0,.8,.6) forwards !important;
+}
+
+@keyframes viewOutLeftSmooth {
+  0%   { opacity: 1; transform: translateX(0); filter: blur(0); }
+  100% { opacity: 0; transform: translateX(-55px); filter: blur(6px); }
+}
+@keyframes viewOutRightSmooth {
+  0%   { opacity: 1; transform: translateX(0); filter: blur(0); }
+  100% { opacity: 0; transform: translateX(55px); filter: blur(6px); }
+}
+@keyframes viewInFromLeftSmooth {
+  0%   { opacity: 0; transform: translateX(-55px) scale(.985); filter: blur(6px); }
+  55%  { opacity: .9; filter: blur(1px); }
+  85%  { opacity: 1; transform: translateX(-3px) scale(1); filter: blur(0); }
+  100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+@keyframes viewInFromRightSmooth {
+  0%   { opacity: 0; transform: translateX(55px) scale(.985); filter: blur(6px); }
+  55%  { opacity: .9; filter: blur(1px); }
+  85%  { opacity: 1; transform: translateX(3px) scale(1); filter: blur(0); }
+  100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+
+/* ─── ۶) اهداف سالانه — بالاتر ─── */
+.monthly-layout:has(.year-overview) .monthly-side {
+  padding-top: 6px !important;
+}
+
+/* ─── ۷) نوار چپ/راست — تمیز و یکدست ─── */
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav {
+  padding: 6px 4px !important;
+  gap: 4px !important;
+  border-radius: 22px !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: auto !important;
+  max-height: calc(100vh - 40px) !important;
+  overflow: visible !important;
+}
+
+/* همه دکمه‌ها هم‌اندازه */
+[data-nav-position="left"] .bottom-nav-btn,
+[data-nav-position="right"] .bottom-nav-btn {
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+  flex: 0 0 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+[data-nav-position="left"] .nav-collapse-tab,
+[data-nav-position="right"] .nav-collapse-tab {
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  height: 40px !important;
+  max-height: 40px !important;
+  flex: 0 0 40px !important;
+  margin: 0 !important;
+}
+
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat {
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  flex: 0 0 44px !important;
+  margin: 4px 0 !important;
+}
+
+/* فقط active بزرگ‌تر می‌شه */
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat) {
+  height: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+  flex: 0 0 58px !important;
+  padding: 5px 3px !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+/* متن زیر آیکون در حالت active */
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+  max-width: 44px !important;
+  margin: 2px 0 0 0 !important;
+  font-size: 9px !important;
+  opacity: 1 !important;
+}
+
+/* اسلایدر چپ/راست هم‌اندازه دکمه */
+[data-nav-position="left"] .nav-slider,
+[data-nav-position="right"] .nav-slider {
+  border-radius: 12px !important;
+}
