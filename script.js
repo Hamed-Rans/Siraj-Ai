@@ -36,7 +36,7 @@ const APP_CONFIG={
         {id:'solid',name:'ساده',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/>'},
         {id:'glass',name:'شیشه‌ای',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 6v12M18 6v12" opacity=".4"/>'}
     ],
-        navPositions:[
+           navPositions:[
         {id:'right',name:'راست',icon:'<rect x="17" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="12" height="18" rx="2"/>'},
         {id:'bottom',name:'پایین',icon:'<rect x="3" y="17" width="18" height="4" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="18" height="12" rx="2"/>'},
         {id:'top',name:'بالا',icon:'<rect x="3" y="3" width="18" height="4" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="9" width="18" height="12" rx="2"/>'},
@@ -1044,8 +1044,6 @@ function loadChat(id){
   currentChatId=id;
   const box=document.getElementById('box');
   box.innerHTML='';
-  
-  /* ★ انیمیشن fade + slide نرم */
   box.style.transition='none';
   box.style.opacity='0';
   box.style.transform='translateY(12px)';
@@ -1056,7 +1054,6 @@ function loadChat(id){
       box.style.transform='translateY(0)';
     });
   });
-  
   c.messages.forEach(m=>{
     if(m.role==='user') renderUserMsg(m.content,m.fileData,m.fileType,true);
     else renderBotMsg(m.content,true);
@@ -1981,3 +1978,19 @@ window.addEventListener('load',()=>{
     },30000);
     resetInactivityTimer();
 });
+/* ★ Override برای صفحه مقالات — فیکس چیدمان */
+(function(){
+  if(typeof window.renderBlog === 'function'){
+    window.renderBlog = function(){
+      var v = document.getElementById('view-blog');
+      if(!v) return;
+      v.innerHTML = '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>'
+        + '<div class="community-hero">'
+        + '<div class="community-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
+        + '<div class="community-title">مقالات سراج</div>'
+        + '<div class="community-desc">اینجا قراره مطالب آموزشی، تحلیل‌های ادبی، نکات دستوری و یادداشت‌های کوتاه درباره‌ی زبان و ادبیات عربی منتشر بشه.</div>'
+        + '<div class="community-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
+        + '</div>';
+    };
+  }
+})();
