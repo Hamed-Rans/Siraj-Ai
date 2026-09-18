@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v36 Final) */
+/* Siraj v2.0 — planner-v2.js (v38 Final) */
 (function(){
   'use strict';
 
@@ -493,7 +493,7 @@
       }
     }
 
-    /* ─── ★ heroes با دکمه برگشت ─── */
+    /* ─── heroes با دکمه برگشت ─── */
     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -1635,7 +1635,6 @@
       var setup=o.querySelector('#studySetup');
       var running=o.querySelector('#studyRunning');
 
-      /* انیمیشن خروج setup */
       setup.style.transition='opacity .28s ease, transform .32s ease';
       setup.style.opacity='0';
       setup.style.transform='scale(.94)';
@@ -1759,7 +1758,7 @@
       stopAudio();unlockSite();closeStudy();
     }
 
-    /* ★ closeStudy با انیمیشن خروج نرم */
+    /* ★ closeStudy با انیمیشن خروج */
     function closeStudy(){
       try{stopAudio();}catch(e){}
       var o=document.getElementById('studyOverlay');
@@ -1939,7 +1938,7 @@
       }
     };
 
-    /* ─── blog/community ★ بازطراحی شده ─── */
+    /* ─── blog/community بازطراحی ─── */
     function blogHTML(){
       return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>'
       +'<div class="blog-v2-hero">'
@@ -1970,7 +1969,6 @@
       +'</div>'
       +'</div>';
     }
-    /* ★ پچ کردن renderBlog و renderCommunity از script.js */
     function patchBlogCommunityRender(){
       if(typeof window.renderBlog==='function' && !window.renderBlog.__sirajPatch){
         window.renderBlog=function(){
@@ -2189,7 +2187,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NAV SLIDER — v36 با wrapper + grow + slide نرم
+       NAV SLIDER — v38 با موقعیت نهایی + بدون کش‌آمدگی
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null;
@@ -2211,7 +2209,10 @@
           }
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
           btn.classList.add('active');
-          setTimeout(function(){track();},30);
+          /* چند مرحله track برای هماهنگی با انیمیشن دکمه */
+          setTimeout(function(){track();},20);
+          setTimeout(function(){track();},200);
+          setTimeout(function(){track();},450);
         },true);
 
         setTimeout(function(){track(true);},150);
@@ -2234,32 +2235,52 @@
           return;
         }
 
-        var nr=nav.getBoundingClientRect();
-        var br=btn.getBoundingClientRect();
-        var x=br.left-nr.left;
-        var y=br.top-nr.top;
-        var w=br.width;
-        var h=br.height;
+        /* ★ برای پایین/بالا: موقعیت نهایی دکمه رو با غیرفعال کردن موقت ترنزیشن می‌خونیم */
+        var isHoriz=(pos==='bottom'||pos==='top');
+        var x,y,w,h;
+        if(isHoriz){
+          var oldT=btn.style.transition;
+          btn.style.transition='none';
+          void btn.offsetWidth;
+          var nr0=nav.getBoundingClientRect();
+          var br0=btn.getBoundingClientRect();
+          btn.style.transition=oldT;
+          x=br0.left-nr0.left;
+          y=br0.top-nr0.top;
+          w=br0.width;
+          h=br0.height;
+        } else {
+          var nr=nav.getBoundingClientRect();
+          var br=btn.getBoundingClientRect();
+          x=br.left-nr.left;
+          y=br.top-nr.top;
+          w=br.width;
+          h=br.height;
+        }
 
         var fill=slider.querySelector('.nav-slider-fill');
-        if(fill) fill.style.borderRadius = vert ? '16px' : '20px';
+        if(fill) fill.style.borderRadius = '20px';
+
+        /* ارتفاع اسلایدر کمی بیشتر — بصری قشنگ‌تر */
+        var extraH = isHoriz ? 8 : 4;
+        var extraY = isHoriz ? -4 : -2;
 
         var wasVisible = slider.classList.contains('visible');
 
         if(!wasVisible || forceGrow){
           slider.style.transition='none';
-          slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
+          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0)';
           slider.style.width=w+'px';
-          slider.style.height=h+'px';
+          slider.style.height=(h+extraH)+'px';
           void slider.offsetWidth;
           slider.style.transition='';
           slider.classList.add('visible','grow');
           setTimeout(function(){slider.classList.remove('grow');},520);
         } else {
           slider.style.transition='transform .42s cubic-bezier(.22,1,.36,1), width .42s cubic-bezier(.22,1,.36,1), height .42s cubic-bezier(.22,1,.36,1), opacity .25s ease';
-          slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
+          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0)';
           slider.style.width=w+'px';
-          slider.style.height=h+'px';
+          slider.style.height=(h+extraH)+'px';
         }
       }
 
@@ -2358,6 +2379,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v36 Final)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v38 Final)');
   }
 })();
