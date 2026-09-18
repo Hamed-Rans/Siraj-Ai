@@ -1,7 +1,8 @@
-/* Siraj v2.0 — script.js (v43 Final) */
+/* Siraj v2.0 — script.js (v3.0 Final) */
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
+    devNotifUrl:"", /* ★ آدرس JSON اعلان‌های سازنده — بعداً پر کن */
     defaultSettings:{
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
         animation:'normal',model:'gemini-3.6-flash',dialect:'fusha',
@@ -15,7 +16,15 @@ const APP_CONFIG={
         fontFamily:'vazirmatn',uiLang:'fa',
         password:'',passwordEnabled:false,
         autoLockMinutes:0,lockOnTabSwitch:false,
-        profileImage:''
+        profileImage:'',
+        /* ★ جدید: اعلان‌ها */
+        notifEnabled:true,
+        notifPreMinutes:10,
+        /* ★ جدید: مطالعه */
+        studyDefaultMinutes:25,
+        studyStrictMode:true,
+        /* ★ جدید: نسخه */
+        appVersion:'3.0'
     },
     themeColors:['navy','crimson','gold','purple','emerald','indigo'],
     colorNames:{navy:'شبانه',crimson:'آتشین',gold:'زرین',purple:'جادویی',emerald:'طبیعی',indigo:'نیلی'},
@@ -125,6 +134,8 @@ const LOCK_SESSION_KEY='siraj-unlocked-session';
 const SESSIONS_KEY='siraj-active-sessions';
 const SESSION_ID_KEY='siraj-session-id';
 const PROFILE_IMG_KEY='siraj-profile-img';
+const DEV_NOTIF_SEEN_KEY='siraj-dev-notif-seen';
+const DEV_NOTIF_CACHE_KEY='siraj-dev-notif-cache';
 
 const RateLimiter={queue:[],processing:false,minInterval:1500,lastRequest:0,
     async run(fn){return new Promise((res,rej)=>{this.queue.push({fn,res,rej});this.process();});},
@@ -162,6 +173,7 @@ let sessionPingInterval=null;
 let inactivityTimer=null;
 let plannerTab='daily';
 let currentPanelTab='history';
+window._settingsSub='general';
 
 function loadSettings(){try{const l=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};const s=Object.assign({},APP_CONFIG.defaultSettings,l);
     const pi=localStorage.getItem(PROFILE_IMG_KEY);
@@ -469,6 +481,8 @@ function applySettingsToUI(s){
     const tb=document.getElementById('thinkBtn');if(tb)tb.classList.toggle('active',t.thinking);
     const qb=document.getElementById('quickBtn');if(qb)qb.classList.toggle('active',t.quick);
     applyPattern(document.getElementById('patternLayer'),t.pattern,t.patternColor1,t.patternColor2,t.patternPerCorner,t.patternSize,t.patternPosition,t.patternOpacity);
+    var vb=document.getElementById('versionBadge');
+    if(vb) vb.textContent='v'+(t.appVersion||'3.0');
     resetInactivityTimer();
     setTimeout(()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);},100);
 }
@@ -695,7 +709,6 @@ function switchPlannerTab(tab){
     }
 }
 
-/* ★★★ بازطراحی مقالات با هدر پلنر ★★★ */
 function renderBlog(){
     const v=document.getElementById('view-blog');
     if(!v) return;
@@ -705,7 +718,7 @@ function renderBlog(){
       +'</div>'
       +'<div class="planner-hero-text">'
       +'<div class="planner-hero-title" style="background:linear-gradient(135deg,#F4D03F,#D4AF37,#B8860B);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">مقالات سراج</div>'
-      +'<div class="planner-hero-sub">جایی برای یادداشت‌ها، تحلیل‌ها و مقالات شما در زبان و ادبیات عربی</div>'
+      +'<div class="planner-hero-sub">جایی برای یادداشت‌ها، تحلیل‌ها و مقالات در زبان و ادبیات عربی</div>'
       +'</div>'
       +'</div>'
       +'<div class="page-empty-card new-style">'
@@ -724,7 +737,6 @@ function renderBlog(){
 function addBlogPost(){const t=document.getElementById('blogTitle')?.value.trim();const b=document.getElementById('blogBody')?.value.trim();if(!t||!b){toast('عنوان و متن لازمه','error');return;}const p=loadBlog();p.unshift({title:t,body:b,ts:Date.now()});saveBlog(p);renderBlog();renderPanelForBlog();toast('مقاله منتشر شد','success');}
 function deleteBlogPost(i){const p=loadBlog();p.splice(i,1);saveBlog(p);renderBlog();renderPanelForBlog();}
 
-/* ★★★ بازطراحی انجمن با هدر پلنر ★★★ */
 function renderCommunity(){
     const v=document.getElementById('view-videos');
     if(!v) return;
@@ -1197,6 +1209,7 @@ function importBackup(ev){
 function openSettings(){
     try{
         settingsCat='appearance';
+        window._settingsSub='general';
         settingsDraft=JSON.parse(JSON.stringify(settings));
         renderSettingsControls();
         updatePreview();
@@ -1240,8 +1253,8 @@ function applySettings(){
 function switchSettingsCat(cat){
     if(cat===settingsCat)return;
     settingsCat=cat;
-    document.querySelectorAll('.settings-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));
-    document.querySelectorAll('.settings-content').forEach(c=>c.classList.toggle('active',c.dataset.cat===cat));
+    if(cat==='appearance') window._settingsSub='general';
+    renderSettingsControls();
     if(cat==='privacy'){renderSessionsList();}
     setTimeout(()=>{
         document.querySelectorAll('#settingsContentWrap input[type=range]').forEach(inp=>{
@@ -1267,13 +1280,13 @@ function updatePvNavPreview(){
 
 function updateDraft(key,value){
     if(!settingsDraft)return;
-    if(['patternSize','patternOpacity','patternPerCorner','navShadowLevel','bgImageOpacity','autoLockMinutes'].includes(key))value=parseInt(value,10);
+    if(['patternSize','patternOpacity','patternPerCorner','navShadowLevel','bgImageOpacity','autoLockMinutes','notifPreMinutes','studyDefaultMinutes'].includes(key))value=parseInt(value,10);
     if(key==='bgPreset'){settingsDraft.bgImage='';settingsDraft.bgPreset=value;}
     else settingsDraft[key]=value;
     document.querySelectorAll('#settingsContentWrap .row-btn, #settingsContentWrap .color-opt, #settingsContentWrap .pattern-opt, #settingsContentWrap .bg-opt').forEach(b=>{
         if(b.dataset.key===key)b.classList.toggle('active',String(b.dataset.value)===String(value));
     });
-    if(['patternSize','patternOpacity','patternPerCorner','navShadowLevel','bgImageOpacity','autoLockMinutes'].includes(key)){
+    if(['patternSize','patternOpacity','patternPerCorner','navShadowLevel','bgImageOpacity','autoLockMinutes','notifPreMinutes','studyDefaultMinutes'].includes(key)){
         document.querySelectorAll('#settingsContentWrap input[type=range]').forEach(inp=>{
             if((inp.getAttribute('oninput')||'').includes(`'${key}'`)){
                 const pct=((inp.value-inp.min)/(inp.max-inp.min))*100;
@@ -1379,7 +1392,7 @@ function handleProfileUpload(ev){
     r.onload=e=>{
         if(!settingsDraft)return;
         settingsDraft.profileImage=e.target.result;
-        toast('عکس انتخاب شد ✓ — الان «اعمال تغییرات» رو بزن','success');
+        toast('عکس انتخاب شد ✓','success');
         renderSettingsControls();
     };
     r.readAsDataURL(f);
@@ -1425,7 +1438,7 @@ function renderSessionsList(){
                 <div class="s-name">${escapeHtml(getDeviceName(s.ua,s.platform))} ${isMe?'<span class="s-badge">دستگاه فعلی</span>':''}</div>
                 <div class="s-sub">${timeAgo(s.lastPing)}${s.lang?' · '+s.lang:''}</div>
             </div>
-            ${isMe?'':`<button class="s-del" onclick="removeSession('${s.id}')" title="خروج از این دستگاه"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`}
+            ${isMe?'':`<button class="s-del" onclick="removeSession('${s.id}')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`}
         </div>`;
     }).join('');
 }
@@ -1456,101 +1469,112 @@ function renderSettingsControls(){
     const wrap=document.getElementById('settingsContentWrap');
     tabs.innerHTML=`
         <button class="settings-tab-btn${settingsCat==='appearance'?' active':''}" data-cat="appearance" onclick="switchSettingsCat('appearance')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 L14 9 L12 12 L10 9 Z"/></svg>ظاهر</button>
-        <button class="settings-tab-btn${settingsCat==='header'?' active':''}" data-cat="header" onclick="switchSettingsCat('header')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>استایل</button>
-        <button class="settings-tab-btn${settingsCat==='pattern'?' active':''}" data-cat="pattern" onclick="switchSettingsCat('pattern')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 Q16 9 12 12 Q8 9 12 3Z"/></svg>طرح</button>
-        <button class="settings-tab-btn${settingsCat==='font'?' active':''}" data-cat="font" onclick="switchSettingsCat('font')"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>فونت</button>
-        <button class="settings-tab-btn${settingsCat==='nav'?' active':''}" data-cat="nav" onclick="switchSettingsCat('nav')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>نوار</button>
+        <button class="settings-tab-btn${settingsCat==='style'?' active':''}" data-cat="style" onclick="switchSettingsCat('style')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>استایل</button>
+        <button class="settings-tab-btn${settingsCat==='behavior'?' active':''}" data-cat="behavior" onclick="switchSettingsCat('behavior')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>رفتار</button>
         <button class="settings-tab-btn${settingsCat==='privacy'?' active':''}" data-cat="privacy" onclick="switchSettingsCat('privacy')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>حریم خصوصی</button>
         <button class="settings-tab-btn${settingsCat==='about'?' active':''}" data-cat="about" onclick="switchSettingsCat('about')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>درباره ما</button>`;
+
+    var subState = window._settingsSub || 'general';
+
     wrap.innerHTML=`
         <div class="settings-content${settingsCat==='appearance'?' active':''}" data-cat="appearance">
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>حالت نمایش</label>
-                <div class="row-btns">
-                    <button class="row-btn${s.themeMode==='dark'?' active':''}" data-key="themeMode" data-value="dark" onclick="updateDraft('themeMode','dark')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>
-                    <button class="row-btn${s.themeMode==='light'?' active':''}" data-key="themeMode" data-value="light" onclick="updateDraft('themeMode','light')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg><span class="rb-label">روز</span></button>
-                    <button class="row-btn${s.themeMode==='midnight'?' active':''}" data-key="themeMode" data-value="midnight" onclick="updateDraft('themeMode','midnight')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>
+            <div class="settings-subtabs">
+                <button class="settings-subtab${subState==='general'?' active':''}" onclick="window._settingsSub='general';renderSettingsControls();">تم و رنگ</button>
+                <button class="settings-subtab${subState==='header'?' active':''}" onclick="window._settingsSub='header';renderSettingsControls();">هدر و المان</button>
+                <button class="settings-subtab${subState==='pattern'?' active':''}" onclick="window._settingsSub='pattern';renderSettingsControls();">طرح</button>
+                <button class="settings-subtab${subState==='font'?' active':''}" onclick="window._settingsSub='font';renderSettingsControls();">فونت</button>
+            </div>
+
+            <div class="settings-subcontent${subState==='general'?' active':''}" data-sub="general">
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>حالت نمایش</label>
+                    <div class="row-btns">
+                        <button class="row-btn${s.themeMode==='dark'?' active':''}" data-key="themeMode" data-value="dark" onclick="updateDraft('themeMode','dark')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>
+                        <button class="row-btn${s.themeMode==='light'?' active':''}" data-key="themeMode" data-value="light" onclick="updateDraft('themeMode','light')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg><span class="rb-label">روز</span></button>
+                        <button class="row-btn${s.themeMode==='midnight'?' active':''}" data-key="themeMode" data-value="midnight" onclick="updateDraft('themeMode','midnight')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>
+                    </div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ اصلی</label>
+                    <div class="color-row">${APP_CONFIG.themeColors.map(c=>`<div class="color-opt${s.themeColor===c?' active':''}" data-key="themeColor" data-value="${c}" onclick="updateDraft('themeColor','${c}')"><div class="color-orb" data-color="${c}"><svg viewBox="0 0 24 24">${APP_CONFIG.colorIcons[c]}</svg></div><div class="color-label">${APP_CONFIG.colorNames[c]}</div></div>`).join('')}</div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="6"/></svg>شکل حباب</label>
+                    <div class="row-btns">${APP_CONFIG.bubbleShapes.map(b=>`<button class="row-btn${s.bubbleShape===b.id?' active':''}" data-key="bubbleShape" data-value="${b.id}" onclick="updateDraft('bubbleShape','${b.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${b.icon}</svg><span class="rb-label">${b.name}</span></button>`).join('')}</div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>اندازه متن</label>
+                    <div class="row-btns">${['13px','15px','17px','19px'].map((f,i)=>`<button class="row-btn${s.fontSize===f?' active':''}" data-key="fontSize" data-value="${f}" onclick="updateDraft('fontSize','${f}')"><span class="rb-label">${['کوچیک','معمولی','درشت','بزرگ'][i]}</span></button>`).join('')}</div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15 L9 9 L15 15 L21 9"/></svg>تصویر پس‌زمینه</label>
+                    <div class="bg-grid">${APP_CONFIG.bgPresets.map(bgOpt).join('')}</div>
+                    <label class="bg-upload-btn" style="margin-top:8px">
+                        <input type="file" accept="image/*" onchange="handleBgUpload(event)">
+                        <svg viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                        <span>آپلود تصویر</span>
+                    </label>
+                    ${s.bgImage?`<button class="btn-secondary" style="width:100%;margin-top:6px" onclick="clearBgImage()">حذف تصویر</button>`:''}
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" opacity=".5"/></svg>شفافیت پس‌زمینه</label>
+                    <div class="slider-row"><input type="range" min="10" max="100" step="5" value="${s.bgImageOpacity||100}" oninput="updateDraft('bgImageOpacity',this.value)"><span class="slider-val">${s.bgImageOpacity||100}%</span></div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>سرعت انیمیشن</label>
+                    <div class="row-btns">${APP_CONFIG.animations.map(a=>`<button class="row-btn${s.animation===a.id?' active':''}" data-key="animation" data-value="${a.id}" onclick="updateDraft('animation','${a.id}')"><span class="rb-label">${a.name}</span></button>`).join('')}</div>
                 </div>
             </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ اصلی</label>
-                <div class="color-row">${APP_CONFIG.themeColors.map(c=>`<div class="color-opt${s.themeColor===c?' active':''}" data-key="themeColor" data-value="${c}" onclick="updateDraft('themeColor','${c}')"><div class="color-orb" data-color="${c}"><svg viewBox="0 0 24 24">${APP_CONFIG.colorIcons[c]}</svg></div><div class="color-label">${APP_CONFIG.colorNames[c]}</div></div>`).join('')}</div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="6"/></svg>شکل حباب</label>
-                <div class="row-btns">${APP_CONFIG.bubbleShapes.map(b=>`<button class="row-btn${s.bubbleShape===b.id?' active':''}" data-key="bubbleShape" data-value="${b.id}" onclick="updateDraft('bubbleShape','${b.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${b.icon}</svg><span class="rb-label">${b.name}</span></button>`).join('')}</div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>اندازه متن</label>
-                <div class="row-btns">${['13px','15px','17px','19px'].map((f,i)=>`<button class="row-btn${s.fontSize===f?' active':''}" data-key="fontSize" data-value="${f}" onclick="updateDraft('fontSize','${f}')"><span class="rb-label">${['کوچیک','معمولی','درشت','بزرگ'][i]}</span></button>`).join('')}</div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15 L9 9 L15 15 L21 9"/></svg>تصویر پس‌زمینه</label>
-                <div class="bg-grid">${APP_CONFIG.bgPresets.map(bgOpt).join('')}</div>
-                <label class="bg-upload-btn" style="margin-top:8px">
-                    <input type="file" accept="image/*" onchange="handleBgUpload(event)">
-                    <svg viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                    <span>آپلود تصویر از دستگاه</span>
-                </label>
-                ${s.bgImage?`<button class="btn-secondary" style="width:100%;margin-top:6px" onclick="clearBgImage()">حذف تصویر آپلود شده</button>`:''}
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" opacity=".5"/></svg>شفافیت تصویر پس‌زمینه</label>
-                <div class="slider-row"><input type="range" min="10" max="100" step="5" value="${s.bgImageOpacity||100}" oninput="updateDraft('bgImageOpacity',this.value)"><span class="slider-val">${s.bgImageOpacity||100}%</span></div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>سرعت انیمیشن</label>
-                <div class="row-btns">${APP_CONFIG.animations.map(a=>`<button class="row-btn${s.animation===a.id?' active':''}" data-key="animation" data-value="${a.id}" onclick="updateDraft('animation','${a.id}')"><span class="rb-label">${a.name}</span></button>`).join('')}</div>
-            </div>
-        </div>
 
-        <div class="settings-content${settingsCat==='header'?' active':''}" data-cat="header">
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/></svg>پس‌زمینه هدر</label>
-                <div class="row-btns">${APP_CONFIG.headerStyles.map(h=>`<button class="row-btn${s.headerStyle===h.id?' active':''}" data-key="headerStyle" data-value="${h.id}" onclick="updateDraft('headerStyle','${h.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${h.icon}</svg><span class="rb-label">${h.name}</span></button>`).join('')}</div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>نوار نوشتن پیام</label>
-                <div class="row-btns">${APP_CONFIG.inputStyles.map(i=>`<button class="row-btn${s.inputStyle===i.id?' active':''}" data-key="inputStyle" data-value="${i.id}" onclick="updateDraft('inputStyle','${i.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${i.icon}</svg><span class="rb-label">${i.name}</span></button>`).join('')}</div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>استایل المان‌ها (کارت‌ها، تقویم و ...)</label>
-                <div class="row-btns">${APP_CONFIG.elementStyles.map(el=>`<button class="row-btn${s.elementStyle===el.id?' active':''}" data-key="elementStyle" data-value="${el.id}" onclick="updateDraft('elementStyle','${el.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${el.icon}</svg><span class="rb-label">${el.name}</span></button>`).join('')}</div>
-            </div>
-        </div>
-
-        <div class="settings-content${settingsCat==='pattern'?' active':''}" data-cat="pattern">
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>انتخاب طرح</label>
-                <div class="pattern-grid">${APP_CONFIG.patterns.map(p=>`<div class="pattern-opt${s.pattern===p.id?' active':''}" data-key="pattern" data-value="${p.id}" onclick="updateDraft('pattern','${p.id}')"><div class="pattern-thumb th-${p.id}"></div><div class="pattern-name">${p.name}</div></div>`).join('')}</div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>موقعیت</label>
-                <div class="row-btns">
-                    <button class="row-btn${s.patternPosition==='both'?' active':''}" data-key="patternPosition" data-value="both" onclick="updateDraft('patternPosition','both')"><span class="rb-label">دو گوشه</span></button>
-                    <button class="row-btn${s.patternPosition==='reverse'?' active':''}" data-key="patternPosition" data-value="reverse" onclick="updateDraft('patternPosition','reverse')"><span class="rb-label">برعکس</span></button>
-                    <button class="row-btn${s.patternPosition==='tr'?' active':''}" data-key="patternPosition" data-value="tr" onclick="updateDraft('patternPosition','tr')"><span class="rb-label">فقط راست</span></button>
-                    <button class="row-btn${s.patternPosition==='bl'?' active':''}" data-key="patternPosition" data-value="bl" onclick="updateDraft('patternPosition','bl')"><span class="rb-label">فقط چپ</span></button>
+            <div class="settings-subcontent${subState==='header'?' active':''}" data-sub="header">
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/></svg>پس‌زمینه هدر</label>
+                    <div class="row-btns">${APP_CONFIG.headerStyles.map(h=>`<button class="row-btn${s.headerStyle===h.id?' active':''}" data-key="headerStyle" data-value="${h.id}" onclick="updateDraft('headerStyle','${h.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${h.icon}</svg><span class="rb-label">${h.name}</span></button>`).join('')}</div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>نوار نوشتن پیام</label>
+                    <div class="row-btns">${APP_CONFIG.inputStyles.map(i=>`<button class="row-btn${s.inputStyle===i.id?' active':''}" data-key="inputStyle" data-value="${i.id}" onclick="updateDraft('inputStyle','${i.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${i.icon}</svg><span class="rb-label">${i.name}</span></button>`).join('')}</div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>استایل المان‌ها</label>
+                    <div class="row-btns">${APP_CONFIG.elementStyles.map(el=>`<button class="row-btn${s.elementStyle===el.id?' active':''}" data-key="elementStyle" data-value="${el.id}" onclick="updateDraft('elementStyle','${el.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${el.icon}</svg><span class="rb-label">${el.name}</span></button>`).join('')}</div>
+                    <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;padding:4px 0">حالت شیشه‌ای، پشت المان‌ها رو با افکت بلور نشون می‌ده.</div>
                 </div>
             </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>تعداد در گوشه</label>
-                <div class="slider-row"><input type="range" min="1" max="8" step="1" value="${s.patternPerCorner}" oninput="updateDraft('patternPerCorner',this.value)"><span class="slider-val">${s.patternPerCorner}×</span></div>
+
+            <div class="settings-subcontent${subState==='pattern'?' active':''}" data-sub="pattern">
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>انتخاب طرح</label>
+                    <div class="pattern-grid">${APP_CONFIG.patterns.map(p=>`<div class="pattern-opt${s.pattern===p.id?' active':''}" data-key="pattern" data-value="${p.id}" onclick="updateDraft('pattern','${p.id}')"><div class="pattern-thumb th-${p.id}"></div><div class="pattern-name">${p.name}</div></div>`).join('')}</div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>موقعیت</label>
+                    <div class="row-btns">
+                        <button class="row-btn${s.patternPosition==='both'?' active':''}" data-key="patternPosition" data-value="both" onclick="updateDraft('patternPosition','both')"><span class="rb-label">دو گوشه</span></button>
+                        <button class="row-btn${s.patternPosition==='reverse'?' active':''}" data-key="patternPosition" data-value="reverse" onclick="updateDraft('patternPosition','reverse')"><span class="rb-label">برعکس</span></button>
+                        <button class="row-btn${s.patternPosition==='tr'?' active':''}" data-key="patternPosition" data-value="tr" onclick="updateDraft('patternPosition','tr')"><span class="rb-label">راست</span></button>
+                        <button class="row-btn${s.patternPosition==='bl'?' active':''}" data-key="patternPosition" data-value="bl" onclick="updateDraft('patternPosition','bl')"><span class="rb-label">چپ</span></button>
+                    </div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>تعداد در گوشه</label>
+                    <div class="slider-row"><input type="range" min="1" max="8" step="1" value="${s.patternPerCorner}" oninput="updateDraft('patternPerCorner',this.value)"><span class="slider-val">${s.patternPerCorner}×</span></div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>اندازه</label>
+                    <div class="slider-row"><input type="range" min="60" max="350" step="10" value="${s.patternSize}" oninput="updateDraft('patternSize',this.value)"><span class="slider-val">${s.patternSize}px</span></div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" opacity=".5"/></svg>شفافیت</label>
+                    <div class="slider-row"><input type="range" min="10" max="100" step="5" value="${s.patternOpacity}" oninput="updateDraft('patternOpacity',this.value)"><span class="slider-val">${s.patternOpacity}%</span></div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ‌های طرح</label>
+                    <div class="color-picker-row">
+                        <div class="color-picker-wrap"><label>رنگ ۱</label><input type="color" value="${s.patternColor1}" oninput="updateDraft('patternColor1',this.value)"></div>
+                        <div class="color-picker-wrap"><label>رنگ ۲</label><input type="color" value="${s.patternColor2}" oninput="updateDraft('patternColor2',this.value)"></div>
+                    </div>
+                </div>
             </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>اندازه</label>
-                <div class="slider-row"><input type="range" min="60" max="350" step="10" value="${s.patternSize}" oninput="updateDraft('patternSize',this.value)"><span class="slider-val">${s.patternSize}px</span></div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" opacity=".5"/></svg>شفافیت</label>
-                <div class="slider-row"><input type="range" min="10" max="100" step="5" value="${s.patternOpacity}" oninput="updateDraft('patternOpacity',this.value)"><span class="slider-val">${s.patternOpacity}%</span></div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ‌های طرح</label>
-                <div class="color-picker-row">
-                    <div class="color-picker-wrap"><label>رنگ ۱</label><input type="color" value="${s.patternColor1}" oninput="updateDraft('patternColor1',this.value)"></div>
-                    <div class="color-picker-wrap"><label>رنگ ۲</label><input type="color" value="${s.patternColor2}" oninput="updateDraft('patternColor2',this.value)"></div>
+
+            <div class="settings-subcontent${subState==='font'?' active':''}" data-sub="font">
+                <div class="setting-group">
+                    <div class="group-subtitle">فونت‌های فارسی</div>
+                    <div class="row-btns">${APP_CONFIG.fonts.persian.map(fontRow).join('')}</div>
+                    <div class="group-subtitle">فونت‌های عربی</div>
+                    <div class="row-btns">${APP_CONFIG.fonts.arabic.map(fontRow).join('')}</div>
+                    <div class="group-subtitle">فونت‌های انگلیسی</div>
+                    <div class="row-btns">${APP_CONFIG.fonts.english.map(fontRow).join('')}</div>
                 </div>
             </div>
         </div>
 
-        <div class="settings-content${settingsCat==='font'?' active':''}" data-cat="font">
-            <div class="setting-group">
-                <div class="group-subtitle">فونت‌های فارسی</div>
-                <div class="row-btns">${APP_CONFIG.fonts.persian.map(fontRow).join('')}</div>
-                <div class="group-subtitle">فونت‌های عربی</div>
-                <div class="row-btns">${APP_CONFIG.fonts.arabic.map(fontRow).join('')}</div>
-                <div class="group-subtitle">فونت‌های انگلیسی</div>
-                <div class="row-btns">${APP_CONFIG.fonts.english.map(fontRow).join('')}</div>
-            </div>
-        </div>
-
-        <div class="settings-content${settingsCat==='nav'?' active':''}" data-cat="nav">
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>حالت باز/بسته</label>
+        <div class="settings-content${settingsCat==='style'?' active':''}" data-cat="style">
+            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>حالت باز/بسته نوار</label>
                 <div class="row-btns">
                     <button class="row-btn${!s.navStartCollapsed?' active':''}" data-key="navStartCollapsed" data-value="false" onclick="updateDraft('navStartCollapsed',false)"><span class="rb-label">باز</span></button>
                     <button class="row-btn${s.navStartCollapsed?' active':''}" data-key="navStartCollapsed" data-value="true" onclick="updateDraft('navStartCollapsed',true)"><span class="rb-label">جمع‌شده</span></button>
@@ -1567,70 +1591,97 @@ function renderSettingsControls(){
             </div>
         </div>
 
+        <div class="settings-content${settingsCat==='behavior'?' active':''}" data-cat="behavior">
+            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+                <label><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>اعلان‌ها و یادآورها</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                    <button class="row-btn${s.notifEnabled!==false?' active':''}" onclick="updateDraft('notifEnabled',true)"><span class="rb-label">فعال ✓</span></button>
+                    <button class="row-btn${s.notifEnabled===false?' active':''}" onclick="updateDraft('notifEnabled',false)"><span class="rb-label">خاموش ✗</span></button>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin-top:6px">یادآور پیش‌کار قبل از شروع هر تسک + یادآور پایان تسک</div>
+            </div>
+
+            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+                <label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>فاصله یادآور پیش‌کار</label>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">
+                    ${[5,10,15,30].map(m=>`<button class="row-btn${s.notifPreMinutes==m?' active':''}" onclick="updateDraft('notifPreMinutes',${m})"><span class="rb-label">${m} دقیقه</span></button>`).join('')}
+                </div>
+            </div>
+
+            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+                <label><svg viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5"/></svg>تست و مجوز اعلان</label>
+                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+                    <button class="btn-primary" style="flex:1;justify-content:center" onclick="if(window.__sendTestNotification)window.__sendTestNotification()">
+                        <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>
+                        ارسال نوتیف تست
+                    </button>
+                    <button class="btn-secondary" style="flex:1;justify-content:center" onclick="if(window.__requestNotifPermission)window.__requestNotifPermission()">
+                        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                        درخواست مجوز
+                    </button>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+                    <button class="btn-secondary" style="flex:1;justify-content:center" onclick="if(window.__checkDevNotifsNow)window.__checkDevNotifsNow()">
+                        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+                        بررسی اعلان‌های سازنده
+                    </button>
+                </div>
+                <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;margin-top:8px">اعلان‌های سازنده از سمت حامد (سازنده سراج) ارسال می‌شن.</div>
+            </div>
+
+            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+                <label><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg>تنظیمات حالت مطالعه</label>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin:4px 0">مدت پیش‌فرض تایمر</div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+                    ${[15,25,45,60].map(m=>`<button class="row-btn${s.studyDefaultMinutes==m?' active':''}" onclick="updateDraft('studyDefaultMinutes',${m})"><span class="rb-label">${m} د</span></button>`).join('')}
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin:8px 0 4px">اجبار به اتمام تایمر</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <button class="row-btn${s.studyStrictMode!==false?' active':''}" onclick="updateDraft('studyStrictMode',true)"><span class="rb-label">سخت‌گیر ✓</span></button>
+                    <button class="row-btn${s.studyStrictMode===false?' active':''}" onclick="updateDraft('studyStrictMode',false)"><span class="rb-label">آزاد</span></button>
+                </div>
+            </div>
+        </div>
+
         <div class="settings-content${settingsCat==='privacy'?' active':''}" data-cat="privacy">
             <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
                 <label><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>قفل ورود با رمز</label>
                 ${s.passwordEnabled&&s.password?`
                     <div style="text-align:center;padding:8px 0">
                         <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#10B981;font-size:11.5px;font-weight:700">
-                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M20 6 9 17l-5-5"/></svg>
-                            قفل فعال است
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M20 6 9 17l-5-5"/></svg>قفل فعال است
                         </div>
                     </div>
-                    <button class="btn-secondary" style="width:100%" onclick="removePassword()">
-                        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                        حذف رمز
-                    </button>
+                    <button class="btn-secondary" style="width:100%" onclick="removePassword()"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>حذف رمز</button>
                 `:`
-                    <div style="font-size:11px;color:var(--text-muted);line-height:1.8;text-align:center;padding:6px 0">برای فعال‌سازی، رمز دلخواه خود را وارد کنید (حداقل ۴ کاراکتر)</div>
                     <input type="password" class="password-input" id="newPass1" placeholder="رمز جدید" maxlength="32" style="margin-bottom:8px">
                     <input type="password" class="password-input" id="newPass2" placeholder="تکرار رمز" maxlength="32" style="margin-bottom:10px">
-                    <button class="btn-primary" style="width:100%;justify-content:center" onclick="updatePassword()">
-                        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        فعال‌سازی قفل
-                    </button>
+                    <button class="btn-primary" style="width:100%;justify-content:center" onclick="updatePassword()">فعال‌سازی قفل</button>
                 `}
             </div>
 
             <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
                 <label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>قفل خودکار بعد از بی‌کاری</label>
-                <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;padding:2px 0 6px">اگه تا مدت مشخصی با سایت کار نکنی، خودکار قفل میشه.</div>
                 <div class="slider-row"><input type="range" min="0" max="60" step="5" value="${s.autoLockMinutes||0}" oninput="updateDraft('autoLockMinutes',this.value)"><span class="slider-val">${(s.autoLockMinutes||0)===0?'خاموش':(s.autoLockMinutes+' دقیقه')}</span></div>
             </div>
 
             <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
                 <label><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8"/><path d="M12 18v2"/></svg>دستگاه‌های فعال</label>
-                <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;padding:2px 0 8px">این نشست‌ها روی همین مرورگر در تب‌های مختلف ثبت می‌شن.</div>
                 <div id="sessionsListInner"></div>
-                ${s.passwordEnabled&&s.password?`
-                    <button class="btn-secondary" style="width:100%;margin-top:6px;border-color:rgba(239,68,68,.4);color:#F87171" onclick="logoutOtherSessions()">
-                        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                        خروج همه دستگاه‌های دیگه
-                    </button>
-                `:''}
+                ${s.passwordEnabled&&s.password?`<button class="btn-secondary" style="width:100%;margin-top:6px;border-color:rgba(239,68,68,.4);color:#F87171" onclick="logoutOtherSessions()">خروج سایر دستگاه‌ها</button>`:''}
             </div>
 
             <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
-                <label><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>بکاپ‌گیری از اطلاعات</label>
-                <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;padding:4px 0">تاریخچه چت، برنامه‌ریز، مقالات، ویدیوها و تنظیمات</div>
+                <label><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>بکاپ‌گیری</label>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-                    <button class="btn-primary" style="justify-content:center" onclick="exportBackup()">
-                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
-                        دانلود
-                    </button>
-                    <label class="btn-secondary" style="cursor:pointer;justify-content:center">
-                        <input type="file" accept=".json" onchange="importBackup(event)" style="display:none">
-                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
-                        بازیابی
-                    </label>
+                    <button class="btn-primary" style="justify-content:center" onclick="exportBackup()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>دانلود</button>
+                    <label class="btn-secondary" style="cursor:pointer;justify-content:center"><input type="file" accept=".json" onchange="importBackup(event)" style="display:none"><svg viewBox="0 0 24 24"><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>بازیابی</label>
                 </div>
             </div>
+
             <div class="setting-group" style="border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:14px;background:rgba(239,68,68,.04)">
                 <label style="color:#F87171"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>منطقه خطر</label>
-                <button class="btn-secondary" style="width:100%;border-color:rgba(239,68,68,.4);color:#F87171" onclick="if(confirm('همه اطلاعات پاک بشه؟ این کار قابل بازگشت نیست!')){localStorage.clear();sessionStorage.clear();location.reload();}">
-                    <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-                    پاک کردن همه اطلاعات
-                </button>
+                <button class="btn-secondary" style="width:100%;border-color:rgba(239,68,68,.4);color:#F87171" onclick="if(confirm('همه اطلاعات پاک بشه؟')){localStorage.clear();sessionStorage.clear();location.reload();}">پاک کردن همه اطلاعات</button>
             </div>
         </div>
 
@@ -1643,16 +1694,11 @@ function renderSettingsControls(){
             <div class="about-bio-card">
                 سلام 👋<br><br>
                 من حامدم؛ یه جوون ۲۰ ساله اراکی که عاشق ایران، تاریخش و مردمشه و همیشه به یادگرفتن و ساختن چیزهای جدید علاقه داشته.<br><br>
-                الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و در کنار درس، به هوش مصنوعی، برنامه‌نویسی و بازی‌سازی علاقه‌مندم. یه زمانی ادیتور و مجسمه‌ساز بودم و حالا مسیرم به چیزهای تازه‌ای رسیده؛ مسیری که هنوز هم ادامه داره.<br><br>
-                سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر و راحت تر بشه. شاید علاقه‌ام به آموزش و تربیت هم بی‌تأثیر نبوده باشه، اما فکر می‌کنم آدم تا دغدغه‌ی چیزی رو نداشته باشه، برای ساختنش قدم برنمی‌داره.<br><br>
-                شاید سراج رو با زبان و ادبیات عربی شروع کرده باشیم، اما سراج به هیچ چیز محدود نیست و نخواهد بود؛ قراره جایی برای یادگیری و تجربه‌ی چیزهای مختلف باشه و قدم‌به‌قدم بزرگ‌تر بشه.<br><br>
-                منم مثل سراج هنوز اول راهم؛ این تازه شروع ماجراست.<br><br>
+                الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و در کنار درس، به هوش مصنوعی، برنامه‌نویسی و بازی‌سازی علاقه‌مندم.<br><br>
+                سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر باشه.<br><br>
                 به دنیای سراج خوش اومدید. 🌱
             </div>
-            <div class="about-section-title">
-                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                راه های ارتباطی
-            </div>
+            <div class="about-section-title"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>راه های ارتباطی</div>
             <div class="about-contacts">
                 <div class="contact-row" data-link="mailto:ranshamed.fr@gmail.com">
                     <div class="contact-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg></div>
@@ -1670,6 +1716,9 @@ function renderSettingsControls(){
                     <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/></svg></div>
                     <div class="contact-info"><div class="contact-label">ایکس</div><div class="contact-value">Hamed_Rans</div></div>
                 </div>
+            </div>
+            <div class="siraj-version-badge" style="text-align:center;padding:14px 0;font-size:12px;color:var(--text-muted)">
+                نسخه <span style="color:var(--accent);font-weight:900">${s.appVersion||'3.0'}</span>
             </div>
         </div>`;
     setTimeout(()=>{
@@ -1717,9 +1766,219 @@ function unregisterMySession(){
     saveSessions(sessions);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   DEVELOPER NOTIFICATIONS — ارسال اعلان از سازنده به کاربر
+   ═══════════════════════════════════════════════════════════════
+   ساختار JSON که سازنده در APP_CONFIG.devNotifUrl قرار می‌ده:
+
+   [
+     {
+       "id": "welcome_v3",
+       "title": "سراج نسخه 3.0 اومد!",
+       "body": "امکانات جدید: اعلان‌ها، PWA، تنظیمات دسته‌بندی‌شده",
+       "type": "info",
+       "emoji": "🎉",
+       "expiresAt": 1893456000000,
+       "targetUsers": []
+     }
+   ]
+   ═══════════════════════════════════════════════════════════════ */
+
+function loadDevNotifSeen(){
+    try{return JSON.parse(localStorage.getItem(DEV_NOTIF_SEEN_KEY)||'[]');}catch(e){return [];}
+}
+function saveDevNotifSeen(arr){
+    try{localStorage.setItem(DEV_NOTIF_SEEN_KEY,JSON.stringify(arr.slice(-200)));}catch(e){}
+}
+function loadDevNotifCache(){
+    try{return JSON.parse(localStorage.getItem(DEV_NOTIF_CACHE_KEY)||'[]');}catch(e){return [];}
+}
+function saveDevNotifCache(arr){
+    try{localStorage.setItem(DEV_NOTIF_CACHE_KEY,JSON.stringify(arr.slice(-50)));}catch(e){}
+}
+
+function getMyUserId(){
+    /* شناسه‌ی کاربر: ترکیب یک id یونیک که توی localStorage ذخیره می‌شه */
+    var uid = localStorage.getItem('siraj_uid');
+    if(!uid){
+        uid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+        localStorage.setItem('siraj_uid', uid);
+    }
+    return uid;
+}
+
+async function fetchDevNotifications(){
+    if(!APP_CONFIG.devNotifUrl || !APP_CONFIG.devNotifUrl.trim()) return;
+    try{
+        var url = APP_CONFIG.devNotifUrl.trim();
+        /* اضافه کردن کش‌باستر برای جلوگیری از کش مرورگر */
+        var sep = url.indexOf('?') > -1 ? '&' : '?';
+        var res = await fetch(url + sep + '_t=' + Date.now(), { cache: 'no-store' });
+        if(!res.ok) return;
+        var data = await res.json();
+        if(!Array.isArray(data)) return;
+        saveDevNotifCache(data);
+        processDevNotifications(data);
+    }catch(e){
+        /* در صورت خطا از کش استفاده کن */
+        try{
+            var cached = loadDevNotifCache();
+            if(cached.length) processDevNotifications(cached);
+        }catch(err){}
+    }
+}
+
+function processDevNotifications(arr){
+    var seen = loadDevNotifSeen();
+    var uid = getMyUserId();
+    var now = Date.now();
+    arr.forEach(function(n){
+        if(!n || !n.id) return;
+        if(seen.indexOf(n.id) > -1) return;
+        /* انقضا */
+        if(n.expiresAt && now > n.expiresAt){ seen.push(n.id); return; }
+        /* هدف‌گذاری */
+        if(n.targetUsers && Array.isArray(n.targetUsers) && n.targetUsers.length > 0){
+            if(n.targetUsers.indexOf(uid) < 0) return;
+        }
+        /* نمایش */
+        showDevNotification(n);
+        seen.push(n.id);
+    });
+    saveDevNotifSeen(seen);
+}
+
+function showDevNotification(n){
+    var emoji = n.emoji || (n.type === 'warning' ? '⚠️' : n.type === 'success' ? '✅' : n.type === 'error' ? '❌' : '📢');
+    var title = n.title || 'اعلان از سراج';
+    var body = n.body || '';
+
+    /* اگر سیستم اعلان planner-v2 در دسترسه، از اون استفاده کن */
+    if(typeof window.__pushDevNotificationToPanel === 'function'){
+        try{
+            window.__pushDevNotificationToPanel({
+                id: 'dev_' + n.id,
+                type: 'dev',
+                title: title,
+                body: body,
+                emoji: emoji,
+                devType: n.type || 'info',
+                ts: Date.now(),
+                answered: true
+            });
+        }catch(e){}
+    }
+
+    /* نوتیف سیستمی */
+    if('Notification' in window && Notification.permission === 'granted'){
+        try{
+            var sys = new Notification(emoji + ' ' + title, {
+                body: body,
+                icon: 'siraj-logo.png',
+                tag: 'siraj_dev_' + n.id,
+                requireInteraction: false
+            });
+            sys.onclick = function(){ window.focus(); sys.close(); };
+        }catch(e){}
+    }
+
+    /* پاپ‌آپ داخل اپ */
+    showDevNotifPopup(emoji, title, body);
+}
+
+function showDevNotifPopup(emoji, title, body){
+    var old = document.getElementById('devNotifPopup');
+    if(old) old.remove();
+    var el = document.createElement('div');
+    el.id = 'devNotifPopup';
+    el.className = 'task-notif-popup';
+    el.innerHTML =
+        '<button class="task-notif-close" id="devNotifClose">✕</button>'
+        +'<div class="task-notif-head">'
+        +'<div class="task-notif-icon">'+emoji+'</div>'
+        +'<div class="task-notif-title">اعلان از سراج</div>'
+        +'</div>'
+        +'<div class="task-notif-task"><b>'+escapeHtml(title)+'</b></div>'
+        +(body?'<div style="font-size:12px;color:var(--text-muted);line-height:1.8;margin-bottom:12px">'+escapeHtml(body)+'</div>':'')
+        +'<div class="task-notif-actions">'
+        +'<button class="yes-btn" id="devNotifOk">متوجه شدم</button>'
+        +'</div>';
+    document.body.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.add('show'); });
+    var close = function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 450); };
+    el.querySelector('#devNotifClose').onclick = close;
+    el.querySelector('#devNotifOk').onclick = close;
+    setTimeout(function(){ if(el.parentNode && el.classList.contains('show')) close(); }, 20000);
+}
+
+window.__checkDevNotifsNow = function(){
+    if(!APP_CONFIG.devNotifUrl || !APP_CONFIG.devNotifUrl.trim()){
+        if(window.toast) window.toast('آدرس اعلان‌های سازنده تنظیم نشده','error');
+        return;
+    }
+    fetchDevNotifications().then(function(){
+        if(window.toast) window.toast('بررسی اعلان‌های سازنده انجام شد ✓','success');
+    }).catch(function(){
+        if(window.toast) window.toast('خطا در بررسی اعلان‌ها','error');
+    });
+};
+
+/* شروع چک دوره‌ای اعلان‌های سازنده — هر ۵ دقیقه */
+setTimeout(fetchDevNotifications, 8000);
+setInterval(fetchDevNotifications, 5 * 60 * 1000);
+
+/* ═══════════════════════════════════════════════════════════════
+   PWA — Service Worker + Install Prompt
+   ═══════════════════════════════════════════════════════════════ */
+
+window._deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    window._deferredInstallPrompt = e;
+    setTimeout(showInstallButton, 5000);
+});
+
+function showInstallButton(){
+    if(!window._deferredInstallPrompt) return;
+    if(document.getElementById('pwaInstallBtn')) return;
+    if(localStorage.getItem('siraj_install_dismissed') === '1') return;
+    var btn = document.createElement('button');
+    btn.id = 'pwaInstallBtn';
+    btn.className = 'pwa-install-btn';
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5"/><path d="M5 21h14"/></svg>نصب اپلیکیشن سراج';
+    btn.onclick = async function(){
+        if(!window._deferredInstallPrompt) return;
+        window._deferredInstallPrompt.prompt();
+        var result = await window._deferredInstallPrompt.userChoice;
+        if(result.outcome === 'accepted'){
+            if(window.toast) window.toast('سراج نصب شد! 🎉','success');
+            btn.remove();
+        } else {
+            localStorage.setItem('siraj_install_dismissed','1');
+            btn.remove();
+        }
+        window._deferredInstallPrompt = null;
+    };
+    document.body.appendChild(btn);
+    setTimeout(function(){ if(btn.parentNode) btn.remove(); }, 30000);
+}
+window.addEventListener('appinstalled', function(){
+    var b = document.getElementById('pwaInstallBtn');
+    if(b) b.remove();
+    if(window.toast) window.toast('سراج با موفقیت نصب شد! 🎉','success');
+});
+
 window.addEventListener('load',()=>{
     setTimeout(()=>{const sl=document.getElementById('splashLoader');if(sl)sl.classList.add('hidden');},400);
     try{const savedImg=localStorage.getItem(PROFILE_IMG_KEY);if(savedImg&&!settings.profileImage)settings.profileImage=savedImg;}catch(e){}
+
+    /* ★ Service Worker */
+    if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('sw.js').then(function(reg){
+            console.log('[SW] registered', reg.scope);
+        }).catch(function(err){ console.warn('[SW] failed', err); });
+    }
+
     initNavState();
     applySettingsToUI();
     ensureCurrentFontLoaded();
