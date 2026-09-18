@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v43 Final) */
+/* Siraj v2.0 — planner-v2.js (v3.0 Final) */
 (function(){
   'use strict';
 
@@ -818,7 +818,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NEW NOTIFICATION SYSTEM (v43)
+       NOTIFICATION SYSTEM v3.0
        ═══════════════════════════════════════════════════════════════ */
     var NOTIF_KEY      = 'siraj-notif-history';
     var NOTIF_SEEN_KEY = 'siraj-notif-seen';
@@ -876,6 +876,18 @@
 
     function checkTaskNotifications(){
       try{
+        var preMin = 10;
+        try{
+          if(typeof settings !== 'undefined' && settings.notifPreMinutes){
+            preMin = parseInt(settings.notifPreMinutes) || 10;
+          }
+        }catch(e){}
+        var notifEnabled = true;
+        try{
+          if(typeof settings !== 'undefined' && settings.notifEnabled === false) notifEnabled = false;
+        }catch(e){}
+        if(!notifEnabled) return;
+
         var now = new Date();
         var todayKey = window.dateKey(now);
         var pl = window.loadPlannerNew();
@@ -890,7 +902,7 @@
           var m = t.time.match(/^(\d{1,2})/);
           if(!m) return;
           var startHour = parseInt(m[1]);
-          var preTime = startHour * 60 - 10;
+          var preTime = startHour * 60 - preMin;
           var endTime = (startHour + 1) * 60;
 
           var preKey = NOTIF_PRE_KEY + todayKey + '_' + t.id;
@@ -1094,20 +1106,22 @@
       var seen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
       list.innerHTML = history.map(function(n){
         var unread = (n.ts||0) > seen ? ' unread' : '';
-        var typeCls = n.type === 'pre' ? ' notif-pre' : ' notif-end';
-        var icon = n.type === 'pre' ? '⏰' : '🔔';
-        var title = n.type === 'pre' ? 'یادآور کار' : 'پایان زمان کار';
+        var typeCls = n.type === 'pre' ? ' notif-pre' : n.type === 'end' ? ' notif-end' : n.type === 'dev' ? ' notif-dev' : '';
+        var icon = n.emoji || (n.type === 'pre' ? '⏰' : n.type === 'end' ? '🔔' : '📢');
+        var title = n.type === 'pre' ? 'یادآور کار' : n.type === 'end' ? 'پایان زمان کار' : (n.title || 'اعلان از سراج');
         var text = n.type === 'pre'
           ? 'کار «'+esc(n.taskTitle)+'» — یادت نره شروع کنی!'
-          : 'کار «'+esc(n.taskTitle)+'» — انجامش دادی؟';
+          : n.type === 'end'
+            ? 'کار «'+esc(n.taskTitle)+'» — انجامش دادی؟'
+            : esc(n.body || '');
         var actions = '';
-        if(!n.answered){
+        if(!n.answered && n.type !== 'dev'){
           if(n.type === 'pre'){
             actions = '<div class="notif-item-actions">'
               +'<button class="notif-btn yes" onclick="window.__notifDone(\''+n.id+'\')">✓ انجام دادم</button>'
               +'<button class="notif-btn reschedule" onclick="window.__notifResched(\''+n.id+'\')">⏰ انتقال</button>'
               +'</div>';
-          } else {
+          } else if(n.type === 'end'){
             actions = '<div class="notif-item-actions">'
               +'<button class="notif-btn yes" onclick="window.__notifDone(\''+n.id+'\')">✓ انجام دادم</button>'
               +'<button class="notif-btn no" onclick="window.__notifNo(\''+n.id+'\')">✗ نه</button>'
@@ -1141,10 +1155,12 @@
         var wasOpen = panel.classList.contains('open');
         if(wasOpen){
           panel.classList.remove('open');
+          document.removeEventListener('click', __notifOutsideClose);
         } else {
           renderNotifPanel();
           markNotifsSeen();
           panel.classList.add('open');
+          setTimeout(function(){ document.addEventListener('click', __notifOutsideClose); }, 50);
         }
         return;
       }
@@ -1165,9 +1181,7 @@
         renderNotifPanel();
         updateNotifBadge();
       };
-      setTimeout(function(){
-        document.addEventListener('click', __notifOutsideClose);
-      }, 100);
+      setTimeout(function(){ document.addEventListener('click', __notifOutsideClose); }, 100);
       renderNotifPanel();
       markNotifsSeen();
     };
@@ -1202,17 +1216,71 @@
       renderNotifPanel();
     };
 
-    /* راه‌اندازی نوتیفیکیشن */
+    /* ★ ارسال نوتیف تست توسط کاربر */
+    window.__sendTestNotification = function(){
+      try{
+        if('Notification' in window && Notification.permission === 'default'){
+          Notification.requestPermission().then(function(p){
+            if(p === 'granted'){
+              fireNotification({
+                id:'n_test_'+Date.now(),
+                type:'pre',
+                taskId:'test',
+                taskTitle:'این یک نوتیف تست هست 🎯',
+                dayKey:window.dateKey(new Date()),
+                time:'',
+                ts:Date.now(),
+                answered:false
+              });
+            }
+          });
+        } else if(Notification.permission === 'granted'){
+          fireNotification({
+            id:'n_test_'+Date.now(),
+            type:'pre',
+            taskId:'test',
+            taskTitle:'این یک نوتیف تست هست 🎯',
+            dayKey:window.dateKey(new Date()),
+            time:'',
+            ts:Date.now(),
+            answered:false
+          });
+        } else {
+          if(window.toast) window.toast('ابتدا اجازه نوتیف رو از مرورگر بگیر','error');
+        }
+      }catch(e){
+        if(window.toast) window.toast('خطا در ارسال نوتیف','error');
+      }
+    };
+
+    /* ★ درخواست مجدد اجازه نوتیف */
+    window.__requestNotifPermission = function(){
+      if(!('Notification' in window)){ if(window.toast) window.toast('مرورگر پشتیبانی نمی‌کنه','error'); return; }
+      if(Notification.permission === 'granted'){ if(window.toast) window.toast('اجازه نوتیف از قبل داده شده ✓','success'); return; }
+      Notification.requestPermission().then(function(p){
+        if(p === 'granted' && window.toast) window.toast('اجازه نوتیف داده شد ✓','success');
+        else if(p === 'denied' && window.toast) window.toast('اجازه رد شد — از تنظیمات مرورگر فعال کن','error');
+      });
+    };
+
+    /* ★ اتصال نوتیف سازنده به پنل اعلان‌ها (از script.js صدا زده می‌شه) */
+    window.__pushDevNotificationToPanel = function(n){
+      try{
+        addNotifToHistory(n);
+      }catch(e){ console.warn('[DevNotif]', e); }
+    };
+
+    /* راه‌اندازی */
     setTimeout(function(){
       if('Notification' in window && Notification.permission === 'default'){
         try{ Notification.requestPermission(); }catch(e){}
       }
       updateNotifBadge();
       checkTaskNotifications();
-    }, 3000);
-    setInterval(checkTaskNotifications, 60000);
+    }, 1500);
+    setInterval(checkTaskNotifications, 30000);
     setInterval(updateNotifBadge, 15000);
-    /* ── پایان سیستم نوتیفیکیشن جدید ── */
+    /* ── پایان سیستم نوتیفیکیشن ── */
 
     function dailyContentHTML(){
       var pl=window.loadPlannerNew();
@@ -2061,8 +2129,13 @@
       var picker=el.querySelector('#studyTimePicker');
       var numEl=el.querySelector('#studyTimeNum');
       var pv=25,dSY=0,dSV=25,dg=false;
+      try{
+        if(typeof settings!=='undefined' && settings.studyDefaultMinutes){
+          pv = parseInt(settings.studyDefaultMinutes) || 25;
+        }
+      }catch(e){}
       function setPV(v){pv=Math.max(1,Math.min(180,Math.round(v)));numEl.textContent=formatTimer(pv);}
-      setPV(25);
+      setPV(pv);
       function pd(e){dg=true;dSY=(e.touches?e.touches[0].clientY:e.clientY);dSV=pv;picker.classList.add('dragging');e.preventDefault();}
       function pm(e){if(!dg) return;var y=(e.touches?e.touches[0].clientY:e.clientY);setPV(dSV+Math.round((dSY-y)/6));}
       function pu(){if(!dg) return;dg=false;picker.classList.remove('dragging');}
@@ -2231,7 +2304,9 @@
     }
 
     function finishAndRecord(){
-      if(studyRunning && studySeconds>10){
+      var strictMode = true;
+      try{ if(typeof settings!=='undefined' && settings.studyStrictMode===false) strictMode=false; }catch(e){}
+      if(strictMode && studyRunning && studySeconds>10){
         showEarlyExitPopup();
         return;
       }
@@ -2329,7 +2404,7 @@
           box.querySelector('#stayBtn').onclick=function(){
             el.classList.remove('open');setTimeout(function(){el.remove();},320);
           };
-          /* ★★★ فیکس باگ تاریخ: حالا از window.plannerDate استفاده می‌شه ★★★ */
+          /* ★ فیکس باگ تاریخ: از window.plannerDate استفاده می‌کنه */
           box.querySelector('#acceptPunish').onclick=function(){
             try{
               var baseDate = window.plannerDate || new Date();
@@ -2597,78 +2672,9 @@
       }
     };
 
-    function blogHTML(){
-      return '<div class="page-title-bar">'
-        +'<div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
-        +'<div class="page-title-text">مقالات سراج</div>'
-        +'</div>'
-        +'<div class="page-empty-card">'
-        +'<div class="page-empty-icon gold"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
-        +'<div class="page-empty-title gold">مقالات سراج</div>'
-        +'<div class="page-empty-desc">جایی برای یادداشت‌ها، تحلیل‌ها و مقالات شما در زمینه‌ی زبان و ادبیات عربی. قراره اینجا بتونید مقالات خودتون رو بنویسید و منتشر کنید، نوشته‌های دیگران رو بخونید و با بقیه به اشتراک بگذارید 🌱</div>'
-        +'<div class="page-empty-soon gold"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
-        +'<div class="page-empty-features">'
-        +'<div class="page-empty-feature"><span>✍️</span>نوشتن مقاله</div>'
-        +'<div class="page-empty-feature"><span>📖</span>خواندن مقالات</div>'
-        +'<div class="page-empty-feature"><span>💬</span>نظرات</div>'
-        +'<div class="page-empty-feature"><span>⭐</span>ذخیره‌سازی</div>'
-        +'</div>'
-        +'</div>';
-    }
-    function communityHTML(){
-      return '<div class="page-title-bar">'
-        +'<div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'
-        +'<div class="page-title-text">انجمن سراج</div>'
-        +'</div>'
-        +'<div class="page-empty-card">'
-        +'<div class="page-empty-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'
-        +'<div class="page-empty-title">انجمن سراج</div>'
-        +'<div class="page-empty-desc">فضایی برای تعامل، پرسش و پاسخ، و هم‌اندیشی بین شما، مدرسین و سایر علاقه‌مندان به زبان و ادبیات عربی. اینجا می‌تونید سؤال بپرسید، تجربیاتتون رو به اشتراک بگذارید و از هم یاد بگیرید 🌿</div>'
-        +'<div class="page-empty-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
-        +'<div class="page-empty-features">'
-        +'<div class="page-empty-feature"><span>❓</span>پرسش و پاسخ</div>'
-        +'<div class="page-empty-feature"><span>👥</span>ارتباط با مدرسین</div>'
-        +'<div class="page-empty-feature"><span>💡</span>تبادل تجربه</div>'
-        +'<div class="page-empty-feature"><span>🎯</span>چالش‌های گروهی</div>'
-        +'</div>'
-        +'</div>';
-    }
-    function patchBlogCommunityRender(){
-      if(typeof window.renderBlog==='function' && !window.renderBlog.__sirajPatch){
-        window.renderBlog=function(){
-          var v=document.getElementById('view-blog');
-          if(!v) return;
-          v.innerHTML=blogHTML();
-        };
-        window.renderBlog.__sirajPatch=true;
-      }
-      if(typeof window.renderCommunity==='function' && !window.renderCommunity.__sirajPatch){
-        window.renderCommunity=function(){
-          var v=document.getElementById('view-videos');
-          if(!v) return;
-          v.innerHTML=communityHTML();
-        };
-        window.renderCommunity.__sirajPatch=true;
-      }
-    }
-    patchBlogCommunityRender();
-    setTimeout(patchBlogCommunityRender,300);
-    setTimeout(patchBlogCommunityRender,1000);
-    setTimeout(patchBlogCommunityRender,2000);
-
-    function fillViews(){
-      var b=document.getElementById('view-blog');
-      if(b&&b.classList.contains('active')){
-        if(!b.querySelector('.page-empty-card')) b.innerHTML=blogHTML();
-      }
-      var c=document.getElementById('view-videos');
-      if(c&&c.classList.contains('active')){
-        if(!c.querySelector('.page-empty-card')) c.innerHTML=communityHTML();
-      }
-    }
-    new MutationObserver(fillViews).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-    setTimeout(fillViews,1500);
-    setTimeout(fillViews,2500);
+    /* ═══════════════════════════════════════════════════════════════
+       BLOG + COMMUNITY — حذف شده (script.js مدیریت می‌کنه)
+       ═══════════════════════════════════════════════════════════════ */
 
     function linkifyContacts(){
       document.querySelectorAll('.contact-row-v2, .contact-row').forEach(function(row){
@@ -2706,7 +2712,7 @@
     setTimeout(linkifyContacts,800);
     setTimeout(linkifyContacts,1800);
 
-    /* ★★★ هدر اکشن‌ها — با دکمه اعلان بین پروفایل و قفل ★★★ */
+    /* هدر اکشن‌ها با دکمه اعلان */
     function injectMainTopActions(){
       if(_injectingHeaderActions) return;
       _injectingHeaderActions=true;
@@ -2735,7 +2741,6 @@
           w.querySelector('#lockHeaderBtn').onclick=function(){
             if(typeof window.lockNow==='function') window.lockNow();
           };
-          /* نمایش نشان اعلان اگر پیام‌های خوانده‌نشده هست */
           setTimeout(updateNotifBadge, 100);
         });
       }finally{_injectingHeaderActions=false;}
@@ -3087,6 +3092,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v43 Final)');
+    console.log('[Siraj v3.0] planner loaded ✓');
   }
 })();
