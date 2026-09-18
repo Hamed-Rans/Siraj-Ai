@@ -1,3 +1,5 @@
+/* Siraj v2.0 — script.js (v39 Final) */
+
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
     defaultSettings:{
@@ -463,7 +465,7 @@ function applySettingsToUI(s){
     const qb=document.getElementById('quickBtn');if(qb)qb.classList.toggle('active',t.quick);
     applyPattern(document.getElementById('patternLayer'),t.pattern,t.patternColor1,t.patternColor2,t.patternPerCorner,t.patternSize,t.patternPosition,t.patternOpacity);
     resetInactivityTimer();
-    setTimeout(()=>updateNavSlider(false),100);
+    setTimeout(()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);},100);
 }
 
 function renderDropdown(id,items,value,key){
@@ -512,13 +514,14 @@ function toggleNavCollapse(){
     }
     const btn=document.querySelector('.nav-collapse-tab');
     if(btn){btn.classList.add('pop');setTimeout(()=>btn.classList.remove('pop'),600);}
-    setTimeout(()=>updateNavSlider(true),500);
+    setTimeout(()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(true);},500);
 }
 function initNavState(){
     if(localStorage.getItem(NAV_KEY)==='1')document.getElementById('navRow').classList.add('collapsed');
     if(localStorage.getItem(PIN_KEY)==='1'){isNavPinned=true;document.getElementById('navRow').classList.remove('collapsed');document.getElementById('navRow').classList.add('pinned');}
 }
 
+/* ★ updateNavSlider — نسخه پایه (planner-v2.js override می‌کنه) */
 function updateNavSlider(animate){
     const slider=document.getElementById('navSlider');
     const active=document.querySelector('.bottom-nav-btn.active');
@@ -558,7 +561,7 @@ function switchView(view){
     if(view==='videos')renderCommunity();
     if(view==='tools')renderTools();
     if(view==='chat'){const box=document.getElementById('box');box.scrollTop=box.scrollHeight;toggleWelcome();}
-    requestAnimationFrame(()=>setTimeout(()=>updateNavSlider(true),10));
+    requestAnimationFrame(()=>setTimeout(()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(true);},10));
 }
 
 function toggleWelcome(){
@@ -621,28 +624,14 @@ function renderDailyPanel(){
             <div class="list-item" onclick="askAIToPlan()"><div class="li-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="li-body"><div class="li-title">برنامه‌ریزی خودکار</div><div class="li-desc">از AI برنامه بگیر</div></div></div>
         </div>`;
 }
+
+/* ★ renderPanelForPlanner — نسخه fallback (planner-v2.js override می‌کنه) */
 function renderPanelForPlanner(){
     document.getElementById('panelTitleText').textContent='برنامه‌ریزی';
     document.getElementById('panelSubText').textContent='خلاصه هفته';
-    const pl=loadPlannerNew();
-    const days=getWeekDays();
-    let total=0,done=0;
-    days.forEach(d=>{
-        const dd=getDayData(pl,d.key);
-        const cnt=Object.values(dd.hours).filter(v=>v&&v.trim()).length;
-        total+=cnt;
-    });
-    document.getElementById('panelContent').innerHTML=`
-        <div class="panel-card" style="border-color:var(--accent);background:var(--accent-soft)">
-            <div class="card-title" style="border-bottom-color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/></svg><span>فعالیت هفته</span></div>
-            <div style="text-align:center;padding:14px 0"><div style="font-size:36px;font-weight:900;color:var(--accent)">${total}</div><div style="font-size:11px;color:var(--text-muted);margin-top:4px">کار در این هفته</div></div>
-        </div>
-        <div class="panel-card"><div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg><span>دسترسی سریع</span></div>
-            <div class="list-item" onclick="plannerTab='daily';switchView('planner')"><div class="li-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="li-body"><div class="li-title">برنامه روزانه</div><div class="li-desc">ساعت‌بندی امروز</div></div></div>
-            <div class="list-item" onclick="plannerTab='weekly';switchView('planner')"><div class="li-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div><div class="li-body"><div class="li-title">برنامه هفتگی</div><div class="li-desc">جدول هفته</div></div></div>
-            <div class="list-item" onclick="plannerTab='monthly';switchView('planner')"><div class="li-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg></div><div class="li-body"><div class="li-title">برنامه ماهانه</div><div class="li-desc">اهداف و تقویم</div></div></div>
-        </div>`;
+    document.getElementById('panelContent').innerHTML='';
 }
+
 function renderPanelForBlog(){
     document.getElementById('panelTitleText').textContent='مقالات سراج';
     document.getElementById('panelSubText').textContent='یادداشت‌ها و مقالات';
@@ -676,282 +665,47 @@ function renderPanelForTools(){
         </div>`;
 }
 
+/* ★ renderPlanner — فقط کانتینر خالی، planner-v2.js محتوا رو پر می‌کنه */
 function renderPlanner(){
     const view=document.getElementById('view-planner');
-    view.innerHTML=`
-        <div class="planner-hero">
-            <div class="planner-hero-icon">
-                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>
-            </div>
-            <div class="planner-hero-text">
-                <div class="planner-hero-title">برنامه‌ریز سراج</div>
-                <div class="planner-hero-sub">روزانه، هفتگی و ماهانه — با هم برنامه‌ات رو بچینیم</div>
-            </div>
-        </div>
-        <div class="planner-body">
-            <aside class="planner-tabs">
-                <button class="planner-tab${plannerTab==='daily'?' active':''}" onclick="switchPlannerTab('daily')">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                    <span>روزانه</span>
-                </button>
-                <button class="planner-tab${plannerTab==='weekly'?' active':''}" onclick="switchPlannerTab('weekly')">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span>هفتگی</span>
-                </button>
-                <button class="planner-tab${plannerTab==='monthly'?' active':''}" onclick="switchPlannerTab('monthly')">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
-                    <span>ماهانه</span>
-                </button>
-            </aside>
-            <main class="planner-pane" id="plannerPane"></main>
-        </div>`;
-    renderPlannerPane();
-}
-function switchPlannerTab(tab){
-    plannerTab=tab;
-    document.querySelectorAll('.planner-tab').forEach(b=>b.classList.remove('active'));
-    const idx={daily:0,weekly:1,monthly:2}[tab];
-    const btns=document.querySelectorAll('.planner-tab');
-    if(btns[idx])btns[idx].classList.add('active');
-    renderPlannerPane();
-}
-function renderPlannerPane(){
-    const pane=document.getElementById('plannerPane');
-    if(!pane)return;
-    if(plannerTab==='daily')pane.innerHTML=renderDailyView();
-    else if(plannerTab==='weekly')pane.innerHTML=renderWeeklyView();
-    else pane.innerHTML=renderMonthlyView();
-}
-function renderDailyView(){
-    const key=dateKey(plannerDate);
-    const pl=loadPlannerNew();
-    const dayData=getDayData(pl,key);
-    const isToday=key===dateKey(new Date());
-    const nowHour=new Date().getHours();
-    const dayName=getDayName(plannerDate);
-    const dateStr=plannerDate.toLocaleDateString('fa-IR',{day:'numeric',month:'long',year:'numeric'});
-    const hoursHtml=HOURS_RANGE.map(h=>{
-        const hk=padHour(h);
-        const val=dayData.hours[hk]||'';
-        const isNow=isToday && nowHour===h;
-        return `<div class="hour-row${isNow?' now':''}">
-            <div class="hour-label">
-                ${isNow?'<span class="now-dot"></span>':''}
-                <span>${hk}:۰۰</span>
-            </div>
-            <textarea class="hour-input" rows="1" placeholder="برای این ساعت چی داری؟" oninput="saveHour('${key}','${hk}',this.value)">${escapeHtml(val)}</textarea>
-        </div>`;
-    }).join('');
-    return `
-        <div class="planner-nav-bar">
-            <button class="planner-nav-btn" onclick="shiftPlannerDay(-1)" title="روز قبل">
-                <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <div class="planner-nav-title">
-                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                <span>${escapeHtml(dayName)} — ${dateStr}${isToday?' <span style="color:var(--accent);font-size:11px;margin-right:6px">(امروز)</span>':''}</span>
-            </div>
-            <button class="planner-nav-btn" onclick="shiftPlannerDay(1)" title="روز بعد">
-                <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-        </div>
-        <div class="planner-nav-bar" style="justify-content:space-between">
-            <button class="planner-nav-btn" onclick="plannerDate=new Date();renderPlannerPane();" title="برو به امروز" style="width:auto;padding:0 12px;gap:6px;font-size:11.5px;font-weight:700;color:var(--text-main)">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
-                <span>برو به امروز</span>
-            </button>
-            <span style="font-size:11px;color:var(--text-muted)">${Object.values(dayData.hours).filter(v=>v&&v.trim()).length} کار ثبت شده</span>
-        </div>
-        <div class="hours-list">${hoursHtml}</div>`;
-}
-function shiftPlannerDay(delta){
-    plannerDate=new Date(plannerDate);
-    plannerDate.setDate(plannerDate.getDate()+delta);
-    renderPlannerPane();
-}
-function saveHour(dayKey,hourKey,value){
-    const pl=loadPlannerNew();
-    const dd=getDayData(pl,dayKey);
-    if(value&&value.trim())dd.hours[hourKey]=value;
-    else delete dd.hours[hourKey];
-    savePlanner(pl);
-}
-function renderWeeklyView(){
-    const days=getWeekDays();
-    const pl=loadPlannerNew();
-    const todayKey=dateKey(new Date());
-    const startStr=days[0].date;
-    const endStr=days[6].date;
-    const monthStr=plannerDate.toLocaleDateString('fa-IR',{month:'long',year:'numeric'});
-    const headerRow=`<tr>
-        <th class="hour-col">ساعت</th>
-        ${days.map(d=>`<th>${escapeHtml(d.name)}<div style="font-size:9.5px;opacity:.7;font-weight:600;margin-top:2px">${escapeHtml(d.date)}</div></th>`).join('')}
-    </tr>`;
-    const bodyRows=HOURS_RANGE.map(h=>{
-        const hk=padHour(h);
-        const cells=days.map(d=>{
-            const dd=getDayData(pl,d.key);
-            const val=dd.hours[hk]||'';
-            const isToday=d.key===todayKey;
-            return `<td class="task-cell${isToday?' today':''}">
-                <input type="text" class="cell-input" value="${escapeHtml(val)}" placeholder="—" oninput="saveHour('${d.key}','${hk}',this.value)">
-            </td>`;
-        }).join('');
-        return `<tr><td class="hour-cell">${hk}:۰۰</td>${cells}</tr>`;
-    }).join('');
-    return `
-        <div class="planner-nav-bar">
-            <button class="planner-nav-btn" onclick="shiftPlannerWeek(-1)" title="هفته قبل">
-                <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <div class="planner-nav-title">
-                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                <span>هفته ${startStr} تا ${endStr} — ${monthStr}</span>
-            </div>
-            <button class="planner-nav-btn" onclick="shiftPlannerWeek(1)" title="هفته بعد">
-                <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-        </div>
-        <div class="week-grid-wrap">
-            <table class="week-table">
-                <thead>${headerRow}</thead>
-                <tbody>${bodyRows}</tbody>
-            </table>
-        </div>`;
-}
-function shiftPlannerWeek(delta){
-    plannerDate=new Date(plannerDate);
-    plannerDate.setDate(plannerDate.getDate()+delta*7);
-    renderPlannerPane();
-}
-function renderMonthlyView(){
-    const year=plannerDate.getFullYear();
-    const month=plannerDate.getMonth();
-    const monthKey=monthKeyOf(plannerDate);
-    const pl=loadPlannerNew();
-    if(!pl.months[monthKey])pl.months[monthKey]={goals:[]};
-    const goals=pl.months[monthKey].goals||[];
-    const firstOfMonth=new Date(year,month,1);
-    const lastOfMonth=new Date(year,month+1,0);
-    const daysInMonth=lastOfMonth.getDate();
-    const startOffset=(firstOfMonth.getDay()+1)%7;
-    const todayKey=dateKey(new Date());
-    const selectedKey=dateKey(plannerDate);
-    const monthLabel=plannerDate.toLocaleDateString('fa-IR',{month:'long',year:'numeric'});
-    const weekdays=['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه'];
-    const cells=[];
-    for(let i=0;i<startOffset;i++)cells.push(`<div class="cal-day empty"></div>`);
-    for(let d=1;d<=daysInMonth;d++){
-        const dt=new Date(year,month,d);
-        const k=dateKey(dt);
-        const isToday=k===todayKey;
-        const isSel=k===selectedKey;
-        const isFri=dt.getDay()===5;
-        const dd=getDayData(pl,k);
-        const count=Object.values(dd.hours).filter(v=>v&&v.trim()).length;
-        const dots=count>0?'<div class="cal-day-dots">'+Array(Math.min(count,4)).fill('<span class="cal-day-dot"></span>').join('')+'</div>':'';
-        cells.push(`<div class="cal-day${isToday?' today':''}${isSel?' selected':''}${isFri?' friday':''}" onclick="selectMonthDay(${d})">
-            <div class="cal-day-num-wrap">
-                <span class="cal-day-num">${d}</span>
-                ${dots}
-            </div>
-        </div>`);
-    }
-    const goalsHtml=goals.map((g,i)=>`<div class="month-goal${g.done?' done':''}">
-        <input type="checkbox" ${g.done?'checked':''} onchange="toggleMonthGoal('${monthKey}',${i})">
-        <span class="mg-text">${escapeHtml(g.text)}</span>
-        <button class="mg-del" onclick="deleteMonthGoal('${monthKey}',${i})" title="حذف">
-            <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-    </div>`).join('');
-    return `
-        <div class="planner-nav-bar">
-            <button class="planner-nav-btn" onclick="shiftPlannerMonth(-1)" title="ماه قبل">
-                <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <div class="planner-nav-title">
-                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                <span>${escapeHtml(monthLabel)}</span>
-            </div>
-            <button class="planner-nav-btn" onclick="shiftPlannerMonth(1)" title="ماه بعد">
-                <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-        </div>
-        <div class="month-goals">
-            <div class="month-goals-title">
-                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                <span>اهداف این ماه</span>
-                <span style="margin-right:auto;font-size:10.5px;color:var(--text-muted);font-weight:600">${goals.filter(g=>g.done).length}/${goals.length}</span>
-            </div>
-            ${goals.length?`<div class="month-goals-list">${goalsHtml}</div>`:'<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:6px 0 10px">هنوز هدفی ثبت نشده</div>'}
-            <div class="month-goal-add">
-                <input type="text" id="newGoalInput" placeholder="هدف جدید این ماه..." onkeydown="if(event.key==='Enter')addMonthGoal('${monthKey}')">
-                <button onclick="addMonthGoal('${monthKey}')">افزودن</button>
-            </div>
-        </div>
-        <div class="month-calendar">
-            <div class="cal-weekdays">${weekdays.map(w=>`<div class="cal-weekday">${w}</div>`).join('')}</div>
-            <div class="cal-grid">${cells.join('')}</div>
-        </div>
-    `;
-}
-function shiftPlannerMonth(delta){
-    plannerDate=new Date(plannerDate);
-    plannerDate.setDate(1);
-    plannerDate.setMonth(plannerDate.getMonth()+delta);
-    renderPlannerPane();
-}
-function selectMonthDay(d){
-    plannerDate=new Date(plannerDate.getFullYear(),plannerDate.getMonth(),d);
-    plannerTab='daily';
-    renderPlanner();
-}
-function addMonthGoal(monthKey){
-    const inp=document.getElementById('newGoalInput');
-    if(!inp)return;
-    const v=inp.value.trim();
-    if(!v)return;
-    const pl=loadPlannerNew();
-    if(!pl.months[monthKey])pl.months[monthKey]={goals:[]};
-    pl.months[monthKey].goals.push({text:v,done:false});
-    savePlanner(pl);
-    inp.value='';
-    renderPlannerPane();
-}
-function toggleMonthGoal(monthKey,i){
-    const pl=loadPlannerNew();
-    if(!pl.months[monthKey]?.goals[i])return;
-    pl.months[monthKey].goals[i].done=!pl.months[monthKey].goals[i].done;
-    savePlanner(pl);
-    renderPlannerPane();
-}
-function deleteMonthGoal(monthKey,i){
-    const pl=loadPlannerNew();
-    if(!pl.months[monthKey]?.goals)return;
-    pl.months[monthKey].goals.splice(i,1);
-    savePlanner(pl);
-    renderPlannerPane();
-}
-function askAIToPlan(){
-    switchView('chat');
-    document.getElementById('q').value=`یه برنامه درسی برای امروز بچین.\nهر کار رو با این فرمت بنویس:\n[PLAN]- ساعت | عنوان کار[/PLAN]`;
-    document.getElementById('q').focus();
-    handleInput();
+    if(!view) return;
+    view.innerHTML='<main class="planner-pane" id="plannerPane" style="width:100%"></main>';
+    if(typeof window.renderPlannerPane==='function') window.renderPlannerPane();
 }
 
-/* ★ صفحه مقالات — فقط هدر */
+/* ★ renderPlannerPane — نسخه fallback (planner-v2.js override می‌کنه) */
+function renderPlannerPane(){
+    const pane=document.getElementById('plannerPane');
+    if(!pane) return;
+    /* اگه planner-v2.js لود نشده باشه، پیام می‌ذاریم */
+    if(typeof window.loadPlannerNew!=='function') return;
+    pane.innerHTML='<div style="padding:30px;text-align:center;color:var(--text-muted)">در حال بارگذاری...</div>';
+}
+
+/* نسخه قدیمی switchPlannerTab (planner-v2 override می‌کنه) */
+function switchPlannerTab(tab){
+    plannerTab=tab;
+    if(typeof window.switchPlannerTab==='function' && window.switchPlannerTab!==switchPlannerTab){
+        window.switchPlannerTab(tab);
+        return;
+    }
+}
+
+/* ★ renderBlog — نسخه قدیمی (planner-v2.js override می‌کنه) */
 function renderBlog(){
     const v=document.getElementById('view-blog');
     if(!v) return;
+    if(v.querySelector('.blog-v2-hero')) return;
     v.innerHTML='<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>';
 }
 function addBlogPost(){const t=document.getElementById('blogTitle')?.value.trim();const b=document.getElementById('blogBody')?.value.trim();if(!t||!b){toast('عنوان و متن لازمه','error');return;}const p=loadBlog();p.unshift({title:t,body:b,ts:Date.now()});saveBlog(p);renderBlog();renderPanelForBlog();toast('مقاله منتشر شد','success');}
 function deleteBlogPost(i){const p=loadBlog();p.splice(i,1);saveBlog(p);renderBlog();renderPanelForBlog();}
 
-/* ★ صفحه انجمن — فقط هدر */
+/* ★ renderCommunity — نسخه قدیمی (planner-v2.js override می‌کنه) */
 function renderCommunity(){
     const v=document.getElementById('view-videos');
     if(!v) return;
+    if(v.querySelector('.community-v2-hero')) return;
     v.innerHTML='<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="page-title-text">انجمن سراج</div></div>';
 }
 
@@ -1018,45 +772,48 @@ function renameChat(id){
 function saveRename(id,newTitle){const h=loadHistory();if(!h[id])return;const t=(newTitle||'').trim()||'گفتگو';h[id].title=t;saveHistory(h);renderHistory();}
 function formatTime(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'الان';if(m<60)return m+' د';const hr=Math.floor(m/60);if(hr<24)return hr+' س';const day=Math.floor(hr/24);if(day<7)return day+' روز';return new Date(ts).toLocaleDateString('fa-IR');}
 
-/* ★ loadChat با انیمیشن نرم */
-/* ★ loadChat با انیمیشن نرم */
+/* ★ loadChat با انیمیشن نرم + گارد رقابتی */
 function loadChat(id){
-  const c = loadHistory()[id];
-  if(!c) return;
-  currentChatId = id;
-  const box = document.getElementById('box');
+    const c = loadHistory()[id];
+    if(!c) return;
+    currentChatId = id;
+    const box = document.getElementById('box');
+    const myToken = id; /* ★ برای جلوگیری از رقابت */
 
-  box.style.transition = 'opacity .18s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1)';
-  box.style.opacity = '0';
-  box.style.transform = 'translateY(-10px)';
-
-  setTimeout(function(){
-    box.innerHTML = '';
-    c.messages.forEach(function(m){
-      if(m.role === 'user') renderUserMsg(m.content, m.fileData, m.fileType, true);
-      else renderBotMsg(m.content, true);
-    });
-
-    box.style.transition = 'none';
-    box.style.transform = 'translateY(14px)';
+    box.style.transition = 'opacity .18s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1)';
     box.style.opacity = '0';
-    box.scrollTop = box.scrollHeight;
-
-    void box.offsetWidth;
-    box.style.transition = 'opacity .35s cubic-bezier(.22,1,.36,1), transform .45s cubic-bezier(.34,1.4,.64,1)';
-    box.style.opacity = '1';
-    box.style.transform = 'translateY(0)';
+    box.style.transform = 'translateY(-10px)';
 
     setTimeout(function(){
-      box.style.transition = '';
-      box.style.opacity = '';
-      box.style.transform = '';
-    }, 500);
-  }, 200);
+        /* ★ اگه کاربر چت دیگه‌ای رو انتخاب کرد، لغو کن */
+        if(currentChatId !== myToken) return;
 
-  renderHistory();
-  switchView('chat');
-  toggleWelcome();
+        box.innerHTML = '';
+        c.messages.forEach(function(m){
+            if(m.role === 'user') renderUserMsg(m.content, m.fileData, m.fileType, true);
+            else renderBotMsg(m.content, true);
+        });
+
+        box.style.transition = 'none';
+        box.style.transform = 'translateY(14px)';
+        box.style.opacity = '0';
+        box.scrollTop = box.scrollHeight;
+
+        void box.offsetWidth;
+        box.style.transition = 'opacity .35s cubic-bezier(.22,1,.36,1), transform .45s cubic-bezier(.34,1.4,.64,1)';
+        box.style.opacity = '1';
+        box.style.transform = 'translateY(0)';
+
+        setTimeout(function(){
+            box.style.transition = '';
+            box.style.opacity = '';
+            box.style.transform = '';
+        }, 500);
+    }, 200);
+
+    renderHistory();
+    switchView('chat');
+    toggleWelcome();
 }
 function deleteChat(id){if(pendingRequests[id]){pendingRequests[id].abort();delete pendingRequests[id];}const h=loadHistory();delete h[id];saveHistory(h);if(currentChatId===id){currentChatId=null;createNewChat();}renderHistory();}
 function newChat(){createNewChat();}
@@ -1417,7 +1174,7 @@ function closeSettings(){
     setTimeout(()=>{
         document.querySelectorAll('.bottom-nav-btn').forEach(b=>{b.style.pointerEvents='auto';b.style.position='relative';b.style.zIndex='2';});
         const s=document.getElementById('navSlider');if(s){s.style.pointerEvents='none';}
-        updateNavSlider(true);
+        if(typeof window.updateNavSlider==='function')window.updateNavSlider(true);
     },340);
     settingsDraft=null;
 }
@@ -1893,7 +1650,7 @@ function ensureClickable(){
 }
 document.addEventListener('visibilitychange',()=>{
     if(!document.hidden){
-        setTimeout(()=>{ensureClickable();updateNavSlider(false);},100);
+        setTimeout(()=>{ensureClickable();if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);},100);
         if(settings.lockOnTabSwitch&&settings.passwordEnabled&&settings.password){
             sessionStorage.removeItem(LOCK_SESSION_KEY);
             const ls=document.getElementById('lockScreen');
@@ -1907,7 +1664,7 @@ document.addEventListener('visibilitychange',()=>{
     }
 });
 window.addEventListener('scroll',ensureClickable,{passive:true});
-window.addEventListener('resize',()=>updateNavSlider(false));
+window.addEventListener('resize',()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);});
 window.addEventListener('beforeunload',()=>{
     try{unregisterMySession();}catch(e){}
 });
@@ -1919,28 +1676,6 @@ function unregisterMySession(){
 }
 
 window.addEventListener('load',()=>{
-    (function injectUserAvatar(){
-      var headerBrand = document.querySelector('.chat-header .header-brand');
-      var lockBtn = document.getElementById('headerLockBtn');
-      if (!headerBrand || !lockBtn) return;
-      if (document.getElementById('headerUserAvatar')) return;
-      var p = {};
-      try{ p = JSON.parse(localStorage.getItem('siraj-profile')||'{}'); }catch(e){}
-      var av = document.createElement('div');
-      av.id = 'headerUserAvatar';
-      av.className = 'header-user-avatar';
-      av.title = p.name ? p.name : 'مشخصات من';
-      if (p.avatar) av.innerHTML = '<img src="' + p.avatar + '" alt="">';
-      else av.textContent = p.name ? p.name.substring(0,1) : '👤';
-      av.onclick = function(){
-        if (typeof window.openSettings === 'function') window.openSettings();
-        setTimeout(function(){
-          var b = document.querySelector('.settings-tab-btn[data-cat="profile"]');
-          if (b) b.click();
-        }, 400);
-      };
-      lockBtn.parentNode.insertBefore(av, lockBtn);
-    })();
     setTimeout(()=>{const sl=document.getElementById('splashLoader');if(sl)sl.classList.add('hidden');},400);
     try{const savedImg=localStorage.getItem(PROFILE_IMG_KEY);if(savedImg&&!settings.profileImage)settings.profileImage=savedImg;}catch(e){}
     initNavState();
@@ -1954,7 +1689,7 @@ window.addEventListener('load',()=>{
     renderCommunity();
     renderTools();
     ensureClickable();
-    setTimeout(()=>updateNavSlider(false),700);
+    setTimeout(()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);},700);
     cleanupSessions();
     checkLock();
     sessionPingInterval=setInterval(()=>{
