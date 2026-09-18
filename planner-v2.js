@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v39 Final — Bug Fixed) */
+/* Siraj v2.0 — planner-v2.js (v40 Final) */
 (function(){
   'use strict';
 
@@ -34,6 +34,17 @@
 
     var LEVEL_LABELS = {beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته'};
     var VIEW_LABELS  = {chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'انجمن', tools:'دستیار'};
+
+    /* ★ state جدا برای هر تب پلنر */
+    if(typeof window._plannerNavState === 'undefined'){
+      window._plannerNavState = { daily:false, weekly:false, monthly:false, yearly:false };
+    }
+    if(typeof window._savedPlannerDate === 'undefined'){
+      window._savedPlannerDate = { daily:null, weekly:null, monthly:null, yearly:null };
+    }
+    if(typeof window.plannerDate === 'undefined'){
+      window.plannerDate = new Date();
+    }
 
     var DAILY_POEMS = [
       {text:'وَمَا نَيْلُ الْمَطَالِبِ بِالتَّمَنِّي ۞ وَلَكِنْ تُؤْخَذُ الدُّنْيَا غِلَابَا', by:'أحمد شوقي', meaning:'به آرزو کردن به هدف نمی‌رسی، بلکه دنیا با غلبه و تلاش به دست میاد.'},
@@ -390,13 +401,29 @@
       else if(unit==='month'){d.setDate(1);d.setMonth(d.getMonth()+dir);}
       else if(unit==='year') d.setFullYear(d.getFullYear()+dir);
       window.plannerDate=d;
+
+      /* ★ ذخیره موقعیت تب فعلی */
+      var tab = getTab();
+      if(tab && window._savedPlannerDate){
+        window._savedPlannerDate[tab] = new Date(d);
+        window._plannerNavState[tab] = true;
+      }
+
       refreshBody(dir>0?'left':'right');
     }
     window.__navDay=function(d){moveDate(d,'day');};
     window.__navWeek=function(d){moveDate(d,'week');};
     window.__navMonth=function(d){moveDate(d,'month');};
     window.__navYear=function(d){moveDate(d,'year');};
-    window.__goToday=function(){window.plannerDate=new Date();refreshBody('left');};
+    window.__goToday=function(){
+      window.plannerDate=new Date();
+      var tab = getTab();
+      if(tab && window._savedPlannerDate){
+        window._savedPlannerDate[tab] = new Date();
+        window._plannerNavState[tab] = true;
+      }
+      refreshBody('left');
+    };
     window.__goThisWeek=window.__goToday;
     window.__goThisMonth=window.__goToday;
     window.__goThisYear=window.__goToday;
@@ -459,12 +486,27 @@
     }
     window.__refreshCurrentTab=refreshBody;
 
+    /* ★ فیکس باگ هفته پیش‌فرض */
     window.switchPlannerTab=function(tab){
+      var prev = getTab();
+      if(prev && prev !== tab && window._plannerNavState[prev]){
+        window._savedPlannerDate[prev] = new Date(window.plannerDate||new Date());
+      }
+
       _lastTab=tab;
       document.querySelectorAll('.panel-planner-tab').forEach(function(b){b.classList.remove('active');});
       var idx={daily:0,weekly:1,monthly:2,yearly:3}[tab];
       var btns=document.querySelectorAll('.panel-planner-tab');
       if(btns[idx]) btns[idx].classList.add('active');
+
+      /* ★ بار اول ورود به این تب → امروز */
+      if(!window._plannerNavState[tab]){
+        window.plannerDate = new Date();
+        window._plannerNavState[tab] = true;
+      } else if(window._savedPlannerDate[tab]){
+        window.plannerDate = new Date(window._savedPlannerDate[tab]);
+      }
+
       var pane=document.getElementById('plannerPane');
       if(pane) pane.dataset.lastTab='';
       refreshBody('left');
@@ -495,7 +537,6 @@
       }
     }
 
-    /* ★ heroes با دکمه برگشت متنی و انیمیشن */
     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -634,7 +675,6 @@
       return '<div class="daily-streak"><span class="ds-fire">🔥</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
     }
 
-    /* ★ کادر واژه امروز — ترتیب: عربی → معنی → نویسنده */
     function dailyWordHTML(){
       var d=new Date(window.plannerDate||new Date());
       var dk=window.dateKey(d);
@@ -660,7 +700,7 @@
         html+='<div class="daily-card-body">';
         html+='<div class="daily-card-text ar">'+esc(it.text)+'</div>';
         if(it.meaning){
-          html+='<div class="daily-card-meaning"><span class="dm-label">📝 معنی</span>'+esc(it.meaning)+'</div>';
+          html+='<div class="daily-card-meaning">'+esc(it.meaning)+'</div>';
         }
         if(it.by){
           html+='<div class="daily-card-author">'+esc(it.by)+'</div>';
@@ -720,7 +760,6 @@
       }
     };
 
-    /* ★ یادگیری با سراج — می‌ره توی چت */
     window.__dailyLearnChat=function(){
       var d=new Date(window.plannerDate||new Date());
       var dk=window.dateKey(d);
@@ -837,24 +876,31 @@
     }
     function viewDaily(){return heroDaily()+'<div class="planner-body-content">'+dailyContentHTML()+'</div>';}
 
+    /* ★ کتابخانه یادگیری — بازطراحی شده */
     var _libCat='all';
     var _libState='learned';
 
     window.__openLibrary=function(){
       var old=document.getElementById('learnLibrary');if(old) old.remove();
+      var learned=getAllLearned();
+      var practice=getAllPractice();
       var el=document.createElement('div');el.id='learnLibrary';el.className='learn-library-overlay';
       el.innerHTML='<div class="learn-library-box">'
         +'<div class="learn-library-header">'
         +'<div class="learn-library-title"><span>📚</span> کتابخانه یادگیری</div>'
         +'<button class="learn-library-close" id="libClose">✕</button>'
         +'</div>'
+        +'<div class="learn-library-stats">'
+        +'<div class="ll-stat"><div class="ll-stat-num">'+toFa(learned.length)+'</div><div class="ll-stat-lbl">یادگرفته</div></div>'
+        +'<div class="ll-stat"><div class="ll-stat-num">'+toFa(practice.length)+'</div><div class="ll-stat-lbl">نیاز به تمرین</div></div>'
+        +'</div>'
         +'<div class="learn-library-filters">'
         +'<div class="ll-filter-group">'
         +'<span class="ll-filter-label">دسته:</span>'
         +'<button class="ll-filter'+( _libCat==='all'?' active':'')+'" data-cat="all">همه</button>'
-        +'<button class="ll-filter'+( _libCat==='بیت'?' active':'')+'" data-cat="بیت">شعر</button>'
-        +'<button class="ll-filter'+( _libCat==='کلمه'?' active':'')+'" data-cat="کلمه">کلمه</button>'
-        +'<button class="ll-filter'+( _libCat==='قواعد'?' active':'')+'" data-cat="قواعد">قواعد</button>'
+        +'<button class="ll-filter'+( _libCat==='بیت'?' active':'')+'" data-cat="بیت">📖 شعر</button>'
+        +'<button class="ll-filter'+( _libCat==='کلمه'?' active':'')+'" data-cat="کلمه">📚 کلمه</button>'
+        +'<button class="ll-filter'+( _libCat==='قواعد'?' active':'')+'" data-cat="قواعد">✏️ قواعد</button>'
         +'</div>'
         +'<div class="ll-filter-group">'
         +'<span class="ll-filter-label">وضعیت:</span>'
@@ -1215,6 +1261,7 @@
       window.savePlanner(pl);refreshBody('left');
     };
 
+    /* ★ monthly — اضافه شد لجند یادآور */
     function monthlyContentHTML(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -1246,7 +1293,7 @@
         }
         if(isF) dc+=' friday';
         var ic='';
-        if(rems.length) ic+='<span class="cal-day-icon icon-evt"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>'+(rems.length>1?'<b>'+toFa(rems.length)+'</b>':'')+'</span>';
+        if(rems.length) ic+='<span class="cal-day-icon icon-evt"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>'+(rems.length>1?'<b>'+toFa(rems.length)+'</b>':'')+'</span>';
         if(evt) ic+='<span class="cal-day-icon icon-occ"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>';
         var si='';
         if(total>0){
@@ -1280,6 +1327,7 @@
         +'<span class="cl-item done"><svg class="cl-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>کامل</span>'
         +'<span class="cl-item partial"><svg class="cl-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3.5 2"/></svg>نیمه</span>'
         +'<span class="cl-item pending"><svg class="cl-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>انجام نشده</span>'
+        +'<span class="cl-item evt"><svg class="cl-icon-svg" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>یادآور</span>'
         +'<span class="cl-item occ"><svg class="cl-icon-svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>مناسبت</span>'
         +'</div>'
         +'<div class="month-calendar">'
@@ -1735,7 +1783,7 @@
       },1000);
     }
 
-    /* ★ toggleStudyPause با انیمیشن نرم */
+    /* ★ toggleStudyPause — انیمیشن نرم بین توقف/ادامه */
     function toggleStudyPause(){
       var o=document.getElementById('studyOverlay');if(!o) return;
       var b=o.querySelector('#studyPauseBtn');
@@ -1777,7 +1825,6 @@
       setDigit('s1',sS[0],a);setDigit('s2',sS[1],a);
     }
 
-    /* ★ پایان و ثبت — چک خروج زودهنگام */
     function finishAndRecord(){
       if(studyRunning && studySeconds>10){
         showEarlyExitPopup();
@@ -1824,19 +1871,20 @@
       };
     }
 
+    /* ★ پاپ آپ دلیل خروج — بدون مثال + تنبیه */
     function showExitReasonPopup(){
       var old=document.getElementById('exitReasonPopup');if(old) old.remove();
       var el=document.createElement('div');el.id='exitReasonPopup';el.className='exit-reason-overlay';
       el.innerHTML='<div class="exit-reason-box">'
         +'<span class="exit-reason-emoji">🔒</span>'
         +'<div class="exit-reason-title">دلیل خروجت رو بنویس</div>'
-        +'<div class="exit-reason-text">باید دلیل قانع‌کننده‌ای داشته باشی و رمزت رو وارد کنی.</div>'
-        +'<textarea class="exit-reason-input" id="exitReasonText" placeholder="مثلاً: کار مهمی پیش اومده، حالم خوب نیست، ..."></textarea>'
-        +'<input type="password" class="exit-reason-pass" id="exitReasonPass" placeholder="رمز عبور" maxlength="32">'
+        +'<div class="exit-reason-text">اگه دلیلت واقعی باشه می‌تونی خارج شی. ولی بدون...</div>'
+        +'<div class="exit-reason-warning"><span class="erw-emoji">😏</span><span>حواست باشه دلیل الکی نیاری — من از لحن پیامت می‌فهمم!</span></div>'
+        +'<textarea class="exit-reason-input" id="exitReasonText" placeholder=""></textarea>'
         +'<div class="exit-reason-error" id="exitReasonError"></div>'
         +'<div class="exit-reason-actions">'
         +'<button class="btn-continue" id="exitReasonCancel">✋ ادامه می‌دم</button>'
-        +'<button class="btn-exit" id="exitReasonSubmit">بررسی و خروج</button>'
+        +'<button class="btn-exit" id="exitReasonSubmit">بررسی دلیل</button>'
         +'</div></div>';
       document.body.appendChild(el);
       requestAnimationFrame(function(){el.classList.add('open');});
@@ -1847,24 +1895,13 @@
       };
       el.querySelector('#exitReasonSubmit').onclick=async function(){
         var reason=(document.getElementById('exitReasonText')||{}).value||'';
-        var pass=(document.getElementById('exitReasonPass')||{}).value||'';
         reason=reason.trim();
         if(!reason){errEl.textContent='دلیل خروج رو بنویس';return;}
-        if(reason.length<10){errEl.textContent='دلیل خروج باید حداقل ۱۰ کاراکتر باشه';return;}
-        if(!pass){errEl.textContent='رمز عبور رو وارد کن';return;}
-        var settingsPassword='';
-        try{
-          var st=JSON.parse(localStorage.getItem('siraj-settings')||'{}');
-          settingsPassword=st.password||'';
-        }catch(e){}
-        if(settingsPassword && pass!==settingsPassword){
-          errEl.textContent='رمز عبور اشتباه است';
-          return;
-        }
+        if(reason.length<8){errEl.textContent='دلیل خروج خیلی کوتاهه — واضح‌تر بنویس';return;}
         var box=el.querySelector('.exit-reason-box');
         box.innerHTML='<div class="exit-reason-checking"><div class="spinner"></div><span>دارم بررسی می‌کنم...</span></div>';
-        var isValid=await checkReasonWithAI(reason);
-        if(isValid){
+        var result=await checkReasonWithAI(reason);
+        if(result.valid){
           box.innerHTML='<span class="exit-reason-emoji">✅</span>'
             +'<div class="exit-reason-title">دلیلت موجه بود</div>'
             +'<div class="exit-reason-text">باشه، می‌تونی خارج شی. موفق باشی 🌱</div>'
@@ -1876,41 +1913,98 @@
         } else {
           box.innerHTML='<span class="exit-reason-emoji">❌</span>'
             +'<div class="exit-reason-title">دلیلت موجه نیست</div>'
-            +'<div class="exit-reason-text">باید تا آخر تایمر بمونی. برگرد سر درست 💪</div>'
-            +'<div class="exit-reason-actions"><button class="btn-continue" id="stayBtn">باشه، ادامه می‌دم</button></div>';
+            +'<div class="exit-reason-text">اگه واقعاً مجبوری بری، یه راه دیگه هست...</div>'
+            +'<div class="punishment-box">'
+            +'<span class="pb-title">🎯 تنبیه خروج زودهنگام</span>'
+            +'فردا باید <b>دو برابر</b> امروز مطالعه کنی!'
+            +'</div>'
+            +'<div class="exit-reason-actions">'
+            +'<button class="btn-continue secondary" id="stayBtn">✋ نه، ادامه می‌دم</button>'
+            +'<button class="btn-exit" id="acceptPunish">قبول می‌کنم و خارج می‌شم</button>'
+            +'</div>';
           box.querySelector('#stayBtn').onclick=function(){
             el.classList.remove('open');setTimeout(function(){el.remove();},320);
+          };
+          box.querySelector('#acceptPunish').onclick=function(){
+            try{
+              var today=new Date();
+              var tomorrow=new Date(today);tomorrow.setDate(tomorrow.getDate()+1);
+              var tk=window.dateKey(tomorrow);
+              var pl=window.loadPlannerNew();
+              var dd=window.getDayData(pl,tk);
+              if(!dd.tasks) dd.tasks=[];
+              dd.tasks.push({
+                id:'punish_'+Date.now(),
+                title:'⚖️ تنبیه: مطالعه دو برابر (به خاطر خروج زودهنگام)',
+                time:'', priority:'high', done:false, createdAt:Date.now()
+              });
+              window.savePlanner(pl);
+              if(window.toast) window.toast('تنبیه ثبت شد — فردا باید دو برابر بخونی! ⚖️','info');
+            }catch(e){}
+            el.remove();
+            doFinishRecord();
           };
         }
       };
     }
 
+    /* ★ checkReasonWithAI — تشخیص دقیق دلایل الکی */
     async function checkReasonWithAI(reason){
       try{
-        var prompt='یه دانش‌آموز/دانشجو داشت توی حالت مطالعه با تایمر درس می‌خوند و الان می‌خواد قبل از تموم شدن تایمر خارج بشه. دلیلش اینه:\n\n«'+reason+'»\n\n'
-          +'آیا این دلیل موجهه برای قطع کردن جلسه مطالعه؟ '
-          +'موارد موجه: بیماری ناگهانی، حادثه، کار خیلی فوری، حالت روحی بد، مشکل جسمی، کار ضروری خانوادگی. '
-          +'موارد غیرموجه: حواس‌پرتی، بی‌حوصلگی، خستگی معمولی، کار غیرضروری، وسوسه فضای مجازی، حوصله نداشتن. '
-          +'فقط با کلمه «بله» یا «خیر» جواب بده.';
-        var res=await fetch(getBaseURL(),{
+        var prompt = 'دلیل کاربر برای قطع جلسه مطالعه قبل از پایان تایمر:\n\n"'+reason+'"\n\n'
+          +'آیا این دلیل واقعی و موجهه برای قطع جلسه؟ '
+          +'دلایل موجه: بیماری ناگهانی، حادثه، وضعیت اورژانسی، کار بسیار ضروری، حال روحی خیلی بد، مشکل جسمی جدی، کار اداری/خانوادگی فوری.\n'
+          +'دلایل غیرموجه: بی‌حوصلگی، خستگی معمولی، حواس‌پرتی، وسوسه شبکه اجتماعی، بی‌انگیزگی، حوصله نداشتن، کار غیرضروری، دلایل ساختگی و کلیشه‌ای.\n\n'
+          +'به لحن و کلمات کاربر دقت کن. اگر دلیل ساختگی، مبهم، یا الکی به نظر می‌رسه رد کن.\n'
+          +'فقط با یک کلمه جواب بده: "بله" (موجه) یا "خیر" (غیرموجه).';
+        var res = await fetch(getBaseURL(),{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({
             model:getModel(),
             messages:[
-              {role:'system',content:'تو یه ارزیاب منصف و منطقی هستی. فقط با «بله» یا «خیر» جواب بده.'},
+              {role:'system',content:'تو یه ارزیاب دقیق و سخت‌گیر هستی. دلایل ساختگی و الکی رو تشخیص می‌دی. فقط با «بله» یا «خیر» جواب بده.'},
               {role:'user',content:prompt}
             ],
-            temperature:0.2,
-            stream:false
+            temperature:0.15,
+            stream:false,
+            max_tokens:10
           })
         });
-        if(!res.ok) return reason.length>=20;
-        var data=await res.json();
-        var ans=(data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '').trim();
-        return ans.indexOf('بله')===0 || ans.indexOf('yes')>-1 || ans.indexOf('Yes')>-1;
+        if(!res.ok){
+          return { valid: reason.length >= 25 };
+        }
+        var data = await res.json();
+        var ans = '';
+        if(data.choices && data.choices[0]){
+          if(data.choices[0].message && data.choices[0].message.content){
+            ans = data.choices[0].message.content;
+          } else if(data.choices[0].delta && data.choices[0].delta.content){
+            ans = data.choices[0].delta.content;
+          } else if(data.choices[0].text){
+            ans = data.choices[0].text;
+          }
+        }
+        ans = String(ans||'').trim();
+        var lower = ans.toLowerCase();
+
+        var hasNo = (ans.indexOf('خیر') > -1) || (ans.indexOf('نه ') > -1) || (ans === 'نه') || (lower.indexOf('no') > -1 && lower.indexOf('not') !== 0);
+        var hasYes = (ans.indexOf('بله') > -1) || (ans.indexOf('آری') > -1) || (lower.indexOf('yes') > -1) || (lower.indexOf('true') > -1);
+
+        if(hasNo && !hasYes) return { valid: false };
+        if(hasYes && !hasNo) return { valid: true };
+
+        if(reason.length < 15) return { valid: false };
+
+        var vagueWords = ['حوصله','بی‌حوصله','خسته','حوصل','حالم نیست','دوست ندارم','نمی‌خوام','بسه','کافیه'];
+        for(var i=0;i<vagueWords.length;i++){
+          if(reason.indexOf(vagueWords[i]) > -1 && reason.length < 40){
+            return { valid: false };
+          }
+        }
+        return { valid: reason.length >= 30 };
       }catch(e){
-        return reason.length>=20;
+        return { valid: reason.length >= 25 };
       }
     }
 
@@ -1976,11 +2070,13 @@
       });
     };
 
+    /* ★ renderStudyChat — پیام اول استاتیک (بدون AI) */
     function renderStudyChat(){
       var box=document.getElementById('studyChatMessages');if(!box) return;
       var p=getProfile();
-      var greeting=p.name?'سلام '+esc(p.name)+' 👋':'سلام 👋';
-      var html='<div class="sc-msg sc-bot">'+greeting+' من سراجم.</div>';
+      var name = (p.name||'').trim() || 'دوست من';
+      var greetingText = 'سلام '+name+' 👋<br>من سراجم — الان توی حالت تمرکزیم 📚<br>حواست به درس باشه، من هم اینجام اگه سؤالی داشتی بپرس ✨';
+      var html='<div class="sc-msg sc-bot">'+greetingText+'</div>';
       studyChatHistory.forEach(function(m){
         if(m.role==='user') html+='<div class="sc-msg sc-user">'+esc(m.content)+'</div>';
         else if(m.role==='assistant') html+='<div class="sc-msg sc-bot">'+esc(m.content)+'</div>';
@@ -2522,6 +2618,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v39 Final — Bug Fixed)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v40 Final)');
   }
 })();
