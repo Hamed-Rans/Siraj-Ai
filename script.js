@@ -28,21 +28,21 @@ const APP_CONFIG={
         {id:'flower',name:'گل'},{id:'star',name:'ستاره'},{id:'tazhib',name:'ترنج'},
         {id:'eslimi',name:'اسلیمی'},{id:'boteh',name:'بته جقه'},{id:'none',name:'بدون طرح'}
     ],
-       inputStyles:[
+    inputStyles:[
         {id:'solid',name:'ساده',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/>'},
         {id:'glass',name:'شیشه‌ای',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8v8M17 8v8" opacity=".5"/>'}
     ],
-       headerStyles:[
+    headerStyles:[
         {id:'solid',name:'ساده',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/>'},
         {id:'glass',name:'شیشه‌ای',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 6v12M18 6v12" opacity=".4"/>'}
     ],
-           navPositions:[
+    navPositions:[
         {id:'right',name:'راست',icon:'<rect x="17" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="12" height="18" rx="2"/>'},
         {id:'bottom',name:'پایین',icon:'<rect x="3" y="17" width="18" height="4" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="18" height="12" rx="2"/>'},
         {id:'top',name:'بالا',icon:'<rect x="3" y="3" width="18" height="4" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="9" width="18" height="12" rx="2"/>'},
         {id:'left',name:'چپ',icon:'<rect x="3" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="9" y="3" width="12" height="18" rx="2"/>'}
     ],
-      navStyles:[
+    navStyles:[
         {id:'default',name:'ساده',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/>'},
         {id:'glass',name:'شیشه‌ای',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8v8M17 8v8" opacity=".5"/>'}
     ],
@@ -939,45 +939,20 @@ function askAIToPlan(){
     handleInput();
 }
 
+/* ★ صفحه مقالات — فقط هدر */
 function renderBlog(){
-  const v = document.getElementById('view-blog');
-  if(!v) return;
-  v.innerHTML = '<div class="page-title-bar">'
-    + '<div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
-    + '<div class="page-title-text">مقالات سراج</div>'
-    + '</div>';
+    const v=document.getElementById('view-blog');
+    if(!v) return;
+    v.innerHTML='<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>';
 }
-        <div class="page-title-bar"><div class="page-title-text">مقالات سراج</div></div>
-        <div class="blog-editor">
-            <input type="text" id="blogTitle" placeholder="عنوان مقاله...">
-            <textarea id="blogBody" placeholder="متن..."></textarea>
-            <div class="blog-editor-actions">
-                <button class="btn-secondary" onclick="document.getElementById('blogTitle').value='';document.getElementById('blogBody').value=''">پاک کردن</button>
-                <button class="btn-primary" onclick="addBlogPost()">انتشار</button>
-            </div>
-        </div>
-        <div class="blog-posts">${posts.length===0?`<div class="empty-state"><span class="emoji">📝</span>هنوز مقاله‌ای نداری</div>`
-            :posts.map((p,i)=>`<div class="blog-post"><button class="bp-del" onclick="deleteBlogPost(${i})"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button><h3>${escapeHtml(p.title)}</h3><div class="bp-date">${new Date(p.ts).toLocaleDateString('fa-IR')}</div><div class="bp-body">${escapeHtml(p.body)}</div></div>`).join('')}
-        </div>`;
-}
-function addBlogPost(){const t=document.getElementById('blogTitle').value.trim();const b=document.getElementById('blogBody').value.trim();if(!t||!b){toast('عنوان و متن لازمه','error');return;}const p=loadBlog();p.unshift({title:t,body:b,ts:Date.now()});saveBlog(p);renderBlog();renderPanelForBlog();toast('مقاله منتشر شد','success');}
+function addBlogPost(){const t=document.getElementById('blogTitle')?.value.trim();const b=document.getElementById('blogBody')?.value.trim();if(!t||!b){toast('عنوان و متن لازمه','error');return;}const p=loadBlog();p.unshift({title:t,body:b,ts:Date.now()});saveBlog(p);renderBlog();renderPanelForBlog();toast('مقاله منتشر شد','success');}
 function deleteBlogPost(i){const p=loadBlog();p.splice(i,1);saveBlog(p);renderBlog();renderPanelForBlog();}
 
+/* ★ صفحه انجمن — فقط هدر */
 function renderCommunity(){
     const v=document.getElementById('view-videos');
-    v.innerHTML=`
-        <div class="page-title-bar"><div class="page-title-text">انجمن سراج</div></div>
-        <div class="community-hero">
-            <div class="community-icon">
-                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div class="community-title">انجمن گفتگوی سراج</div>
-            <div class="community-desc">یه فضای صمیمی که کاربرا، مدرسین و من بتونیم با هم درباره‌ی عربی، ادبیات، برنامه‌ریزی درسی و یادگیری حرف بزنیم. اینجا جای کامنت و پرسش و گفتگوست، نه چت خصوصی.</div>
-            <div class="community-badge">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>
-                به‌زودی راه‌اندازی می‌شه
-            </div>
-        </div>`;
+    if(!v) return;
+    v.innerHTML='<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="page-title-text">انجمن سراج</div></div>';
 }
 
 function renderTools(){
@@ -1042,30 +1017,32 @@ function renameChat(id){
 }
 function saveRename(id,newTitle){const h=loadHistory();if(!h[id])return;const t=(newTitle||'').trim()||'گفتگو';h[id].title=t;saveHistory(h);renderHistory();}
 function formatTime(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'الان';if(m<60)return m+' د';const hr=Math.floor(m/60);if(hr<24)return hr+' س';const day=Math.floor(hr/24);if(day<7)return day+' روز';return new Date(ts).toLocaleDateString('fa-IR');}
+
+/* ★ loadChat با انیمیشن */
 function loadChat(id){
-  const c=loadHistory()[id];
-  if(!c) return;
-  currentChatId=id;
-  const box=document.getElementById('box');
-  box.innerHTML='';
-  box.style.transition='none';
-  box.style.opacity='0';
-  box.style.transform='translateY(12px)';
-  requestAnimationFrame(()=>{
+    const c=loadHistory()[id];
+    if(!c) return;
+    currentChatId=id;
+    const box=document.getElementById('box');
+    box.innerHTML='';
+    box.style.transition='none';
+    box.style.opacity='0';
+    box.style.transform='translateY(12px)';
     requestAnimationFrame(()=>{
-      box.style.transition='opacity .3s cubic-bezier(.22,1,.36,1), transform .3s cubic-bezier(.22,1,.36,1)';
-      box.style.opacity='1';
-      box.style.transform='translateY(0)';
+        requestAnimationFrame(()=>{
+            box.style.transition='opacity .3s cubic-bezier(.22,1,.36,1), transform .3s cubic-bezier(.22,1,.36,1)';
+            box.style.opacity='1';
+            box.style.transform='translateY(0)';
+        });
     });
-  });
-  c.messages.forEach(m=>{
-    if(m.role==='user') renderUserMsg(m.content,m.fileData,m.fileType,true);
-    else renderBotMsg(m.content,true);
-  });
-  box.scrollTop=box.scrollHeight;
-  renderHistory();
-  switchView('chat');
-  toggleWelcome();
+    c.messages.forEach(m=>{
+        if(m.role==='user') renderUserMsg(m.content,m.fileData,m.fileType,true);
+        else renderBotMsg(m.content,true);
+    });
+    box.scrollTop=box.scrollHeight;
+    renderHistory();
+    switchView('chat');
+    toggleWelcome();
 }
 function deleteChat(id){if(pendingRequests[id]){pendingRequests[id].abort();delete pendingRequests[id];}const h=loadHistory();delete h[id];saveHistory(h);if(currentChatId===id){currentChatId=null;createNewChat();}renderHistory();}
 function newChat(){createNewChat();}
@@ -1096,16 +1073,10 @@ function getSystemPrompt(){
     const dm={fusha:'العربية الفصحى',iraqi:'اللهجة العراقية',levantine:'اللهجة الشامية',egyptian:'اللهجة المصرية',maghrebi:'اللهجة المغربية'};
     const dialect=dm[settings.dialect]||'العربية الفصحى';
     let extra='';
-        try{
-        var prof = JSON.parse(localStorage.getItem('siraj-profile')||'{}');
-        if(prof.name) extra += '\n\n👤 اسم کاربر: ' + prof.name;
-        if(prof.bio) extra += '\n📝 درباره‌ی خودش: ' + prof.bio + '\nاسمش رو تو جواب‌هات صدا بزن.';
-    }catch(e){}
-        // پروفایل کاربر
     try{
         var prof = JSON.parse(localStorage.getItem('siraj-profile')||'{}');
         if(prof.name) extra += '\n\n👤 اسم کاربر: ' + prof.name;
-        if(prof.bio) extra += '\n📝 درباره‌ی خودش: ' + prof.bio + '\nمی‌تونی توی جواب‌هات به این اطلاعات اشاره کنی و اسمش رو صدا بزنی.';
+        if(prof.bio) extra += '\n📝 درباره‌ی خودش: ' + prof.bio + '\nاسمش رو تو جواب‌هات صدا بزن.';
     }catch(e){}
     if(settings.quick)extra+='\n\n⚡ حالت پاسخ سریع: پاسخ‌ها را کوتاه، مختصر و مستقیم بده.';
     if(settings.thinking)extra+='\n\n🧠 حالت تفکر عمیق: با دقت و عمق بیشتر تحلیل کن.';
@@ -1934,7 +1905,6 @@ function unregisterMySession(){
 }
 
 window.addEventListener('load',()=>{
-        // آواتار کاربر در هدر
     (function injectUserAvatar(){
       var headerBrand = document.querySelector('.chat-header .header-brand');
       var lockBtn = document.getElementById('headerLockBtn');
@@ -1982,19 +1952,3 @@ window.addEventListener('load',()=>{
     },30000);
     resetInactivityTimer();
 });
-/* ★ Override برای صفحه مقالات — فیکس چیدمان */
-(function(){
-  if(typeof window.renderBlog === 'function'){
-    window.renderBlog = function(){
-      var v = document.getElementById('view-blog');
-      if(!v) return;
-      v.innerHTML = '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>'
-        + '<div class="community-hero">'
-        + '<div class="community-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
-        + '<div class="community-title">مقالات سراج</div>'
-        + '<div class="community-desc">اینجا قراره مطالب آموزشی، تحلیل‌های ادبی، نکات دستوری و یادداشت‌های کوتاه درباره‌ی زبان و ادبیات عربی منتشر بشه.</div>'
-        + '<div class="community-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
-        + '</div>';
-    };
-  }
-})();
