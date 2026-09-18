@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v17 Final) */
+/* Siraj v2.0 — planner-v2.js (v18 Final) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -15,14 +15,13 @@
     var REMINDER_KEY = 'siraj-reminders';
     var STUDY_CHAT_KEY = 'siraj-study-chat-session';
     var LEVEL_KEY = 'siraj-user-level';
+    var DEFAULT_VIEW_KEY = 'siraj-default-view';
     var studyChatHistory = [];
     var USER_AVATAR_URL = 'siraj-logo.png';
 
     var SOUND_FILES = {
-      nature:'sounds/ocean.mp3',
-      forest:'sounds/forest.mp3',
-      hall:'sounds/hall.mp3',
-      rain:'sounds/rain.mp3'
+      nature:'sounds/ocean.mp3', forest:'sounds/forest.mp3',
+      hall:'sounds/hall.mp3', rain:'sounds/rain.mp3'
     };
     var SOUND_NAMES = {
       nature:'موج دریا 🌊', forest:'جنگل 🌳',
@@ -71,6 +70,7 @@
       ]
     };
     var LEVEL_LABELS = { beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته' };
+    var VIEW_LABELS = { chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'انجمن', tools:'دستیار' };
 
     var _currentWord = null;
     var _lastTab = 'daily';
@@ -89,8 +89,7 @@
     }
     function formatTimer(mins){
       mins = Math.max(0, Math.round(mins));
-      var h = Math.floor(mins/60);
-      var m = mins % 60;
+      var h = Math.floor(mins/60), m = mins % 60;
       return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
     }
     function esc(s){
@@ -101,9 +100,11 @@
     function getUserLevel(){
       try{ return localStorage.getItem(LEVEL_KEY) || 'beginner'; }catch(e){ return 'beginner'; }
     }
-    function setUserLevel(l){
-      try{ localStorage.setItem(LEVEL_KEY, l); }catch(e){}
+    function setUserLevel(l){ try{ localStorage.setItem(LEVEL_KEY, l); }catch(e){} }
+    function getDefaultView(){
+      try{ return localStorage.getItem(DEFAULT_VIEW_KEY) || 'chat'; }catch(e){ return 'chat'; }
     }
+    function setDefaultView(v){ try{ localStorage.setItem(DEFAULT_VIEW_KEY, v); }catch(e){} }
     function pickNewWord(){
       var pool = WORDS_BY_LEVEL[getUserLevel()] || WORDS_BY_LEVEL.beginner;
       _currentWord = pool[Math.floor(Math.random()*pool.length)];
@@ -126,8 +127,7 @@
       var out = '\n\n👤 اطلاعات کاربر:\n';
       if (p.name) out += '• اسمش: ' + p.name + '\n';
       if (p.bio) out += '• درباره‌ی خودش: ' + p.bio + '\n';
-      var lvl = getUserLevel();
-      out += '• سطح عربیش: ' + LEVEL_LABELS[lvl] + '\n';
+      out += '• سطح عربیش: ' + LEVEL_LABELS[getUserLevel()] + '\n';
       return out;
     }
     function loadReminders(){ try{ return JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}'); }catch(e){ return {}; } }
@@ -270,6 +270,7 @@
       document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});
     });
 
+    /* ★★★ انیمیشن هوشمند — فقط عناصری که تغییر کردن ★★★ */
     function smartUpdateHero(tab, direction){
       var c = document.querySelector('.phc-center'); if (!c) return;
       var d = new Date(window.plannerDate || new Date());
@@ -318,36 +319,69 @@
     window.__goThisMonth = window.__goToday;
     window.__goThisYear = window.__goToday;
 
+    /* ★★★ refreshBody — هوشمند: ناوبری تاریخ = فقط hero، تب‌سوییچ = کل pane ★★★ */
     function refreshBody(direction){
       var pane = document.getElementById('plannerPane');
       if (!pane) return;
       if (pane.dataset.animating === '1') return;
 
       var tab = getTab();
+      var isSameTab = pane.dataset.lastTab === tab;
+      pane.dataset.lastTab = tab;
+
       var dir = direction || 'left';
-      var outClass = dir === 'left' ? 'heroOutRight' : 'heroOutLeft';
-      var inClass  = dir === 'left' ? 'heroInFromLeft' : 'heroInFromRight';
 
-      pane.dataset.animating = '1';
-      pane.style.pointerEvents = 'none';
-      pane.classList.add(outClass);
+      if (isSameTab){
+        /* ناوبری داخل تب — فقط hero به‌روز می‌شه با انیمیشن هوشمند */
+        smartUpdateHero(tab, dir);
+        var body = pane.querySelector('.planner-body-content');
+        if (body){
+          body.style.transition = 'opacity .15s ease';
+          body.style.opacity = '0';
+          setTimeout(function(){
+            var html = '';
+            if (tab === 'daily')        html = dailyContentHTML();
+            else if (tab === 'weekly')  html = weeklyContentHTML();
+            else if (tab === 'monthly') html = monthlyContentHTML();
+            else if (tab === 'yearly')  html = yearlyContentHTML();
+            body.innerHTML = html;
+            bindPaneEvents(tab);
+            if (tab === 'weekly') setTimeout(setupWeekSummaryClicks, 50);
+            body.style.transition = 'opacity .25s ease';
+            body.style.opacity = '1';
+          }, 150);
+        } else {
+          renderPane(tab);
+        }
+      } else {
+        /* سوییچ تب — کل pane با اسلاید میاد */
+        var outClass = dir === 'left' ? 'heroOutRight' : 'heroOutLeft';
+        var inClass  = dir === 'left' ? 'heroInFromLeft' : 'heroInFromRight';
 
-      setTimeout(function(){
-        pane.classList.remove(outClass);
-        var html = '';
-        if (tab === 'daily')        html = viewDaily();
-        else if (tab === 'weekly')  html = viewWeekly();
-        else if (tab === 'monthly') html = viewMonthly();
-        else if (tab === 'yearly')  html = viewYearly();
-        pane.innerHTML = html;
-        bindPaneEvents(tab);
-        pane.classList.add(inClass);
-        pane.style.pointerEvents = '';
+        pane.dataset.animating = '1';
+        pane.style.pointerEvents = 'none';
+        pane.classList.add(outClass);
+
         setTimeout(function(){
-          pane.classList.remove(inClass);
-          delete pane.dataset.animating;
-        }, 450);
-      }, 330);
+          pane.classList.remove(outClass);
+          var html = '';
+          if (tab === 'daily')        html = viewDaily();
+          else if (tab === 'weekly')  html = viewWeekly();
+          else if (tab === 'monthly') html = viewMonthly();
+          else if (tab === 'yearly')  html = viewYearly();
+          pane.innerHTML = html;
+          bindPaneEvents(tab);
+          if (tab === 'weekly') setTimeout(setupWeekSummaryClicks, 50);
+
+          pane.classList.add(inClass);
+          pane.style.pointerEvents = '';
+
+          setTimeout(function(){
+            pane.classList.remove(inClass);
+            delete pane.dataset.animating;
+          }, 430);
+        }, 320);
+      }
     }
     window.__refreshCurrentTab = refreshBody;
 
@@ -358,7 +392,10 @@
       var idx = {daily:0, weekly:1, monthly:2, yearly:3}[tab];
       var btns = document.querySelectorAll('.panel-planner-tab');
       if (btns[idx]) btns[idx].classList.add('active');
-      renderPane(tab);
+      /* ★ ریست lastTab تا انیمیشن سوییچ تب اجرا شه ★ */
+      var pane = document.getElementById('plannerPane');
+      if (pane) pane.dataset.lastTab = '';
+      refreshBody('left');
       window.renderPanelForPlanner();
     };
     function renderPane(tab){
@@ -370,6 +407,7 @@
       else if (tab === 'yearly') pane.innerHTML = viewYearly();
       bindPaneEvents(tab);
       if (tab === 'weekly') setTimeout(setupWeekSummaryClicks, 50);
+      pane.dataset.lastTab = tab;
     }
     window.renderPlannerPane = function(){ renderPane(getTab()); };
     function bindPaneEvents(tab){
@@ -506,7 +544,6 @@
       var msg = s>=30?'فوق‌العاده‌ای! 🏆':s>=14?'عالی پیش می‌ری! ✨':s>=7?'ادامه بده! 💪':'خوب شروع کردی! 🌱';
       return '<div class="daily-streak"><span class="ds-fire">🔥</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
     }
-
     function dailyWordHTML(){
       if (!_currentWord) pickNewWord();
       var w = _currentWord;
@@ -723,9 +760,9 @@
       });
       var pct = totalTasks ? Math.round((doneCount/totalTasks)*100) : 0;
       var summaryHTML = '<div class="week-summary">' +
-        '<div class="ws-box" data-stat="total" title="نمایش کل کارها"><div class="ws-num">'+toFa(totalTasks)+'</div><div class="ws-lbl">کل کارها</div></div>' +
-        '<div class="ws-box" data-stat="done" title="نمایش کارهای انجام‌شده"><div class="ws-num">'+toFa(doneCount)+'</div><div class="ws-lbl">انجام شده</div></div>' +
-        '<div class="ws-box" data-stat="progress" title="درصد پیشرفت"><div class="ws-num">'+toFa(pct)+'%</div><div class="ws-lbl">پیشرفت</div></div>' +
+        '<div class="ws-box" data-stat="total"><div class="ws-num">'+toFa(totalTasks)+'</div><div class="ws-lbl">کل کارها</div></div>' +
+        '<div class="ws-box" data-stat="done"><div class="ws-num">'+toFa(doneCount)+'</div><div class="ws-lbl">انجام شده</div></div>' +
+        '<div class="ws-box" data-stat="progress"><div class="ws-num">'+toFa(pct)+'%</div><div class="ws-lbl">پیشرفت</div></div>' +
       '</div>';
       return '<div class="week-grid-wrap"><table class="week-table"><thead>'+headerRow+'</thead><tbody>'+bodyRows+'</tbody></table></div>'+summaryHTML;
     }
@@ -753,9 +790,9 @@
       var pl = window.loadPlannerNew();
       var dd = window.getDayData(pl, dayKey);
       if (!dd.tasks) dd.tasks = [];
-      var newId = 'tk_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
       dd.tasks.push({
-        id: newId, title: val, time: hourKey+':00 تا '+(parseInt(hourKey)+1)+':00',
+        id: 'tk_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        title: val, time: hourKey+':00 تا '+(parseInt(hourKey)+1)+':00',
         priority: 'med', done: false, createdAt: Date.now()
       });
       window.savePlanner(pl);
@@ -783,7 +820,6 @@
         nums[2].textContent = toFa(pct) + '%';
       }
     }
-
     function setupWeekSummaryClicks(){
       document.querySelectorAll('.week-summary .ws-box').forEach(function(box){
         box.onclick = function(){
@@ -809,7 +845,6 @@
         };
       });
     }
-
     window.__wTickTask = function(dayKey, taskId){
       var pl = window.loadPlannerNew();
       var dd = window.getDayData(pl, dayKey);
@@ -1086,7 +1121,6 @@
       pl.years[y].goals.splice(i,1); window.savePlanner(pl);
       refreshBody('left');
     };
-
     window.addMonthGoal = function(monthKey){
       var inp = document.getElementById('newGoalInput'); if (!inp) return;
       var v = inp.value.trim(); if (!v) return;
@@ -1165,9 +1199,7 @@
       audio.loop = true;
       audio.volume = masterVolume;
       audio.preload = 'auto';
-      audio.play().catch(function(err){
-        console.warn('[Sound] Cannot play '+url+':', err.message);
-      });
+      audio.play().catch(function(err){ console.warn('[Sound]', err.message); });
       currentAudio = audio;
     }
     function setMasterVolume(v){
@@ -1622,14 +1654,19 @@
     setTimeout(linkifyContacts, 1800);
     setTimeout(linkifyContacts, 3000);
 
-    /* ═══ دکمه‌های پروفایل + قفل در هدر ═══ */
+    /* ★★★ دکمه‌های هدر — تمیزسازی کامل + ترتیب درست ★★★ */
     function injectMainTopActions(){
-      document.querySelectorAll('#mainTopActions, .main-top-actions').forEach(function(el){ el.remove(); });
+      /* ۱) حذف همه‌ی نمونه‌های قدیمی */
+      document.querySelectorAll('#mainTopActions, .main-top-actions, .header-left-actions').forEach(function(el){ el.remove(); });
       document.querySelectorAll('#headerLockBtn').forEach(function(el){ el.style.display = 'none'; });
+      document.querySelectorAll('.main-top-avatar, .main-top-icon-btn').forEach(function(el){
+        if (!el.closest('.header-left-actions')) el.remove();
+      });
 
       var p = getProfile();
       var avatarSrc = p.avatar || USER_AVATAR_URL;
 
+      /* ۲) پیدا کردن همه هدرها */
       var headers = document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar');
       headers.forEach(function(header){
         if (header.querySelector('.header-left-actions')) return;
@@ -1640,7 +1677,14 @@
         av.className = 'main-top-avatar';
         av.title = p.name ? p.name : 'مشخصات من';
         av.innerHTML = '<img src="'+avatarSrc+'" alt="">';
-        av.onclick = function(){ if (typeof window.openSettings === 'function') window.openSettings(); };
+        av.onclick = function(){
+          if (typeof window.openSettings === 'function') window.openSettings();
+          /* ★ پروفایل → مستقیم برو تب مشخصات من ★ */
+          setTimeout(function(){
+            var b = document.querySelector('.settings-tab-btn[data-cat="profile"]');
+            if (b) b.click();
+          }, 300);
+        };
 
         var lk = document.createElement('button');
         lk.type = 'button';
@@ -1649,6 +1693,7 @@
         lk.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
         lk.onclick = function(){ if (typeof window.lockNow === 'function') window.lockNow(); };
 
+        /* ترتیب از چپ: پروفایل، قفل */
         wrap.appendChild(av);
         wrap.appendChild(lk);
         header.appendChild(wrap);
@@ -1714,9 +1759,14 @@
       var p = getProfile();
       var avatarSrc = p.avatar || USER_AVATAR_URL;
       var lvl = getUserLevel();
+      var dv = getDefaultView();
       var lvlOpts = ['beginner','intermediate','advanced'];
       var lvlHTML = lvlOpts.map(function(k){
         return '<button class="level-opt'+(k===lvl?' active':'')+'" data-level="'+k+'">'+LEVEL_LABELS[k]+'</button>';
+      }).join('');
+      var viewOpts = ['chat','planner','blog','videos','tools'];
+      var viewHTML = viewOpts.map(function(k){
+        return '<button class="default-view-opt'+(k===dv?' active':'')+'" data-view="'+k+'">'+VIEW_LABELS[k]+'</button>';
       }).join('');
 
       pane.innerHTML =
@@ -1742,6 +1792,14 @@
             '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>' +
             'سطحمو نمی‌دونم، با هوش مصنوعی تعیین کن' +
           '</button>' +
+        '</div>' +
+
+        '<div class="default-view-selector">' +
+          '<div class="default-view-title">' +
+            '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>' +
+            '<span>تب دیفالت هنگام ورود</span>' +
+          '</div>' +
+          '<div class="default-view-options">'+viewHTML+'</div>' +
         '</div>';
 
       pane.querySelectorAll('.level-opt').forEach(function(b){
@@ -1752,6 +1810,16 @@
           b.classList.add('active');
           pickNewWord();
           if (window.toast) window.toast('سطح '+LEVEL_LABELS[l]+' انتخاب شد ✓','success');
+        };
+      });
+
+      pane.querySelectorAll('.default-view-opt').forEach(function(b){
+        b.onclick = function(){
+          var v = b.getAttribute('data-view');
+          setDefaultView(v);
+          pane.querySelectorAll('.default-view-opt').forEach(function(x){ x.classList.remove('active'); });
+          b.classList.add('active');
+          if (window.toast) window.toast('تب دیفالت شد: '+VIEW_LABELS[v],'success');
         };
       });
 
@@ -1786,7 +1854,7 @@
       }
     }
 
-    /* ═══ اسلایدر نوار — بدون فلش ═══ */
+    /* ★★★ اسلایدر نوار — باگ‌فیکس کامل ★★★ */
     (function(){
       function ensureSlider(){
         var nav = document.getElementById('bottomNav'); if (!nav) return null;
@@ -1799,14 +1867,14 @@
         }
         return slider;
       }
-      function doMove(){
+      function positionSlider(){
         var nav = document.getElementById('bottomNav');
         var slider = ensureSlider();
-        if (!nav || !slider) return;
+        if (!nav || !slider) return false;
         var active = document.querySelector('.bottom-nav-btn.active');
         if (!active || active.classList.contains('nav-btn-chat')){
           slider.classList.remove('visible');
-          return;
+          return false;
         }
         var navRect = nav.getBoundingClientRect();
         var btnRect = active.getBoundingClientRect();
@@ -1814,13 +1882,17 @@
         var isVert = pos === 'left' || pos === 'right';
         var L, T, W, H, R;
         if (isVert){
-          L = 3; W = navRect.width - 6;
-          T = btnRect.top - navRect.top; H = btnRect.height;
-          R = 14;
+          L = btnRect.left - navRect.left;
+          W = btnRect.width;
+          T = btnRect.top - navRect.top;
+          H = btnRect.height;
+          R = 12;
         } else {
           L = btnRect.left - navRect.left;
           T = btnRect.top - navRect.top;
-          W = btnRect.width; H = btnRect.height; R = 21;
+          W = btnRect.width;
+          H = btnRect.height;
+          R = 21;
         }
         slider.style.left = L + 'px';
         slider.style.top = T + 'px';
@@ -1828,45 +1900,37 @@
         slider.style.height = H + 'px';
         slider.style.borderRadius = R + 'px';
         slider.classList.add('ready', 'visible');
+        return true;
       }
-      function doMoveInstant(){
+      var _moveTimer = null;
+      function scheduleMove(){
+        /* ★ فوری مخفی کن — بعد از پایان انیمیشن دکمه، با انیمیشن برو ★ */
+        var slider = ensureSlider();
+        if (slider) slider.classList.remove('visible');
+        if (_moveTimer) clearTimeout(_moveTimer);
+        _moveTimer = setTimeout(function(){
+          _moveTimer = null;
+          positionSlider();
+        }, 480);
+      }
+      function moveInstant(){
         var slider = ensureSlider();
         if (!slider) return;
         slider.classList.remove('ready', 'visible');
         slider.style.transition = 'none';
-        doMove();
+        positionSlider();
         void slider.offsetWidth;
         slider.style.transition = '';
-        slider.classList.remove('visible');
-        setTimeout(function(){ slider.classList.add('visible'); }, 40);
       }
-      function scheduleAfterButtonExpand(){
-        var nav = document.getElementById('bottomNav'); if (!nav) return;
-        var active = nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
-        if (!active){ doMove(); return; }
-        var done = false;
-        function finish(){
-          if (done) return; done = true;
-          active.removeEventListener('transitionend', onEnd);
-          doMove();
-        }
-        function onEnd(e){
-          if (e.target === active &&
-              (e.propertyName === 'max-width' || e.propertyName === 'padding' || e.propertyName === 'width')){
-            finish();
-          }
-        }
-        active.addEventListener('transitionend', onEnd);
-        setTimeout(finish, 600);
-      }
-      window.__moveNavSlider = doMove;
+      window.__moveNavSlider = moveInstant;
+
       var navEl = document.getElementById('bottomNav');
       if (navEl){
         new MutationObserver(function(muts){
           for (var i=0;i<muts.length;i++){
             if (muts[i].attributeName === 'class' &&
-                muts[i].target.classList.contains('bottom-nav-btn')){
-              scheduleAfterButtonExpand();
+                muts[i].target.classList && muts[i].target.classList.contains('bottom-nav-btn')){
+              scheduleMove();
               return;
             }
           }
@@ -1875,12 +1939,13 @@
       new MutationObserver(function(){
         var sl = document.getElementById('navSlider');
         if (sl) sl.classList.remove('ready');
-        doMoveInstant();
-        setTimeout(doMove, 500);
+        moveInstant();
+        setTimeout(positionSlider, 600);
       }).observe(document.documentElement, {attributes:true, attributeFilter:['data-nav-position']});
-      window.addEventListener('resize', doMoveInstant);
-      setTimeout(doMoveInstant, 800);
-      setTimeout(doMove, 1400);
+
+      window.addEventListener('resize', moveInstant);
+      setTimeout(moveInstant, 800);
+      setTimeout(positionSlider, 1400);
     })();
 
     /* رنگ ساعت */
@@ -1903,6 +1968,17 @@
     }, 200);
 
     pickNewWord();
-    console.log('[Siraj v2.0] planner loaded ✓ (v17)');
+
+    /* ★★★ تب دیفالت در ورود بعدی ★★★ */
+    setTimeout(function(){
+      try{
+        var dv = getDefaultView();
+        if (dv && dv !== 'chat' && typeof window.switchView === 'function'){
+          window.switchView(dv);
+        }
+      }catch(e){}
+    }, 1200);
+
+    console.log('[Siraj v2.0] planner loaded ✓ (v18)');
   }
 })();
