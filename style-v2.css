@@ -4013,3 +4013,120 @@
   color: #fff;
   box-shadow: 0 4px 14px -4px var(--accent);
 }
+/* ═══════════════════════════════════════════════════════════════
+   PATCH v24
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── ۱) انیمیشن ناوبری داخل تب: خروج + ورود ─── */
+[data-anim-key] {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+[data-anim-key].heroOutRight {
+  animation: heroOutRight .24s cubic-bezier(.4,0,1,1) forwards;
+}
+[data-anim-key].heroOutLeft {
+  animation: heroOutLeft .24s cubic-bezier(.4,0,1,1) forwards;
+}
+[data-anim-key].heroInFromLeft {
+  animation: heroInFromLeft .42s cubic-bezier(.22,1,.36,1) both;
+}
+[data-anim-key].heroInFromRight {
+  animation: heroInFromRight .42s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes heroOutRight {
+  to { opacity: 0; transform: translateX(40px); filter: blur(3px); }
+}
+@keyframes heroOutLeft {
+  to { opacity: 0; transform: translateX(-40px); filter: blur(3px); }
+}
+@keyframes heroInFromLeft {
+  from { opacity: 0; transform: translateX(-40px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateX(0); filter: blur(0); }
+}
+@keyframes heroInFromRight {
+  from { opacity: 0; transform: translateX(40px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateX(0); filter: blur(0); }
+}
+
+/* ─── ۲) انیمیشن fade لود محتوای داخل تب ─── */
+@keyframes bodyFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── ۳) انیمیشن سوییچ بین تب‌های اصلی ─── */
+.view.switching-in {
+  animation: viewFadeSlide .4s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes viewFadeSlide {
+  from { opacity: 0; transform: translateX(-28px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateX(0); filter: blur(0); }
+}
+
+/* ─── ۴) دکمه پین — جهت فلش در چپ/راست ─── */
+/* چپ + باز یا پین → فلش به چپ */
+[data-nav-position="left"] .nav-row:not(.collapsed) .nav-collapse-tab svg,
+[data-nav-position="left"] .nav-row.pinned .nav-collapse-tab svg {
+  transform: rotate(-90deg) !important;
+}
+/* چپ + بسته → فلش به راست */
+[data-nav-position="left"] .nav-row.collapsed:not(.pinned) .nav-collapse-tab svg {
+  transform: rotate(90deg) !important;
+}
+/* راست + باز یا پین → فلش به راست */
+[data-nav-position="right"] .nav-row:not(.collapsed) .nav-collapse-tab svg,
+[data-nav-position="right"] .nav-row.pinned .nav-collapse-tab svg {
+  transform: rotate(90deg) !important;
+}
+/* راست + بسته → فلش به چپ */
+[data-nav-position="right"] .nav-row.collapsed:not(.pinned) .nav-collapse-tab svg {
+  transform: rotate(-90deg) !important;
+}
+
+/* ─── ۵) آواتار پروفایل بدون rip ─── */
+.header-left-actions .main-top-avatar,
+.header-left-actions .main-top-icon-btn {
+  transition: transform .28s cubic-bezier(.34,1.4,.64,1),
+              box-shadow .3s ease,
+              border-color .25s ease !important;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.header-left-actions .main-top-avatar:hover {
+  transform: scale(1.06) translateZ(0);
+  box-shadow: 0 0 0 2px var(--accent), 0 6px 18px -6px var(--accent) !important;
+}
+.header-left-actions .main-top-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+.header-left-actions .main-top-icon-btn:hover {
+  transform: scale(1.05) translateZ(0);
+}
+
+/* ─── ۶) اسلایدر عمودی — عرض کامل ─── */
+[data-nav-position="left"] .nav-slider,
+[data-nav-position="right"] .nav-slider {
+  min-width: 40px !important;
+}
+
+/* ─── ۷) اسلایدر ready ─── */
+.nav-slider {
+  opacity: 0;
+  transition: none;
+}
+.nav-slider.ready {
+  transition:
+    left .38s cubic-bezier(.22,1,.36,1),
+    top .38s cubic-bezier(.22,1,.36,1),
+    width .34s cubic-bezier(.22,1,.36,1),
+    height .34s cubic-bezier(.22,1,.36,1),
+    border-radius .3s !important;
+}
+.nav-slider.visible { opacity: 1; }
