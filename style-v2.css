@@ -2048,3 +2048,261 @@
   from{opacity:0;transform:translate(-60px,-60px) scale(.92);filter:blur(6px)}
   to{opacity:1;transform:translate(0,0) scale(1);filter:blur(0)}
 }
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v34 — FINAL NAV + LIBRARY + STUDY FIXES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1) صفحه مقالات و انجمن — فقط هدر */
+.blog-view .community-hero,
+.videos-view .community-hero{display:none!important}
+.blog-view .page-title-bar,
+.videos-view .page-title-bar{width:100%!important;margin:0!important;box-sizing:border-box!important}
+
+/* 2) دکمه کتابخانه — مثل دکمه حالت مطالعه */
+.panel-library-btn{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  width:100%!important;
+  padding:16px 18px!important;
+  border-radius:18px!important;
+  border:none!important;
+  background:linear-gradient(135deg,#8b5cf6,#6d28d9)!important;
+  color:#fff!important;
+  font-family:var(--font-text)!important;
+  font-size:14px!important;
+  font-weight:800!important;
+  cursor:pointer!important;
+  box-shadow:0 10px 30px -10px #6d28d9!important;
+  transition:transform .3s cubic-bezier(.34,1.4,.64,1),box-shadow .3s!important;
+  margin-top:10px!important;
+  text-align:right!important;
+}
+.panel-library-btn:hover{transform:translateY(-3px)!important;box-shadow:0 14px 36px -10px #6d28d9!important}
+.panel-library-btn svg{width:28px!important;height:28px!important;stroke:currentColor!important;fill:none!important;stroke-width:1.8!important;flex-shrink:0!important}
+
+/* 3) کارت روزانه — دکمه سوم */
+.daily-action-btn.learn-study{
+  background:rgba(99,102,241,.12)!important;
+  border-color:rgba(99,102,241,.35)!important;
+  color:#818CF8!important;
+}
+.daily-action-btn.learn-study:hover{
+  background:linear-gradient(135deg,#818CF8,#4F46E5)!important;
+  color:#fff!important;
+  border-color:#4F46E5!important;
+  transform:translateY(-2px)!important;
+}
+
+/* 4) کتابخانه — دکمه ورود به حالت مطالعه */
+.lib-study-btn{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  margin:12px 20px 16px!important;
+  padding:12px 18px!important;
+  border-radius:14px!important;
+  border:none!important;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  color:#fff!important;
+  font-family:var(--font-text)!important;
+  font-size:13px!important;
+  font-weight:800!important;
+  cursor:pointer!important;
+  box-shadow:0 8px 20px -8px var(--accent)!important;
+  transition:transform .25s!important;
+}
+.lib-study-btn:hover{transform:translateY(-2px)!important}
+.lib-study-btn svg{width:18px!important;height:18px!important;stroke:currentColor!important;fill:none!important;stroke-width:2!important}
+
+/* 5) study chat panel → سمت راست */
+.study-chat-panel{
+  left:auto!important;
+  right:max(16px,env(safe-area-inset-right))!important;
+}
+
+/* 6) NAV SLIDER — ساختار جدید */
+.nav-slider{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  pointer-events:none!important;
+  z-index:0!important;
+  opacity:0;
+  background:transparent!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  transition:
+    transform .42s cubic-bezier(.22,1,.36,1),
+    width .42s cubic-bezier(.22,1,.36,1),
+    height .42s cubic-bezier(.22,1,.36,1),
+    opacity .28s ease!important;
+  will-change:transform,width,height!important;
+}
+.nav-slider.visible{opacity:1!important}
+.nav-slider-fill{
+  width:100%;
+  height:100%;
+  background:var(--accent);
+  border-radius:22px;
+  box-shadow:0 6px 20px -6px var(--accent);
+  transform-origin:center;
+  transition:border-radius .3s ease;
+}
+.nav-slider.grow .nav-slider-fill{
+  animation:navSliderGrow .55s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes navSliderGrow{
+  0%{transform:scale(.35);opacity:0}
+  60%{opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+
+/* پنهان کردن اسلایدر در حالت چپ/راست چه توی پنل چه مخفی */
+[data-nav-position="left"] .nav-slider,
+[data-nav-position="right"] .nav-slider{
+  display:block!important;
+}
+
+/* 7) PIN BUTTON — چرخش بر اساس موقعیت */
+.nav-collapse-tab svg{
+  transition:transform .4s cubic-bezier(.34,1.4,.64,1)!important;
+}
+[data-nav-position="bottom"] .nav-collapse-tab svg{transform:rotate(180deg)!important}
+[data-nav-position="bottom"] .nav-row:not(.collapsed) .nav-collapse-tab svg,
+[data-nav-position="bottom"] .nav-row.pinned .nav-collapse-tab svg{transform:rotate(0deg)!important}
+
+[data-nav-position="top"] .nav-collapse-tab svg{transform:rotate(90deg)!important}
+[data-nav-position="top"] .nav-row:not(.collapsed) .nav-collapse-tab svg,
+[data-nav-position="top"] .nav-row.pinned .nav-collapse-tab svg{transform:rotate(180deg)!important}
+
+[data-nav-position="right"] .nav-collapse-tab svg{transform:rotate(0deg)!important}
+[data-nav-position="right"] .nav-row:not(.collapsed) .nav-collapse-tab svg,
+[data-nav-position="right"] .nav-row.pinned .nav-collapse-tab svg{transform:rotate(-90deg)!important}
+
+[data-nav-position="left"] .nav-collapse-tab svg{transform:rotate(0deg)!important}
+[data-nav-position="left"] .nav-row:not(.collapsed) .nav-collapse-tab svg,
+[data-nav-position="left"] .nav-row.pinned .nav-collapse-tab svg{transform:rotate(90deg)!important}
+
+/* 8) VERTICAL NAV — مخفی کردن فقط با pin */
+[data-nav-position="left"] .nav-row.collapsed .bottom-nav,
+[data-nav-position="right"] .nav-row.collapsed .bottom-nav{
+  padding:6px!important;
+  min-width:52px!important;
+  width:52px!important;
+  overflow:hidden!important;
+}
+[data-nav-position="left"] .nav-row.collapsed .bottom-nav-btn,
+[data-nav-position="right"] .nav-row.collapsed .bottom-nav-btn{
+  opacity:0!important;
+  width:0!important;
+  min-width:0!important;
+  max-width:0!important;
+  height:0!important;
+  min-height:0!important;
+  max-height:0!important;
+  padding:0!important;
+  margin:0!important;
+  pointer-events:none!important;
+  overflow:hidden!important;
+  transition:opacity .25s,width .4s cubic-bezier(.22,1,.36,1),height .4s cubic-bezier(.22,1,.36,1)!important;
+}
+[data-nav-position="left"] .nav-row.collapsed .nav-slider,
+[data-nav-position="right"] .nav-row.collapsed .nav-slider{
+  opacity:0!important;
+}
+[data-nav-position="left"] .nav-row.collapsed .nav-collapse-tab,
+[data-nav-position="right"] .nav-row.collapsed .nav-collapse-tab{
+  margin:0!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  display:flex!important;
+}
+/* حذف translateX قدیمی — چون دیگه محتوا رو مخفی می‌کنیم */
+[data-nav-position="left"] .nav-row.collapsed,
+[data-nav-position="right"] .nav-row.collapsed{
+  transform:translateY(-50%)!important;
+}
+
+/* 9) VERTICAL NAV — دکمه‌های عادی */
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat){
+  width:44px!important;
+  min-width:44px!important;
+  max-width:44px!important;
+  height:44px!important;
+  min-height:44px!important;
+  max-height:44px!important;
+  border-radius:14px!important;
+  padding:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:0!important;
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  color:var(--text-muted)!important;
+  position:relative!important;
+  overflow:visible!important;
+  transition:
+    height .42s cubic-bezier(.22,1,.36,1),
+    padding .42s cubic-bezier(.22,1,.36,1),
+    gap .42s cubic-bezier(.22,1,.36,1),
+    color .3s,
+    border-radius .3s!important;
+}
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat){
+  height:66px!important;
+  min-height:66px!important;
+  max-height:66px!important;
+  padding:8px 2px 6px!important;
+  gap:4px!important;
+  color:#fff!important;
+  border-radius:18px!important;
+  background:transparent!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat) svg,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat) svg{
+  width:20px!important;
+  height:20px!important;
+}
+/* لیبل برای vertical */
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat)::after{
+  content:attr(title);
+  display:block;
+  font-family:var(--font-text);
+  font-size:9.5px;
+  font-weight:700;
+  line-height:1;
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  white-space:nowrap;
+  color:currentColor;
+  transition:max-height .4s cubic-bezier(.22,1,.36,1),opacity .3s,margin .3s!important;
+}
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat)::after{
+  max-height:20px;
+  opacity:1;
+  margin-top:3px!important;
+}
+/* اسلایدر vertical گردتر */
+[data-nav-position="left"] .nav-slider-fill,
+[data-nav-position="right"] .nav-slider-fill{
+  border-radius:18px!important;
+}
+
+/* 10) تم شیشه‌ای — مطمئن‌سازی */
+[data-header-style="glass"] .chat-header,
+[data-header-style="glass"] .page-title-bar,
+[data-header-style="glass"] .planner-hero{
+  background:rgba(18,22,30,.55)!important;
+  backdrop-filter:blur(22px) saturate(180%) brightness(1.1)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(180%) brightness(1.1)!important;
+}
