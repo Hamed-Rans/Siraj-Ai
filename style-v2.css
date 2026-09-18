@@ -4602,3 +4602,34 @@
   opacity: 0 !important;
   transition: opacity .1s !important;
 }
+/* ═══════════════════════════════════════════════════
+   FIX: نوار چپ/راست از بالا/پایین سرریز نکنه
+   ═══════════════════════════════════════════════════ */
+
+[data-nav-position="right"] .nav-row,
+[data-nav-position="left"] .nav-row {
+  max-height: calc(100vh - 100px) !important;
+  bottom: auto !important;
+  top: 50% !important;
+  overflow: visible !important;
+}
+
+[data-nav-position="right"] .bottom-nav,
+[data-nav-position="left"] .bottom-nav {
+  max-height: calc(100vh - 120px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* اسکرول‌بار نوار مخفی */
+[data-nav-position="right"] .bottom-nav::-webkit-scrollbar,
+[data-nav-position="left"] .bottom-nav::-webkit-scrollbar {
+  width: 0 !important;
+}
+
+/* محتوای main-chat که با created by قاطی نشه */
+.main-chat,
+.chat-view-inner,
+#box {
+  padding-bottom: 54px !important;
+}
