@@ -4400,3 +4400,151 @@
 #headerUserAvatar,
 .header-user-avatar,
 #headerLockBtn { display: none !important; }
+/* ═══════════════════════════════════════════════════
+   NAV FIX FINAL
+   ═══════════════════════════════════════════════════ */
+
+/* متن دکمه از title ساخته می‌شه */
+[data-nav-position] .bottom-nav-btn[title]::after,
+[data-nav-position] .nav-collapse-tab[title]::after {
+  content: attr(title);
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  font-family: var(--font-text);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: currentColor;
+  pointer-events: none;
+  transition: max-width .5s cubic-bezier(.22,1,.36,1),
+              opacity .3s ease,
+              margin-right .5s cubic-bezier(.22,1,.36,1);
+}
+
+/* ★ حالت فعال — متن باز، پس‌زمینه به اندازه ایکون + متن */
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat) {
+  max-width: 180px !important;
+  padding-left: 16px !important;
+  padding-right: 12px !important;
+  gap: 10px !important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+  max-width: 140px !important;
+  opacity: 1 !important;
+  margin-right: 10px !important;
+}
+
+/* ★ measuring — دقیقاً برابر active (برای اندازه‌گیری دقیق اسلایدر) */
+[data-nav-position] .bottom-nav-btn.measuring:not(.nav-btn-chat) {
+  max-width: 180px !important;
+  padding-left: 16px !important;
+  padding-right: 12px !important;
+  gap: 10px !important;
+  transition: none !important;
+}
+[data-nav-position] .bottom-nav-btn.measuring:not(.nav-btn-chat)::after {
+  max-width: 140px !important;
+  opacity: 1 !important;
+  margin-right: 10px !important;
+  transition: none !important;
+}
+
+/* ★ حالت عمودی (چپ/راست) — متن زیر آیکون */
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat) {
+  max-width: 64px !important;
+  height: 62px !important;
+  max-height: 62px !important;
+  padding: 6px 4px !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+  max-width: 56px !important;
+  opacity: 1 !important;
+  margin-right: 0 !important;
+  margin-top: 2px !important;
+  font-size: 9.5px !important;
+}
+
+[data-nav-position="left"] .bottom-nav-btn.measuring:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn.measuring:not(.nav-btn-chat) {
+  max-width: 64px !important;
+  height: 62px !important;
+  max-height: 62px !important;
+  padding: 6px 4px !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  transition: none !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.measuring:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn.measuring:not(.nav-btn-chat)::after {
+  max-width: 56px !important;
+  opacity: 1 !important;
+  margin-right: 0 !important;
+  margin-top: 2px !important;
+  font-size: 9.5px !important;
+  transition: none !important;
+}
+
+/* رنگ متن و آیکون فعال = سفید */
+[data-nav-position] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+  color: #fff !important;
+}
+[data-nav-position] .bottom-nav-btn.active:not(.nav-btn-chat) svg {
+  stroke: #fff !important;
+}
+
+/* اسلایدر نوار — رنگ و انیمیشن */
+.nav-slider {
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-dark)) !important;
+  box-shadow: 0 6px 20px -6px var(--accent) !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+.nav-slider.ready {
+  transition: left .5s cubic-bezier(.22,1,.36,1),
+              top .5s cubic-bezier(.22,1,.36,1),
+              width .5s cubic-bezier(.22,1,.36,1),
+              height .5s cubic-bezier(.22,1,.36,1),
+              border-radius .3s,
+              opacity .2s !important;
+}
+.nav-slider.visible { opacity: 1 !important; }
+/* ═══════════════════════════════════════════════════
+   MONTHLY/YEARLY PANEL ALIGNMENT
+   ═══════════════════════════════════════════════════ */
+
+.monthly-layout {
+  align-items: flex-start !important;
+}
+.monthly-side {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  align-self: flex-start !important;
+}
+.monthly-main {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+/* تراز دقیق کارت اهداف با بالای تقویم */
+.monthly-side .month-goals,
+.monthly-side .month-goals.compact,
+.monthly-side .year-goals {
+  margin-top: 0 !important;
+  padding-top: 16px !important;
+}
+/* تقویم هم از بالا تراز شه */
+.monthly-main .month-calendar {
+  margin-top: 0 !important;
+}
+/* اگه legend بالای تقویم هست، اهداف ماه هم به همون اندازه فاصله بگیره */
+.monthly-side {
+  padding-top: 42px !important; /* ارتفاع legend تقویم */
+}
