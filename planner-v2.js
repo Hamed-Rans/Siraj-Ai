@@ -127,8 +127,20 @@
           setTimeout(function(){el.classList.remove('heroInFromLeft','heroInFromRight');},400);
         },220);
       });
-      var todayBadge=c.querySelector('.phc-today');
-      if(todayBadge){todayBadge.style.display=window.dateKey(d)===window.dateKey(new Date())?'':'none';}
+            var todayBadge=c.querySelector('.phc-today');
+      if(todayBadge){
+        var isTodayNow=window.dateKey(d)===window.dateKey(new Date());
+        if(isTodayNow){
+          if(todayBadge.style.display==='none'||!todayBadge.style.display){
+            todayBadge.style.display='';
+            todayBadge.classList.remove('phc-today-anim');
+            void todayBadge.offsetWidth;
+            todayBadge.classList.add('phc-today-anim');
+          }
+        } else {
+          todayBadge.style.display='none';
+        }
+      }
       var shouldShow=false,btnLabel='',btnAction='';
       if(tab==='daily'){shouldShow=window.dateKey(d)!==window.dateKey(new Date());btnLabel='↩ برگرد به امروز';btnAction='window.__goToday()';}
       else if(tab==='weekly'){shouldShow=window.dateKey(weekStart(d))!==window.dateKey(weekStart(new Date()));btnLabel='↩ برگرد به این هفته';btnAction='window.__goThisWeek()';}
