@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v40 Final) */
+/* Siraj v2.0 — planner-v2.js (v41 Final) */
 (function(){
   'use strict';
 
@@ -35,7 +35,6 @@
     var LEVEL_LABELS = {beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته'};
     var VIEW_LABELS  = {chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'انجمن', tools:'دستیار'};
 
-    /* ★ state جدا برای هر تب پلنر */
     if(typeof window._plannerNavState === 'undefined'){
       window._plannerNavState = { daily:false, weekly:false, monthly:false, yearly:false };
     }
@@ -91,7 +90,7 @@
       var mode=seed%3;
       if(mode===0){
         var p=DAILY_POEMS[seed%DAILY_POEMS.length];
-        return {type:'بیت',badge:'📖 بیت و معنی امروز',text:p.text,by:p.by,meaning:p.meaning,isAr:true};
+        return {type:'بیت',badge:'📖 بیت امروز',text:p.text,by:p.by,meaning:p.meaning,isAr:true};
       } else if(mode===1){
         var words=[];
         for(var i=0;i<3;i++) words.push(DAILY_WORDS[(seed+i)%DAILY_WORDS.length].text);
@@ -402,7 +401,6 @@
       else if(unit==='year') d.setFullYear(d.getFullYear()+dir);
       window.plannerDate=d;
 
-      /* ★ ذخیره موقعیت تب فعلی */
       var tab = getTab();
       if(tab && window._savedPlannerDate){
         window._savedPlannerDate[tab] = new Date(d);
@@ -486,7 +484,6 @@
     }
     window.__refreshCurrentTab=refreshBody;
 
-    /* ★ فیکس باگ هفته پیش‌فرض */
     window.switchPlannerTab=function(tab){
       var prev = getTab();
       if(prev && prev !== tab && window._plannerNavState[prev]){
@@ -499,7 +496,6 @@
       var btns=document.querySelectorAll('.panel-planner-tab');
       if(btns[idx]) btns[idx].classList.add('active');
 
-      /* ★ بار اول ورود به این تب → امروز */
       if(!window._plannerNavState[tab]){
         window.plannerDate = new Date();
         window._plannerNavState[tab] = true;
@@ -876,7 +872,6 @@
     }
     function viewDaily(){return heroDaily()+'<div class="planner-body-content">'+dailyContentHTML()+'</div>';}
 
-    /* ★ کتابخانه یادگیری — بازطراحی شده */
     var _libCat='all';
     var _libState='learned';
 
@@ -1261,7 +1256,6 @@
       window.savePlanner(pl);refreshBody('left');
     };
 
-    /* ★ monthly — اضافه شد لجند یادآور */
     function monthlyContentHTML(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -1783,7 +1777,6 @@
       },1000);
     }
 
-    /* ★ toggleStudyPause — انیمیشن نرم بین توقف/ادامه */
     function toggleStudyPause(){
       var o=document.getElementById('studyOverlay');if(!o) return;
       var b=o.querySelector('#studyPauseBtn');
@@ -1871,7 +1864,6 @@
       };
     }
 
-    /* ★ پاپ آپ دلیل خروج — بدون مثال + تنبیه */
     function showExitReasonPopup(){
       var old=document.getElementById('exitReasonPopup');if(old) old.remove();
       var el=document.createElement('div');el.id='exitReasonPopup';el.className='exit-reason-overlay';
@@ -1948,7 +1940,6 @@
       };
     }
 
-    /* ★ checkReasonWithAI — تشخیص دقیق دلایل الکی */
     async function checkReasonWithAI(reason){
       try{
         var prompt = 'دلیل کاربر برای قطع جلسه مطالعه قبل از پایان تایمر:\n\n"'+reason+'"\n\n'
@@ -2070,7 +2061,6 @@
       });
     };
 
-    /* ★ renderStudyChat — پیام اول استاتیک (بدون AI) */
     function renderStudyChat(){
       var box=document.getElementById('studyChatMessages');if(!box) return;
       var p=getProfile();
@@ -2434,6 +2424,9 @@
       }
     }
 
+    /* ═══════════════════════════════════════════════════════════════
+       NAV SLIDER
+       ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null;
       function init(){
@@ -2533,6 +2526,9 @@
       var iv=setInterval(function(){if(init()||++tries>100) clearInterval(iv);},100);
     })();
 
+    /* ═══════════════════════════════════════════════════════════════
+       VIEW SWITCHER HOOK
+       ═══════════════════════════════════════════════════════════════ */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function') return false;
@@ -2595,21 +2591,67 @@
       },1000);
     })();
 
+    /* ═══════════════════════════════════════════════════════════════
+       PIN BUTTON — با فیکس چرخش پایدار
+       ═══════════════════════════════════════════════════════════════ */
+    function applyPinRotation(){
+      var row=document.getElementById('navRow');
+      var svg=document.querySelector('.nav-collapse-tab svg');
+      if(!row||!svg) return;
+      var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
+      var isPinned=row.classList.contains('pinned');
+      var isCollapsed=row.classList.contains('collapsed');
+      var deg=0;
+      if(pos==='bottom'){
+        deg = isPinned ? 0 : (isCollapsed ? 180 : 0);
+      } else if(pos==='top'){
+        deg = isPinned ? 180 : (isCollapsed ? 0 : 180);
+      } else if(pos==='right'){
+        deg = isPinned ? -90 : (isCollapsed ? 0 : -90);
+      } else if(pos==='left'){
+        deg = isPinned ? 90 : (isCollapsed ? 0 : 90);
+      }
+      svg.style.transition='transform .55s cubic-bezier(.34,1.4,.64,1)';
+      svg.style.transform='rotate('+deg+'deg)';
+      svg.style.setProperty('transform','rotate('+deg+'deg)','important');
+    }
+
     if(typeof window.toggleNavCollapse==='function'){
       var origToggle=window.toggleNavCollapse;
       window.toggleNavCollapse=function(){
-        var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
-        var isVert=(pos==='left'||pos==='right');
-        var svg=document.querySelector('.nav-collapse-tab svg');
-        if(svg && isVert){
-          svg.style.transition='transform .45s cubic-bezier(.34,1.4,.64,1)';
-        }
         try{origToggle.apply(this,arguments);}catch(e){}
+        setTimeout(applyPinRotation,50);
         setTimeout(function(){
           if(typeof window.__moveNavSlider==='function') window.__moveNavSlider();
         },520);
       };
     }
+
+    /* ★ interval برای اطمینان از پایداری چرخش پین */
+    setInterval(function(){
+      var row=document.getElementById('navRow');
+      var svg=document.querySelector('.nav-collapse-tab svg');
+      if(!row||!svg) return;
+      var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
+      var isPinned=row.classList.contains('pinned');
+      var isCollapsed=row.classList.contains('collapsed');
+      var deg=0;
+      if(pos==='bottom'){
+        deg = isPinned ? 0 : (isCollapsed ? 180 : 0);
+      } else if(pos==='top'){
+        deg = isPinned ? 180 : (isCollapsed ? 0 : 180);
+      } else if(pos==='right'){
+        deg = isPinned ? -90 : (isCollapsed ? 0 : -90);
+      } else if(pos==='left'){
+        deg = isPinned ? 90 : (isCollapsed ? 0 : 90);
+      }
+      var target='rotate('+deg+'deg)';
+      var current=svg.style.transform||'';
+      if(current!==target){
+        svg.style.transition='transform .45s cubic-bezier(.34,1.4,.64,1)';
+        svg.style.transform=target;
+      }
+    },800);
 
     setTimeout(function(){
       try{
@@ -2618,6 +2660,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v40 Final)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v41 Final)');
   }
 })();
