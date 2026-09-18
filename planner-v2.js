@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v41 Final) */
+/* Siraj v2.0 — planner-v2.js (v42 Final) */
 (function(){
   'use strict';
 
@@ -817,6 +817,124 @@
       }
     }
 
+    /* ═══════════════════════════════════════════════════════════════
+       NOTIFICATION SYSTEM
+       ═══════════════════════════════════════════════════════════════ */
+    function initTaskNotifications(){
+      if('Notification' in window && Notification.permission === 'default'){
+        setTimeout(function(){
+          try{ Notification.requestPermission(); }catch(e){}
+        }, 5000);
+      }
+      setInterval(checkTaskReminders, 60000);
+      setTimeout(checkTaskReminders, 30000);
+    }
+
+    function checkTaskReminders(){
+      try{
+        var now = new Date();
+        var currentHour = now.getHours();
+        var currentMin = now.getMinutes();
+        var todayKey = window.dateKey(now);
+        var pl = window.loadPlannerNew();
+        var dd = window.getDayData(pl, todayKey);
+        var tasks = (dd.tasks || []).filter(function(t){ return !t.done; });
+
+        tasks.forEach(function(task){
+          if(!task.time) return;
+          var m = task.time.match(/^(\d{1,2})/);
+          if(!m) return;
+          var taskHour = parseInt(m[1]);
+
+          if(taskHour === currentHour && currentMin >= 50){
+            var askedKey = 'siraj_notified_' + todayKey + '_' + task.id;
+            if(localStorage.getItem(askedKey)) return;
+            localStorage.setItem(askedKey, '1');
+            showTaskReminder(task);
+          }
+        });
+      }catch(e){ console.warn('[Notif]', e); }
+    }
+
+    function showTaskReminder(task){
+      showTaskNotifPopup(task);
+      if('Notification' in window && Notification.permission === 'granted'){
+        try{
+          var n = new Notification('سراج — یادآور ⏰', {
+            body: 'کار «' + task.title + '» رو انجام دادی؟',
+            icon: 'siraj-logo.png',
+            tag: 'siraj_task_' + task.id,
+            requireInteraction: true
+          });
+          n.onclick = function(){
+            window.focus();
+            showTaskNotifPopup(task);
+            n.close();
+          };
+        }catch(e){}
+      }
+    }
+
+    function showTaskNotifPopup(task){
+      var old = document.getElementById('taskNotifPopup');
+      if(old) old.remove();
+
+      var el = document.createElement('div');
+      el.id = 'taskNotifPopup';
+      el.className = 'task-notif-popup';
+      el.innerHTML =
+        '<button class="task-notif-close" id="taskNotifClose">✕</button>'
+        +'<div class="task-notif-head">'
+        +'<div class="task-notif-icon">⏰</div>'
+        +'<div class="task-notif-title">یادآور کار</div>'
+        +'</div>'
+        +'<div class="task-notif-task">'+esc(task.title)+'</div>'
+        +'<div class="task-notif-actions">'
+        +'<button class="yes-btn" id="taskNotifYes">✓ بله انجام دادم</button>'
+        +'<button class="no-btn" id="taskNotifNo">✗ نه، بعداً</button>'
+        +'</div>';
+
+      document.body.appendChild(el);
+      requestAnimationFrame(function(){ el.classList.add('show'); });
+
+      var close = function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 450); };
+
+      el.querySelector('#taskNotifClose').onclick = close;
+
+      el.querySelector('#taskNotifYes').onclick = function(){
+        close();
+        try{
+          var pl = window.loadPlannerNew();
+          var todayKey = window.dateKey(new Date());
+          var dd = window.getDayData(pl, todayKey);
+          var idx = (dd.tasks||[]).findIndex(function(t){ return t.id === task.id; });
+          if(idx >= 0){
+            dd.tasks[idx].done = true;
+            window.savePlanner(pl);
+            if(window.toast) window.toast('✓ انجام شد!','success');
+            refreshBody('left');
+          }
+        }catch(e){}
+      };
+
+      el.querySelector('#taskNotifNo').onclick = function(){
+        close();
+        try{
+          var todayKey = window.dateKey(new Date());
+          localStorage.removeItem('siraj_notified_' + todayKey + '_' + task.id);
+        }catch(e){}
+        if(window.toast) window.toast('۳۰ دقیقه دیگه یادت می‌ندازم','info');
+      };
+
+      setTimeout(function(){
+        if(el.parentNode && el.classList.contains('show')){
+          close();
+        }
+      }, 30000);
+    }
+
+    setTimeout(initTaskNotifications, 2000);
+
     function dailyContentHTML(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -826,14 +944,29 @@
       var active=allTasks.filter(function(tk){return !tk.done;});
       var done=allTasks.filter(function(tk){return tk.done;});
 
+      var punishmentHTML = '';
+      var punishments = (dd.tasks||[]).filter(function(tk){ return !tk.done && tk.isPunishment; });
+      if(punishments.length > 0){
+        punishmentHTML = punishments.map(function(tk){
+          return '<div class="punishment-reminder">'
+            +'<span class="pr-icon">⚖️</span>'
+            +'<div>'
+            +'<span class="pr-title">تنبیه فعال</span>'
+            +esc(tk.title)
+            +'</div>'
+            +'</div>';
+        }).join('');
+      }
+
       var activeHTML = active.length===0
         ? '<div class="tasks-empty"><span class="emoji">📝</span>کاری در جریان نداری<br>از کادر بالا کار جدید اضافه کن</div>'
         : '<div class="tasks-list">'+active.map(function(tk){
             var idx=allTasks.indexOf(tk);
             var pm={high:'بالا',med:'متوسط',low:'پایین'};
+            var punishBadge = tk.isPunishment ? '<span class="punishment-badge">تنبیه</span>' : '';
             return '<div class="task-item pri-'+(tk.priority||'med')+'" onclick="window.__taskClick(event, \''+key+'\', '+idx+')">'
               +'<button class="task-check" onclick="event.stopPropagation();window.__dToggleTask('+idx+')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>'
-              +'<div class="task-info"><div class="task-title">'+esc(tk.title)+'</div>'
+              +'<div class="task-info"><div class="task-title">'+punishBadge+esc(tk.title)+'</div>'
               +'<div class="task-meta">'+(tk.time?'<span>🕐 '+esc(tk.time)+'</span>':'')+'<span class="task-badge pri-'+(tk.priority||'med')+'">'+(pm[tk.priority]||'متوسط')+'</span></div></div>'
               +'<button class="task-del" onclick="event.stopPropagation();window.__dDeleteTask('+idx+')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>'
               +'</div>';
@@ -861,7 +994,7 @@
       var po=[{value:'high',label:'بالا',dot:'red'},{value:'med',label:'متوسط',dot:'yellow'},{value:'low',label:'پایین',dot:'green'}];
       window.__pendingTime='';window.__pendingPri='med';
 
-      return streakHTML()+dailyWordHTML()+weekStatsHTML()
+      return streakHTML()+punishmentHTML+dailyWordHTML()+weekStatsHTML()
         +'<div class="task-add-form">'
         +'<input type="text" id="pNewTitle" placeholder="عنوان کار جدید..." onkeydown="if(event.key===\'Enter\')window.__dAddTask()">'
         +'<div class="task-form-selects">'+makeSelect('pNewTime','',ho)+makeSelect('pNewPri','med',po,'اولویت‌بندی')+'</div>'
@@ -1927,11 +2060,15 @@
               if(!dd.tasks) dd.tasks=[];
               dd.tasks.push({
                 id:'punish_'+Date.now(),
-                title:'⚖️ تنبیه: مطالعه دو برابر (به خاطر خروج زودهنگام)',
-                time:'', priority:'high', done:false, createdAt:Date.now()
+                title:'مطالعه دو برابر (به خاطر خروج زودهنگام از حالت مطالعه)',
+                time:'',
+                priority:'high',
+                done:false,
+                isPunishment:true,
+                createdAt:Date.now()
               });
               window.savePlanner(pl);
-              if(window.toast) window.toast('تنبیه ثبت شد — فردا باید دو برابر بخونی! ⚖️','info');
+              if(window.toast) window.toast('یادآور برای فردا ثبت شد ⚖️','info');
             }catch(e){}
             el.remove();
             doFinishRecord();
@@ -2178,35 +2315,42 @@
       }
     };
 
+    /* ★ blog/community بازطراحی کامل */
     function blogHTML(){
-      return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>'
-      +'<div class="blog-v2-hero">'
-      +'<div class="blog-v2-logo"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
-      +'<div class="blog-v2-title">مقالات سراج</div>'
-      +'<div class="blog-v2-desc">جایی برای یادداشت‌ها، تحلیل‌ها و مقالات شما در زمینه‌ی زبان و ادبیات عربی. قراره اینجا بتونید مقالات خودتون رو منتشر کنید، نوشته‌های دیگران رو بخونید و با بقیه به اشتراک بگذارید 🌱</div>'
-      +'<div class="blog-v2-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
-      +'<div class="blog-v2-features">'
-      +'<div class="blog-v2-feature"><span>✍️</span>نوشتن مقاله</div>'
-      +'<div class="blog-v2-feature"><span>📖</span>خواندن مقالات</div>'
-      +'<div class="blog-v2-feature"><span>💬</span>نظرات</div>'
-      +'<div class="blog-v2-feature"><span>⭐</span>ذخیره‌سازی</div>'
-      +'</div>'
-      +'</div>';
+      return '<div class="page-title-bar">'
+        +'<div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
+        +'<div class="page-title-text">مقالات سراج</div>'
+        +'</div>'
+        +'<div class="page-empty-card">'
+        +'<div class="page-empty-icon gold"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
+        +'<div class="page-empty-title gold">مقالات سراج</div>'
+        +'<div class="page-empty-desc">جایی برای یادداشت‌ها، تحلیل‌ها و مقالات شما در زمینه‌ی زبان و ادبیات عربی. قراره اینجا بتونید مقالات خودتون رو بنویسید و منتشر کنید، نوشته‌های دیگران رو بخونید و با بقیه به اشتراک بگذارید 🌱</div>'
+        +'<div class="page-empty-soon gold"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
+        +'<div class="page-empty-features">'
+        +'<div class="page-empty-feature"><span>✍️</span>نوشتن مقاله</div>'
+        +'<div class="page-empty-feature"><span>📖</span>خواندن مقالات</div>'
+        +'<div class="page-empty-feature"><span>💬</span>نظرات</div>'
+        +'<div class="page-empty-feature"><span>⭐</span>ذخیره‌سازی</div>'
+        +'</div>'
+        +'</div>';
     }
     function communityHTML(){
-      return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="page-title-text">انجمن سراج</div></div>'
-      +'<div class="community-v2-hero">'
-      +'<div class="community-v2-logo"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'
-      +'<div class="community-v2-title">انجمن سراج</div>'
-      +'<div class="community-v2-desc">فضایی برای تعامل، پرسش و پاسخ، و هم‌اندیشی بین شما، مدرسین و سایر علاقه‌مندان به زبان و ادبیات عربی. اینجا می‌تونید سؤال بپرسید، تجربیاتتون رو به اشتراک بگذارید و از هم یاد بگیرید 🌿</div>'
-      +'<div class="community-v2-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
-      +'<div class="community-v2-features">'
-      +'<div class="community-v2-feature"><span>❓</span>پرسش و پاسخ</div>'
-      +'<div class="community-v2-feature"><span>👥</span>ارتباط با مدرسین</div>'
-      +'<div class="community-v2-feature"><span>💡</span>تبادل تجربه</div>'
-      +'<div class="community-v2-feature"><span>🎯</span>چالش‌های گروهی</div>'
-      +'</div>'
-      +'</div>';
+      return '<div class="page-title-bar">'
+        +'<div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'
+        +'<div class="page-title-text">انجمن سراج</div>'
+        +'</div>'
+        +'<div class="page-empty-card">'
+        +'<div class="page-empty-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'
+        +'<div class="page-empty-title">انجمن سراج</div>'
+        +'<div class="page-empty-desc">فضایی برای تعامل، پرسش و پاسخ، و هم‌اندیشی بین شما، مدرسین و سایر علاقه‌مندان به زبان و ادبیات عربی. اینجا می‌تونید سؤال بپرسید، تجربیاتتون رو به اشتراک بگذارید و از هم یاد بگیرید 🌿</div>'
+        +'<div class="page-empty-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
+        +'<div class="page-empty-features">'
+        +'<div class="page-empty-feature"><span>❓</span>پرسش و پاسخ</div>'
+        +'<div class="page-empty-feature"><span>👥</span>ارتباط با مدرسین</div>'
+        +'<div class="page-empty-feature"><span>💡</span>تبادل تجربه</div>'
+        +'<div class="page-empty-feature"><span>🎯</span>چالش‌های گروهی</div>'
+        +'</div>'
+        +'</div>';
     }
     function patchBlogCommunityRender(){
       if(typeof window.renderBlog==='function' && !window.renderBlog.__sirajPatch){
@@ -2234,11 +2378,11 @@
     function fillViews(){
       var b=document.getElementById('view-blog');
       if(b&&b.classList.contains('active')){
-        if(!b.querySelector('.blog-v2-hero')) b.innerHTML=blogHTML();
+        if(!b.querySelector('.page-empty-card')) b.innerHTML=blogHTML();
       }
       var c=document.getElementById('view-videos');
       if(c&&c.classList.contains('active')){
-        if(!c.querySelector('.community-v2-hero')) c.innerHTML=communityHTML();
+        if(!c.querySelector('.page-empty-card')) c.innerHTML=communityHTML();
       }
     }
     new MutationObserver(fillViews).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
@@ -2250,25 +2394,27 @@
         if(row.tagName==='A'||row.dataset.linkified==='1') return;
         row.dataset.linkified='1';
         row.querySelectorAll('.contact-copy, [data-copy], .copy-btn').forEach(function(b){b.remove();});
-        var le=row.querySelector('.contact-label');
-        var ve=row.querySelector('.contact-value');
-        var l=(le?le.textContent:'').trim();
-        var v=(ve?ve.textContent:'').trim();
-        var vv=v.replace(/^[@\s]+/,'').trim();
-        var h='';
-        if(/تلگرام|telegram/i.test(l)) h='https://t.me/'+vv;
-        else if(/ایمیل|email/i.test(l)) h='mailto:'+v;
-        else if(/اینستاگرام|instagram/i.test(l)) h='https://instagram.com/'+vv;
-        else if(/^X$|توییتر|twitter/i.test(l)) h='https://x.com/'+vv;
-        else if(/سایت|وب/i.test(l)) h=/^https?:/.test(v)?v:('https://'+v);
-        if(h){
+        var link = row.getAttribute('data-link');
+        if(!link){
+          var le=row.querySelector('.contact-label');
+          var ve=row.querySelector('.contact-value');
+          var l=(le?le.textContent:'').trim();
+          var v=(ve?ve.textContent:'').trim();
+          var vv=v.replace(/^[@\s]+/,'').trim();
+          if(/تلگرام|telegram/i.test(l)) link='https://t.me/'+vv;
+          else if(/ایمیل|email/i.test(l)) link='mailto:'+v;
+          else if(/اینستاگرام|instagram/i.test(l)) link='https://instagram.com/'+vv;
+          else if(/^X$|توییتر|twitter/i.test(l)) link='https://x.com/'+vv;
+        }
+        if(link){
           row.style.cursor='pointer';
           row.setAttribute('role','link');
           row.setAttribute('tabindex','0');
           var o=function(e){
             if(e.target.closest('a')) return;
             e.preventDefault();
-            window.open(h,'_blank','noopener');
+            if(link.indexOf('mailto:')===0){window.location.href=link;}
+            else{window.open(link,'_blank','noopener');}
           };
           row.addEventListener('click',o);
           row.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ') o(e);});
@@ -2424,9 +2570,6 @@
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       NAV SLIDER
-       ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null;
       function init(){
@@ -2495,7 +2638,7 @@
         }
 
         var fill=slider.querySelector('.nav-slider-fill');
-        if(fill) fill.style.borderRadius='20px';
+        if(fill) fill.style.borderRadius= vert ? '999px' : '20px';
 
         var extraH = isHoriz ? 8 : 4;
         var extraY = isHoriz ? -4 : -2;
@@ -2526,9 +2669,6 @@
       var iv=setInterval(function(){if(init()||++tries>100) clearInterval(iv);},100);
     })();
 
-    /* ═══════════════════════════════════════════════════════════════
-       VIEW SWITCHER HOOK
-       ═══════════════════════════════════════════════════════════════ */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function') return false;
@@ -2591,9 +2731,6 @@
       },1000);
     })();
 
-    /* ═══════════════════════════════════════════════════════════════
-       PIN BUTTON — با فیکس چرخش پایدار
-       ═══════════════════════════════════════════════════════════════ */
     function applyPinRotation(){
       var row=document.getElementById('navRow');
       var svg=document.querySelector('.nav-collapse-tab svg');
@@ -2627,7 +2764,6 @@
       };
     }
 
-    /* ★ interval برای اطمینان از پایداری چرخش پین */
     setInterval(function(){
       var row=document.getElementById('navRow');
       var svg=document.querySelector('.nav-collapse-tab svg');
@@ -2660,6 +2796,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v41 Final)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v42 Final)');
   }
 })();
