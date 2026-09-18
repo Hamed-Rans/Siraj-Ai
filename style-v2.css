@@ -1587,3 +1587,245 @@
   opacity:0!important;
   transform:translateY(-8px)!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v39 — FINAL POLISH
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① تقویم برگرده به حالت قبلی، فقط کمی جمع‌تر */
+.month-calendar{padding:14px!important;border-radius:20px!important;margin:0!important}
+.cal-weekdays{gap:5px!important;margin-bottom:6px!important}
+.cal-weekday{font-size:10.5px!important;padding:5px 2px!important}
+.cal-grid{gap:5px!important}
+.cal-day{min-height:48px!important;padding:5px 3px!important;border-radius:16px!important;gap:2px!important;justify-content:flex-start!important;aspect-ratio:auto!important}
+.cal-day-num{font-size:13px!important;margin-top:2px!important}
+.cal-day-status{width:12px!important;height:12px!important;top:3px!important;left:3px!important}
+.cal-day-status svg{width:7px!important;height:7px!important}
+.cal-day-icons-row{margin-top:auto!important;height:auto!important;overflow:visible!important;gap:2px!important}
+.cal-day-icon{font-size:7px!important;padding:0 2px!important}
+.cal-day-icon svg{width:7px!important;height:7px!important}
+
+/* ② چیدمان ماهانه — راهنما وسط چین بالای تقویم، پنل اهداف هم‌تراز تقویم */
+.monthly-layout{
+  grid-template-columns:250px 1fr!important;
+  gap:14px!important;
+  margin:14px 20px 16px!important;
+  align-items:start!important;
+}
+.monthly-side{
+  padding-top:42px!important;
+  margin-top:0!important;
+  align-self:start!important;
+}
+.monthly-main{
+  padding-top:0!important;
+  margin-top:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  min-width:0!important;
+}
+.monthly-layout .cal-legend{
+  margin:0 auto 8px!important;
+  width:max-content!important;
+  padding:6px 12px!important;
+}
+
+/* ③ کادر واژه امروز — ترتیب درست */
+.daily-card-body{margin-top:8px!important;display:flex!important;flex-direction:column!important;gap:10px!important}
+.daily-card-text.ar{
+  font-family:'Amiri','Vazirmatn',sans-serif!important;
+  font-size:17px!important;line-height:2.3!important;
+  text-align:center!important;direction:rtl!important;
+  color:var(--text-main)!important;
+  margin:0!important;padding:0 8px!important;
+}
+.daily-card-meaning{
+  font-size:13px!important;line-height:1.9!important;
+  color:var(--text-main)!important;text-align:right!important;
+  padding:10px 12px!important;border-radius:12px!important;
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid var(--border)!important;
+}
+.daily-card-meaning .dm-label{
+  font-size:10.5px!important;color:var(--accent)!important;
+  font-weight:800!important;display:block!important;margin-bottom:4px!important;
+}
+.daily-card-author{
+  font-size:11.5px!important;color:var(--text-muted)!important;
+  text-align:left!important;direction:rtl!important;
+  font-weight:700!important;font-style:italic!important;
+  margin-top:2px!important;
+}
+.daily-card-author::before{content:'— '!important}
+
+/* ④ نوار چپ/راست — متن زیر ایکون */
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav{
+  min-width:70px!important;width:70px!important;
+  padding:10px 6px!important;gap:6px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat){
+  width:58px!important;min-width:58px!important;max-width:58px!important;
+  min-height:44px!important;height:auto!important;max-height:none!important;
+  padding:6px 2px!important;
+  border-radius:18px!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat){
+  min-height:60px!important;height:auto!important;max-height:none!important;
+  padding:8px 2px 6px!important;
+  gap:4px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat)::after{
+  content:attr(title);
+  display:block;
+  font-family:var(--font-text);
+  font-size:9.5px;font-weight:700;line-height:1;
+  max-height:0;opacity:0;overflow:hidden;white-space:nowrap;
+  color:currentColor;margin:0!important;
+  transition:max-height .38s cubic-bezier(.22,1,.36,1),opacity .28s!important;
+}
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat)::after{
+  max-height:20px!important;opacity:1!important;margin-top:2px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat) svg,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat) svg{
+  width:20px!important;height:20px!important;flex-shrink:0!important;
+}
+
+/* ⑤ دکمه برگشت با متن */
+.phc-back-inline{
+  display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;
+  gap:5px!important;
+  padding:5px 12px 5px 10px!important;
+  height:28px!important;width:auto!important;
+  border-radius:14px!important;
+  border:1px solid var(--accent-soft)!important;
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  cursor:pointer!important;
+  margin:0 8px 0 0!important;
+  font-family:var(--font-text)!important;
+  font-size:11px!important;font-weight:800!important;
+  white-space:nowrap!important;
+  transition:all .28s cubic-bezier(.34,1.4,.64,1)!important;
+  vertical-align:middle!important;
+}
+.phc-back-inline:hover{
+  background:var(--accent)!important;color:#fff!important;
+  transform:translateX(-3px)!important;
+}
+.phc-back-inline svg{
+  width:12px!important;height:12px!important;
+  stroke:currentColor!important;fill:none!important;stroke-width:2.4!important;
+  flex-shrink:0!important;
+}
+.phc-back-inline.hidden{display:none!important}
+.phc-back-inline.appearing{
+  animation:backBtnIn .5s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes backBtnIn{
+  0%{opacity:0;transform:scale(.5) translateX(-10px)}
+  60%{opacity:1;transform:scale(1.1) translateX(0)}
+  100%{opacity:1;transform:scale(1) translateX(0)}
+}
+
+/* ⑥ نوار بالا — مخفی بیشتر بره بیرون */
+[data-nav-position="top"] .nav-row.collapsed .bottom-nav{
+  transform:translateY(-75%)!important;opacity:.5!important;
+}
+
+/* ⑦ ★ انیمیشن تبدیل توقف → ادامه */
+.study-btn.pause-mode,
+.study-btn.resume-mode{
+  transition:
+    background .4s cubic-bezier(.22,1,.36,1),
+    box-shadow .4s cubic-bezier(.22,1,.36,1),
+    transform .35s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.study-btn.switching{
+  transform:scale(.92)!important;
+}
+
+/* ⑧ ★ پاپ آپ دلیل خروج مطالعه */
+.exit-reason-overlay{
+  position:fixed!important;inset:0!important;z-index:1100000!important;
+  background:rgba(0,0,0,.8)!important;
+  backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  padding:20px!important;opacity:0!important;visibility:hidden!important;
+  transition:opacity .3s,visibility .3s!important;
+}
+.exit-reason-overlay.open{opacity:1!important;visibility:visible!important}
+.exit-reason-box{
+  max-width:440px!important;width:100%!important;
+  padding:28px 24px!important;border-radius:22px!important;
+  background:var(--panel-bg)!important;border:1px solid var(--border-strong)!important;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.8)!important;
+  text-align:center!important;
+  transform:scale(.9) translateY(20px)!important;
+  transition:transform .38s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.exit-reason-overlay.open .exit-reason-box{transform:scale(1) translateY(0)!important}
+.exit-reason-emoji{font-size:52px;line-height:1;margin-bottom:12px;display:block}
+.exit-reason-title{font-size:17px;font-weight:900;color:var(--text-main);margin-bottom:8px}
+.exit-reason-text{font-size:12.5px;color:var(--text-muted);line-height:1.9;margin-bottom:16px}
+.exit-reason-input{
+  width:100%!important;padding:12px 14px!important;
+  border-radius:12px!important;border:1px solid var(--border)!important;
+  background:var(--primary)!important;color:var(--text-main)!important;
+  font-family:var(--font-text)!important;font-size:12.5px!important;
+  outline:none!important;resize:vertical!important;min-height:80px!important;
+  line-height:1.8!important;text-align:right!important;
+  margin-bottom:10px!important;
+}
+.exit-reason-input:focus{border-color:var(--accent)!important}
+.exit-reason-pass{
+  width:100%!important;padding:12px 14px!important;
+  border-radius:12px!important;border:1px solid var(--border)!important;
+  background:var(--primary)!important;color:var(--text-main)!important;
+  font-family:var(--font-text)!important;font-size:13px!important;
+  outline:none!important;text-align:center!important;
+  letter-spacing:2px!important;font-weight:800!important;
+  margin-bottom:12px!important;
+}
+.exit-reason-pass:focus{border-color:var(--accent)!important}
+.exit-reason-actions{display:flex!important;gap:8px!important;justify-content:center!important}
+.exit-reason-actions button{
+  flex:1!important;padding:11px 16px!important;border-radius:12px!important;
+  border:none!important;font-family:var(--font-text)!important;
+  font-size:12.5px!important;font-weight:800!important;cursor:pointer!important;
+  transition:transform .2s!important;
+}
+.exit-reason-actions .btn-continue{
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  color:#fff!important;box-shadow:0 8px 20px -8px var(--accent)!important;
+}
+.exit-reason-actions .btn-exit{
+  background:rgba(239,68,68,.12)!important;color:#F87171!important;
+  border:1px solid rgba(239,68,68,.4)!important;
+}
+.exit-reason-actions button:hover{transform:translateY(-2px)!important}
+.exit-reason-error{
+  font-size:11px!important;color:#F87171!important;
+  margin-top:8px!important;min-height:16px!important;font-weight:700!important;
+}
+.exit-reason-checking{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:8px!important;padding:14px 0!important;
+  color:var(--accent)!important;font-size:12.5px!important;font-weight:700!important;
+}
+.exit-reason-checking .spinner{
+  width:18px!important;height:18px!important;border-radius:50%!important;
+  border:2px solid var(--accent-soft)!important;border-top-color:var(--accent)!important;
+  animation:spin .7s linear infinite!important;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
