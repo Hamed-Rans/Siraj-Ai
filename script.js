@@ -2,7 +2,7 @@
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
-    devNotifUrl:"", /* ★ آدرس JSON اعلان‌های سازنده — بعداً پر کن */
+    devNotifUrl:"https://raw.githubusercontent.com/Hamed-Rans/Siraj-Ai/refs/heads/main/notifications.json", /* ★ آدرس JSON اعلان‌های سازنده — بعداً پر کن */
     defaultSettings:{
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
         animation:'normal',model:'gemini-3.6-flash',dialect:'fusha',
