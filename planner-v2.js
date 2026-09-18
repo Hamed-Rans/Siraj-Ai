@@ -754,9 +754,7 @@
       var s=pane.querySelector('#profileSaveBtn');if(s){s.onclick=function(){var p2=getProfile();p2.name=(pane.querySelector('#profileName')||{}).value||'';p2.bio=(pane.querySelector('#profileBio')||{}).value||'';saveProfile(p2);if(window.toast)window.toast('ذخیره شد ✓','success');if(typeof window.renderPanelForPlanner==='function')window.renderPanelForPlanner();updateMainTopAvatar();};}
     }
 
-    /* ═══════════════════════════════════════════════════════
-       ★ اسلایدر نوار — هماهنگ با انیمیشن دکمه ★
-       ═══════════════════════════════════════════════════════ */
+       /* ═══ اسلایدر — tracking همراه دکمه ═══ */
     (function(){
       var nav=null, slider=null, ready=false;
 
@@ -772,128 +770,62 @@
         ready=true;
 
         requestAnimationFrame(function(){
-          paint(false);
+          track(0);
           slider.classList.add('grow');
           setTimeout(function(){ slider.classList.remove('grow'); }, 560);
         });
 
-        /* کلیک روی دکمه — اندازه‌گیری با کلاس measuring (فوراً مقادیر نهایی) */
+        /* ★ فاز capture — قبل از onclick اجرا می‌شه ★ */
         nav.addEventListener('click', function(e){
-          var btn=e.target.closest('.bottom-nav-btn');
-          if(!btn||btn.classList.contains('nav-btn-chat')) return;
-          /* فوری مقادیر نهایی رو با measuring بگیر */
-          requestAnimationFrame(function(){ paint(true); });
+          var btn = e.target.closest('.bottom-nav-btn[data-view]');
+          if(!btn) return;
+          if(btn.classList.contains('nav-btn-chat')) return;
+          /* بلافاصله active رو جابه‌جا کن */
+          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          /* اسلایدر رو همراه دکمه ببر */
+          track(650);
         }, true);
 
-        /* تغییر جهت نوار */
         new MutationObserver(function(){
-          requestAnimationFrame(function(){ paint(false); });
+          track(0);
         }).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position']});
 
-        window.addEventListener('resize', function(){
-          requestAnimationFrame(function(){ paint(false); });
-        });
-
-        setTimeout(function(){ paint(true); }, 700);
+        window.addEventListener('resize', function(){ track(0); });
+        setTimeout(function(){ track(0); }, 800);
         return true;
       }
 
-      function paint(animate){
-        if(!nav||!slider) return;
-        var active=nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
-        if(!active){ slider.classList.remove('visible'); return; }
+      /* اسلایدر رو روی دکمه قفل کن و برای duration میلی‌ثانیه تعقیبش کن */
+      function track(duration){
+        if(!nav || !slider) return;
+        var btn = nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
+        if(!btn){ slider.classList.remove('visible'); return; }
 
-        var nr=nav.getBoundingClientRect();
+        var endTime = performance.now() + duration;
+        var pos = document.documentElement.getAttribute('data-nav-position') || 'bottom';
+        var vert = (pos === 'left' || pos === 'right');
 
-        /* ★ اندازه‌گیری نهایی با کلاس measuring ★ */
-        var wasActive = active.classList.contains('active');
-        if(wasActive) active.classList.remove('active');
-        active.classList.add('measuring');
-        void active.offsetWidth;
-        var ar = active.getBoundingClientRect();
-        active.classList.remove('measuring');
-        if(wasActive) active.classList.add('active');
-        void active.offsetWidth;
-
-        var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
-        var vert=(pos==='left'||pos==='right');
-
-        if(!animate){
-          slider.classList.remove('ready');
-          slider.style.transition='none';
-        } else {
-          slider.classList.add('ready');
+        function tick(){
+          if(!btn.isConnected) return;
+          var nr = nav.getBoundingClientRect();
+          var br = btn.getBoundingClientRect();
+          slider.style.left = (br.left - nr.left) + 'px';
+          slider.style.top = (br.top - nr.top) + 'px';
+          slider.style.width = br.width + 'px';
+          slider.style.height = br.height + 'px';
+          slider.style.borderRadius = vert ? '16px' : '21px';
+          if(performance.now() < endTime) requestAnimationFrame(tick);
         }
 
-        slider.style.left=(ar.left-nr.left)+'px';
-        slider.style.top=(ar.top-nr.top)+'px';
-        slider.style.width=ar.width+'px';
-        slider.style.height=ar.height+'px';
-        slider.style.borderRadius=vert?'16px':'21px';
-
-        if(!animate){
-          void slider.offsetWidth;
-          slider.style.transition='';
-          slider.classList.add('ready');
-        }
+        requestAnimationFrame(tick);
         slider.classList.add('visible');
       }
 
-      window.__moveNavSlider=function(a){
-        requestAnimationFrame(function(){ paint(a!==false); });
-      };
+      window.__moveNavSlider = function(){ track(0); };
 
-      var tries=0;
-      var iv=setInterval(function(){
-        if(init() || ++tries>100){ clearInterval(iv); }
+      var tries = 0;
+      var iv = setInterval(function(){
+        if(init() || ++tries > 100){ clearInterval(iv); }
       }, 100);
     })();
-
-    /* ═══ سوییچ بین تب‌ها — سریع‌تر ═══ */
-    (function(){
-      function hook(){
-        if(typeof window.switchView!=='function')return false;
-        if(window.switchView.__hooked)return true;
-        var orig=window.switchView;
-        window.switchView=function(view){
-          var oldName=_currentMainView;
-          if(oldName===view){orig.apply(this,arguments);return;}
-          var oldEl=document.getElementById('view-'+oldName);
-          var newEl=document.getElementById('view-'+view);
-          var oldIdx=VIEW_ORDER.indexOf(oldName);
-          var newIdx=VIEW_ORDER.indexOf(view);
-          if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){orig.apply(this,arguments);_currentMainView=view;return;}
-          var goingLeft=newIdx>oldIdx;
-          var outClass=goingLeft?'view-out-right':'view-out-left';
-          var inClass=goingLeft?'view-in-from-left':'view-in-from-right';
-          var origArgs=arguments;
-          if(window.switchView.__busy)return;
-          window.switchView.__busy=true;
-          oldEl.classList.add('leaving',outClass);
-          oldEl.style.pointerEvents='none';
-          setTimeout(function(){
-            orig.apply(window,origArgs);
-            _currentMainView=view;
-            newEl.classList.add(inClass);
-            setTimeout(function(){
-              oldEl.classList.remove('leaving',outClass);
-              oldEl.style.pointerEvents='';
-              newEl.classList.remove(inClass);
-              window.switchView.__busy=false;
-            },360);
-          },320);
-        };
-        window.switchView.__hooked=true;
-        return true;
-      }
-      if(!hook()){var t=setInterval(function(){if(hook())clearInterval(t);},300);setTimeout(function(){clearInterval(t);},8000);}
-      setTimeout(function(){var a=document.querySelector('.view.active');if(a){var n=a.id.replace('view-','');if(VIEW_ORDER.indexOf(n)!==-1)_currentMainView=n;}},1000);
-    })();
-
-    pickNewWord();
-
-    setTimeout(function(){try{var dv=getDefaultView();if(dv&&dv!=='chat'&&typeof window.switchView==='function')window.switchView(dv);}catch(e){}},1200);
-
-    console.log('[Siraj v2.0] planner loaded ✓ (v26 Final)');
-  }
-})();
