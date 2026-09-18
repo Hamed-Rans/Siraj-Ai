@@ -1,4 +1,4 @@
-/* Siraj v2.0 — script.js (v41 Final) */
+/* Siraj v2.0 — script.js (v41 Final + v42 patch) */
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
@@ -661,10 +661,21 @@ function renderPanelForTools(){
         </div>`;
 }
 
+/* ★★★ تغییر ۱: renderPlanner با هدر برگشت ★★★ */
 function renderPlanner(){
     const view=document.getElementById('view-planner');
     if(!view) return;
-    view.innerHTML='<main class="planner-pane" id="plannerPane" style="width:100%"></main>';
+    view.innerHTML=`
+        <div class="planner-hero">
+            <div class="planner-hero-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>
+            </div>
+            <div class="planner-hero-text">
+                <div class="planner-hero-title">برنامه‌ریز سراج</div>
+                <div class="planner-hero-sub">روزانه، هفتگی و ماهانه — با هم برنامه‌ات رو بچینیم</div>
+            </div>
+        </div>
+        <main class="planner-pane" id="plannerPane" style="width:100%"></main>`;
     if(typeof window.renderPlannerPane==='function') window.renderPlannerPane();
 }
 function renderPlannerPane(){
@@ -759,12 +770,17 @@ function renameChat(id){
 function saveRename(id,newTitle){const h=loadHistory();if(!h[id])return;const t=(newTitle||'').trim()||'گفتگو';h[id].title=t;saveHistory(h);renderHistory();}
 function formatTime(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'الان';if(m<60)return m+' د';const hr=Math.floor(m/60);if(hr<24)return hr+' س';const day=Math.floor(hr/24);if(day<7)return day+' روز';return new Date(ts).toLocaleDateString('fa-IR');}
 
+/* ★★★ تغییر ۲: loadChat با فیکس welcome ★★★ */
 function loadChat(id){
     const c = loadHistory()[id];
     if(!c) return;
     currentChatId = id;
     const box = document.getElementById('box');
     const myToken = id;
+
+    /* ★ فیکس: مخفی کردن صفحه خوش‌آمدگویی فوراً */
+    const w=document.getElementById('welcomeScreen');
+    if(w) w.classList.add('hidden');
 
     box.style.transition = 'opacity .18s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1)';
     box.style.opacity = '0';
@@ -798,7 +814,6 @@ function loadChat(id){
 
     renderHistory();
     switchView('chat');
-    toggleWelcome();
 }
 function deleteChat(id){if(pendingRequests[id]){pendingRequests[id].abort();delete pendingRequests[id];}const h=loadHistory();delete h[id];saveHistory(h);if(currentChatId===id){currentChatId=null;createNewChat();}renderHistory();}
 function newChat(){createNewChat();}
