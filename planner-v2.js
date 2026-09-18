@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v35 Final) */
+/* Siraj v2.0 — planner-v2.js (v34 Final) */
 (function(){
   'use strict';
 
@@ -461,7 +461,7 @@
       }
     }
 
-    /* ─── heroes (با دکمه برگرد) ─── */
+    /* ─── heroes ─── */
     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -477,7 +477,6 @@
         +'<div class="phc-center">'
         +'<div class="phc-day"><span data-anim-key="weekday">'+esc(p.weekday)+'</span> <span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span></div>'
         +'<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'
-        +(!isToday?'<button class="phc-back-btn-inline" onclick="window.__goToday()" title="برگرد به امروز">↩ امروز</button>':'')
         +(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
@@ -487,13 +486,11 @@
       var d=new Date(window.plannerDate||new Date());
       var days=myWeekDays();
       var p=dateParts(d);
-      var isCurrentWeek=days[0].key===window.dateKey(weekStart(new Date()));
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navWeek(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
         +'<div class="phc-day"><span data-anim-key="monthName2">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum2">'+esc(p.yearNum)+'</span></div>'
         +'<div class="phc-date"><span data-anim-key="weekOrdinal">هفته '+weekOrd(weekOfMonth())+' ماه</span> — <span data-anim-key="weekRange">از '+esc(days[0].date)+' تا '+esc(days[6].date)+'</span></div>'
-        +(!isCurrentWeek?'<button class="phc-back-btn-inline" onclick="window.__goThisWeek()" title="برگرد به این هفته">↩ این هفته</button>':'')
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navWeek(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
@@ -506,14 +503,11 @@
       if(!pl.months[monthKey]) pl.months[monthKey]={goals:[]};
       var goals=pl.months[monthKey].goals||[];
       var dg=goals.filter(function(g){return g.done;}).length;
-      var now=new Date();
-      var isCurrentMonth=(d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth());
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
         +'<div class="phc-day"><span data-anim-key="monthName3">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum3">'+esc(p.yearNum)+'</span></div>'
         +'<div class="phc-date" data-anim-key="monthStat">'+toFa(dg)+' از '+toFa(goals.length)+' هدف این ماه انجام شده</div>'
-        +(!isCurrentMonth?'<button class="phc-back-btn-inline" onclick="window.__goThisMonth()" title="برگرد به این ماه">↩ این ماه</button>':'')
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
@@ -526,13 +520,11 @@
       if(!pl.years[y]) pl.years[y]={goals:[]};
       var goals=pl.years[y].goals||[];
       var done=goals.filter(function(g){return g.done;}).length;
-      var isCurrentYear=y===new Date().getFullYear();
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
         +'<div class="phc-day"><span data-anim-key="yearNum4">'+esc(d.toLocaleDateString('fa-IR',{year:'numeric'}))+'</span></div>'
         +'<div class="phc-date">'+toFa(done)+' از '+toFa(goals.length)+' هدف سالانه انجام شده</div>'
-        +(!isCurrentYear?'<button class="phc-back-btn-inline" onclick="window.__goThisYear()" title="برگرد به امسال">↩ امسال</button>':'')
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navYear(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
@@ -579,7 +571,6 @@
       return '<div class="daily-streak"><span class="ds-fire">🔥</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
     }
 
-    /* ★ کارت روزانه با ۳ دکمه (یاد نگرفتم، یاد گرفتم، مطالعه با سراج) */
     function dailyWordHTML(){
       var d=new Date(window.plannerDate||new Date());
       var dk=window.dateKey(d);
@@ -591,8 +582,8 @@
       html+='<div class="daily-card-head">'
         +'<span class="daily-card-badge">'+esc(it.badge)+'</span>'
         +'<div class="daily-card-actions">'
-        +'<button class="daily-action-btn learn-no" onclick="window.__dailyLearn(\'practice\')">✗ یاد نگرفتم</button>'
         +'<button class="daily-action-btn learn-yes" onclick="window.__dailyLearn(\'learned\')">✓ یاد گرفتم</button>'
+        +'<button class="daily-action-btn learn-no" onclick="window.__dailyLearn(\'practice\')">✗ یاد نگرفتم</button>'
         +'<button class="daily-action-btn learn-study" onclick="window.__dailyStudy()">🎯 مطالعه با سراج</button>'
         +'</div></div>';
       if(it.words){
@@ -839,10 +830,10 @@
         }
         html+='<div class="ll-item-actions">';
         if(_libState==='practice'){
-          html+='<button class="ll-action ask-siraj" onclick="window.__askSiraj(\''+x.dateKey+'\')">🤖 رفع مشکل با سراج</button>';
+          html+='<button class="ll-action ask-siraj" onclick="window.__askSiraj(\''+x.dateKey+'\')"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>رفع مشکل با سراج</button>';
           html+='<button class="ll-action mark-learned" onclick="window.__markLearned(\''+x.dateKey+'\')">✓ یاد گرفتم</button>';
         } else {
-          html+='<button class="ll-action ask-siraj" onclick="window.__askSiraj(\''+x.dateKey+'\')">🤖 مرور با سراج</button>';
+          html+='<button class="ll-action ask-siraj" onclick="window.__askSiraj(\''+x.dateKey+'\')"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>مرور با سراج</button>';
         }
         html+='<button class="ll-action delete" onclick="window.__deleteLearned(\''+x.dateKey+'\')">🗑️ حذف</button>';
         html+='</div></div>';
@@ -1515,8 +1506,7 @@
         +'<div class="study-sub" id="studyRunningSub">تا اتمام تایمر نمیتونی خارج شی 💪</div>'
         +'<div class="study-actions">'
         +'<button class="study-btn pause-mode" id="studyPauseBtn"><span id="studyPauseLabel">توقف</span></button>'
-        +'<button class="study-btn" id="studyChatBtn">💬 هوش مصنوعی سراج</button>'
-        +'<button class="study-btn" id="studyAssistBtn">🎯 دستیار</button>'
+        +'<button class="study-btn" id="studyChatBtn">دستیار هوشمند</button>'
         +'<button class="study-btn finish-mode" id="studyFinishBtn" disabled>پایان و ثبت</button>'
         +'<button class="study-btn secondary" id="studyExitBtn">خروج</button>'
         +'</div></div>';
@@ -1572,7 +1562,6 @@
       el.querySelector('#studyCancelBtn').onclick=function(){stopAudio();closeStudy();};
       el.querySelector('#studyExitBtn').onclick=exitStudyConfirm;
       el.querySelector('#studyChatBtn').onclick=toggleStudyChat;
-      el.querySelector('#studyAssistBtn').onclick=toggleStudyAssist;
       el.querySelector('#studyPauseBtn').onclick=toggleStudyPause;
       el.querySelector('#studyFinishBtn').onclick=finishAndRecord;
     }
@@ -1688,8 +1677,6 @@
       var o=document.getElementById('studyOverlay');
       var chat=document.getElementById('studyChatPanel');
       if(chat) chat.remove();
-      var assist=document.getElementById('studyAssistPanel');
-      if(assist) assist.remove();
       if(_studyDragHandlers){
         try{
           document.removeEventListener('mousemove',_studyDragHandlers.move);
@@ -1756,19 +1743,12 @@
       box.innerHTML=html;
       box.scrollTop=box.scrollHeight;
     }
-
-    /* ★ AI chat — سمت چپ */
     function toggleStudyChat(){
       var ex=document.getElementById('studyChatPanel');
       if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
-      var exAssist=document.getElementById('studyAssistPanel');
-      if(exAssist){exAssist.classList.remove('open');setTimeout(function(){exAssist.remove();},320);}
-
       var p=document.createElement('div');
       p.id='studyChatPanel';p.className='study-chat-panel';
-      p.style.left='max(16px,env(safe-area-inset-left))';
-      p.style.right='auto';
-      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">💬 سراج — هوش مصنوعی</div><button class="study-chat-close" id="studyChatCloseBtn">✕</button></div>'
+      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">سراج — دستیار مطالعه</div><button class="study-chat-close" id="studyChatCloseBtn">✕</button></div>'
         +'<div class="study-chat-messages" id="studyChatMessages"></div>'
         +'<div class="study-chat-input-row">'
         +'<input type="text" class="study-chat-input" id="studyChatInput" placeholder="سؤالت رو بپرس..." onkeydown="if(event.key===\'Enter\')window.__studyChatSend()">'
@@ -1780,57 +1760,6 @@
       requestAnimationFrame(function(){p.classList.add('open');});
       setTimeout(function(){var i=document.getElementById('studyChatInput');if(i) i.focus();},350);
     }
-
-    /* ★ Assist panel — سمت راست */
-    function toggleStudyAssist(){
-      var ex=document.getElementById('studyAssistPanel');
-      if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
-      var exChat=document.getElementById('studyChatPanel');
-      if(exChat){exChat.classList.remove('open');setTimeout(function(){exChat.remove();},320);}
-
-      var tools=[
-        {icon:'🎯', name:'تحلیل بیت', prompt:'این بیت رو تحلیل کن: «بیت»'},
-        {icon:'📖', name:'اعراب', prompt:'این جمله رو اعراب کن: «جمله»'},
-        {icon:'✏️', name:'قواعد سریع', prompt:'یه نکته کاربردی نحو یادم بده'},
-        {icon:'🔍', name:'تفاوت واژه‌ها', prompt:'تفاوت این دو واژه چیه؟'},
-        {icon:'📝', name:'تمرین ساز', prompt:'یه تمرین درباره عربی بساز'},
-        {icon:'🌐', name:'ترجمه', prompt:'این متن رو ترجمه کن: «متن»'},
-        {icon:'📚', name:'واژه جدید', prompt:'یه واژه جدید عربی با ریشه یادم بده'},
-        {icon:'🎓', name:'برنامه درسی', prompt:'یه برنامه درسی برای امروز بچین'}
-      ];
-
-      var p=document.createElement('div');
-      p.id='studyAssistPanel';
-      p.className='study-assist-panel';
-      p.innerHTML='<div class="study-assist-header"><div class="study-assist-title">🎯 دستیار سراج</div><button class="study-assist-close" id="studyAssistClose">✕</button></div>'
-        +'<div class="study-assist-tools">'
-        +tools.map(function(t,i){
-          return '<div class="sat-item" data-tool="'+i+'"><span class="sat-item-icon">'+t.icon+'</span>'+t.name+'</div>';
-        }).join('')
-        +'</div>';
-      document.body.appendChild(p);
-      p.querySelector('#studyAssistClose').onclick=function(){p.classList.remove('open');setTimeout(function(){p.remove();},320);};
-      p.querySelectorAll('.sat-item').forEach(function(it){
-        it.onclick=function(){
-          var i=parseInt(it.getAttribute('data-tool'));
-          var t=tools[i];
-          if(!t) return;
-          var chatEx=document.getElementById('studyChatPanel');
-          if(!chatEx){
-            toggleStudyChat();
-            setTimeout(function(){
-              var q=document.getElementById('studyChatInput');
-              if(q){ q.value=t.prompt; q.focus(); }
-            },400);
-          } else {
-            var q=document.getElementById('studyChatInput');
-            if(q){ q.value=t.prompt; q.focus(); }
-          }
-        };
-      });
-      requestAnimationFrame(function(){p.classList.add('open');});
-    }
-
     window.__studyChatSend=async function(){
       var inp=document.getElementById('studyChatInput');
       var box=document.getElementById('studyChatMessages');
@@ -2087,7 +2016,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NAV SLIDER — v35 RAF بدون overshoot
+       NAV SLIDER — v34 with wrapper + grow + slide
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null;
@@ -2110,14 +2039,15 @@
             slider.classList.remove('visible');
             return;
           }
+          var wasActive=btn.classList.contains('active');
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
           btn.classList.add('active');
-          track(false);
+          setTimeout(function(){track();},30);
         },true);
 
-        setTimeout(function(){ track(true); },150);
-        new MutationObserver(function(){ track(false); }).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position','data-nav-style']});
-        window.addEventListener('resize',function(){ track(false); });
+        setTimeout(function(){track(true);},150);
+        new MutationObserver(function(){track();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position','data-nav-style']});
+        window.addEventListener('resize',function(){track();});
         return true;
       }
 
@@ -2126,48 +2056,48 @@
         var btn=nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
         var vert=(pos==='left'||pos==='right');
-        var navRow=document.getElementById('navRow');
-        var navCollapsed=navRow&&navRow.classList.contains('collapsed');
 
-        if(!btn || btn.classList.contains('nav-btn-chat') || (vert && navCollapsed)){
+        /* اگه دکمه فعال chat باشه یا نوار مخفی باشه → مخفی */
+        var navCollapsed = document.getElementById('navRow').classList.contains('collapsed');
+        if(!btn || btn.classList.contains('nav-btn-chat')){
           slider.classList.remove('visible');
           return;
         }
 
-        slider.style.transition='none';
+        /* موقعیت دکمه */
+        var nr=nav.getBoundingClientRect();
+        var br=btn.getBoundingClientRect();
+        var x=br.left-nr.left;
+        var y=br.top-nr.top;
+        var w=br.width;
+        var h=br.height;
 
-        function apply(){
-          var nr=nav.getBoundingClientRect();
-          var br=btn.getBoundingClientRect();
-          slider.style.transform='translate3d('+(br.left-nr.left)+'px,'+(br.top-nr.top)+'px,0)';
-          slider.style.width=br.width+'px';
-          slider.style.height=br.height+'px';
-          var fill=slider.querySelector('.nav-slider-fill');
-          if(fill) fill.style.borderRadius = vert ? '16px' : '22px';
-        }
+        var fill=slider.querySelector('.nav-slider-fill');
+        if(fill) fill.style.borderRadius = vert ? '18px' : '22px';
 
-        var wasVisible=slider.classList.contains('visible');
+        var wasVisible = slider.classList.contains('visible');
 
         if(!wasVisible || forceGrow){
-          apply();
+          /* ★ اولین نمایش — از حالت grow */
+          slider.style.transition='none';
+          slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
+          slider.style.width=w+'px';
+          slider.style.height=h+'px';
           void slider.offsetWidth;
+          slider.style.transition='';
           slider.classList.add('visible','grow');
-          setTimeout(function(){ slider.classList.remove('grow'); },600);
-          return;
+          setTimeout(function(){slider.classList.remove('grow');},600);
+        } else {
+          /* ★ اسلاید نرم */
+          slider.style.transition='';
+          slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
+          slider.style.width=w+'px';
+          slider.style.height=h+'px';
         }
-
-        var endTime=performance.now()+500;
-        function tick(){
-          if(!btn.isConnected){ slider.classList.remove('visible'); return; }
-          apply();
-          if(performance.now()<endTime) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-        slider.classList.add('visible');
       }
 
-      window.__moveNavSlider=function(){ track(false); };
-      window.updateNavSlider=function(animate){ track(animate===false); };
+      window.__moveNavSlider=function(){track();};
+      window.updateNavSlider=function(animate){track(animate===false);};
 
       var tries=0;
       var iv=setInterval(function(){if(init()||++tries>100) clearInterval(iv);},100);
@@ -2238,18 +2168,22 @@
       },1000);
     })();
 
-    /* ─── PIN BUTTON override ─── */
+    /* ═══════════════════════════════════════════════════════════════
+       PIN BUTTON — override برای اطمینان
+       ═══════════════════════════════════════════════════════════════ */
     if(typeof window.toggleNavCollapse==='function'){
       var origToggle=window.toggleNavCollapse;
       window.toggleNavCollapse=function(){
         try{origToggle.apply(this,arguments);}catch(e){}
         setTimeout(function(){
           if(typeof window.__moveNavSlider==='function') window.__moveNavSlider();
-        },420);
+        },520);
       };
     }
 
-    /* ─── START ─── */
+    /* ═══════════════════════════════════════════════════════════════
+       START
+       ═══════════════════════════════════════════════════════════════ */
     setTimeout(function(){
       try{
         var dv=getDefaultView();
@@ -2257,6 +2191,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v35 Final)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v34 Final)');
   }
 })();
