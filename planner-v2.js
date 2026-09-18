@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v34 Final) */
+/* Siraj v2.0 — planner-v2.js (v35 Final) */
 (function(){
   'use strict';
 
@@ -230,6 +230,34 @@
       return days;
     }
 
+    /* ─── ★ بازگشت به امروز / این هفته / این ماه / امسال ─── */
+    function isCurrentDay(){
+      return window.dateKey(window.plannerDate||new Date())===window.dateKey(new Date());
+    }
+    function isCurrentWeek(){
+      var t=new Date();
+      var pd=window.plannerDate||new Date();
+      var ws=weekStart(pd);
+      var we=new Date(ws);we.setDate(we.getDate()+6);we.setHours(23,59,59,999);
+      return t>=ws && t<=we;
+    }
+    function isCurrentMonth(){
+      var t=new Date();
+      var pd=window.plannerDate||new Date();
+      return t.getFullYear()===pd.getFullYear() && t.getMonth()===pd.getMonth();
+    }
+    function isCurrentYear(){
+      var t=new Date();
+      var pd=window.plannerDate||new Date();
+      return t.getFullYear()===pd.getFullYear();
+    }
+    function backBtnHTML(isCurrent,label){
+      if(isCurrent) return '';
+      return '<button class="phc-back-inline" onclick="window.__goToday()" title="برگرد به '+label+'">'
+        +'<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>'
+        +'</button>';
+    }
+
     /* ─── popups ─── */
     function showPopup(emoji,title,text){
       var old=document.getElementById('sirajPopup'); if(old) old.remove();
@@ -333,6 +361,27 @@
           setTimeout(function(){el.classList.remove('heroInFromLeft','heroInFromRight');},400);
         },220);
       });
+      /* ★ آپدیت دکمه برگرد در hero */
+      var dayLine=c.querySelector('.phc-day');
+      if(dayLine){
+        var bb=dayLine.querySelector('.phc-back-inline');
+        var shouldShow=false;
+        var lbl='امروز';
+        if(tab==='daily'){ shouldShow=!isCurrentDay(); lbl='امروز'; }
+        else if(tab==='weekly'){ shouldShow=!isCurrentWeek(); lbl='این هفته'; }
+        else if(tab==='monthly'){ shouldShow=!isCurrentMonth(); lbl='این ماه'; }
+        else if(tab==='yearly'){ shouldShow=!isCurrentYear(); lbl='امسال'; }
+        if(shouldShow && !bb){
+          var nb=document.createElement('button');
+          nb.className='phc-back-inline';
+          nb.title='برگرد به '+lbl;
+          nb.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
+          nb.onclick=function(){window.__goToday();};
+          dayLine.insertBefore(nb,dayLine.firstChild);
+        } else if(!shouldShow && bb){
+          bb.remove();
+        }
+      }
       var tb=c.querySelector('.phc-today');
       if(tb){
         var isT=window.dateKey(d)===window.dateKey(new Date());
@@ -461,7 +510,7 @@
       }
     }
 
-    /* ─── heroes ─── */
+    /* ─── ★ heroes با دکمه برگرد ─── */
     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -472,10 +521,11 @@
       var goals=pl.months[monthKey].goals||[];
       var goal=goals.length?(goals.find(function(g){return !g.done;})||goals[0]):null;
       var p=dateParts(d);
+      var bb=backBtnHTML(isToday,'امروز');
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
-        +'<div class="phc-day"><span data-anim-key="weekday">'+esc(p.weekday)+'</span> <span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span></div>'
+        +'<div class="phc-day">'+bb+'<span data-anim-key="weekday">'+esc(p.weekday)+'</span> <span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span></div>'
         +'<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'
         +(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')
         +'</div>'
@@ -486,10 +536,12 @@
       var d=new Date(window.plannerDate||new Date());
       var days=myWeekDays();
       var p=dateParts(d);
+      var ic=isCurrentWeek();
+      var bb=backBtnHTML(ic,'این هفته');
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navWeek(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
-        +'<div class="phc-day"><span data-anim-key="monthName2">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum2">'+esc(p.yearNum)+'</span></div>'
+        +'<div class="phc-day">'+bb+'<span data-anim-key="monthName2">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum2">'+esc(p.yearNum)+'</span></div>'
         +'<div class="phc-date"><span data-anim-key="weekOrdinal">هفته '+weekOrd(weekOfMonth())+' ماه</span> — <span data-anim-key="weekRange">از '+esc(days[0].date)+' تا '+esc(days[6].date)+'</span></div>'
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navWeek(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
@@ -503,10 +555,12 @@
       if(!pl.months[monthKey]) pl.months[monthKey]={goals:[]};
       var goals=pl.months[monthKey].goals||[];
       var dg=goals.filter(function(g){return g.done;}).length;
+      var ic=isCurrentMonth();
+      var bb=backBtnHTML(ic,'این ماه');
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
-        +'<div class="phc-day"><span data-anim-key="monthName3">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum3">'+esc(p.yearNum)+'</span></div>'
+        +'<div class="phc-day">'+bb+'<span data-anim-key="monthName3">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum3">'+esc(p.yearNum)+'</span></div>'
         +'<div class="phc-date" data-anim-key="monthStat">'+toFa(dg)+' از '+toFa(goals.length)+' هدف این ماه انجام شده</div>'
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
@@ -520,10 +574,12 @@
       if(!pl.years[y]) pl.years[y]={goals:[]};
       var goals=pl.years[y].goals||[];
       var done=goals.filter(function(g){return g.done;}).length;
+      var ic=isCurrentYear();
+      var bb=backBtnHTML(ic,'امسال');
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
-        +'<div class="phc-day"><span data-anim-key="yearNum4">'+esc(d.toLocaleDateString('fa-IR',{year:'numeric'}))+'</span></div>'
+        +'<div class="phc-day">'+bb+'<span data-anim-key="yearNum4">'+esc(d.toLocaleDateString('fa-IR',{year:'numeric'}))+'</span></div>'
         +'<div class="phc-date">'+toFa(done)+' از '+toFa(goals.length)+' هدف سالانه انجام شده</div>'
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navYear(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
@@ -1506,7 +1562,8 @@
         +'<div class="study-sub" id="studyRunningSub">تا اتمام تایمر نمیتونی خارج شی 💪</div>'
         +'<div class="study-actions">'
         +'<button class="study-btn pause-mode" id="studyPauseBtn"><span id="studyPauseLabel">توقف</span></button>'
-        +'<button class="study-btn" id="studyChatBtn">دستیار هوشمند</button>'
+        +'<button class="study-btn" id="studyChatBtn">🤖 هوش مصنوعی سراج</button>'
+        +'<button class="study-btn" id="studyToolsBtn">🛠️ دستیار</button>'
         +'<button class="study-btn finish-mode" id="studyFinishBtn" disabled>پایان و ثبت</button>'
         +'<button class="study-btn secondary" id="studyExitBtn">خروج</button>'
         +'</div></div>';
@@ -1562,6 +1619,7 @@
       el.querySelector('#studyCancelBtn').onclick=function(){stopAudio();closeStudy();};
       el.querySelector('#studyExitBtn').onclick=exitStudyConfirm;
       el.querySelector('#studyChatBtn').onclick=toggleStudyChat;
+      el.querySelector('#studyToolsBtn').onclick=toggleStudyTools;
       el.querySelector('#studyPauseBtn').onclick=toggleStudyPause;
       el.querySelector('#studyFinishBtn').onclick=finishAndRecord;
     }
@@ -1672,11 +1730,15 @@
       window.__studyTask='';window.__studyTaskSourceId=null;window.__studyTaskSourceDay=null;
       stopAudio();unlockSite();closeStudy();
     }
+
+    /* ★ closeStudy با انیمیشن خروج نرم */
     function closeStudy(){
       try{stopAudio();}catch(e){}
       var o=document.getElementById('studyOverlay');
       var chat=document.getElementById('studyChatPanel');
+      var tools=document.getElementById('studyToolsPanel');
       if(chat) chat.remove();
+      if(tools) tools.remove();
       if(_studyDragHandlers){
         try{
           document.removeEventListener('mousemove',_studyDragHandlers.move);
@@ -1687,12 +1749,13 @@
         _studyDragHandlers=null;
       }
       if(!o) return;
+      o.style.transition='opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.4,0,.2,1), visibility .45s';
       o.classList.remove('open');
-      setTimeout(function(){o.remove();},500);
+      setTimeout(function(){if(o.parentNode)o.remove();},620);
       setTimeout(function(){
         if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
         refreshBody('left');
-      },300);
+      },380);
     }
     function blockKey(e){
       if(!studyRunning) return;
@@ -1723,7 +1786,7 @@
       o.style.transition='none';
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
-          o.style.transition='opacity .4s, transform .5s';
+          o.style.transition='opacity .4s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.34,1.4,.64,1), visibility .4s';
           o.classList.add('open');
           o.style.opacity='';
           o.style.transform='';
@@ -1748,7 +1811,7 @@
       if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
       var p=document.createElement('div');
       p.id='studyChatPanel';p.className='study-chat-panel';
-      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">سراج — دستیار مطالعه</div><button class="study-chat-close" id="studyChatCloseBtn">✕</button></div>'
+      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">🤖 سراج — دستیار مطالعه</div><button class="study-chat-close" id="studyChatCloseBtn">✕</button></div>'
         +'<div class="study-chat-messages" id="studyChatMessages"></div>'
         +'<div class="study-chat-input-row">'
         +'<input type="text" class="study-chat-input" id="studyChatInput" placeholder="سؤالت رو بپرس..." onkeydown="if(event.key===\'Enter\')window.__studyChatSend()">'
@@ -1760,6 +1823,42 @@
       requestAnimationFrame(function(){p.classList.add('open');});
       setTimeout(function(){var i=document.getElementById('studyChatInput');if(i) i.focus();},350);
     }
+
+    /* ★ پنل دستیار مطالعه — سمت راست */
+    function toggleStudyTools(){
+      var ex=document.getElementById('studyToolsPanel');
+      if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
+      var p=document.createElement('div');
+      p.id='studyToolsPanel';p.className='study-tools-panel';
+      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">🛠️ دستیارهای مطالعه</div><button class="study-chat-close" id="studyToolsCloseBtn">✕</button></div>'
+        +'<div class="study-tools-grid">'
+        +'<div class="study-tool-card" onclick="window.__studyTool(\'اعراب\')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><div class="stc-title">اعراب</div><div class="stc-desc">تجزیه و ترکیب</div></div>'
+        +'<div class="study-tool-card" onclick="window.__studyTool(\'تحلیل بیت\')"><svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/></svg><div class="stc-title">تحلیل بیت</div><div class="stc-desc">ادبی و بلاغی</div></div>'
+        +'<div class="study-tool-card" onclick="window.__studyTool(\'قواعد\')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="stc-title">قواعد</div><div class="stc-desc">نکات دستوری</div></div>'
+        +'<div class="study-tool-card" onclick="window.__studyTool(\'ترجمه\')"><svg viewBox="0 0 24 24"><path d="m5 8 6 6m-7 0 6-6 2-3M2 5h12"/><path d="M9 5v14"/><path d="M15 5v14"/><path d="M21 5v14"/></svg><div class="stc-title">ترجمه</div><div class="stc-desc">عربی به فارسی</div></div>'
+        +'<div class="study-tool-card" onclick="window.__studyTool(\'تمرین\')"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><div class="stc-title">تمرین ساز</div><div class="stc-desc">آزمون شخصی</div></div>'
+        +'<div class="study-tool-card" onclick="window.__studyTool(\'واژه\')"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><div class="stc-title">واژه جدید</div><div class="stc-desc">کلمه یاد بگیر</div></div>'
+        +'</div>';
+      document.body.appendChild(p);
+      p.querySelector('#studyToolsCloseBtn').onclick=function(){p.classList.remove('open');setTimeout(function(){p.remove();},320);};
+      requestAnimationFrame(function(){p.classList.add('open');});
+    }
+    window.__studyTool=function(type){
+      var tp=document.getElementById('studyToolsPanel');
+      if(tp){tp.classList.remove('open');setTimeout(function(){if(tp.parentNode)tp.remove();},320);}
+      setTimeout(function(){
+        var chat=document.getElementById('studyChatPanel');
+        if(!chat) toggleStudyChat();
+        setTimeout(function(){
+          var inp=document.getElementById('studyChatInput');
+          if(inp){
+            inp.value='می‌خوام یه '+type+' بهم یاد بدی و تمرین کنی.';
+            inp.focus();
+          }
+        },420);
+      },260);
+    };
+
     window.__studyChatSend=async function(){
       var inp=document.getElementById('studyChatInput');
       var box=document.getElementById('studyChatMessages');
@@ -1812,23 +1911,45 @@
       }
     };
 
-    /* ─── blog/community ─── */
+    /* ─── ★ blog/community بازطراحی شده ─── */
     function blogHTML(){
-      return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>';
+      return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div>'
+      +'<div class="blog-v2-hero">'
+      +'<div class="blog-v2-logo"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
+      +'<div class="blog-v2-title">مقالات سراج</div>'
+      +'<div class="blog-v2-desc">جایی برای یادداشت‌ها، تحلیل‌ها و مقالات شما در زمینه‌ی زبان و ادبیات عربی. قراره اینجا بتونید مقالات خودتون رو منتشر کنید، نوشته‌های دیگران رو بخونید و با بقیه به اشتراک بگذارید 🌱</div>'
+      +'<div class="blog-v2-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
+      +'<div class="blog-v2-features">'
+      +'<div class="blog-v2-feature"><span>✍️</span>نوشتن مقاله</div>'
+      +'<div class="blog-v2-feature"><span>📖</span>خواندن مقالات</div>'
+      +'<div class="blog-v2-feature"><span>💬</span>نظرات</div>'
+      +'<div class="blog-v2-feature"><span>⭐</span>ذخیره‌سازی</div>'
+      +'</div>'
+      +'</div>';
     }
     function communityHTML(){
-      return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="page-title-text">انجمن سراج</div></div>';
+      return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="page-title-text">انجمن سراج</div></div>'
+      +'<div class="community-v2-hero">'
+      +'<div class="community-v2-logo"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'
+      +'<div class="community-v2-title">انجمن سراج</div>'
+      +'<div class="community-v2-desc">فضایی برای تعامل، پرسش و پاسخ، و هم‌اندیشی بین شما، مدرسین و سایر علاقه‌مندان به زبان و ادبیات عربی. اینجا می‌تونید سؤال بپرسید، تجربیاتتون رو به اشتراک بگذارید و از هم یاد بگیرید 🌿</div>'
+      +'<div class="community-v2-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>به‌زودی راه‌اندازی می‌شه</div>'
+      +'<div class="community-v2-features">'
+      +'<div class="community-v2-feature"><span>❓</span>پرسش و پاسخ</div>'
+      +'<div class="community-v2-feature"><span>👥</span>ارتباط با مدرسین</div>'
+      +'<div class="community-v2-feature"><span>💡</span>تبادل تجربه</div>'
+      +'<div class="community-v2-feature"><span>🎯</span>چالش‌های گروهی</div>'
+      +'</div>'
+      +'</div>';
     }
     function fillViews(){
       var b=document.getElementById('view-blog');
       if(b&&b.classList.contains('active')){
-        var h=b.querySelector('.page-title-bar');
-        if(!h || b.querySelector('.community-hero')) b.innerHTML=blogHTML();
+        if(!b.querySelector('.blog-v2-hero')) b.innerHTML=blogHTML();
       }
       var c=document.getElementById('view-videos');
       if(c&&c.classList.contains('active')){
-        var h2=c.querySelector('.page-title-bar');
-        if(!h2 || c.querySelector('.community-hero')) c.innerHTML=communityHTML();
+        if(!c.querySelector('.community-v2-hero')) c.innerHTML=communityHTML();
       }
     }
     new MutationObserver(fillViews).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
@@ -2016,7 +2137,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NAV SLIDER — v34 with wrapper + grow + slide
+       NAV SLIDER — v35 with wrapper + grow + slide
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null;
@@ -2032,9 +2153,6 @@
         nav.addEventListener('click',function(e){
           var btn=e.target.closest('.bottom-nav-btn[data-view]');
           if(!btn) return;
-          nav.classList.add('nav-floating');
-          clearTimeout(nav.__floatT);
-          nav.__floatT=setTimeout(function(){nav.classList.remove('nav-floating');},380);
           if(btn.classList.contains('nav-btn-chat')){
             slider.classList.remove('visible');
             return;
@@ -2057,14 +2175,14 @@
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
         var vert=(pos==='left'||pos==='right');
 
-        /* اگه دکمه فعال chat باشه یا نوار مخفی باشه → مخفی */
-        var navCollapsed = document.getElementById('navRow').classList.contains('collapsed');
-        if(!btn || btn.classList.contains('nav-btn-chat')){
+        var navRow=document.getElementById('navRow');
+        var navCollapsed = navRow && navRow.classList.contains('collapsed');
+
+        if(!btn || btn.classList.contains('nav-btn-chat') || navCollapsed){
           slider.classList.remove('visible');
           return;
         }
 
-        /* موقعیت دکمه */
         var nr=nav.getBoundingClientRect();
         var br=btn.getBoundingClientRect();
         var x=br.left-nr.left;
@@ -2078,7 +2196,6 @@
         var wasVisible = slider.classList.contains('visible');
 
         if(!wasVisible || forceGrow){
-          /* ★ اولین نمایش — از حالت grow */
           slider.style.transition='none';
           slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
           slider.style.width=w+'px';
@@ -2088,7 +2205,6 @@
           slider.classList.add('visible','grow');
           setTimeout(function(){slider.classList.remove('grow');},600);
         } else {
-          /* ★ اسلاید نرم */
           slider.style.transition='';
           slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
           slider.style.width=w+'px';
@@ -2169,7 +2285,7 @@
     })();
 
     /* ═══════════════════════════════════════════════════════════════
-       PIN BUTTON — override برای اطمینان
+       PIN BUTTON
        ═══════════════════════════════════════════════════════════════ */
     if(typeof window.toggleNavCollapse==='function'){
       var origToggle=window.toggleNavCollapse;
@@ -2191,6 +2307,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v34 Final)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v35 Final)');
   }
 })();
