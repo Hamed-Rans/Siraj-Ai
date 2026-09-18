@@ -1,10 +1,7 @@
-/* Siraj v2.0 — planner-v2.js (v31 Final Fixed) */
+/* Siraj v2.0 — planner-v2.js (v31 Final) */
 (function(){
   'use strict';
 
-  /* ═══════════════════════════════════════════════════════════════
-     BOOT — اجرای فوری، اگه نشد polling
-     ═══════════════════════════════════════════════════════════════ */
   function _boot(){
     if(typeof window.renderPlanner==='function' && typeof window.loadPlannerNew==='function'){
       try{ init(); }catch(e){ console.error('[Planner]', e); }
@@ -16,12 +13,8 @@
     var boot=setInterval(function(){ if(_boot()) clearInterval(boot); }, 100);
   }
 
-  /* ═══════════════════════════════════════════════════════════════
-     INIT
-     ═══════════════════════════════════════════════════════════════ */
   function init(){
 
-    /* ─── constants ─── */
     var PROFILE_KEY    = 'siraj-profile';
     var REMINDER_KEY   = 'siraj-reminders';
     var STUDY_CHAT_KEY = 'siraj-study-chat-session';
@@ -42,7 +35,6 @@
       rain:'sounds/rain.mp3'
     };
 
-    /* ─── words ─── */
     var WORDS_BY_LEVEL = {
       beginner:[
         {type:'واژه',text:'«کِتاب» یعنی کتاب. ریشه: ک-ت-ب. جمع: کُتُب.'},
@@ -86,9 +78,6 @@
     var LEVEL_LABELS = {beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته'};
     var VIEW_LABELS  = {chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'انجمن', tools:'دستیار'};
 
-    /* ═══════════════════════════════════════════════════════════════
-       UTILITIES
-       ═══════════════════════════════════════════════════════════════ */
     function toFa(n){
       var fa=['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
       return String(n).replace(/\d/g,function(d){return fa[+d];});
@@ -146,7 +135,6 @@
       return out;
     }
 
-    /* ─── reminders ─── */
     function loadReminders(){ try{ return JSON.parse(localStorage.getItem(REMINDER_KEY)||'{}'); }catch(e){ return {}; } }
     function saveReminders(r){ try{ localStorage.setItem(REMINDER_KEY,JSON.stringify(r)); }catch(e){} }
     function getDayReminders(k){ return loadReminders()[k]||[]; }
@@ -156,7 +144,6 @@
       saveReminders(r);
     }
 
-    /* ─── Iranian events ─── */
     var IRAN_EVENTS = {
       '01-01':'نوروز','01-02':'عید نوروز','01-03':'عید نوروز','01-04':'عید نوروز',
       '01-06':'روز امید','01-12':'روز جمهوری اسلامی','01-13':'سیزده‌بدر',
@@ -186,9 +173,6 @@
       }catch(e){ return ''; }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       TAB / DATE HELPERS
-       ═══════════════════════════════════════════════════════════════ */
     function getTab(){
       var btn=document.querySelector('.panel-planner-tab.active');
       if(!btn) return 'daily';
@@ -205,7 +189,6 @@
         };
       }catch(e){ return {weekday:'',dayNum:'',monthName:'',yearNum:''}; }
     }
-    /* ✅ FIX #1: استفاده از روز شمسی به‌جای میلادی */
     function weekOfMonth(){
       var d=window.plannerDate||new Date();
       try{
@@ -237,9 +220,6 @@
       return days;
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       POPUPS
-       ═══════════════════════════════════════════════════════════════ */
     function showPopup(emoji,title,text){
       var old=document.getElementById('sirajPopup'); if(old) old.remove();
       var el=document.createElement('div');
@@ -276,9 +256,6 @@
       el.querySelector('#sirajTriple3').onclick=function(){ close(); if(opt3.onClick) opt3.onClick(); };
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       SELECT
-       ═══════════════════════════════════════════════════════════════ */
     function makeSelect(id,value,options,label){
       var cur=options.find(function(o){ return o.value===value; })||options[0];
       var items=options.map(function(o){
@@ -310,9 +287,6 @@
       document.querySelectorAll('.siraj-select.open').forEach(function(s){ s.classList.remove('open'); });
     });
 
-    /* ═══════════════════════════════════════════════════════════════
-       HERO — smart update
-       ═══════════════════════════════════════════════════════════════ */
     function smartUpdateHero(tab,direction){
       var c=document.querySelector('.phc-center'); if(!c) return;
       var d=new Date(window.plannerDate||new Date());
@@ -331,7 +305,6 @@
       } else if(tab==='monthly'){
         var p3=dateParts(d);
         map.monthName3=p3.monthName; map.yearNum3=p3.yearNum;
-        /* ✅ FIX #3: آمار اهداف ماه هم آپدیت می‌شه */
         var pl=window.loadPlannerNew();
         var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
         var goals=(pl.months[mk]&&pl.months[mk].goals)||[];
@@ -359,7 +332,6 @@
         },220);
       });
 
-      /* today badge */
       var todayBadge=c.querySelector('.phc-today');
       if(todayBadge){
         var isTodayNow=window.dateKey(d)===window.dateKey(new Date());
@@ -375,7 +347,6 @@
         }
       }
 
-      /* back button */
       var shouldShow=false,btnLabel='',btnAction='';
       if(tab==='daily'){
         shouldShow=window.dateKey(d)!==window.dateKey(new Date());
@@ -403,9 +374,6 @@
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       NAVIGATION
-       ═══════════════════════════════════════════════════════════════ */
     function moveDate(dir,unit){
       var d=new Date(window.plannerDate||new Date());
       if(unit==='day')   d.setDate(d.getDate()+dir);
@@ -424,9 +392,6 @@
     window.__goThisMonth = window.__goToday;
     window.__goThisYear  = window.__goToday;
 
-    /* ═══════════════════════════════════════════════════════════════
-       REFRESH
-       ═══════════════════════════════════════════════════════════════ */
     function refreshBody(direction){
       var pane=document.getElementById('plannerPane'); if(!pane) return;
       if(pane.dataset.animating==='1') return;
@@ -475,7 +440,6 @@
         return;
       }
 
-      /* tab changed */
       pane.dataset.animating='1';
       pane.style.pointerEvents='none';
 
@@ -541,9 +505,6 @@
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       HEROES
-       ═══════════════════════════════════════════════════════════════ */
     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -620,9 +581,6 @@
         +'</div>';
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       DAILY
-       ═══════════════════════════════════════════════════════════════ */
     function weekStatsHTML(){
       var pl=window.loadPlannerNew();
       var days=myWeekDays();
@@ -721,7 +679,6 @@
               +'</div>';
           }).join('')+'</div>';
 
-      /* ✅ FIX #9: تسک‌های done دیگه cursor pointer و onclick ندارن */
       var doneHTML = done.length===0
         ? '<div class="tasks-done-empty">هنوز کاری انجام ندادی</div>'
         : '<div class="tasks-list tasks-done-list">'+done.map(function(tk){
@@ -761,7 +718,6 @@
     }
     function viewDaily(){ return heroDaily()+'<div class="planner-body-content">'+dailyContentHTML()+'</div>'; }
 
-    /* ─── task ops ─── */
     window.__taskClick=function(e,dayKey,idx){
       e.stopPropagation();
       var pl=window.loadPlannerNew();
@@ -849,9 +805,6 @@
       refreshBody('left');
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       WEEKLY
-       ═══════════════════════════════════════════════════════════════ */
     function buildWeekCell(day,hk,pl){
       var dd=window.getDayData(pl,day.key);
       var ht=(dd.tasks||[]).filter(function(tk){ return tk.time&&tk.time.indexOf(hk+':00')===0; });
@@ -1046,9 +999,6 @@
       refreshBody('left');
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       MONTHLY
-       ═══════════════════════════════════════════════════════════════ */
     function monthlyContentHTML(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -1200,9 +1150,6 @@
       window.__calDayClick(parseInt(key.split('-')[2],10));
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       YEARLY
-       ═══════════════════════════════════════════════════════════════ */
     function yearlyContentHTML(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -1254,11 +1201,9 @@
     }
     function viewYearly(){ return heroYearly()+'<div class="planner-body-content">'+yearlyContentHTML()+'</div>'; }
 
-    /* ✅ FIX #5: محاسبه‌ی مستقیم و سریع‌تر */
     window.__goToMonth=function(mi){
       var base=new Date(window.plannerDate||new Date());
       var faYear=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(base));
-      /* پیدا کردن اول فروردین سال شمسی جاری */
       var ref=new Date(faYear+621, 2, 15);
       for(var i=0;i<40;i++){
         try{
@@ -1269,7 +1214,6 @@
         }catch(e){}
         ref.setDate(ref.getDate()+1);
       }
-      /* اسکن تا پیدا کردن ماه مقصد */
       for(var j=0;j<400;j++){
         try{
           var fY2=parseInt(new Intl.DateTimeFormat('en-US-u-ca-persian',{year:'numeric'}).format(ref));
@@ -1339,9 +1283,6 @@
       refreshBody('left');
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       PANEL (right side) — for planner view
-       ═══════════════════════════════════════════════════════════════ */
     window.renderPanelForPlanner=function(){
       var p=getProfile();
       var te=document.getElementById('panelTitleText');
@@ -1378,9 +1319,6 @@
         +'</div></div>';
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       SOUND
-       ═══════════════════════════════════════════════════════════════ */
     var currentAudio=null, masterVolume=0.4;
     function stopAudio(){
       if(currentAudio){
@@ -1402,9 +1340,6 @@
       if(currentAudio) currentAudio.volume=masterVolume;
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       STUDY CHAT
-       ═══════════════════════════════════════════════════════════════ */
     function loadStudyChat(){ try{ return JSON.parse(sessionStorage.getItem(STUDY_CHAT_KEY)||'[]'); }catch(e){ return []; } }
     function saveStudyChat(){ try{ sessionStorage.setItem(STUDY_CHAT_KEY,JSON.stringify(studyChatHistory)); }catch(e){} }
     function clearStudyChat(){ studyChatHistory=[]; try{ sessionStorage.removeItem(STUDY_CHAT_KEY); }catch(e){} }
@@ -1412,9 +1347,6 @@
 
     var studyTimer=null, studySeconds=0, studyRunning=false, studyPaused=false, studyTotalMinutes=0;
 
-    /* ═══════════════════════════════════════════════════════════════
-       STUDY OVERLAY
-       ═══════════════════════════════════════════════════════════════ */
     function buildStudyOverlay(){
       var old=document.getElementById('studyOverlay'); if(old) old.remove();
       var pl=window.loadPlannerNew();
@@ -1468,7 +1400,6 @@
         +'</div></div>';
       document.body.appendChild(el);
 
-      /* ─── time picker ─── */
       var picker=el.querySelector('#studyTimePicker');
       var numEl=el.querySelector('#studyTimeNum');
       var pv=25,dSY=0,dSV=25,dg=false;
@@ -1478,7 +1409,6 @@
       }
       setPV(25);
 
-      /* ✅ FIX #2: ذخیره‌ی ref برای cleanup */
       function pd(e){
         dg=true;
         dSY=(e.touches?e.touches[0].clientY:e.clientY);
@@ -1524,7 +1454,6 @@
         };
       }
 
-      /* ─── task select ─── */
       var tSel=el.querySelector('#studyTaskSelect');
       if(tSel){
         var tr=tSel.querySelector('.siraj-select-trigger');
@@ -1604,7 +1533,6 @@
           var fb=document.getElementById('studyFinishBtn');
           if(fb) fb.disabled=false;
           stopAudio();
-          /* ✅ FIX #3: AudioContext بسته می‌شه */
           try{
             var ac=new (window.AudioContext||window.webkitAudioContext)();
             var o=ac.createOscillator(),g=ac.createGain();
@@ -1701,8 +1629,6 @@
       var o=document.getElementById('studyOverlay');
       var chat=document.getElementById('studyChatPanel');
       if(chat) chat.remove();
-
-      /* ✅ FIX #2: حذف listenerها */
       if(_studyDragHandlers){
         try{
           document.removeEventListener('mousemove',_studyDragHandlers.move);
@@ -1712,12 +1638,9 @@
         }catch(e){}
         _studyDragHandlers=null;
       }
-
       if(!o) return;
       o.classList.remove('open');
-      setTimeout(function(){
-        o.remove();
-      },500);
+      setTimeout(function(){ o.remove(); },500);
       setTimeout(function(){
         if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
         refreshBody('left');
@@ -1763,7 +1686,6 @@
       });
     };
 
-    /* ─── study chat ─── */
     function renderStudyChat(){
       var box=document.getElementById('studyChatMessages'); if(!box) return;
       var p=getProfile();
@@ -1870,9 +1792,6 @@
       }
     };
 
-    /* ═══════════════════════════════════════════════════════════════
-       BLOG + COMMUNITY
-       ═══════════════════════════════════════════════════════════════ */
     function blogHTML(){
       return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div><div class="community-hero"><div class="community-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="community-title">مقالات سراج</div><div class="community-desc">اینجا قراره مطالب آموزشی، تحلیل‌های ادبی، نکات دستوری و یادداشت‌های کوتاه درباره‌ی زبان و ادبیات عربی منتشر بشه.</div><div class="community-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>به‌زودی راه‌اندازی می‌شه</div></div>';
     }
@@ -1896,9 +1815,6 @@
     setTimeout(fillViews,1500);
     setTimeout(fillViews,2500);
 
-    /* ═══════════════════════════════════════════════════════════════
-       CONTACT LINKIFY
-       ═══════════════════════════════════════════════════════════════ */
     function linkifyContacts(){
       document.querySelectorAll('.contact-row-v2, .contact-row').forEach(function(row){
         if(row.tagName==='A'||row.dataset.linkified==='1') return;
@@ -1935,9 +1851,6 @@
     setTimeout(linkifyContacts,800);
     setTimeout(linkifyContacts,1800);
 
-    /* ═══════════════════════════════════════════════════════════════
-       HEADER ACTIONS — profile avatar + lock
-       ═══════════════════════════════════════════════════════════════ */
     function injectMainTopActions(){
       if(_injectingHeaderActions) return;
       _injectingHeaderActions=true;
@@ -1972,7 +1885,6 @@
     setTimeout(injectMainTopActions,1500);
     setTimeout(injectMainTopActions,3000);
 
-    /* نگهبان — فقط هر ۲ ثانیه */
     setInterval(function(){
       var needFix=false;
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
@@ -1995,9 +1907,6 @@
       });
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       PROFILE TAB in settings
-       ═══════════════════════════════════════════════════════════════ */
     if(typeof window.openSettings==='function'){
       var origOS=window.openSettings;
       window.openSettings=function(){
@@ -2013,7 +1922,6 @@
         btn.setAttribute('data-cat','profile');
         btn.setAttribute('onclick',"switchSettingsCat('profile')");
         btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
-        /* ✅ FIX #6: پیدا کردن تب about با querySelector */
         var aboutBtn=tw.querySelector('[data-cat="about"]');
         tw.insertBefore(btn, aboutBtn||null);
       }
@@ -2106,7 +2014,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NAV SLIDER
+       NAV SLIDER — GPU transform (بدون لرزش)
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null,slider=null,ready=false;
@@ -2135,35 +2043,39 @@
           }
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
           btn.classList.add('active');
-          track(650);
+          track(600);
         },true);
         new MutationObserver(function(){ track(0); }).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position']});
         window.addEventListener('resize',function(){ track(0); });
         setTimeout(function(){ track(0); },800);
         return true;
       }
-           function track(duration){
+      function track(duration){
         if(!nav||!slider) return;
         var btn=nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
         if(!btn){ slider.classList.remove('visible'); return; }
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
         var vert=(pos==='left'||pos==='right');
 
-        /* ★ transition CSS رو غیرفعال می‌کنیم تا با RAF تداخل نکنه */
-        slider.style.transition = 'none';
+        /* ★ transform-based + GPU — بدون تداخل با CSS */
+        slider.style.transition='none';
+        slider.style.left='0';
+        slider.style.top='0';
+        slider.style.willChange='transform,width,height';
 
-        var endTime = performance.now() + (duration || 0);
+        var endTime=performance.now()+(duration||0);
 
         function tick(){
           if(!btn.isConnected) return;
           var nr=nav.getBoundingClientRect();
           var br=btn.getBoundingClientRect();
-          slider.style.left=(br.left-nr.left)+'px';
-          slider.style.top=(br.top-nr.top)+'px';
+          var x=(br.left-nr.left);
+          var y=(br.top-nr.top);
+          slider.style.transform='translate3d('+x+'px,'+y+'px,0)';
           slider.style.width=br.width+'px';
           slider.style.height=br.height+'px';
           slider.style.borderRadius=vert?'12px':'21px';
-          if(duration > 0 && performance.now() < endTime){
+          if(duration>0 && performance.now()<endTime){
             requestAnimationFrame(tick);
           }
         }
@@ -2176,6 +2088,7 @@
         if(init()||++tries>100) clearInterval(iv);
       },100);
     })();
+
     /* ═══════════════════════════════════════════════════════════════
        VIEW SWITCHER HOOK
        ═══════════════════════════════════════════════════════════════ */
@@ -2247,9 +2160,6 @@
       },1000);
     })();
 
-    /* ═══════════════════════════════════════════════════════════════
-       START
-       ═══════════════════════════════════════════════════════════════ */
     pickNewWord(true);
     setTimeout(function(){
       try{
@@ -2258,6 +2168,6 @@
       }catch(e){}
     },1200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v31)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v31 Final)');
   }
 })();
