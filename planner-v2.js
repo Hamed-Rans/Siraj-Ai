@@ -596,17 +596,22 @@
     setTimeout(injectMainTopActions,3000);
 
     setInterval(function(){
-      var needsFix=false;
+          /* ★ نگهبان: فقط وقتی چیزی *گم شده* یا *تکراری* هست، فیکس کن ★ */
+    setInterval(function(){
+      var needFix = false;
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
-        var wraps=h.querySelectorAll('#sirajHeaderActions, .header-left-actions');
-        var avs=h.querySelectorAll('.main-top-avatar');
-        var lks=h.querySelectorAll('.main-top-icon-btn');
-        if(wraps.length!==1||avs.length!==1||lks.length!==1)needsFix=true;
+        var wraps = h.querySelectorAll('#sirajHeaderActions, .header-left-actions');
+        var avs = h.querySelectorAll('.main-top-avatar');
+        var lks = h.querySelectorAll('.main-top-icon-btn');
+        /* فقط اگه گم شده یا تکراری شده */
+        if(wraps.length !== 1 || avs.length !== 1 || lks.length !== 1){
+          needFix = true;
+        }
       });
-      var stray=document.querySelectorAll('body > .main-top-avatar, body > .main-top-icon-btn, body > .header-left-actions');
-      if(stray.length)needsFix=true;
-      if(needsFix)injectMainTopActions();
-    }, 1500);
+      var stray = document.querySelectorAll('body > .main-top-avatar, body > .main-top-icon-btn, body > .header-left-actions');
+      if(stray.length) needFix = true;
+      if(needFix) injectMainTopActions();
+    }, 2000);
 
     function updateMainTopAvatar(){var p=getProfile();var s=p.avatar||USER_AVATAR_URL;document.querySelectorAll('.main-top-avatar').forEach(function(a){a.title=p.name?p.name:'مشخصات من';a.innerHTML='<img src="'+s+'" alt="" draggable="false">';});}
 
@@ -681,24 +686,39 @@
 
     /* ═══ سوییچ بین تب‌ها ═══ */
     (function(){
-            function hook(){
+                 function hook(){
         if(typeof window.switchView!=='function')return false;
         if(window.switchView.__hooked)return true;
         var orig=window.switchView;
+
         window.switchView=function(view){
+          /* ★ فیکس باگ کلیک روی تب فعلی — از DOM چک کن ★ */
+          var currentActive = document.querySelector('.view.active');
+          var currentName = currentActive ? currentActive.id.replace('view-','') : '';
+
+          if(currentName === view){
+            /* کاربر روی همون تب فعلی کلیک کرده — کاری نکن */
+            return;
+          }
+
           var oldName=_currentMainView;
-          if(oldName===view){orig.apply(this,arguments);return;}
+          if(oldName===view){_currentMainView=view;return;}
+
           var oldEl=document.getElementById('view-'+oldName);
           var newEl=document.getElementById('view-'+view);
           var oldIdx=VIEW_ORDER.indexOf(oldName);
           var newIdx=VIEW_ORDER.indexOf(view);
-          if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){orig.apply(this,arguments);_currentMainView=view;return;}
+          if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){
+            orig.apply(this,arguments);
+            _currentMainView=view;
+            return;
+          }
 
-          /* ★ کنسل کردن setTimeoutهای قبلی — فیکس کلیک سریع ★ */
+          /* کنسل تایمرهای قبلی */
           if(window.switchView.__t1)clearTimeout(window.switchView.__t1);
           if(window.switchView.__t2)clearTimeout(window.switchView.__t2);
 
-          /* ★ ریست همه viewها — پاک‌سازی از stateهای قبلی ★ */
+          /* ریست همه viewها */
           document.querySelectorAll('.view').forEach(function(v){
             v.classList.remove('leaving','view-out-left','view-out-right','view-in-from-left','view-in-from-right');
             v.style.pointerEvents='';
@@ -717,7 +737,7 @@
             _currentMainView=view;
             newEl.classList.add(inClass);
 
-            /* ★ بلافاصله پروفایل رو بریز — بدون دیلی ★ */
+            /* پروفایل سریع بیاد */
             setTimeout(injectMainTopActions,10);
 
             window.switchView.__t2=setTimeout(function(){
@@ -725,7 +745,7 @@
               oldEl.style.pointerEvents='';
               newEl.classList.remove(inClass);
             },240);
-          },180);
+          },170);
         };
         window.switchView.__hooked=true;
         return true;
