@@ -2422,3 +2422,257 @@
 .task-notif-close:hover{
   background:rgba(239,68,68,.15)!important;color:#EF4444!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v43 — Fixes + Notification + Global Element Style
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① فاصله بین هدر پلنر و کارت بعدی */
+.planner-pane > .planner-hero-card:first-child,
+#plannerPane > .planner-hero-card:first-child,
+#plannerPane > *:first-child:not(.planner-hero){
+  margin-top:14px!important;
+}
+
+/* ② ایموجی سمت چپ متن (RTL) */
+.punishment-reminder > .pr-icon{order:2!important;}
+.punishment-reminder > div{order:1!important;flex:1!important;text-align:right!important;}
+.exit-reason-warning > .erw-emoji{order:2!important;}
+.exit-reason-warning > span:not(.erw-emoji){order:1!important;flex:1!important;text-align:right!important;}
+
+/* ③ شیشه‌ای‌تر شدن هدرها — بک‌گراند پشتش دیده بشه */
+[data-header-style="glass"] .chat-header,
+[data-header-style="glass"] .page-title-bar,
+[data-header-style="glass"] .planner-hero{
+  background:rgba(18,22,30,.34)!important;
+  backdrop-filter:blur(30px) saturate(200%) brightness(1.12)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(200%) brightness(1.12)!important;
+  border-bottom:1px solid rgba(255,255,255,.12)!important;
+}
+[data-theme^="light"][data-header-style="glass"] .chat-header,
+[data-theme^="light"][data-header-style="glass"] .page-title-bar,
+[data-theme^="light"][data-header-style="glass"] .planner-hero{
+  background:rgba(255,255,255,.44)!important;
+  backdrop-filter:blur(30px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(200%)!important;
+}
+
+/* ④ استایل المان‌ها — ساده */
+[data-element-style="solid"] .month-calendar,
+[data-element-style="solid"] .month-goals,
+[data-element-style="solid"] .year-overview,
+[data-element-style="solid"] .daily-card,
+[data-element-style="solid"] .tasks-done-list,
+[data-element-style="solid"] .tasks-done-empty,
+[data-element-style="solid"] .week-grid-wrap,
+[data-element-style="solid"] .week-summary,
+[data-element-style="solid"] .panel-card,
+[data-element-style="solid"] .tool-card,
+[data-element-style="solid"] .hour-row,
+[data-element-style="solid"] .learn-library-box,
+[data-element-style="solid"] .planner-hero-card,
+[data-element-style="solid"] .siraj-select-trigger,
+[data-element-style="solid"] .siraj-select-panel,
+[data-element-style="solid"] .task-item,
+[data-element-style="solid"] .tasks-list .task-item,
+[data-element-style="solid"] .week-cell-task,
+[data-element-style="solid"] .study-tool-card{
+  background:var(--panel-bg)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+/* ⑤ استایل المان‌ها — شیشه‌ای (نه شفاف، بک‌گراند پشتش یکم دیده بشه) */
+[data-element-style="glass"] .month-calendar,
+[data-element-style="glass"] .month-goals,
+[data-element-style="glass"] .year-overview,
+[data-element-style="glass"] .daily-card,
+[data-element-style="glass"] .tasks-done-list,
+[data-element-style="glass"] .tasks-done-empty,
+[data-element-style="glass"] .week-grid-wrap,
+[data-element-style="glass"] .week-summary,
+[data-element-style="glass"] .panel-card,
+[data-element-style="glass"] .tool-card,
+[data-element-style="glass"] .hour-row,
+[data-element-style="glass"] .learn-library-box,
+[data-element-style="glass"] .planner-hero-card,
+[data-element-style="glass"] .siraj-select-trigger,
+[data-element-style="glass"] .siraj-select-panel,
+[data-element-style="glass"] .task-item,
+[data-element-style="glass"] .tasks-list .task-item,
+[data-element-style="glass"] .week-cell-task,
+[data-element-style="glass"] .study-tool-card,
+[data-element-style="glass"] .week-cell-edit .wc-input,
+[data-element-style="glass"] .task-add-form input[type=text]{
+  background:rgba(18,22,30,.42)!important;
+  backdrop-filter:blur(24px) saturate(190%) brightness(1.1)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(190%) brightness(1.1)!important;
+  border-color:rgba(255,255,255,.11)!important;
+}
+[data-theme^="light"][data-element-style="glass"] .month-calendar,
+[data-theme^="light"][data-element-style="glass"] .month-goals,
+[data-theme^="light"][data-element-style="glass"] .year-overview,
+[data-theme^="light"][data-element-style="glass"] .daily-card,
+[data-theme^="light"][data-element-style="glass"] .tasks-done-list,
+[data-theme^="light"][data-element-style="glass"] .tasks-done-empty,
+[data-theme^="light"][data-element-style="glass"] .week-grid-wrap,
+[data-theme^="light"][data-element-style="glass"] .week-summary,
+[data-theme^="light"][data-element-style="glass"] .panel-card,
+[data-theme^="light"][data-element-style="glass"] .tool-card,
+[data-theme^="light"][data-element-style="glass"] .hour-row,
+[data-theme^="light"][data-element-style="glass"] .learn-library-box,
+[data-theme^="light"][data-element-style="glass"] .planner-hero-card,
+[data-theme^="light"][data-element-style="glass"] .siraj-select-trigger,
+[data-theme^="light"][data-element-style="glass"] .siraj-select-panel,
+[data-theme^="light"][data-element-style="glass"] .task-item,
+[data-element-style="glass"] .tasks-list .task-item{
+  background:rgba(255,255,255,.55)!important;
+  border-color:rgba(0,0,0,.08)!important;
+}
+
+/* ⑥ دکمه برگشت — چپ، بدون به‌هم‌ریختن مرکز */
+.phc-center{position:relative!important;}
+.phc-back-inline{
+  position:absolute!important;
+  left:0!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+}
+.phc-back-inline:hover{
+  transform:translateY(-50%) translateX(-3px)!important;
+}
+.phc-back-inline.appearing{
+  animation:backBtnIn2 .5s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes backBtnIn2{
+  0%{opacity:0;transform:translateY(-50%) scale(.5) translateX(-10px)}
+  60%{opacity:1;transform:translateY(-50%) scale(1.1) translateX(0)}
+  100%{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
+}
+
+/* ⑦ دکمه اعلان در هدر */
+.main-top-icon-btn.notif-bell{position:relative;}
+.main-top-icon-btn.notif-bell svg{transition:transform .3s;}
+.main-top-icon-btn.notif-bell.shake svg{animation:notifShake .7s ease;}
+@keyframes notifShake{
+  0%,100%{transform:rotate(0)}
+  20%{transform:rotate(-14deg)}
+  40%{transform:rotate(12deg)}
+  60%{transform:rotate(-9deg)}
+  80%{transform:rotate(6deg)}
+}
+.notif-badge{
+  position:absolute;
+  top:-3px;right:-3px;
+  min-width:16px;height:16px;
+  padding:0 4px;
+  border-radius:8px;
+  background:linear-gradient(135deg,#EF4444,#DC2626);
+  color:#fff;
+  font-size:9.5px;
+  font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--panel-bg);
+  box-shadow:0 2px 8px rgba(239,68,68,.5);
+  animation:notifBadgeIn .4s cubic-bezier(.34,1.4,.64,1);
+  pointer-events:none;
+}
+@keyframes notifBadgeIn{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* ⑧ پنل اعلان‌ها */
+.notif-panel{
+  position:fixed;
+  top:74px;
+  left:14px;
+  width:min(380px,calc(100vw - 28px));
+  max-height:min(72vh,600px);
+  background:var(--panel-bg);
+  border:1px solid var(--border-strong);
+  border-radius:20px;
+  box-shadow:0 24px 60px -18px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03);
+  z-index:999999;
+  direction:rtl;
+  display:flex;
+  flex-direction:column;
+  opacity:0;
+  transform:translateY(-14px) scale(.94);
+  pointer-events:none;
+  transition:opacity .25s,transform .32s cubic-bezier(.34,1.4,.64,1);
+  overflow:hidden;
+  backdrop-filter:blur(24px) saturate(200%);
+  -webkit-backdrop-filter:blur(24px) saturate(200%);
+}
+.notif-panel.open{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  pointer-events:auto;
+}
+.notif-header{
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,var(--accent-soft),transparent);
+  flex-shrink:0;
+}
+.notif-header-title{
+  font-size:14px;font-weight:900;color:var(--accent);
+  display:flex;align-items:center;gap:8px;
+}
+.notif-clear-btn{
+  padding:5px 11px;border-radius:9px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text-muted);
+  font-family:var(--font-text);
+  font-size:10.5px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.notif-clear-btn:hover{border-color:#EF4444;color:#EF4444;}
+.notif-list{
+  padding:10px;
+  overflow-y:auto;
+  display:flex;flex-direction:column;gap:8px;
+  flex:1;min-height:0;
+}
+.notif-empty{
+  padding:40px 20px;text-align:center;
+  color:var(--text-muted);font-size:12px;line-height:1.9;
+}
+.notif-empty .emoji{font-size:38px;display:block;margin-bottom:8px;opacity:.5;}
+.notif-item{
+  padding:12px 14px;border-radius:14px;
+  background:var(--primary);
+  border:1px solid var(--border);
+  border-right:3px solid var(--accent);
+  display:flex;flex-direction:column;gap:6px;
+  animation:paneLoad .35s cubic-bezier(.22,1,.36,1) both;
+  transition:background .25s,border-color .25s;
+}
+.notif-item.unread{background:var(--accent-soft);}
+.notif-item.notif-pre{border-right-color:#60A5FA;}
+.notif-item.notif-end{border-right-color:#F59E0B;}
+.notif-item-head{display:flex;align-items:center;gap:8px;justify-content:space-between;}
+.notif-item-icon{font-size:18px;line-height:1;}
+.notif-item-title{font-size:12.5px;font-weight:800;color:var(--text-main);flex:1;}
+.notif-item-time{font-size:9.5px;color:var(--text-muted);font-weight:700;}
+.notif-item-text{font-size:11.5px;color:var(--text-muted);line-height:1.75;font-weight:600;}
+.notif-item-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.notif-btn{
+  flex:1;min-width:80px;
+  padding:8px 12px;border-radius:10px;
+  border:none;font-family:var(--font-text);
+  font-size:11px;font-weight:800;cursor:pointer;
+  transition:transform .2s;
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+}
+.notif-btn:active{transform:scale(.96);}
+.notif-btn.yes{background:linear-gradient(135deg,#10B981,#059669);color:#fff;box-shadow:0 4px 12px -4px #10B981;}
+.notif-btn.no{background:rgba(239,68,68,.12);color:#F87171;border:1px solid rgba(239,68,68,.35);}
+.notif-btn.reschedule{background:rgba(96,165,250,.15);color:#60A5FA;border:1px solid rgba(96,165,250,.35);}
+
+/* ⑨ کارت‌های خالی بازطراحی‌شده (مقالات/انجمن) */
+.page-empty-card.new-style{
+  background:rgba(18,22,30,.5)!important;
+  backdrop-filter:blur(24px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(180%)!important;
+}
