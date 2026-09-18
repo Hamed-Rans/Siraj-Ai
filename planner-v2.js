@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v42 Final) */
+/* Siraj v2.0 — planner-v2.js (v43 Final) */
 (function(){
   'use strict';
 
@@ -818,122 +818,401 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NOTIFICATION SYSTEM
+       NEW NOTIFICATION SYSTEM (v43)
        ═══════════════════════════════════════════════════════════════ */
-    function initTaskNotifications(){
-      if('Notification' in window && Notification.permission === 'default'){
-        setTimeout(function(){
-          try{ Notification.requestPermission(); }catch(e){}
-        }, 5000);
+    var NOTIF_KEY      = 'siraj-notif-history';
+    var NOTIF_SEEN_KEY = 'siraj-notif-seen';
+    var NOTIF_PRE_KEY  = 'siraj_notif_pre_';
+    var NOTIF_END_KEY  = 'siraj_notif_end_';
+
+    function timeAgoShort(ts){
+      var d = Date.now() - ts;
+      var s = Math.floor(d/1000);
+      if(s < 60) return 'الان';
+      var m = Math.floor(s/60);
+      if(m < 60) return m + ' د';
+      var h = Math.floor(m/60);
+      if(h < 24) return h + ' س';
+      return Math.floor(h/24) + ' روز';
+    }
+    function loadNotifHistory(){
+      try{ return JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]'); }catch(e){ return []; }
+    }
+    function saveNotifHistory(a){
+      try{ localStorage.setItem(NOTIF_KEY, JSON.stringify(a.slice(-100))); }catch(e){}
+    }
+    function addNotifToHistory(n){
+      var list = loadNotifHistory();
+      list.push(n);
+      saveNotifHistory(list);
+      updateNotifBadge();
+      var panel = document.getElementById('notifPanel');
+      if(panel && panel.classList.contains('open')) renderNotifPanel();
+    }
+    function updateNotifBadge(){
+      var btn = document.getElementById('notifBtn');
+      if(!btn) return;
+      var list = loadNotifHistory();
+      var seen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
+      var unseen = list.filter(function(n){ return (n.ts||0) > seen; }).length;
+      var badge = btn.querySelector('.notif-badge');
+      if(unseen > 0){
+        if(!badge){
+          badge = document.createElement('span');
+          badge.className = 'notif-badge';
+          btn.appendChild(badge);
+          btn.classList.add('shake');
+          setTimeout(function(){ btn.classList.remove('shake'); }, 750);
+        }
+        badge.textContent = unseen > 9 ? '9+' : unseen;
+      } else if(badge){
+        badge.remove();
       }
-      setInterval(checkTaskReminders, 60000);
-      setTimeout(checkTaskReminders, 30000);
+    }
+    function markNotifsSeen(){
+      localStorage.setItem(NOTIF_SEEN_KEY, String(Date.now()));
+      updateNotifBadge();
     }
 
-    function checkTaskReminders(){
+    function checkTaskNotifications(){
       try{
         var now = new Date();
-        var currentHour = now.getHours();
-        var currentMin = now.getMinutes();
         var todayKey = window.dateKey(now);
         var pl = window.loadPlannerNew();
         var dd = window.getDayData(pl, todayKey);
-        var tasks = (dd.tasks || []).filter(function(t){ return !t.done; });
+        var tasks = dd.tasks || [];
+        var currentHour = now.getHours();
+        var currentMin = now.getMinutes();
+        var nowMins = currentHour * 60 + currentMin;
 
-        tasks.forEach(function(task){
-          if(!task.time) return;
-          var m = task.time.match(/^(\d{1,2})/);
+        tasks.forEach(function(t){
+          if(t.done || !t.time) return;
+          var m = t.time.match(/^(\d{1,2})/);
           if(!m) return;
-          var taskHour = parseInt(m[1]);
+          var startHour = parseInt(m[1]);
+          var preTime = startHour * 60 - 10;
+          var endTime = (startHour + 1) * 60;
 
-          if(taskHour === currentHour && currentMin >= 50){
-            var askedKey = 'siraj_notified_' + todayKey + '_' + task.id;
-            if(localStorage.getItem(askedKey)) return;
-            localStorage.setItem(askedKey, '1');
-            showTaskReminder(task);
+          var preKey = NOTIF_PRE_KEY + todayKey + '_' + t.id;
+          var endKey = NOTIF_END_KEY + todayKey + '_' + t.id;
+
+          if(nowMins >= preTime && nowMins < endTime && !localStorage.getItem(preKey)){
+            localStorage.setItem(preKey, '1');
+            fireNotification({
+              id: 'n_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+              type: 'pre',
+              taskId: t.id,
+              taskTitle: t.title,
+              dayKey: todayKey,
+              time: t.time,
+              ts: Date.now(),
+              answered: false
+            });
+          }
+          if(nowMins >= endTime && !localStorage.getItem(endKey)){
+            localStorage.setItem(endKey, '1');
+            fireNotification({
+              id: 'n_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+              type: 'end',
+              taskId: t.id,
+              taskTitle: t.title,
+              dayKey: todayKey,
+              time: t.time,
+              ts: Date.now(),
+              answered: false
+            });
           }
         });
-      }catch(e){ console.warn('[Notif]', e); }
+      }catch(e){ console.warn('[NotifCheck]', e); }
     }
 
-    function showTaskReminder(task){
-      showTaskNotifPopup(task);
+    function fireNotification(n){
+      addNotifToHistory(n);
+      showNotifLivePopup(n);
       if('Notification' in window && Notification.permission === 'granted'){
         try{
-          var n = new Notification('سراج — یادآور ⏰', {
-            body: 'کار «' + task.title + '» رو انجام دادی؟',
-            icon: 'siraj-logo.png',
-            tag: 'siraj_task_' + task.id,
-            requireInteraction: true
-          });
-          n.onclick = function(){
-            window.focus();
-            showTaskNotifPopup(task);
-            n.close();
-          };
+          var title = n.type === 'pre' ? '⏰ یادآور کار' : '🔔 پایان زمان کار';
+          var body  = n.type === 'pre'
+            ? 'کار «'+n.taskTitle+'» رو شروع کن'
+            : 'کار «'+n.taskTitle+'» رو انجام دادی؟';
+          var sys = new Notification(title, { body: body, icon:'siraj-logo.png', tag:'siraj_notif_'+n.id });
+          sys.onclick = function(){ window.focus(); showNotifLivePopup(n); sys.close(); };
         }catch(e){}
       }
     }
 
-    function showTaskNotifPopup(task){
-      var old = document.getElementById('taskNotifPopup');
+    function showNotifLivePopup(n){
+      var old = document.getElementById('notifLivePopup');
       if(old) old.remove();
-
       var el = document.createElement('div');
-      el.id = 'taskNotifPopup';
+      el.id = 'notifLivePopup';
       el.className = 'task-notif-popup';
+      var icon  = n.type === 'pre' ? '⏰' : '🔔';
+      var title = n.type === 'pre' ? 'یادآور کار' : 'پایان زمان کار';
+      var text  = n.type === 'pre'
+        ? 'کار «'+esc(n.taskTitle)+'» رو شروع کن'
+        : 'کار «'+esc(n.taskTitle)+'» رو انجام دادی؟';
+      var actions = n.type === 'pre'
+        ? '<button class="yes-btn" id="nlYes">✓ انجام دادم</button><button class="no-btn" id="nlResched">⏰ انتقال</button>'
+        : '<button class="yes-btn" id="nlYes">✓ انجام دادم</button><button class="no-btn" id="nlNo">✗ نه</button>';
       el.innerHTML =
-        '<button class="task-notif-close" id="taskNotifClose">✕</button>'
-        +'<div class="task-notif-head">'
-        +'<div class="task-notif-icon">⏰</div>'
-        +'<div class="task-notif-title">یادآور کار</div>'
-        +'</div>'
-        +'<div class="task-notif-task">'+esc(task.title)+'</div>'
-        +'<div class="task-notif-actions">'
-        +'<button class="yes-btn" id="taskNotifYes">✓ بله انجام دادم</button>'
-        +'<button class="no-btn" id="taskNotifNo">✗ نه، بعداً</button>'
-        +'</div>';
-
+        '<button class="task-notif-close" id="nlClose">✕</button>'
+        +'<div class="task-notif-head"><div class="task-notif-icon">'+icon+'</div><div class="task-notif-title">'+title+'</div></div>'
+        +'<div class="task-notif-task">'+text+'</div>'
+        +'<div class="task-notif-actions">'+actions+'</div>';
       document.body.appendChild(el);
       requestAnimationFrame(function(){ el.classList.add('show'); });
-
       var close = function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 450); };
-
-      el.querySelector('#taskNotifClose').onclick = close;
-
-      el.querySelector('#taskNotifYes').onclick = function(){
-        close();
-        try{
-          var pl = window.loadPlannerNew();
-          var todayKey = window.dateKey(new Date());
-          var dd = window.getDayData(pl, todayKey);
-          var idx = (dd.tasks||[]).findIndex(function(t){ return t.id === task.id; });
-          if(idx >= 0){
-            dd.tasks[idx].done = true;
-            window.savePlanner(pl);
-            if(window.toast) window.toast('✓ انجام شد!','success');
-            refreshBody('left');
-          }
-        }catch(e){}
-      };
-
-      el.querySelector('#taskNotifNo').onclick = function(){
-        close();
-        try{
-          var todayKey = window.dateKey(new Date());
-          localStorage.removeItem('siraj_notified_' + todayKey + '_' + task.id);
-        }catch(e){}
-        if(window.toast) window.toast('۳۰ دقیقه دیگه یادت می‌ندازم','info');
-      };
-
-      setTimeout(function(){
-        if(el.parentNode && el.classList.contains('show')){
-          close();
-        }
-      }, 30000);
+      el.querySelector('#nlClose').onclick = close;
+      el.querySelector('#nlYes').onclick = function(){ close(); markTaskDone(n.taskId, n.dayKey); markNotifAnswered(n.id); };
+      if(n.type === 'pre'){
+        el.querySelector('#nlResched').onclick = function(){ close(); smartReschedule(n.taskId, n.dayKey); markNotifAnswered(n.id); };
+      } else {
+        el.querySelector('#nlNo').onclick = function(){ close(); showNotifChoicePopup(n); markNotifAnswered(n.id); };
+      }
+      setTimeout(function(){ if(el.parentNode && el.classList.contains('show')) close(); }, 30000);
     }
 
-    setTimeout(initTaskNotifications, 2000);
+    function markNotifAnswered(id){
+      var list = loadNotifHistory();
+      var n = list.find(function(x){ return x.id === id; });
+      if(n){ n.answered = true; saveNotifHistory(list); }
+      var panel = document.getElementById('notifPanel');
+      if(panel && panel.classList.contains('open')) renderNotifPanel();
+    }
+
+    function markTaskDone(taskId, dayKey){
+      try{
+        var pl = window.loadPlannerNew();
+        var dd = window.getDayData(pl, dayKey);
+        var idx = (dd.tasks||[]).findIndex(function(t){ return t.id === taskId; });
+        if(idx < 0) return;
+        dd.tasks[idx].done = true;
+        window.savePlanner(pl);
+        if(window.toast) window.toast('✓ انجام شد','success');
+        refreshBody('left');
+        if(dayKey === window.dateKey(window.plannerDate||new Date())){
+          maybeCelebrate(dayKey);
+        }
+      }catch(e){}
+    }
+    function deleteTask(taskId, dayKey){
+      try{
+        var pl = window.loadPlannerNew();
+        var dd = window.getDayData(pl, dayKey);
+        var idx = (dd.tasks||[]).findIndex(function(t){ return t.id === taskId; });
+        if(idx < 0) return;
+        dd.tasks.splice(idx, 1);
+        window.savePlanner(pl);
+        if(window.toast) window.toast('حذف شد','info');
+        refreshBody('left');
+      }catch(e){}
+    }
+    function findNextFreeSlot(pl, fromDayKey){
+      var HOURS = [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23];
+      var base = new Date(fromDayKey + 'T12:00:00');
+      if(isNaN(base.getTime())) base = new Date();
+      var nowHour = new Date().getHours();
+      for(var d = 0; d < 7; d++){
+        var day = new Date(base);
+        day.setDate(day.getDate() + d);
+        var dayKey = window.dateKey(day);
+        var dd = window.getDayData(pl, dayKey);
+        var startIdx = 0;
+        if(d === 0){
+          var found = -1;
+          for(var k=0;k<HOURS.length;k++){ if(HOURS[k] > nowHour){ found = k; break; } }
+          if(found < 0) continue;
+          startIdx = found;
+        }
+        for(var i = startIdx; i < HOURS.length; i++){
+          var h = HOURS[i];
+          var occupied = (dd.tasks||[]).some(function(t){
+            if(t.done || !t.time) return false;
+            var m = t.time.match(/^(\d{1,2})/);
+            return m && parseInt(m[1]) === h;
+          });
+          if(!occupied) return { dayKey: dayKey, hour: h };
+        }
+      }
+      return null;
+    }
+    function smartReschedule(taskId, dayKey){
+      try{
+        var pl = window.loadPlannerNew();
+        var dd = window.getDayData(pl, dayKey);
+        var idx = (dd.tasks||[]).findIndex(function(t){ return t.id === taskId; });
+        if(idx < 0) return;
+        var slot = findNextFreeSlot(pl, dayKey);
+        if(!slot){ if(window.toast) window.toast('جای خالی پیدا نشد','error'); return; }
+        var newTime = slot.hour + ':00 تا ' + (slot.hour+1) + ':00';
+        if(slot.dayKey !== dayKey){
+          var task = dd.tasks.splice(idx, 1)[0];
+          task.time = newTime;
+          var newDD = window.getDayData(pl, slot.dayKey);
+          if(!newDD.tasks) newDD.tasks = [];
+          newDD.tasks.push(task);
+        } else {
+          dd.tasks[idx].time = newTime;
+        }
+        window.savePlanner(pl);
+        if(window.toast) window.toast('به ساعت '+slot.hour+' منتقل شد ✓','success');
+        refreshBody('left');
+      }catch(e){ console.warn('[Resched]', e); }
+    }
+    function showNotifChoicePopup(n){
+      var old = document.getElementById('notifChoicePopup');
+      if(old) old.remove();
+      var el = document.createElement('div');
+      el.id = 'notifChoicePopup';
+      el.className = 'siraj-popup-overlay';
+      el.innerHTML = '<div class="siraj-popup">'
+        +'<span class="siraj-popup-emoji">🤔</span>'
+        +'<div class="siraj-popup-title">چیکارش کنم؟</div>'
+        +'<div class="siraj-popup-text">کار «'+esc(n.taskTitle)+'» رو انجام ندادی.<br>می‌خوای منتقلش کنی یا حذفش کنی؟</div>'
+        +'<div class="siraj-popup-actions-3">'
+        +'<button class="siraj-popup-btn secondary" id="ncpDel">🗑️ حذف</button>'
+        +'<button class="siraj-popup-btn secondary" id="ncpResch">⏰ انتقال</button>'
+        +'<button class="siraj-popup-btn" id="ncpKeep">✋ بعداً</button>'
+        +'</div></div>';
+      document.body.appendChild(el);
+      requestAnimationFrame(function(){ el.classList.add('open'); });
+      var close = function(){ el.classList.remove('open'); setTimeout(function(){ el.remove(); }, 320); };
+      el.querySelector('#ncpDel').onclick = function(){ close(); deleteTask(n.taskId, n.dayKey); };
+      el.querySelector('#ncpResch').onclick = function(){ close(); smartReschedule(n.taskId, n.dayKey); };
+      el.querySelector('#ncpKeep').onclick = close;
+    }
+
+    function renderNotifPanel(){
+      var list = document.getElementById('notifList');
+      if(!list) return;
+      var history = loadNotifHistory().slice().reverse();
+      if(history.length === 0){
+        list.innerHTML = '<div class="notif-empty"><span class="emoji">🔔</span>هنوز اعلانی نداری</div>';
+        return;
+      }
+      var seen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
+      list.innerHTML = history.map(function(n){
+        var unread = (n.ts||0) > seen ? ' unread' : '';
+        var typeCls = n.type === 'pre' ? ' notif-pre' : ' notif-end';
+        var icon = n.type === 'pre' ? '⏰' : '🔔';
+        var title = n.type === 'pre' ? 'یادآور کار' : 'پایان زمان کار';
+        var text = n.type === 'pre'
+          ? 'کار «'+esc(n.taskTitle)+'» — یادت نره شروع کنی!'
+          : 'کار «'+esc(n.taskTitle)+'» — انجامش دادی؟';
+        var actions = '';
+        if(!n.answered){
+          if(n.type === 'pre'){
+            actions = '<div class="notif-item-actions">'
+              +'<button class="notif-btn yes" onclick="window.__notifDone(\''+n.id+'\')">✓ انجام دادم</button>'
+              +'<button class="notif-btn reschedule" onclick="window.__notifResched(\''+n.id+'\')">⏰ انتقال</button>'
+              +'</div>';
+          } else {
+            actions = '<div class="notif-item-actions">'
+              +'<button class="notif-btn yes" onclick="window.__notifDone(\''+n.id+'\')">✓ انجام دادم</button>'
+              +'<button class="notif-btn no" onclick="window.__notifNo(\''+n.id+'\')">✗ نه</button>'
+              +'</div>';
+          }
+        }
+        return '<div class="notif-item'+unread+typeCls+'">'
+          +'<div class="notif-item-head">'
+          +'<span class="notif-item-icon">'+icon+'</span>'
+          +'<span class="notif-item-title">'+title+'</span>'
+          +'<span class="notif-item-time">'+timeAgoShort(n.ts)+'</span>'
+          +'</div>'
+          +'<div class="notif-item-text">'+text+'</div>'
+          +actions
+          +'</div>';
+      }).join('');
+    }
+
+    function __notifOutsideClose(e){
+      var p = document.getElementById('notifPanel');
+      if(!p) return;
+      if(!e.target.closest('#notifPanel') && !e.target.closest('#notifBtn')){
+        p.classList.remove('open');
+        document.removeEventListener('click', __notifOutsideClose);
+      }
+    }
+
+    window.__toggleNotifPanel = function(){
+      var panel = document.getElementById('notifPanel');
+      if(panel){
+        var wasOpen = panel.classList.contains('open');
+        if(wasOpen){
+          panel.classList.remove('open');
+        } else {
+          renderNotifPanel();
+          markNotifsSeen();
+          panel.classList.add('open');
+        }
+        return;
+      }
+      panel = document.createElement('div');
+      panel.id = 'notifPanel';
+      panel.className = 'notif-panel';
+      panel.innerHTML =
+        '<div class="notif-header">'
+        +'<div class="notif-header-title">🔔 اعلان‌ها</div>'
+        +'<button class="notif-clear-btn" id="notifClearBtn">پاک کردن</button>'
+        +'</div>'
+        +'<div class="notif-list" id="notifList"></div>';
+      document.body.appendChild(panel);
+      requestAnimationFrame(function(){ panel.classList.add('open'); });
+      panel.querySelector('#notifClearBtn').onclick = function(e){
+        e.stopPropagation();
+        saveNotifHistory([]);
+        renderNotifPanel();
+        updateNotifBadge();
+      };
+      setTimeout(function(){
+        document.addEventListener('click', __notifOutsideClose);
+      }, 100);
+      renderNotifPanel();
+      markNotifsSeen();
+    };
+
+    window.__notifDone = function(id){
+      var list = loadNotifHistory();
+      var n = list.find(function(x){ return x.id === id; });
+      if(!n) return;
+      n.answered = true;
+      saveNotifHistory(list);
+      markTaskDone(n.taskId, n.dayKey);
+      renderNotifPanel();
+    };
+    window.__notifNo = function(id){
+      var list = loadNotifHistory();
+      var n = list.find(function(x){ return x.id === id; });
+      if(!n) return;
+      n.answered = true;
+      saveNotifHistory(list);
+      renderNotifPanel();
+      var p = document.getElementById('notifPanel');
+      if(p) p.classList.remove('open');
+      showNotifChoicePopup(n);
+    };
+    window.__notifResched = function(id){
+      var list = loadNotifHistory();
+      var n = list.find(function(x){ return x.id === id; });
+      if(!n) return;
+      n.answered = true;
+      saveNotifHistory(list);
+      smartReschedule(n.taskId, n.dayKey);
+      renderNotifPanel();
+    };
+
+    /* راه‌اندازی نوتیفیکیشن */
+    setTimeout(function(){
+      if('Notification' in window && Notification.permission === 'default'){
+        try{ Notification.requestPermission(); }catch(e){}
+      }
+      updateNotifBadge();
+      checkTaskNotifications();
+    }, 3000);
+    setInterval(checkTaskNotifications, 60000);
+    setInterval(updateNotifBadge, 15000);
+    /* ── پایان سیستم نوتیفیکیشن جدید ── */
 
     function dailyContentHTML(){
       var pl=window.loadPlannerNew();
@@ -2050,11 +2329,14 @@
           box.querySelector('#stayBtn').onclick=function(){
             el.classList.remove('open');setTimeout(function(){el.remove();},320);
           };
+          /* ★★★ فیکس باگ تاریخ: حالا از window.plannerDate استفاده می‌شه ★★★ */
           box.querySelector('#acceptPunish').onclick=function(){
             try{
-              var today=new Date();
-              var tomorrow=new Date(today);tomorrow.setDate(tomorrow.getDate()+1);
-              var tk=window.dateKey(tomorrow);
+              var baseDate = window.plannerDate || new Date();
+              var tomorrow = new Date(baseDate);
+              tomorrow.setHours(12,0,0,0);
+              tomorrow.setDate(tomorrow.getDate()+1);
+              var tk = window.dateKey(tomorrow);
               var pl=window.loadPlannerNew();
               var dd=window.getDayData(pl,tk);
               if(!dd.tasks) dd.tasks=[];
@@ -2315,7 +2597,6 @@
       }
     };
 
-    /* ★ blog/community بازطراحی کامل */
     function blogHTML(){
       return '<div class="page-title-bar">'
         +'<div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
@@ -2425,6 +2706,7 @@
     setTimeout(linkifyContacts,800);
     setTimeout(linkifyContacts,1800);
 
+    /* ★★★ هدر اکشن‌ها — با دکمه اعلان بین پروفایل و قفل ★★★ */
     function injectMainTopActions(){
       if(_injectingHeaderActions) return;
       _injectingHeaderActions=true;
@@ -2438,15 +2720,23 @@
           var w=document.createElement('div');
           w.id='sirajHeaderActions';
           w.className='header-left-actions';
-          w.innerHTML='<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div><button type="button" class="main-top-icon-btn" title="قفل کردن سایت"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>';
+          w.innerHTML='<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div>'
+            +'<button type="button" class="main-top-icon-btn notif-bell" id="notifBtn" title="اعلان‌ها"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>'
+            +'<button type="button" class="main-top-icon-btn" id="lockHeaderBtn" title="قفل کردن سایت"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>';
           h.appendChild(w);
           w.querySelector('.main-top-avatar').onclick=function(){
             if(typeof window.openSettings==='function') window.openSettings();
             setTimeout(function(){var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');if(b) b.click();},400);
           };
-          w.querySelector('.main-top-icon-btn').onclick=function(){
+          w.querySelector('#notifBtn').onclick=function(e){
+            e.stopPropagation();
+            if(typeof window.__toggleNotifPanel==='function') window.__toggleNotifPanel();
+          };
+          w.querySelector('#lockHeaderBtn').onclick=function(){
             if(typeof window.lockNow==='function') window.lockNow();
           };
+          /* نمایش نشان اعلان اگر پیام‌های خوانده‌نشده هست */
+          setTimeout(updateNotifBadge, 100);
         });
       }finally{_injectingHeaderActions=false;}
     }
@@ -2458,8 +2748,9 @@
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
         var wraps=h.querySelectorAll('#sirajHeaderActions, .header-left-actions');
         var avs=h.querySelectorAll('.main-top-avatar');
-        var lks=h.querySelectorAll('.main-top-icon-btn');
-        if(wraps.length!==1||avs.length!==1||lks.length!==1) needFix=true;
+        var lks=h.querySelectorAll('#lockHeaderBtn');
+        var ntf=h.querySelectorAll('#notifBtn');
+        if(wraps.length!==1||avs.length!==1||lks.length!==1||ntf.length!==1) needFix=true;
       });
       var stray=document.querySelectorAll('body > .main-top-avatar, body > .main-top-icon-btn, body > .header-left-actions');
       if(stray.length) needFix=true;
@@ -2796,6 +3087,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v42 Final)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v43 Final)');
   }
 })();
