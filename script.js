@@ -1,4 +1,4 @@
-/* Siraj v2.0 — script.js (v39 Final) */
+/* Siraj v2.0 — script.js (v40 Final) */
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
@@ -132,6 +132,9 @@ const RateLimiter={queue:[],processing:false,minInterval:1500,lastRequest:0,
     }
 };
 
+/* ★ plannerDate global */
+window.plannerDate = new Date();
+
 let settings=loadSettings();
 let settingsDraft=null;
 let settingsCat='appearance';
@@ -156,7 +159,6 @@ let isNavPinned=false;
 let sessionPingInterval=null;
 let inactivityTimer=null;
 let plannerTab='daily';
-let plannerDate=new Date();
 let currentPanelTab='history';
 
 function loadSettings(){try{const l=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};const s=Object.assign({},APP_CONFIG.defaultSettings,l);
@@ -218,7 +220,7 @@ function dateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2
 function getWeekStart(date){const d=new Date(date);d.setHours(0,0,0,0);const day=d.getDay();const diff=(day+1)%7;d.setDate(d.getDate()-diff);return d;}
 function getWeekDays(){
     const days=[];
-    const start=getWeekStart(plannerDate);
+    const start=getWeekStart(window.plannerDate);
     for(let i=0;i<7;i++){
         const d=new Date(start);d.setDate(start.getDate()+i);
         days.push({key:dateKey(d),name:getDayName(d),date:d.toLocaleDateString('fa-IR',{month:'short',day:'numeric'}),dateObj:d});
@@ -521,7 +523,7 @@ function initNavState(){
     if(localStorage.getItem(PIN_KEY)==='1'){isNavPinned=true;document.getElementById('navRow').classList.remove('collapsed');document.getElementById('navRow').classList.add('pinned');}
 }
 
-/* ★ updateNavSlider — نسخه پایه (planner-v2.js override می‌کنه) */
+/* fallback — planner-v2.js override می‌کنه */
 function updateNavSlider(animate){
     const slider=document.getElementById('navSlider');
     const active=document.querySelector('.bottom-nav-btn.active');
@@ -624,14 +626,12 @@ function renderDailyPanel(){
             <div class="list-item" onclick="askAIToPlan()"><div class="li-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="li-body"><div class="li-title">برنامه‌ریزی خودکار</div><div class="li-desc">از AI برنامه بگیر</div></div></div>
         </div>`;
 }
-
-/* ★ renderPanelForPlanner — نسخه fallback (planner-v2.js override می‌کنه) */
+/* fallback — planner-v2.js override می‌کنه */
 function renderPanelForPlanner(){
     document.getElementById('panelTitleText').textContent='برنامه‌ریزی';
     document.getElementById('panelSubText').textContent='خلاصه هفته';
     document.getElementById('panelContent').innerHTML='';
 }
-
 function renderPanelForBlog(){
     document.getElementById('panelTitleText').textContent='مقالات سراج';
     document.getElementById('panelSubText').textContent='یادداشت‌ها و مقالات';
@@ -665,7 +665,7 @@ function renderPanelForTools(){
         </div>`;
 }
 
-/* ★ renderPlanner — فقط کانتینر خالی، planner-v2.js محتوا رو پر می‌کنه */
+/* fallback — planner-v2.js override می‌کنه */
 function renderPlanner(){
     const view=document.getElementById('view-planner');
     if(!view) return;
@@ -673,16 +673,14 @@ function renderPlanner(){
     if(typeof window.renderPlannerPane==='function') window.renderPlannerPane();
 }
 
-/* ★ renderPlannerPane — نسخه fallback (planner-v2.js override می‌کنه) */
+/* fallback — planner-v2.js override می‌کنه */
 function renderPlannerPane(){
     const pane=document.getElementById('plannerPane');
     if(!pane) return;
-    /* اگه planner-v2.js لود نشده باشه، پیام می‌ذاریم */
-    if(typeof window.loadPlannerNew!=='function') return;
     pane.innerHTML='<div style="padding:30px;text-align:center;color:var(--text-muted)">در حال بارگذاری...</div>';
 }
 
-/* نسخه قدیمی switchPlannerTab (planner-v2 override می‌کنه) */
+/* fallback — planner-v2.js override می‌کنه */
 function switchPlannerTab(tab){
     plannerTab=tab;
     if(typeof window.switchPlannerTab==='function' && window.switchPlannerTab!==switchPlannerTab){
@@ -691,7 +689,7 @@ function switchPlannerTab(tab){
     }
 }
 
-/* ★ renderBlog — نسخه قدیمی (planner-v2.js override می‌کنه) */
+/* fallback — planner-v2.js override می‌کنه */
 function renderBlog(){
     const v=document.getElementById('view-blog');
     if(!v) return;
@@ -701,7 +699,7 @@ function renderBlog(){
 function addBlogPost(){const t=document.getElementById('blogTitle')?.value.trim();const b=document.getElementById('blogBody')?.value.trim();if(!t||!b){toast('عنوان و متن لازمه','error');return;}const p=loadBlog();p.unshift({title:t,body:b,ts:Date.now()});saveBlog(p);renderBlog();renderPanelForBlog();toast('مقاله منتشر شد','success');}
 function deleteBlogPost(i){const p=loadBlog();p.splice(i,1);saveBlog(p);renderBlog();renderPanelForBlog();}
 
-/* ★ renderCommunity — نسخه قدیمی (planner-v2.js override می‌کنه) */
+/* fallback — planner-v2.js override می‌کنه */
 function renderCommunity(){
     const v=document.getElementById('view-videos');
     if(!v) return;
@@ -778,14 +776,13 @@ function loadChat(id){
     if(!c) return;
     currentChatId = id;
     const box = document.getElementById('box');
-    const myToken = id; /* ★ برای جلوگیری از رقابت */
+    const myToken = id;
 
     box.style.transition = 'opacity .18s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1)';
     box.style.opacity = '0';
     box.style.transform = 'translateY(-10px)';
 
     setTimeout(function(){
-        /* ★ اگه کاربر چت دیگه‌ای رو انتخاب کرد، لغو کن */
         if(currentChatId !== myToken) return;
 
         box.innerHTML = '';
