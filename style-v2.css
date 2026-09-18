@@ -4532,3 +4532,73 @@
 .monthly-side {
   padding-top: 42px !important; /* ارتفاع legend تقویم */
 }
+/* ═══════════════════════════════════════════════════
+   PATCH v28 — Nav + Chat + Spacing
+   ═══════════════════════════════════════════════════ */
+
+/* ─── دکمه‌های عمودی — مربع گوشه گرد ─── */
+[data-nav-position="left"] .bottom-nav-btn,
+[data-nav-position="right"] .bottom-nav-btn,
+[data-nav-position="left"] .nav-collapse-tab,
+[data-nav-position="right"] .nav-collapse-tab {
+  border-radius: 14px !important;
+}
+[data-nav-position="left"] .nav-slider,
+[data-nav-position="right"] .nav-slider {
+  border-radius: 14px !important;
+}
+
+/* ─── چت بات — ایکون بزرگ‌تر، hover متفاوت از active ─── */
+.bottom-nav-btn.nav-btn-chat {
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-dark)) !important;
+  border: 2px solid var(--panel-bg) !important;
+  box-shadow: 0 0 0 2px var(--accent), 0 6px 18px -6px var(--accent) !important;
+  transition: transform .25s cubic-bezier(.34,1.4,.64,1),
+              box-shadow .25s ease,
+              filter .2s ease !important;
+}
+/* hover — فقط بزرگ‌تر و درخشان‌تر، بدون تغییر رنگ */
+.bottom-nav-btn.nav-btn-chat:hover {
+  transform: scale(1.1) !important;
+  filter: brightness(1.2) !important;
+  box-shadow: 0 0 0 2px var(--accent), 0 10px 28px -4px var(--accent), 0 0 24px var(--accent-soft) !important;
+}
+/* active — بیرون‌زده، بدون تغییر اندازه */
+.bottom-nav-btn.nav-btn-chat.active {
+  transform: scale(1) !important;
+  filter: brightness(1) !important;
+  box-shadow: 0 0 0 2px var(--panel-bg), 0 0 0 4px var(--accent) !important;
+}
+.bottom-nav-btn.nav-btn-chat:active {
+  transform: scale(.94) !important;
+}
+.bottom-nav-btn.nav-btn-chat svg {
+  width: 24px !important;
+  height: 24px !important;
+  stroke-width: 2.2 !important;
+}
+
+/* ─── فاصله پایین همه صفحات از created by ─── */
+.view.active {
+  padding-bottom: 48px !important;
+}
+.chat-view-inner {
+  padding-bottom: 8px !important;
+}
+.blog-view,
+.videos-view,
+.tools-view,
+.planner-view {
+  padding-bottom: 48px !important;
+}
+[data-nav-position="left"] .view.active,
+[data-nav-position="right"] .view.active,
+[data-nav-position="top"] .view.active {
+  padding-bottom: 62px !important;
+}
+
+/* ─── slider وقتی chat active هست، فوری محو ─── */
+.bottom-nav:has(.nav-btn-chat.active) .nav-slider {
+  opacity: 0 !important;
+  transition: opacity .1s !important;
+}
