@@ -994,15 +994,6 @@
 }
 
 /* 1️⃣1️⃣ اسلایدر — هماهنگ با انیمیشن دکمه (بدون overshoot) */
-.nav-slider{
-  transition:
-    left .45s cubic-bezier(.22,1,.36,1),
-    top .45s cubic-bezier(.22,1,.36,1),
-    width .45s cubic-bezier(.22,1,.36,1),
-    height .45s cubic-bezier(.22,1,.36,1),
-    border-radius .3s,
-    opacity .2s!important;
-}
 
 /* 1️⃣2️⃣ نوار نوشتن پیام — انیمیشن نرم */
 .input-bar-shell{
