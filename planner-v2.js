@@ -2142,13 +2142,18 @@
         setTimeout(function(){ track(0); },800);
         return true;
       }
-      function track(duration){
+           function track(duration){
         if(!nav||!slider) return;
         var btn=nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
         if(!btn){ slider.classList.remove('visible'); return; }
-        var endTime=performance.now()+duration;
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
         var vert=(pos==='left'||pos==='right');
+
+        /* ★ transition CSS رو غیرفعال می‌کنیم تا با RAF تداخل نکنه */
+        slider.style.transition = 'none';
+
+        var endTime = performance.now() + (duration || 0);
+
         function tick(){
           if(!btn.isConnected) return;
           var nr=nav.getBoundingClientRect();
@@ -2158,7 +2163,9 @@
           slider.style.width=br.width+'px';
           slider.style.height=br.height+'px';
           slider.style.borderRadius=vert?'12px':'21px';
-          if(performance.now()<endTime) requestAnimationFrame(tick);
+          if(duration > 0 && performance.now() < endTime){
+            requestAnimationFrame(tick);
+          }
         }
         requestAnimationFrame(tick);
         slider.classList.add('visible');
@@ -2169,7 +2176,6 @@
         if(init()||++tries>100) clearInterval(iv);
       },100);
     })();
-
     /* ═══════════════════════════════════════════════════════════════
        VIEW SWITCHER HOOK
        ═══════════════════════════════════════════════════════════════ */
