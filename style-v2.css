@@ -1369,3 +1369,221 @@
 .flashcard-overlay.open{opacity:1!important;visibility:visible!important}
 .flashcard-box{max-width:460px!important;width:100%!important;padding:28px 24px!important;border-radius:24px!important;background:var(--panel-bg)!important;border:1px solid var(--border-strong)!important;box-shadow:0 30px 60px -20px rgba(0,0,0,.7)!important;text-align:center!important;transform:scale(.9) translateY(20px)!important;transition:transform .38s cubic-bezier(.34,1.4,.64,1)!important}
 .flashcard-overlay.open .flashcard-box{transform:scale(1) translateY(0)!important}
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v38 — FINAL POLISH
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① تقویم ماهانه — جمع‌تر، ارتفاع کمتر */
+.month-calendar{
+  padding:12px 14px!important;
+  border-radius:18px!important;
+}
+.cal-weekdays{
+  gap:4px!important;
+  margin-bottom:5px!important;
+}
+.cal-weekday{
+  font-size:10px!important;
+  padding:3px 2px!important;
+}
+.cal-grid{gap:4px!important}
+.cal-day{
+  min-height:38px!important;
+  height:38px!important;
+  padding:3px 2px!important;
+  border-radius:14px!important;
+  gap:1px!important;
+  justify-content:center!important;
+}
+.cal-day-num{font-size:12px!important;margin-top:0!important;line-height:1!important}
+.cal-day-status{width:11px!important;height:11px!important;top:3px!important;left:3px!important}
+.cal-day-status svg{width:7px!important;height:7px!important}
+.cal-day-icons-row{
+  gap:1px!important;
+  margin-top:1px!important;
+  height:9px!important;
+  overflow:hidden!important;
+}
+.cal-day-icon{font-size:7px!important;padding:0 2px!important;line-height:1!important}
+.cal-day-icon svg{width:7px!important;height:7px!important}
+
+/* ② پنل اهداف ماهانه — هم‌تراز با تقویم */
+.monthly-layout{
+  align-items:start!important;
+}
+.monthly-side,
+.monthly-main{
+  padding-top:0!important;
+  margin-top:0!important;
+  align-self:start!important;
+}
+.monthly-side .month-goals,
+.monthly-side .month-goals.compact{
+  margin:0!important;
+  padding:14px 14px 16px!important;
+}
+.monthly-layout .cal-legend{
+  margin:0 0 8px 0!important;
+}
+
+/* ③ ★ نوار چپ/راست — دکمه‌های Pill شکل (عرض بیشتر، ارتفاع کم) */
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav{
+  min-width:74px!important;
+  width:74px!important;
+  padding:10px 8px!important;
+  gap:6px!important;
+  border-radius:24px!important;
+  background:var(--panel-bg)!important;
+  border:1px solid var(--border-strong)!important;
+  box-shadow:0 15px 40px -12px rgba(0,0,0,.6),0 0 30px -12px var(--accent-soft)!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat){
+  width:58px!important;
+  min-width:58px!important;
+  max-width:58px!important;
+  height:40px!important;
+  min-height:40px!important;
+  max-height:40px!important;
+  padding:0!important;
+  margin:0!important;
+  border-radius:20px!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  color:var(--text-muted)!important;
+  transition:
+    color .28s,
+    transform .35s cubic-bezier(.34,1.4,.64,1)!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat):hover,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat):hover{
+  color:var(--accent)!important;
+  transform:scale(1.06)!important;
+}
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat){
+  height:40px!important;
+  min-height:40px!important;
+  max-height:40px!important;
+  padding:0 10px!important;
+  gap:6px!important;
+  color:#fff!important;
+  border-radius:20px!important;
+  background:transparent!important;
+  transform:scale(1)!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat) svg,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat) svg{
+  width:19px!important;
+  height:19px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat)::after{
+  content:attr(title);
+  display:inline-block;
+  font-family:var(--font-text);
+  font-size:10px;
+  font-weight:700;
+  line-height:1;
+  max-width:0;
+  opacity:0;
+  overflow:hidden;
+  white-space:nowrap;
+  color:currentColor;
+  transition:max-width .38s cubic-bezier(.22,1,.36,1),opacity .28s!important;
+}
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat)::after{
+  max-width:46px!important;
+  opacity:1!important;
+  margin-left:2px!important;
+}
+/* pin چپ/راست */
+[data-nav-position="left"] .nav-collapse-tab,
+[data-nav-position="right"] .nav-collapse-tab{
+  width:58px!important;
+  height:40px!important;
+  border-radius:20px!important;
+  margin:0 0 4px 0!important;
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+/* FAB چپ/راست */
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat{
+  width:48px!important;
+  height:48px!important;
+  min-width:48px!important;
+  min-height:48px!important;
+  max-width:48px!important;
+  max-height:48px!important;
+  margin:4px 0!important;
+  border-radius:50%!important;
+  transition:
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    margin .5s cubic-bezier(.22,1,.36,1)!important;
+}
+[data-nav-position="left"] .nav-slider-fill,
+[data-nav-position="right"] .nav-slider-fill{
+  border-radius:20px!important;
+}
+
+/* ④ ★ اسلایدر نوار پایین/بالا — بدون کش‌آمدگی */
+[data-nav-position="bottom"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="top"] .bottom-nav-btn:not(.nav-btn-chat){
+  transition:
+    max-width .42s cubic-bezier(.22,1,.36,1),
+    padding .42s cubic-bezier(.22,1,.36,1),
+    color .25s,
+    background .25s!important;
+}
+.nav-slider{
+  transition:
+    transform .42s cubic-bezier(.22,1,.36,1),
+    width .42s cubic-bezier(.22,1,.36,1),
+    height .42s cubic-bezier(.22,1,.36,1),
+    opacity .25s ease!important;
+}
+.nav-slider-fill{
+  transition:border-radius .3s ease,transform .35s cubic-bezier(.34,1.4,.64,1);
+}
+/* انیمیشن grow — یکم نرم‌تر */
+.nav-slider.grow .nav-slider-fill{
+  animation:navFillGrowV2 .5s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes navFillGrowV2{
+  0%{opacity:0;transform:scale(.78)}
+  60%{opacity:1;transform:scale(1.04)}
+  100%{opacity:1;transform:scale(1)}
+}
+
+/* ⑤ ★ FAB — انیمیشن نرم هنگام جابجایی در نوار */
+.bottom-nav-btn.nav-btn-chat{
+  transition:
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    margin .5s cubic-bezier(.22,1,.36,1),
+    box-shadow .4s ease,
+    filter .3s ease!important;
+}
+
+/* ⑥ ★ دکمه‌های مطالعه — ارتفاع یکسان برای FAB نلرزه */
+.study-actions-row .study-btn{
+  transition:transform .3s cubic-bezier(.34,1.4,.64,1),box-shadow .3s!important;
+}
+
+/* ⑦ ★ چت — انیمیشن لود نرم */
+#box{
+  transition:opacity .3s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.34,1.4,.64,1)!important;
+}
+#box.chat-loading{
+  opacity:0!important;
+  transform:translateY(-8px)!important;
+}
