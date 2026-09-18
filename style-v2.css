@@ -5092,3 +5092,6 @@
 [data-nav-position="top"] .bottom-nav {
   padding: 6px 12px !important;
 }
+.phc-today.phc-today-anim {
+  animation: todayBadgeIn .45s cubic-bezier(.34,1.4,.64,1) both !important;
+}
