@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v26 Final) */
+/* Siraj v2.0 — planner-v2.js (v27) */
 (function(){
   'use strict';
   var boot=setInterval(function(){
@@ -21,112 +21,6 @@
     var _lastTab='daily';
     var SOUND_FILES={nature:'sounds/ocean.mp3',forest:'sounds/forest.mp3',hall:'sounds/hall.mp3',rain:'sounds/rain.mp3'};
 
-    /* ═══ Inject CSS از JS ═══ */
-    (function injectCSS(){
-      var s=document.createElement('style');
-      s.textContent=`
-        /* اطمینان از visible بودن اسلایدر */
-        .nav-slider{
-          background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
-          box-shadow:0 6px 20px -6px var(--accent)!important;
-          opacity:0;transition:none;pointer-events:none;z-index:0;
-        }
-        .nav-slider.ready{
-          transition:left .5s cubic-bezier(.22,1,.36,1),
-                     top .5s cubic-bezier(.22,1,.36,1),
-                     width .5s cubic-bezier(.22,1,.36,1),
-                     height .5s cubic-bezier(.22,1,.36,1),
-                     border-radius .3s,opacity .15s!important;
-        }
-        .nav-slider.visible{opacity:1!important}
-        .nav-slider.grow{animation:sliderGrow .55s cubic-bezier(.34,1.4,.64,1) both}
-        @keyframes sliderGrow{0%{transform:scale(.3);opacity:0}60%{opacity:1}100%{transform:scale(1);opacity:1}}
-
-        /* سرعت انیمیشن دکمه نوار — کندتر برای هماهنگی با تب */
-        .bottom-nav-btn,.nav-collapse-tab{
-          transition:background .4s cubic-bezier(.22,1,.36,1),
-                     color .3s,
-                     padding .5s cubic-bezier(.22,1,.36,1),
-                     max-width .5s cubic-bezier(.22,1,.36,1),
-                     border-color .3s,
-                     box-shadow .4s cubic-bezier(.22,1,.36,1)!important;
-        }
-        [data-nav-position] .bottom-nav-btn.measuring{
-          max-width:155px!important;padding:0 14px 0 10px!important;transition:none!important;
-        }
-        [data-nav-position] .bottom-nav-btn.measuring::after{
-          max-width:110px!important;opacity:1!important;margin:0 6px 0 0!important;transition:none!important;
-        }
-        [data-nav-position="left"] .bottom-nav-btn.measuring,
-        [data-nav-position="right"] .bottom-nav-btn.measuring{
-          max-width:46px!important;min-width:46px!important;height:62px!important;
-          max-height:62px!important;padding:5px 3px!important;flex-direction:column!important;
-        }
-        [data-nav-position="left"] .bottom-nav-btn.measuring::after,
-        [data-nav-position="right"] .bottom-nav-btn.measuring::after{
-          max-width:44px!important;margin:1px 0 0 0!important;
-        }
-
-        /* فیکس اندازه نوار */
-        [data-nav-position="bottom"] .bottom-nav,
-        [data-nav-position="top"] .bottom-nav{padding:4px 16px!important;min-height:48px!important}
-        [data-nav-position="left"] .bottom-nav,
-        [data-nav-position="right"] .bottom-nav{padding:6px 3px!important;gap:3px!important}
-
-        /* انیمیشن تب‌ها — سریع‌تر */
-        .view.leaving{display:flex!important;position:absolute;inset:0;pointer-events:none;z-index:1}
-        .view.active{animation:none!important}
-        .view.active.view-in-from-left{animation:viewInFromLeft .34s cubic-bezier(.22,1,.36,1) both!important}
-        .view.active.view-in-from-right{animation:viewInFromRight .34s cubic-bezier(.22,1,.36,1) both!important}
-        .view.leaving.view-out-left{animation:viewOutLeft .3s cubic-bezier(.4,0,1,1) forwards!important}
-        .view.leaving.view-out-right{animation:viewOutRight .3s cubic-bezier(.4,0,1,1) forwards!important}
-        @keyframes viewOutLeft{to{opacity:0;transform:translateX(-60px);filter:blur(5px)}}
-        @keyframes viewOutRight{to{opacity:0;transform:translateX(60px);filter:blur(5px)}}
-        @keyframes viewInFromLeft{from{opacity:0;transform:translateX(-60px);filter:blur(5px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
-        @keyframes viewInFromRight{from{opacity:0;transform:translateX(60px);filter:blur(5px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
-
-        /* انیمیشن تقویم ماهانه */
-        .month-calendar.cal-out-right{animation:calOutRight .24s cubic-bezier(.4,0,1,1) forwards}
-        .month-calendar.cal-out-left{animation:calOutLeft .24s cubic-bezier(.4,0,1,1) forwards}
-        .month-calendar.cal-in-from-left{animation:calInFromLeft .38s cubic-bezier(.22,1,.36,1) both}
-        .month-calendar.cal-in-from-right{animation:calInFromRight .38s cubic-bezier(.22,1,.36,1) both}
-        @keyframes calOutRight{to{opacity:0;transform:translateX(50px)}}
-        @keyframes calOutLeft{to{opacity:0;transform:translateX(-50px)}}
-        @keyframes calInFromLeft{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
-        @keyframes calInFromRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
-
-        /* انیمیشن hero */
-        [data-anim-key]{display:inline-block;will-change:transform,opacity,filter}
-        [data-anim-key].heroOutRight{animation:heroOutRight .22s cubic-bezier(.4,0,1,1) forwards}
-        [data-anim-key].heroOutLeft{animation:heroOutLeft .22s cubic-bezier(.4,0,1,1) forwards}
-        [data-anim-key].heroInFromLeft{animation:heroInFromLeft .38s cubic-bezier(.22,1,.36,1) both}
-        [data-anim-key].heroInFromRight{animation:heroInFromRight .38s cubic-bezier(.22,1,.36,1) both}
-        @keyframes heroOutRight{to{opacity:0;transform:translateX(40px);filter:blur(3px)}}
-        @keyframes heroOutLeft{to{opacity:0;transform:translateX(-40px);filter:blur(3px)}}
-        @keyframes heroInFromLeft{from{opacity:0;transform:translateX(-40px);filter:blur(3px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
-        @keyframes heroInFromRight{from{opacity:0;transform:translateX(40px);filter:blur(3px)}to{opacity:1;transform:translateX(0);filter:blur(0)}}
-        @keyframes bodyFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-        /* ★ مسدودسازی avatar/قفل تکراری ★ */
-        .chat-header > .main-top-avatar ~ .main-top-avatar,
-        .chat-header > .main-top-icon-btn ~ .main-top-icon-btn,
-        .planner-hero > .main-top-avatar ~ .main-top-avatar,
-        .page-title-bar > .main-top-avatar ~ .main-top-avatar,
-        .chat-header > .header-left-actions ~ .header-left-actions,
-        .planner-hero > .header-left-actions ~ .header-left-actions,
-        .page-title-bar > .header-left-actions ~ .header-left-actions,
-        .chat-header > .main-top-avatar ~ .header-left-actions,
-        .chat-header > .main-top-icon-btn ~ .header-left-actions,
-        .chat-header > #headerLockBtn:not(:only-of-type){display:none!important}
-
-        /* رنگ متن دکمه فعال */
-        .bottom-nav-btn.active:not(.nav-btn-chat),
-        .bottom-nav-btn.active:not(.nav-btn-chat)::after{color:#fff!important}
-        .bottom-nav-btn.active:not(.nav-btn-chat) svg{stroke:#fff!important}
-      `;
-      document.head.appendChild(s);
-    })();
-
     var WORDS_BY_LEVEL={
       beginner:[
         {type:'واژه',text:'«کِتاب» یعنی کتاب. ریشه: ک-ت-ب. جمع: کُتُب.'},
@@ -147,25 +41,24 @@
         {type:'بیت',text:'وَمَنْ يَتَصَبَّرْ يَجِدْ خَيْراً بِصَبْرِهِ ۞ وَمَنْ يَتَعَجَّلْ يَجْنِ غَيْرَ مَا يَشْتَهي',by:'متنبی'},
         {type:'نکته',text:'«إنَّ» و «أنَّ» اسم رو منصوب و خبر رو مرفوع می‌کنن.'},
         {type:'نکته',text:'فعل مضارع با «سـ» یعنی آینده‌ی نزدیک، با «سوف» آینده‌ی دور.'},
-        {type:'بیت',text:'تَعَلَّمْ فَلَيْسَ الْمَرْءُ يُولَدُ عَالِماً ۞ وَلَيْسَ أَخُو عِلْمٍ كَمَنْ هُوَ جَاهِلُ',by:'متنبی'},
+        {type:'بیت',text:'تَعَلَّمْ فَلَيْسَ الْمَرْءُ يُولَدُ عَالِم',by:'متنبی'},
         {type:'نکته',text:'«كان» و اخواتش اسم رو مرفوع و خبر رو منصوب می‌کنن.'},
-        {type:'واژه',text:'«صَبْر» یعنی شکیبایی. ریشه: ص-ب-ر. جمع: صُبور.'},
+        {type:'واژه',text:'«صَبْر» یعنی شکیبایی. ریشه: ص-ب-ر.'},
         {type:'نکته',text:'اسم فاعل بر وزن «فاعل» و اسم مفعول بر وزن «مفعول».'},
-        {type:'واژه',text:'«عِلْم» یعنی دانش. ریشه: ع-ل-م. جمع: عُلوم.'},
-        {type:'واژه',text:'«أَدَب» یعنی ادب. ریشه: أ-د-ب. جمع: آداب.'},
+        {type:'واژه',text:'«عِلْم» یعنی دانش. ریشه: ع-ل-م.'},
+        {type:'واژه',text:'«أَدَب» یعنی ادب. ریشه: أ-د-ب.'},
         {type:'نکته',text:'«مِن، إلى، عَن، عَلى، في» از حروف جر هستن.'}
       ],
       advanced:[
-        {type:'بیت',text:'وَمَا الْحُرُّ مَنْ يَحْيَا بِغَيْرِ حُرِّيَّةٍ ۞ فَكَيْفَ يَعِيشُ الْحُرُّ وَهْوَ أَسِيرُ',by:'أبو القاسم الشابي'},
+        {type:'بیت',text:'وَمَا الْحُرُّ مَنْ يَحْيَا بِغَيْرِ حُرِّيَّةٍ',by:'أبو القاسم الشابي'},
         {type:'بیت',text:'إِذَا الشَّعْبُ أَرَادَ الْحَيَاةَ فَلَا بُدَّ أَنْ يَسْتَجِيبَ الْقَدَرُ',by:'أبو القاسم الشابي'},
-        {type:'بیت',text:'دَعِ الْأَيَّامَ تَفْعَلُ مَا تَشَاءُ ۞ وَطِبْ نَفْساً إِذَا حَكَمَ الْقَضَاءُ',by:'الإمام الشافعي'},
-        {type:'نکته',text:'تمییز، حال، و مفعول‌به همه از منصوبات هستن ولی نقش متفاوت دارن.'},
-        {type:'نکته',text:'«لای نفی جنس» اسمش منصوب و خبرش مرفوعه: لا طالِبَ مهملٌ.'},
+        {type:'بیت',text:'دَعِ الْأَيَّامَ تَفْعَلُ مَا تَشَاءُ',by:'الإمام الشافعي'},
+        {type:'نکته',text:'تمییز، حال، و مفعول‌به همه از منصوبات هستن.'},
+        {type:'نکته',text:'لای نفی جنس: اسمش منصوب و خبرش مرفوع.'},
         {type:'نکته',text:'اسلوب شرط: «إن» شرطیه دو فعل مضارع رو مجزوم می‌کنه.'},
         {type:'نکته',text:'«مفعول مطلق» مصدر منصوبیه که برای تأکید فعل میاد.'},
         {type:'نکته',text:'اسم تفضیل بر وزن «أفعَل» و اسم مبالغه بر وزن «فَعّال».'},
-        {type:'بیت',text:'وَمَا أَنَا بِالَّذِي يَرْضَى بِذُلٍّ ۞ وَلَا أَرْضَى بِمَا فِيهِ الْخَنَاةُ',by:'عنتره'},
-        {type:'نکته',text:'«کان» تامه یعنی «وجود داشت» و ناقصه اسم و خبر می‌گیره.'}
+        {type:'بیت',text:'وَمَا أَنَا بِالَّذِي يَرْضَى بِذُلٍّ',by:'عنتره'}
       ]
     };
     var LEVEL_LABELS={beginner:'مبتدی',intermediate:'متوسط',advanced:'پیشرفته'};
@@ -264,7 +157,6 @@
     window.__goThisMonth=window.__goToday;
     window.__goThisYear=window.__goToday;
 
-    /* ★ refreshBody — هوشمند: انیمیشن تقویم مخصوص monthly ★ */
     function refreshBody(direction){
       var pane=document.getElementById('plannerPane');if(!pane)return;
       if(pane.dataset.animating==='1')return;
@@ -272,13 +164,10 @@
       var isSameTab=pane.dataset.lastTab===tab;
       pane.dataset.lastTab=tab;
       var dir=direction||'left';
-
       if(isSameTab){
         smartUpdateHero(tab,dir);
         var body=pane.querySelector('.planner-body-content');
         if(!body){renderPane(tab);return;}
-
-        /* ★★★ مخصوص تقویم ماهانه — اسلاید فقط برای calendar ★ */
         if(tab==='monthly'){
           var cal=pane.querySelector('.month-calendar');
           if(cal){
@@ -300,8 +189,6 @@
             return;
           }
         }
-
-        /* عادی — fade */
         var html='';
         if(tab==='daily')html=dailyContentHTML();
         else if(tab==='weekly')html=weeklyContentHTML();
@@ -314,8 +201,6 @@
         body.style.animation='bodyFadeIn .3s ease';
         return;
       }
-
-      /* سوییچ تب — انیمیشن کل pane */
       pane.dataset.animating='1';
       pane.style.pointerEvents='none';
       var html='';
@@ -632,19 +517,19 @@
     function startStudy(){var o=document.getElementById('studyOverlay');if(!o)return;var t=window.__studyTask||'';var m=window.__studyMinutesGetter?window.__studyMinutesGetter():25;if(!m||m<1)m=25;if(m>180)m=180;studySeconds=m*60;studyTotalMinutes=m;studyRunning=true;studyPaused=false;o.querySelector('#studySetup').style.display='none';o.querySelector('#studyRunning').style.display='flex';o.querySelector('#studyTaskName').textContent=t||'مطالعه آزاد';o.classList.remove('paused');var fb=o.querySelector('#studyFinishBtn');if(fb)fb.disabled=true;updateStudyTimer(true);startStudyTimer();lockSite();}
     function elapsedMinutes(){return Math.max(1,studyTotalMinutes-Math.floor(studySeconds/60));}
     function markSourceTaskDone(){if(!window.__studyTaskSourceId||!window.__studyTaskSourceDay)return;var pl=window.loadPlannerNew();var dd=window.getDayData(pl,window.__studyTaskSourceDay);var idx=(dd.tasks||[]).findIndex(function(x){return x.id===window.__studyTaskSourceId;});if(idx>=0){dd.tasks[idx].done=true;dd.tasks[idx].studiedMinutes=elapsedMinutes();window.savePlanner(pl);}}
-    function startStudyTimer(){if(studyTimer)clearInterval(studyTimer);studyTimer=setInterval(function(){if(studyPaused)return;studySeconds--;updateStudyTimer(false);if(studySeconds<=0){clearInterval(studyTimer);studyTimer=null;studyRunning=false;var fb=document.getElementById('studyFinishBtn');if(fb)fb.disabled=false;stopAudio();try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=880;g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(0.2,ac.currentTime+0.05);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.8);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+0.85);}catch(e){}showPopup('🎉','عالی بود!','زمان مطالعه تموم شد. دکمه‌ی پایان و ثبت رو بزن.');}},1000);}
-    function toggleStudyPause(){var o=document.getElementById('studyOverlay');if(!o)return;studyPaused=!studyPaused;var b=o.querySelector('#studyPauseBtn');var l=o.querySelector('#studyPauseLabel');var s=o.querySelector('#studyRunningSub');if(studyPaused){o.classList.add('paused');if(b){b.classList.remove('pause-mode');b.classList.add('resume-mode');}if(l)l.textContent='ادامه';if(currentAudio)currentAudio.volume=0;if(s)s.textContent='⏸️ متوقف شده';}else{o.classList.remove('paused');if(b){b.classList.remove('resume-mode');b.classList.add('pause-mode');}if(l)l.textContent='توقف';var vol=o.querySelector('#studyVolume');var v=vol?(parseInt(vol.value)/100):0.4;if(currentAudio)currentAudio.volume=v;if(s)s.textContent='تا اتمام تایمر نمیتونی خارج شی 💪';}}
+    function startStudyTimer(){if(studyTimer)clearInterval(studyTimer);studyTimer=setInterval(function(){if(studyPaused)return;studySeconds--;updateStudyTimer(false);if(studySeconds<=0){clearInterval(studyTimer);studyTimer=null;studyRunning=false;var fb=document.getElementById('studyFinishBtn');if(fb)fb.disabled=false;stopAudio();try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=880;g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(0.2,ac.currentTime+0.05);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.8);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+0.85);}catch(e){}showPopup('🎉','عالی بود!','زمان مطالعه تموم شد.');}},1000);}
+    function toggleStudyPause(){var o=document.getElementById('studyOverlay');if(!o)return;studyPaused=!studyPaused;var b=o.querySelector('#studyPauseBtn');var l=o.querySelector('#studyPauseLabel');var s=o.querySelector('#studyRunningSub');if(studyPaused){o.classList.add('paused');if(b){b.classList.remove('pause-mode');b.classList.add('resume-mode');}if(l)l.textContent='ادامه';if(currentAudio)currentAudio.volume=0;if(s)s.textContent='⏸️ متوقف شده';}else{o.classList.remove('paused');if(b){b.classList.remove('resume-mode');b.classList.add('pause-mode');}if(l)l.textContent='توقف';var vol=o.querySelector('#studyVolume');var v=vol?(parseInt(vol.value)/100):0.4;if(currentAudio)currentAudio.volume=v;if(s)s.textContent='تا اتمام تایمر 💪';}}
     function setDigit(k,v,a){var el=document.querySelector('.study-digit[data-k="'+k+'"]');if(!el)return;var f=toFa(v);if(el.textContent===f)return;if(a){el.classList.remove('roll');void el.offsetWidth;el.classList.add('roll');}el.textContent=f;}
     function updateStudyTimer(i){if(studySeconds<0)studySeconds=0;var m=Math.floor(studySeconds/60),s=studySeconds%60;var mS=(m<10?'0':'')+m;var sS=(s<10?'0':'')+s;var a=!i;setDigit('m1',mS[0],a);setDigit('m2',mS[1],a);setDigit('s1',sS[0],a);setDigit('s2',sS[1],a);}
-    function finishAndRecord(){var m=elapsedMinutes();var sd=window.__studyTaskSourceDay;var st=window.__studyTask;markSourceTaskDone();if(st){showPopup('🏆','کار انجام شد!','کار «'+st+'» با '+formatMinutes(m)+' مطالعه ثبت شد.');}else{showPopup('✨','خوب بود!',formatMinutes(m)+' مطالعه ثبت شد.');}if(studyTimer)clearInterval(studyTimer);studyTimer=null;studyRunning=false;window.__studyTask='';window.__studyTaskSourceId=null;window.__studyTaskSourceDay=null;clearStudyChat();stopAudio();unlockSite();closeStudy();if(sd)setTimeout(function(){maybeCelebrate(sd);},500);}
-    function exitStudyConfirm(){if(!confirm('مطمئنی خارج شی؟ (زمانت ثبت نمیشه)'))return;if(studyTimer)clearInterval(studyTimer);studyTimer=null;studyRunning=false;window.__studyTask='';window.__studyTaskSourceId=null;window.__studyTaskSourceDay=null;stopAudio();unlockSite();closeStudy();}
+    function finishAndRecord(){var m=elapsedMinutes();var sd=window.__studyTaskSourceDay;var st=window.__studyTask;markSourceTaskDone();if(st){showPopup('🏆','کار انجام شد!','«'+st+'» با '+formatMinutes(m)+' ثبت شد.');}else{showPopup('✨','خوب بود!',formatMinutes(m)+' ثبت شد.');}if(studyTimer)clearInterval(studyTimer);studyTimer=null;studyRunning=false;window.__studyTask='';window.__studyTaskSourceId=null;window.__studyTaskSourceDay=null;clearStudyChat();stopAudio();unlockSite();closeStudy();if(sd)setTimeout(function(){maybeCelebrate(sd);},500);}
+    function exitStudyConfirm(){if(!confirm('مطمئنی خارج شی؟'))return;if(studyTimer)clearInterval(studyTimer);studyTimer=null;studyRunning=false;window.__studyTask='';window.__studyTaskSourceId=null;window.__studyTaskSourceDay=null;stopAudio();unlockSite();closeStudy();}
     function closeStudy(){try{stopAudio();}catch(e){}var o=document.getElementById('studyOverlay');var chat=document.getElementById('studyChatPanel');if(chat)chat.remove();if(!o)return;o.classList.remove('open');setTimeout(function(){o.remove();},500);setTimeout(function(){if(typeof window.renderPanelForPlanner==='function')window.renderPanelForPlanner();refreshBody('left');},300);}
     function blockKey(e){if(!studyRunning)return;var k=e.key||'';var c=e.ctrlKey||e.metaKey;if(k==='F5'||k==='F11'||k==='Escape'||(c&&['r','R','w','W','n','N','t','T','p','P'].indexOf(k)>=0)){e.preventDefault();e.stopPropagation();return false;}}
     function blockContext(e){if(studyRunning)e.preventDefault();}
-    function blockUnload(e){if(!studyRunning)return;e.preventDefault();e.returnValue='در حال مطالعه‌ای!';return e.returnValue;}
+    function blockUnload(e){if(!studyRunning)return;e.preventDefault();e.returnValue='در حال مطالعه';return e.returnValue;}
     function lockSite(){document.addEventListener('keydown',blockKey,true);document.addEventListener('contextmenu',blockContext,true);window.addEventListener('beforeunload',blockUnload);}
     function unlockSite(){document.removeEventListener('keydown',blockKey,true);document.removeEventListener('contextmenu',blockContext,true);window.removeEventListener('beforeunload',blockUnload);}
-    window.__openStudy=function(){buildStudyOverlay();var o=document.getElementById('studyOverlay');if(!o)return;o.style.opacity='0';o.style.transform='scale(.92) translateY(20px)';o.style.transition='none';requestAnimationFrame(function(){requestAnimationFrame(function(){o.style.transition='opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.34,1.4,.64,1), visibility .45s';o.classList.add('open');o.style.opacity='';o.style.transform='';});});};
+    window.__openStudy=function(){buildStudyOverlay();var o=document.getElementById('studyOverlay');if(!o)return;o.style.opacity='0';o.style.transform='scale(.92)';o.style.transition='none';requestAnimationFrame(function(){requestAnimationFrame(function(){o.style.transition='opacity .4s, transform .5s';o.classList.add('open');o.style.opacity='';o.style.transform='';});});};
     function renderStudyChat(){var box=document.getElementById('studyChatMessages');if(!box)return;var p=getProfile();var greeting=p.name?'سلام '+esc(p.name)+' 👋':'سلام 👋';var html='<div class="sc-msg sc-bot">'+greeting+' من سراجم.</div>';studyChatHistory.forEach(function(m){if(m.role==='user')html+='<div class="sc-msg sc-user">'+esc(m.content)+'</div>';else if(m.role==='assistant')html+='<div class="sc-msg sc-bot">'+esc(m.content)+'</div>';});box.innerHTML=html;box.scrollTop=box.scrollHeight;}
     function toggleStudyChat(){var ex=document.getElementById('studyChatPanel');if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}var p=document.createElement('div');p.id='studyChatPanel';p.className='study-chat-panel';p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">سراج — همیار مطالعه</div><button class="study-chat-close" id="studyChatCloseBtn">✕</button></div><div class="study-chat-messages" id="studyChatMessages"></div><div class="study-chat-input-row"><input type="text" class="study-chat-input" id="studyChatInput" placeholder="سؤالت رو بپرس..." onkeydown="if(event.key===\'Enter\')window.__studyChatSend()"><button class="study-chat-send" onclick="window.__studyChatSend()">➤</button></div>';document.body.appendChild(p);p.querySelector('#studyChatCloseBtn').onclick=function(){p.classList.remove('open');setTimeout(function(){p.remove();},320);};renderStudyChat();requestAnimationFrame(function(){p.classList.add('open');});setTimeout(function(){var i=document.getElementById('studyChatInput');if(i)i.focus();},350);}
     window.__studyChatSend=async function(){
@@ -689,25 +574,18 @@
     new MutationObserver(linkifyContacts).observe(document.body,{childList:true,subtree:true});
     setTimeout(linkifyContacts,800);setTimeout(linkifyContacts,1800);
 
-    /* ═══════════════════════════════════════════════════════
-       ★ پروفایل — با Force Removal و نگهبان امن ★
-       ═══════════════════════════════════════════════════════ */
+    /* پروفایل + قفل */
     function injectMainTopActions(){
       var p=getProfile();
       var src=p.avatar||USER_AVATAR_URL;
       var name=p.name?p.name:'مشخصات من';
-
-      /* ★ گام ۱: حذف همه‌چیز مرتبط با پروفایل — در کل صفحه ★ */
       document.querySelectorAll('.main-top-avatar, .main-top-icon-btn, .header-left-actions, #sirajHeaderActions, #mainProfileAvatar, #mainLockBtn, #mainTopActions, .main-top-actions').forEach(function(el){el.remove();});
       document.querySelectorAll('#headerLockBtn').forEach(function(el){el.style.display='none';});
-
-      /* ★ گام ۲: ساخت تازه در هر هدر ★ */
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
         var w=document.createElement('div');
         w.id='sirajHeaderActions';
         w.className='header-left-actions';
-        w.innerHTML='<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div>'+
-                    '<button type="button" class="main-top-icon-btn" title="قفل کردن سایت"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>';
+        w.innerHTML='<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div><button type="button" class="main-top-icon-btn" title="قفل کردن سایت"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>';
         h.appendChild(w);
         w.querySelector('.main-top-avatar').onclick=function(){if(typeof window.openSettings==='function')window.openSettings();setTimeout(function(){var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');if(b)b.click();},400);};
         w.querySelector('.main-top-icon-btn').onclick=function(){if(typeof window.lockNow==='function')window.lockNow();};
@@ -716,15 +594,13 @@
     setTimeout(injectMainTopActions,500);
     setTimeout(injectMainTopActions,1500);
     setTimeout(injectMainTopActions,3000);
-
-    /* ★ نگهبان امن — فقط اگر وضعیت خراب بود ★ */
     setInterval(function(){
       var needsFix=false;
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
         var wraps=h.querySelectorAll('#sirajHeaderActions, .header-left-actions');
         var avs=h.querySelectorAll('.main-top-avatar');
         var lks=h.querySelectorAll('.main-top-icon-btn');
-        if(wraps.length!==1||avs.length!==1||lks.length!==1){needsFix=true;}
+        if(wraps.length!==1||avs.length!==1||lks.length!==1)needsFix=true;
       });
       var stray=document.querySelectorAll('body > .main-top-avatar, body > .main-top-icon-btn, body > .header-left-actions');
       if(stray.length)needsFix=true;
@@ -754,7 +630,9 @@
       var s=pane.querySelector('#profileSaveBtn');if(s){s.onclick=function(){var p2=getProfile();p2.name=(pane.querySelector('#profileName')||{}).value||'';p2.bio=(pane.querySelector('#profileBio')||{}).value||'';saveProfile(p2);if(window.toast)window.toast('ذخیره شد ✓','success');if(typeof window.renderPanelForPlanner==='function')window.renderPanelForPlanner();updateMainTopAvatar();};}
     }
 
-       /* ═══ اسلایدر — tracking همراه دکمه ═══ */
+    /* ═══════════════════════════════════════════════════════
+       ★ اسلایدر — tracking هم‌زمان با دکمه (بدون دیلی) ★
+       ═══════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null, ready=false;
 
@@ -775,15 +653,15 @@
           setTimeout(function(){ slider.classList.remove('grow'); }, 560);
         });
 
-        /* ★ فاز capture — قبل از onclick اجرا می‌شه ★ */
+        /* ★ Capture phase — قبل از onclick کاربر ★ */
         nav.addEventListener('click', function(e){
           var btn = e.target.closest('.bottom-nav-btn[data-view]');
           if(!btn) return;
           if(btn.classList.contains('nav-btn-chat')) return;
-          /* بلافاصله active رو جابه‌جا کن */
+          /* فوراً active رو عوض کن */
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
           btn.classList.add('active');
-          /* اسلایدر رو همراه دکمه ببر */
+          /* اسلایدر رو همراه دکمه ببر برای 650 میلی‌ثانیه */
           track(650);
         }, true);
 
@@ -796,7 +674,7 @@
         return true;
       }
 
-      /* اسلایدر رو روی دکمه قفل کن و برای duration میلی‌ثانیه تعقیبش کن */
+      /* اسلایدر رو ۶۵۰ms همراه دکمه نگه دار */
       function track(duration){
         if(!nav || !slider) return;
         var btn = nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
@@ -829,3 +707,51 @@
         if(init() || ++tries > 100){ clearInterval(iv); }
       }, 100);
     })();
+
+    /* ═══ سوییچ بین تب‌ها ═══ */
+    (function(){
+      function hook(){
+        if(typeof window.switchView!=='function')return false;
+        if(window.switchView.__hooked)return true;
+        var orig=window.switchView;
+        window.switchView=function(view){
+          var oldName=_currentMainView;
+          if(oldName===view){orig.apply(this,arguments);return;}
+          var oldEl=document.getElementById('view-'+oldName);
+          var newEl=document.getElementById('view-'+view);
+          var oldIdx=VIEW_ORDER.indexOf(oldName);
+          var newIdx=VIEW_ORDER.indexOf(view);
+          if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){orig.apply(this,arguments);_currentMainView=view;return;}
+          var goingLeft=newIdx>oldIdx;
+          var outClass=goingLeft?'view-out-right':'view-out-left';
+          var inClass=goingLeft?'view-in-from-left':'view-in-from-right';
+          var origArgs=arguments;
+          if(window.switchView.__busy)return;
+          window.switchView.__busy=true;
+          oldEl.classList.add('leaving',outClass);
+          oldEl.style.pointerEvents='none';
+          setTimeout(function(){
+            orig.apply(window,origArgs);
+            _currentMainView=view;
+            newEl.classList.add(inClass);
+            setTimeout(function(){
+              oldEl.classList.remove('leaving',outClass);
+              oldEl.style.pointerEvents='';
+              newEl.classList.remove(inClass);
+              window.switchView.__busy=false;
+            },360);
+          },320);
+        };
+        window.switchView.__hooked=true;
+        return true;
+      }
+      if(!hook()){var t=setInterval(function(){if(hook())clearInterval(t);},300);setTimeout(function(){clearInterval(t);},8000);}
+      setTimeout(function(){var a=document.querySelector('.view.active');if(a){var n=a.id.replace('view-','');if(VIEW_ORDER.indexOf(n)!==-1)_currentMainView=n;}},1000);
+    })();
+
+    pickNewWord();
+    setTimeout(function(){try{var dv=getDefaultView();if(dv&&dv!=='chat'&&typeof window.switchView==='function')window.switchView(dv);}catch(e){}},1200);
+
+    console.log('[Siraj v2.0] planner loaded ✓ (v27)');
+  }
+})();
