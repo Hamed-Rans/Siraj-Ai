@@ -4396,3 +4396,7 @@
 .view.active.view-in-from-right { animation: viewInFromRight .42s cubic-bezier(.22,1,.36,1) both !important; }
 .view.leaving.view-out-left  { animation: viewOutLeft .4s cubic-bezier(.4,0,1,1) forwards !important; }
 .view.leaving.view-out-right { animation: viewOutRight .4s cubic-bezier(.4,0,1,1) forwards !important; }
+/* مخفی کردن آواتار تکراری از script.js */
+#headerUserAvatar,
+.header-user-avatar,
+#headerLockBtn { display: none !important; }
