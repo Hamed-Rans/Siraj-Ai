@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v28 Final) */
+/* Siraj v2.0 — planner-v2.js (v30 Final) */
 (function(){
   'use strict';
   var boot=setInterval(function(){
@@ -574,7 +574,6 @@
     new MutationObserver(linkifyContacts).observe(document.body,{childList:true,subtree:true});
     setTimeout(linkifyContacts,800);setTimeout(linkifyContacts,1800);
 
-    /* پروفایل + قفل */
     function injectMainTopActions(){
       var p=getProfile();
       var src=p.avatar||USER_AVATAR_URL;
@@ -595,15 +594,13 @@
     setTimeout(injectMainTopActions,1500);
     setTimeout(injectMainTopActions,3000);
 
-    setInterval(function(){
-          /* ★ نگهبان: فقط وقتی چیزی *گم شده* یا *تکراری* هست، فیکس کن ★ */
+    /* نگهبان — فقط هر ۲ ثانیه، فقط اگه گم/تکراری شده */
     setInterval(function(){
       var needFix = false;
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
         var wraps = h.querySelectorAll('#sirajHeaderActions, .header-left-actions');
         var avs = h.querySelectorAll('.main-top-avatar');
         var lks = h.querySelectorAll('.main-top-icon-btn');
-        /* فقط اگه گم شده یا تکراری شده */
         if(wraps.length !== 1 || avs.length !== 1 || lks.length !== 1){
           needFix = true;
         }
@@ -675,7 +672,7 @@
           slider.style.top=(br.top-nr.top)+'px';
           slider.style.width=br.width+'px';
           slider.style.height=br.height+'px';
-          slider.style.borderRadius=vert?'14px':'21px';
+          slider.style.borderRadius=vert?'12px':'21px';
           if(performance.now()<endTime)requestAnimationFrame(tick);
         }
         requestAnimationFrame(tick);slider.classList.add('visible');
@@ -684,20 +681,20 @@
       var tries=0;var iv=setInterval(function(){if(init()||++tries>100)clearInterval(iv);},100);
     })();
 
-    /* ═══ سوییچ بین تب‌ها ═══ */
+    /* ═══ سوییچ بین تب‌ها — فیکس باگ کلیک روی تب فعلی ═══ */
     (function(){
-                 function hook(){
+      function hook(){
         if(typeof window.switchView!=='function')return false;
         if(window.switchView.__hooked)return true;
         var orig=window.switchView;
 
         window.switchView=function(view){
-          /* ★ فیکس باگ کلیک روی تب فعلی — از DOM چک کن ★ */
-          var currentActive = document.querySelector('.view.active');
-          var currentName = currentActive ? currentActive.id.replace('view-','') : '';
+          /* ★ چک از DOM: اگه همون تب فعلی بود، هیچ کاری نکن ★ */
+          var currentActive=document.querySelector('.view.active');
+          var currentName=currentActive?currentActive.id.replace('view-',''):'';
 
-          if(currentName === view){
-            /* کاربر روی همون تب فعلی کلیک کرده — کاری نکن */
+          if(currentName===view){
+            /* کاربر روی همون تب فعلی کلیک کرده — هیچ کاری نکن */
             return;
           }
 
@@ -714,11 +711,9 @@
             return;
           }
 
-          /* کنسل تایمرهای قبلی */
           if(window.switchView.__t1)clearTimeout(window.switchView.__t1);
           if(window.switchView.__t2)clearTimeout(window.switchView.__t2);
 
-          /* ریست همه viewها */
           document.querySelectorAll('.view').forEach(function(v){
             v.classList.remove('leaving','view-out-left','view-out-right','view-in-from-left','view-in-from-right');
             v.style.pointerEvents='';
@@ -736,10 +731,7 @@
             orig.apply(window,origArgs);
             _currentMainView=view;
             newEl.classList.add(inClass);
-
-            /* پروفایل سریع بیاد */
             setTimeout(injectMainTopActions,10);
-
             window.switchView.__t2=setTimeout(function(){
               oldEl.classList.remove('leaving',outClass);
               oldEl.style.pointerEvents='';
@@ -757,6 +749,6 @@
     pickNewWord();
     setTimeout(function(){try{var dv=getDefaultView();if(dv&&dv!=='chat'&&typeof window.switchView==='function')window.switchView(dv);}catch(e){}},1200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v28)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v30)');
   }
 })();
