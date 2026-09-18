@@ -4358,3 +4358,41 @@
   60%  { opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
 }
+/* ═══════════════════════════════════════════════════════════════
+   PATCH v27
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ★ اندازه‌گیری دقیق دکمه‌ها — با specificity بالاتر از active ★ */
+[data-nav-position] .bottom-nav-btn.measuring {
+  max-width: 170px !important;
+  padding: 0 14px 0 10px !important;
+  transition: none !important;
+}
+[data-nav-position] .bottom-nav-btn.measuring::after {
+  max-width: 110px !important;
+  opacity: 1 !important;
+  margin: 0 8px 0 0 !important;
+  transition: none !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.measuring,
+[data-nav-position="right"] .bottom-nav-btn.measuring {
+  max-width: 56px !important;
+  min-width: 56px !important;
+  height: 62px !important;
+  max-height: 62px !important;
+  min-height: 62px !important;
+  padding: 5px 3px !important;
+  flex-direction: column !important;
+}
+[data-nav-position="left"] .bottom-nav-btn.measuring::after,
+[data-nav-position="right"] .bottom-nav-btn.measuring::after {
+  max-width: 44px !important;
+  margin: 1px 0 0 0 !important;
+}
+
+/* ★ انیمیشن view — فقط کلاس‌های خاص ★ */
+.view.active { animation: none !important; }
+.view.active.view-in-from-left  { animation: viewInFromLeft .42s cubic-bezier(.22,1,.36,1) both !important; }
+.view.active.view-in-from-right { animation: viewInFromRight .42s cubic-bezier(.22,1,.36,1) both !important; }
+.view.leaving.view-out-left  { animation: viewOutLeft .4s cubic-bezier(.4,0,1,1) forwards !important; }
+.view.leaving.view-out-right { animation: viewOutRight .4s cubic-bezier(.4,0,1,1) forwards !important; }
