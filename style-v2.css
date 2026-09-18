@@ -4401,10 +4401,10 @@
 .header-user-avatar,
 #headerLockBtn { display: none !important; }
 /* ═══════════════════════════════════════════════════
-   NAV FIX FINAL
+   NAV FINAL v2
    ═══════════════════════════════════════════════════ */
 
-/* متن دکمه از title ساخته می‌شه */
+/* ::after از title */
 [data-nav-position] .bottom-nav-btn[title]::after,
 [data-nav-position] .nav-collapse-tab[title]::after {
   content: attr(title);
@@ -4420,79 +4420,62 @@
   pointer-events: none;
   transition: max-width .5s cubic-bezier(.22,1,.36,1),
               opacity .3s ease,
-              margin-right .5s cubic-bezier(.22,1,.36,1);
+              margin .5s cubic-bezier(.22,1,.36,1);
 }
 
-/* ★ حالت فعال — متن باز، پس‌زمینه به اندازه ایکون + متن */
+/* افقی: ایکون راست، متن چپ (RTL) */
+[data-nav-position="bottom"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="top"] .bottom-nav-btn:not(.nav-btn-chat) {
+  flex-direction: row !important;
+  gap: 8px !important;
+  max-width: 46px !important;
+  min-width: 46px !important;
+  padding: 0 10px !important;
+  transition: max-width .5s cubic-bezier(.22,1,.36,1),
+              padding .5s cubic-bezier(.22,1,.36,1) !important;
+}
 [data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat),
 [data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat) {
-  max-width: 180px !important;
-  padding-left: 16px !important;
-  padding-right: 12px !important;
-  gap: 10px !important;
+  max-width: 150px !important;
+  padding: 0 14px 0 10px !important;
 }
 [data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
 [data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
-  max-width: 140px !important;
+  max-width: 110px !important;
   opacity: 1 !important;
-  margin-right: 10px !important;
+  margin-left: 6px !important;
+  margin-right: 0 !important;
 }
 
-/* ★ measuring — دقیقاً برابر active (برای اندازه‌گیری دقیق اسلایدر) */
-[data-nav-position] .bottom-nav-btn.measuring:not(.nav-btn-chat) {
-  max-width: 180px !important;
-  padding-left: 16px !important;
-  padding-right: 12px !important;
-  gap: 10px !important;
-  transition: none !important;
+/* عمودی: زیر هم */
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat) {
+  flex-direction: column !important;
+  height: 40px !important;
+  max-height: 40px !important;
+  max-width: 46px !important;
+  min-width: 46px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  transition: max-height .5s cubic-bezier(.22,1,.36,1),
+              padding .5s cubic-bezier(.22,1,.36,1) !important;
 }
-[data-nav-position] .bottom-nav-btn.measuring:not(.nav-btn-chat)::after {
-  max-width: 140px !important;
-  opacity: 1 !important;
-  margin-right: 10px !important;
-  transition: none !important;
-}
-
-/* ★ حالت عمودی (چپ/راست) — متن زیر آیکون */
 [data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat),
 [data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat) {
-  max-width: 64px !important;
   height: 62px !important;
   max-height: 62px !important;
-  padding: 6px 4px !important;
-  flex-direction: column !important;
+  padding: 6px 3px !important;
   gap: 2px !important;
 }
 [data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
 [data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
-  max-width: 56px !important;
+  max-width: 44px !important;
   opacity: 1 !important;
-  margin-right: 0 !important;
-  margin-top: 2px !important;
+  margin: 1px 0 0 0 !important;
   font-size: 9.5px !important;
 }
 
-[data-nav-position="left"] .bottom-nav-btn.measuring:not(.nav-btn-chat),
-[data-nav-position="right"] .bottom-nav-btn.measuring:not(.nav-btn-chat) {
-  max-width: 64px !important;
-  height: 62px !important;
-  max-height: 62px !important;
-  padding: 6px 4px !important;
-  flex-direction: column !important;
-  gap: 2px !important;
-  transition: none !important;
-}
-[data-nav-position="left"] .bottom-nav-btn.measuring:not(.nav-btn-chat)::after,
-[data-nav-position="right"] .bottom-nav-btn.measuring:not(.nav-btn-chat)::after {
-  max-width: 56px !important;
-  opacity: 1 !important;
-  margin-right: 0 !important;
-  margin-top: 2px !important;
-  font-size: 9.5px !important;
-  transition: none !important;
-}
-
-/* رنگ متن و آیکون فعال = سفید */
+/* رنگ دکمه فعال */
 [data-nav-position] .bottom-nav-btn.active:not(.nav-btn-chat),
 [data-nav-position] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
   color: #fff !important;
@@ -4501,22 +4484,23 @@
   stroke: #fff !important;
 }
 
-/* اسلایدر نوار — رنگ و انیمیشن */
+/* اسلایدر — بدون transition، JS حرکت می‌ده */
 .nav-slider {
   background: linear-gradient(135deg, var(--accent-light), var(--accent-dark)) !important;
   box-shadow: 0 6px 20px -6px var(--accent) !important;
   z-index: 0 !important;
   pointer-events: none !important;
-}
-.nav-slider.ready {
-  transition: left .5s cubic-bezier(.22,1,.36,1),
-              top .5s cubic-bezier(.22,1,.36,1),
-              width .5s cubic-bezier(.22,1,.36,1),
-              height .5s cubic-bezier(.22,1,.36,1),
-              border-radius .3s,
-              opacity .2s !important;
+  transition: opacity .25s !important;
 }
 .nav-slider.visible { opacity: 1 !important; }
+.nav-slider.grow { animation: sliderGrow .55s cubic-bezier(.34,1.4,.64,1) both !important; }
+@keyframes sliderGrow { 0%{transform:scale(.3);opacity:0}60%{opacity:1}100%{transform:scale(1);opacity:1} }
+
+/* دکمه پین */
+[data-nav-position="right"] .nav-collapse-tab svg { transform: rotate(90deg) !important; }
+[data-nav-position="left"] .nav-collapse-tab svg { transform: rotate(-90deg) !important; }
+[data-nav-position="right"] .nav-row.collapsed .nav-collapse-tab svg { transform: rotate(-90deg) !important; }
+[data-nav-position="left"] .nav-row.collapsed .nav-collapse-tab svg { transform: rotate(90deg) !important; }
 /* ═══════════════════════════════════════════════════
    MONTHLY/YEARLY PANEL ALIGNMENT
    ═══════════════════════════════════════════════════ */
