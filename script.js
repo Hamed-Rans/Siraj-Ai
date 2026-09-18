@@ -36,11 +36,11 @@ const APP_CONFIG={
         {id:'solid',name:'ساده',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/>'},
         {id:'glass',name:'شیشه‌ای',icon:'<rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 6v12M18 6v12" opacity=".4"/>'}
     ],
-    navPositions:[
+        navPositions:[
+        {id:'right',name:'راست',icon:'<rect x="17" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="12" height="18" rx="2"/>'},
         {id:'bottom',name:'پایین',icon:'<rect x="3" y="17" width="18" height="4" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="18" height="12" rx="2"/>'},
         {id:'top',name:'بالا',icon:'<rect x="3" y="3" width="18" height="4" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="9" width="18" height="12" rx="2"/>'},
-        {id:'left',name:'چپ',icon:'<rect x="3" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="9" y="3" width="12" height="18" rx="2"/>'},
-        {id:'right',name:'راست',icon:'<rect x="17" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="3" y="3" width="12" height="18" rx="2"/>'}
+        {id:'left',name:'چپ',icon:'<rect x="3" y="3" width="4" height="18" rx="2" fill="currentColor" opacity=".7"/><rect x="9" y="3" width="12" height="18" rx="2"/>'}
     ],
       navStyles:[
         {id:'default',name:'ساده',icon:'<rect x="3" y="8" width="18" height="8" rx="4"/>'},
@@ -1038,7 +1038,34 @@ function renameChat(id){
 }
 function saveRename(id,newTitle){const h=loadHistory();if(!h[id])return;const t=(newTitle||'').trim()||'گفتگو';h[id].title=t;saveHistory(h);renderHistory();}
 function formatTime(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'الان';if(m<60)return m+' د';const hr=Math.floor(m/60);if(hr<24)return hr+' س';const day=Math.floor(hr/24);if(day<7)return day+' روز';return new Date(ts).toLocaleDateString('fa-IR');}
-function loadChat(id){const c=loadHistory()[id];if(!c)return;currentChatId=id;const box=document.getElementById('box');box.innerHTML='';c.messages.forEach(m=>{if(m.role==='user')renderUserMsg(m.content,m.fileData,m.fileType,true);else renderBotMsg(m.content,true);});box.scrollTop=box.scrollHeight;renderHistory();switchView('chat');toggleWelcome();}
+function loadChat(id){
+  const c=loadHistory()[id];
+  if(!c) return;
+  currentChatId=id;
+  const box=document.getElementById('box');
+  box.innerHTML='';
+  
+  /* ★ انیمیشن fade + slide نرم */
+  box.style.transition='none';
+  box.style.opacity='0';
+  box.style.transform='translateY(12px)';
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      box.style.transition='opacity .3s cubic-bezier(.22,1,.36,1), transform .3s cubic-bezier(.22,1,.36,1)';
+      box.style.opacity='1';
+      box.style.transform='translateY(0)';
+    });
+  });
+  
+  c.messages.forEach(m=>{
+    if(m.role==='user') renderUserMsg(m.content,m.fileData,m.fileType,true);
+    else renderBotMsg(m.content,true);
+  });
+  box.scrollTop=box.scrollHeight;
+  renderHistory();
+  switchView('chat');
+  toggleWelcome();
+}
 function deleteChat(id){if(pendingRequests[id]){pendingRequests[id].abort();delete pendingRequests[id];}const h=loadHistory();delete h[id];saveHistory(h);if(currentChatId===id){currentChatId=null;createNewChat();}renderHistory();}
 function newChat(){createNewChat();}
 
