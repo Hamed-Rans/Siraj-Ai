@@ -1019,48 +1019,44 @@ function saveRename(id,newTitle){const h=loadHistory();if(!h[id])return;const t=
 function formatTime(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'الان';if(m<60)return m+' د';const hr=Math.floor(m/60);if(hr<24)return hr+' س';const day=Math.floor(hr/24);if(day<7)return day+' روز';return new Date(ts).toLocaleDateString('fa-IR');}
 
 /* ★ loadChat با انیمیشن نرم */
+/* ★ loadChat با انیمیشن نرم */
 function loadChat(id){
-    const c = loadHistory()[id];
-    if(!c) return;
-    currentChatId = id;
-    const box = document.getElementById('box');
+  const c = loadHistory()[id];
+  if(!c) return;
+  currentChatId = id;
+  const box = document.getElementById('box');
 
-    /* فاز ۱: fade out + کمی بالا */
-    box.style.transition = 'opacity .18s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1)';
+  box.style.transition = 'opacity .18s cubic-bezier(.22,1,.36,1), transform .22s cubic-bezier(.22,1,.36,1)';
+  box.style.opacity = '0';
+  box.style.transform = 'translateY(-10px)';
+
+  setTimeout(function(){
+    box.innerHTML = '';
+    c.messages.forEach(function(m){
+      if(m.role === 'user') renderUserMsg(m.content, m.fileData, m.fileType, true);
+      else renderBotMsg(m.content, true);
+    });
+
+    box.style.transition = 'none';
+    box.style.transform = 'translateY(14px)';
     box.style.opacity = '0';
-    box.style.transform = 'translateY(-10px)';
+    box.scrollTop = box.scrollHeight;
+
+    void box.offsetWidth;
+    box.style.transition = 'opacity .35s cubic-bezier(.22,1,.36,1), transform .45s cubic-bezier(.34,1.4,.64,1)';
+    box.style.opacity = '1';
+    box.style.transform = 'translateY(0)';
 
     setTimeout(function(){
-        /* فاز ۲: پاک کردن و لود پیام‌ها */
-        box.innerHTML = '';
-        c.messages.forEach(function(m){
-            if(m.role === 'user') renderUserMsg(m.content, m.fileData, m.fileType, true);
-            else renderBotMsg(m.content, true);
-        });
+      box.style.transition = '';
+      box.style.opacity = '';
+      box.style.transform = '';
+    }, 500);
+  }, 200);
 
-        /* بدون انیمیشن، آماده شو از پایین */
-        box.style.transition = 'none';
-        box.style.transform = 'translateY(14px)';
-        box.style.opacity = '0';
-        box.scrollTop = box.scrollHeight;
-
-        /* فاز ۳: fade in از پایین */
-        void box.offsetWidth;
-        box.style.transition = 'opacity .35s cubic-bezier(.22,1,.36,1), transform .45s cubic-bezier(.34,1.4,.64,1)';
-        box.style.opacity = '1';
-        box.style.transform = 'translateY(0)';
-
-        /* پاک کردن استایل‌های inline */
-        setTimeout(function(){
-            box.style.transition = '';
-            box.style.opacity = '';
-            box.style.transform = '';
-        }, 500);
-    }, 200);
-
-    renderHistory();
-    switchView('chat');
-    toggleWelcome();
+  renderHistory();
+  switchView('chat');
+  toggleWelcome();
 }
 function deleteChat(id){if(pendingRequests[id]){pendingRequests[id].abort();delete pendingRequests[id];}const h=loadHistory();delete h[id];saveHistory(h);if(currentChatId===id){currentChatId=null;createNewChat();}renderHistory();}
 function newChat(){createNewChat();}
