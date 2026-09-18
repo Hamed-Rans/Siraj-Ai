@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v27) */
+/* Siraj v2.0 — planner-v2.js (v28 Final) */
 (function(){
   'use strict';
   var boot=setInterval(function(){
@@ -566,7 +566,7 @@
 
     function blogHTML(){return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="page-title-text">مقالات سراج</div></div><div class="community-hero"><div class="community-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div><div class="community-title">مقالات سراج</div><div class="community-desc">اینجا قراره مطالب آموزشی، تحلیل‌های ادبی، نکات دستوری و یادداشت‌های کوتاه درباره‌ی زبان و ادبیات عربی منتشر بشه.</div><div class="community-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>به‌زودی راه‌اندازی می‌شه</div></div>';}
     function communityHTML(){return '<div class="page-title-bar"><div class="page-title-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="page-title-text">انجمن سراج</div></div><div class="community-hero"><div class="community-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="community-title">انجمن گفتگوی سراج</div><div class="community-desc">یه فضای صمیمی که کاربرا، مدرسین و من بتونیم با هم درباره‌ی عربی، ادبیات، برنامه‌ریزی درسی و یادگیری حرف بزنیم.</div><div class="community-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>به‌زودی راه‌اندازی می‌شه</div></div>';}
-    function fillViews(){var b=document.getElementById('view-blog');if(b&&b.classList.contains('active')&&!b.querySelector('.community-hero'))b.innerHTML=blogHTML();var c=document.getElementById('view-videos');if(c&&c.classList.contains('active')){var h=c.querySelector('.community-hero');if(!h){c.innerHTML=communityHTML();}else{var d=h.querySelector('.community-desc');if(d&&d.textContent.length<40)c.innerHTML=communityHTML();}}}
+    function fillViews(){var b=document.getElementById('view-blog');if(b&&b.classList.contains('active')&&!b.querySelector('.community-hero'))b.innerHTML=blogHTML();var c=document.getElementById('view-videos');if(c&&c.classList.contains('active')){var h=c.querySelector('.community-hero');if(!h){c.innerHTML=communityHTML();}else{var d=h.querySelector('.community-desc');if(d&&d.textContent.length<40)c.innerHTML=communityHTML();}}setTimeout(injectMainTopActions,20);}
     new MutationObserver(fillViews).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
     setTimeout(fillViews,1500);setTimeout(fillViews,2500);
 
@@ -594,6 +594,18 @@
     setTimeout(injectMainTopActions,500);
     setTimeout(injectMainTopActions,1500);
     setTimeout(injectMainTopActions,3000);
+
+    /* ★ MutationObserver سریع برای main-chat ★ */
+    (function(){
+      var mc=document.querySelector('.main-chat');
+      if(!mc)return;
+      var fastT=null;
+      new MutationObserver(function(){
+        if(fastT)clearTimeout(fastT);
+        fastT=setTimeout(function(){injectMainTopActions();},30);
+      }).observe(mc,{childList:true,subtree:true});
+    })();
+
     setInterval(function(){
       var needsFix=false;
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
@@ -605,7 +617,7 @@
       var stray=document.querySelectorAll('body > .main-top-avatar, body > .main-top-icon-btn, body > .header-left-actions');
       if(stray.length)needsFix=true;
       if(needsFix)injectMainTopActions();
-    }, 900);
+    }, 200);
 
     function updateMainTopAvatar(){var p=getProfile();var s=p.avatar||USER_AVATAR_URL;document.querySelectorAll('.main-top-avatar').forEach(function(a){a.title=p.name?p.name:'مشخصات من';a.innerHTML='<img src="'+s+'" alt="" draggable="false">';});}
 
@@ -630,82 +642,52 @@
       var s=pane.querySelector('#profileSaveBtn');if(s){s.onclick=function(){var p2=getProfile();p2.name=(pane.querySelector('#profileName')||{}).value||'';p2.bio=(pane.querySelector('#profileBio')||{}).value||'';saveProfile(p2);if(window.toast)window.toast('ذخیره شد ✓','success');if(typeof window.renderPanelForPlanner==='function')window.renderPanelForPlanner();updateMainTopAvatar();};}
     }
 
-    /* ═══════════════════════════════════════════════════════
-       ★ اسلایدر — tracking هم‌زمان با دکمه (بدون دیلی) ★
-       ═══════════════════════════════════════════════════════ */
+    /* ═══ اسلایدر نوار ═══ */
     (function(){
-      var nav=null, slider=null, ready=false;
-
+      var nav=null,slider=null,ready=false;
       function init(){
-        nav=document.getElementById('bottomNav');
-        if(!nav) return false;
-        var old=document.getElementById('navSlider');
-        if(old) old.remove();
-        slider=document.createElement('div');
-        slider.id='navSlider';
-        slider.className='nav-slider';
-        nav.insertBefore(slider, nav.firstChild);
-        ready=true;
-
-        requestAnimationFrame(function(){
-          track(0);
-          slider.classList.add('grow');
-          setTimeout(function(){ slider.classList.remove('grow'); }, 560);
-        });
-
-        /* ★ Capture phase — قبل از onclick کاربر ★ */
-        nav.addEventListener('click', function(e){
-          var btn = e.target.closest('.bottom-nav-btn[data-view]');
-          if(!btn) return;
-          if(btn.classList.contains('nav-btn-chat')) return;
-          /* فوراً active رو عوض کن */
-          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+        nav=document.getElementById('bottomNav');if(!nav)return false;
+        var old=document.getElementById('navSlider');if(old)old.remove();
+        slider=document.createElement('div');slider.id='navSlider';slider.className='nav-slider';
+        nav.insertBefore(slider,nav.firstChild);ready=true;
+        requestAnimationFrame(function(){track(0);slider.classList.add('grow');setTimeout(function(){slider.classList.remove('grow');},560);});
+        nav.addEventListener('click',function(e){
+          var btn=e.target.closest('.bottom-nav-btn[data-view]');
+          if(!btn)return;
+          if(btn.classList.contains('nav-btn-chat')){
+            if(slider)slider.classList.remove('visible');
+            return;
+          }
+          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
           btn.classList.add('active');
-          /* اسلایدر رو همراه دکمه ببر برای 650 میلی‌ثانیه */
           track(650);
-        }, true);
-
-        new MutationObserver(function(){
-          track(0);
-        }).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position']});
-
-        window.addEventListener('resize', function(){ track(0); });
-        setTimeout(function(){ track(0); }, 800);
+        },true);
+        new MutationObserver(function(){track(0);}).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position']});
+        window.addEventListener('resize',function(){track(0);});
+        setTimeout(function(){track(0);},800);
         return true;
       }
-
-      /* اسلایدر رو ۶۵۰ms همراه دکمه نگه دار */
       function track(duration){
-        if(!nav || !slider) return;
-        var btn = nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
-        if(!btn){ slider.classList.remove('visible'); return; }
-
-        var endTime = performance.now() + duration;
-        var pos = document.documentElement.getAttribute('data-nav-position') || 'bottom';
-        var vert = (pos === 'left' || pos === 'right');
-
+        if(!nav||!slider)return;
+        var btn=nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
+        if(!btn){slider.classList.remove('visible');return;}
+        var endTime=performance.now()+duration;
+        var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
+        var vert=(pos==='left'||pos==='right');
         function tick(){
-          if(!btn.isConnected) return;
-          var nr = nav.getBoundingClientRect();
-          var br = btn.getBoundingClientRect();
-          slider.style.left = (br.left - nr.left) + 'px';
-          slider.style.top = (br.top - nr.top) + 'px';
-          slider.style.width = br.width + 'px';
-          slider.style.height = br.height + 'px';
-          slider.style.borderRadius = vert ? '16px' : '21px';
-          if(performance.now() < endTime) requestAnimationFrame(tick);
+          if(!btn.isConnected)return;
+          var nr=nav.getBoundingClientRect();var br=btn.getBoundingClientRect();
+          slider.style.left=(br.left-nr.left)+'px';
+          slider.style.top=(br.top-nr.top)+'px';
+          slider.style.width=br.width+'px';
+          slider.style.height=br.height+'px';
+          slider.style.borderRadius=vert?'14px':'21px';
+          if(performance.now()<endTime)requestAnimationFrame(tick);
         }
-
-        requestAnimationFrame(tick);
-        slider.classList.add('visible');
+        requestAnimationFrame(tick);slider.classList.add('visible');
       }
-
-      window.__moveNavSlider = function(){ track(0); };
-
-      var tries = 0;
-      var iv = setInterval(function(){
-        if(init() || ++tries > 100){ clearInterval(iv); }
-      }, 100);
+      window.__moveNavSlider=function(){track(0);};
+      var tries=0;var iv=setInterval(function(){if(init()||++tries>100)clearInterval(iv);},100);
     })();
 
     /* ═══ سوییچ بین تب‌ها ═══ */
@@ -752,6 +734,6 @@
     pickNewWord();
     setTimeout(function(){try{var dv=getDefaultView();if(dv&&dv!=='chat'&&typeof window.switchView==='function')window.switchView(dv);}catch(e){}},1200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v27)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v28)');
   }
 })();
