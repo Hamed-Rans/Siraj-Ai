@@ -4633,3 +4633,96 @@
 #box {
   padding-bottom: 54px !important;
 }
+/* ═══════════════════════════════════════════════════
+   PATCH v30 — Input Bar + Nav + Yearly + Animation
+   ═══════════════════════════════════════════════════ */
+
+/* ─── ۱) فیکس نوار پیام + افکت دو خط چرخان روی focus ─── */
+.input-bar-shell:focus-within {
+  transform: none !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+.input-wrapper {
+  padding: 0 20px 16px !important;
+}
+
+/* لایه بیرونی — خط دوم (blur) */
+.input-bar-shell::before,
+.input-bar-shell::after {
+  content: '' !important;
+  position: absolute !important;
+  border-radius: 30px !important;
+  padding: 3px !important;
+  inset: -3px !important;
+  background: conic-gradient(from var(--spin),
+    transparent 0deg,
+    transparent 300deg,
+    rgba(96,165,250,.1) 322deg,
+    var(--accent-light) 344deg,
+    #ffffff 356deg,
+    var(--accent) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none !important;
+  opacity: 0;
+  transition: opacity .4s ease;
+  animation: spinNeon 2.8s linear infinite;
+  z-index: 0;
+  will-change: background;
+}
+.input-bar-shell::after {
+  inset: -6px !important;
+  border-radius: 34px !important;
+  padding: 2px !important;
+  background: conic-gradient(from calc(var(--spin) - 130deg),
+    transparent 0deg,
+    transparent 300deg,
+    rgba(37,99,235,.15) 322deg,
+    var(--accent-dark) 342deg,
+    var(--accent) 355deg,
+    transparent 360deg);
+  filter: blur(4px) !important;
+}
+.input-bar-shell:focus-within::before { opacity: 1 !important; }
+.input-bar-shell:focus-within::after { opacity: .85 !important; }
+
+@keyframes spinNeon { to { --spin: 360deg; } }
+
+/* ─── ۲) فاصله دکمه‌های نوار کمتر ─── */
+.bottom-nav {
+  padding: 4px 8px !important;
+  gap: 2px !important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="top"] .bottom-nav-btn:not(.nav-btn-chat) {
+  padding: 0 8px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat) {
+  max-width: 130px !important;
+  padding: 0 12px 0 8px !important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn.active:not(.nav-btn-chat)::after,
+[data-nav-position="top"] .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+  max-width: 88px !important;
+  margin-left: 4px !important;
+  margin-right: 0 !important;
+}
+.bottom-nav-btn.nav-btn-chat {
+  margin: 0 4px !important;
+}
+
+/* ─── ۳) اهداف سالانه هم‌تراز (فقط yearly!) ─── */
+.monthly-layout:has(.year-overview) .monthly-side {
+  padding-top: 28px !important;
+}
+
+/* ─── ۴) انیمیشن سریع‌تر + روون‌تر تب‌ها ─── */
+.view.active.view-in-from-left  { animation: viewInFromLeft .26s cubic-bezier(.22,1,.36,1) both !important; }
+.view.active.view-in-from-right { animation: viewInFromRight .26s cubic-bezier(.22,1,.36,1) both !important; }
+.view.leaving.view-out-left  { animation: viewOutLeft .2s cubic-bezier(.4,0,1,1) forwards !important; }
+.view.leaving.view-out-right { animation: viewOutRight .2s cubic-bezier(.4,0,1,1) forwards !important; }
