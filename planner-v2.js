@@ -606,7 +606,7 @@
       var stray=document.querySelectorAll('body > .main-top-avatar, body > .main-top-icon-btn, body > .header-left-actions');
       if(stray.length)needsFix=true;
       if(needsFix)injectMainTopActions();
-    }, 900);
+    }, 1500);
 
     function updateMainTopAvatar(){var p=getProfile();var s=p.avatar||USER_AVATAR_URL;document.querySelectorAll('.main-top-avatar').forEach(function(a){a.title=p.name?p.name:'مشخصات من';a.innerHTML='<img src="'+s+'" alt="" draggable="false">';});}
 
@@ -681,7 +681,7 @@
 
     /* ═══ سوییچ بین تب‌ها ═══ */
     (function(){
-      function hook(){
+            function hook(){
         if(typeof window.switchView!=='function')return false;
         if(window.switchView.__hooked)return true;
         var orig=window.switchView;
@@ -693,25 +693,39 @@
           var oldIdx=VIEW_ORDER.indexOf(oldName);
           var newIdx=VIEW_ORDER.indexOf(view);
           if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){orig.apply(this,arguments);_currentMainView=view;return;}
+
+          /* ★ کنسل کردن setTimeoutهای قبلی — فیکس کلیک سریع ★ */
+          if(window.switchView.__t1)clearTimeout(window.switchView.__t1);
+          if(window.switchView.__t2)clearTimeout(window.switchView.__t2);
+
+          /* ★ ریست همه viewها — پاک‌سازی از stateهای قبلی ★ */
+          document.querySelectorAll('.view').forEach(function(v){
+            v.classList.remove('leaving','view-out-left','view-out-right','view-in-from-left','view-in-from-right');
+            v.style.pointerEvents='';
+          });
+
           var goingLeft=newIdx>oldIdx;
           var outClass=goingLeft?'view-out-right':'view-out-left';
           var inClass=goingLeft?'view-in-from-left':'view-in-from-right';
           var origArgs=arguments;
-          if(window.switchView.__busy)return;
-          window.switchView.__busy=true;
+
           oldEl.classList.add('leaving',outClass);
           oldEl.style.pointerEvents='none';
-          setTimeout(function(){
+
+          window.switchView.__t1=setTimeout(function(){
             orig.apply(window,origArgs);
             _currentMainView=view;
             newEl.classList.add(inClass);
-            setTimeout(function(){
+
+            /* ★ بلافاصله پروفایل رو بریز — بدون دیلی ★ */
+            setTimeout(injectMainTopActions,10);
+
+            window.switchView.__t2=setTimeout(function(){
               oldEl.classList.remove('leaving',outClass);
               oldEl.style.pointerEvents='';
               newEl.classList.remove(inClass);
-              window.switchView.__busy=false;
-            },360);
-          },320);
+            },240);
+          },180);
         };
         window.switchView.__hooked=true;
         return true;
