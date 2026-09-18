@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v21 Final) */
+/* Siraj v2.0 — planner-v2.js (v22 Final) */
 (function(){
   'use strict';
   var boot = setInterval(function(){
@@ -106,6 +106,7 @@
     function bindSelects(root,handlers){if(!root)return;root.querySelectorAll('.siraj-select').forEach(function(sel){var trig=sel.querySelector('.siraj-select-trigger');if(!trig)return;trig.onclick=function(e){e.stopPropagation();var was=sel.classList.contains('open');document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});if(!was)sel.classList.add('open');};sel.querySelectorAll('.siraj-select-item').forEach(function(item){item.onclick=function(e){e.stopPropagation();var val=item.getAttribute('data-value');sel.classList.remove('open');if(handlers&&handlers[sel.id])handlers[sel.id](val,item);};});});}
     document.addEventListener('click',function(){document.querySelectorAll('.siraj-select.open').forEach(function(s){s.classList.remove('open');});});
 
+    /* ★ smartUpdateHero — با مدیریت دکمه‌ی برگشت ★ */
     function smartUpdateHero(tab,direction){
       var c=document.querySelector('.phc-center');if(!c)return;
       var d=new Date(window.plannerDate||new Date());
@@ -133,8 +134,38 @@
           setTimeout(function(){el.classList.remove(inClass);},440);
         },230);
       });
+      /* badge امروز */
       var todayBadge=c.querySelector('.phc-today');
-      if(todayBadge){var isToday=window.dateKey(d)===window.dateKey(new Date());todayBadge.style.display=isToday?'':'none';}
+      if(todayBadge){
+        var isToday=window.dateKey(d)===window.dateKey(new Date());
+        todayBadge.style.display=isToday?'':'none';
+      }
+      /* ★ دکمه‌ی برگشت ★ */
+      var shouldShow=false,btnLabel='',btnAction='';
+      if(tab==='daily'){
+        shouldShow=window.dateKey(d)!==window.dateKey(new Date());
+        btnLabel='↩ برگرد به امروز';btnAction='window.__goToday()';
+      } else if(tab==='weekly'){
+        shouldShow=window.dateKey(weekStart(d))!==window.dateKey(weekStart(new Date()));
+        btnLabel='↩ برگرد به این هفته';btnAction='window.__goThisWeek()';
+      } else if(tab==='monthly'){
+        var now=new Date();
+        shouldShow=!(d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth());
+        btnLabel='↩ برگرد به این ماه';btnAction='window.__goThisMonth()';
+      } else if(tab==='yearly'){
+        shouldShow=d.getFullYear()!==new Date().getFullYear();
+        btnLabel='↩ برگرد به امسال';btnAction='window.__goThisYear()';
+      }
+      var existing=c.querySelector('.phc-back-btn');
+      if(shouldShow&&!existing){
+        var nb=document.createElement('button');
+        nb.className='phc-back-btn';
+        nb.setAttribute('onclick',btnAction);
+        nb.textContent=btnLabel;
+        c.appendChild(nb);
+      } else if(!shouldShow&&existing){
+        existing.remove();
+      }
     }
 
     function moveDate(dir,unit){
@@ -155,7 +186,7 @@
     window.__goThisMonth=window.__goToday;
     window.__goThisYear=window.__goToday;
 
-    /* ★ refreshBody — فیکس تکرار انیمیشن ★ */
+    /* ★ refreshBody — ساده، بدون تکرار انیمیشن ★ */
     function refreshBody(direction){
       var pane=document.getElementById('plannerPane');if(!pane)return;
       if(pane.dataset.animating==='1')return;
@@ -183,30 +214,25 @@
         return;
       }
 
-      /* سوییچ تب — بدون تکرار */
       pane.dataset.animating='1';
       pane.style.pointerEvents='none';
-      /* ★ حذف انیمیشن قبلی اول ★ */
-      pane.style.animation='none';
-      void pane.offsetWidth;
-      /* ★ حالا انیمیشن جدید ★ */
-      pane.style.animation='paneSwitchIn .32s ease';
+      pane.classList.remove('pane-switch-anim');
 
+      var html='';
+      if(tab==='daily')html=viewDaily();
+      else if(tab==='weekly')html=viewWeekly();
+      else if(tab==='monthly')html=viewMonthly();
+      else if(tab==='yearly')html=viewYearly();
+      pane.innerHTML=html;
+      bindPaneEvents(tab);
+      if(tab==='weekly')setTimeout(setupWeekSummaryClicks,50);
+      void pane.offsetWidth;
+      pane.classList.add('pane-switch-anim');
       setTimeout(function(){
-        var html='';
-        if(tab==='daily')html=viewDaily();
-        else if(tab==='weekly')html=viewWeekly();
-        else if(tab==='monthly')html=viewMonthly();
-        else if(tab==='yearly')html=viewYearly();
-        pane.innerHTML=html;
-        bindPaneEvents(tab);
-        if(tab==='weekly')setTimeout(setupWeekSummaryClicks,50);
+        pane.classList.remove('pane-switch-anim');
         pane.style.pointerEvents='';
-        setTimeout(function(){
-          pane.style.animation='';
-          delete pane.dataset.animating;
-        },350);
-      },160);
+        delete pane.dataset.animating;
+      },350);
     }
     window.__refreshCurrentTab=refreshBody;
 
@@ -986,16 +1012,21 @@
     new MutationObserver(linkifyContacts).observe(document.body,{childList:true,subtree:true});
     setTimeout(linkifyContacts,800);setTimeout(linkifyContacts,1800);setTimeout(linkifyContacts,3000);
 
-    /* ═══ پروفایل + قفل — پاک‌سازی تمیز ═══ */
-    function injectMainTopActions(){
+    /* ★ پروفایل + قفل — فقط یک بار در هر هدر ★ */
+    var _lastInject=0;
+    function injectMainTopActions(force){
+      var now=Date.now();
+      if(!force && now-_lastInject<400) return;
+      _lastInject=now;
       var p=getProfile();
       var avatarSrc=p.avatar||USER_AVATAR_URL;
       var userName=p.name?p.name:'مشخصات من';
-      var headers=document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar');
-      headers.forEach(function(header){
-        /* حذف هر چیزی که به پروفایل/قفل مربوطه */
-        header.querySelectorAll('.main-top-avatar, .main-top-icon-btn, .header-left-actions, .main-top-actions, #mainTopActions, #mainProfileAvatar, #mainLockBtn').forEach(function(el){el.remove();});
+      document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(header){
+        /* حذف همه‌ی نمونه‌های قبلی */
+        header.querySelectorAll('.header-left-actions').forEach(function(w){w.remove();});
+        header.querySelectorAll('.main-top-avatar, .main-top-icon-btn, #mainProfileAvatar, #mainLockBtn, #mainTopActions, .main-top-actions').forEach(function(el){el.remove();});
         header.querySelectorAll('#headerLockBtn').forEach(function(el){el.style.display='none';});
+        /* ساخت نمونه‌ی تازه */
         var wrap=document.createElement('div');
         wrap.className='header-left-actions';
         wrap.innerHTML='<div class="main-top-avatar" title="'+esc(userName)+'"><img src="'+avatarSrc+'" alt="" draggable="false"></div><button type="button" class="main-top-icon-btn" title="قفل کردن سایت"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>';
@@ -1003,28 +1034,24 @@
         wrap.querySelector('.main-top-avatar').onclick=function(){if(typeof window.openSettings==='function')window.openSettings();setTimeout(function(){var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');if(b)b.click();},400);};
         wrap.querySelector('.main-top-icon-btn').onclick=function(){if(typeof window.lockNow==='function')window.lockNow();};
       });
-      /* حذف سرگردان‌ها */
-      document.querySelectorAll('.main-top-avatar, .main-top-icon-btn, .header-left-actions').forEach(function(el){if(!el.closest('.chat-header, .planner-hero, .page-title-bar'))el.remove();});
     }
-    var _injectTimer=null;
-    function scheduleInject(){if(_injectTimer)clearTimeout(_injectTimer);_injectTimer=setTimeout(function(){_injectTimer=null;injectMainTopActions();},100);}
-    setTimeout(scheduleInject,500);setTimeout(scheduleInject,1500);setTimeout(scheduleInject,3000);
-    /* نگهبان */
-    setInterval(function(){
+    setTimeout(function(){injectMainTopActions(true);},500);
+    setTimeout(function(){injectMainTopActions(true);},1600);
+    setTimeout(function(){injectMainTopActions(true);},3200);
+    /* نگهبان — اگر نمونه‌ی اضافه ظاهر شد فوراً پاک می‌شه */
+    var _guardTimer=setInterval(function(){
+      var needFix=false;
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(header){
         var wraps=header.querySelectorAll('.header-left-actions');
-        for(var i=1;i<wraps.length;i++)wraps[i].remove();
-        if(wraps[0]){
-          var avs=wraps[0].querySelectorAll('.main-top-avatar');
-          for(var i=1;i<avs.length;i++)avs[i].remove();
-          var lks=wraps[0].querySelectorAll('.main-top-icon-btn');
-          for(var i=1;i<lks.length;i++)lks[i].remove();
-        }
-        header.querySelectorAll('.main-top-avatar, .main-top-icon-btn').forEach(function(el){if(!el.closest('.header-left-actions'))el.remove();});
+        if(wraps.length!==1){needFix=true;return;}
+        var avs=wraps[0].querySelectorAll('.main-top-avatar');
+        var lks=wraps[0].querySelectorAll('.main-top-icon-btn');
+        if(avs.length!==1||lks.length!==1){needFix=true;return;}
+        var looseAvs=header.querySelectorAll(':scope > .main-top-avatar');
+        if(looseAvs.length>0){needFix=true;}
       });
-    },700);
-    var mainChatEl=document.querySelector('.main-chat');
-    if(mainChatEl){new MutationObserver(scheduleInject).observe(mainChatEl,{childList:true,subtree:true});}
+      if(needFix) injectMainTopActions(true);
+    },400);
     function updateMainTopAvatar(){var p=getProfile();var avatarSrc=p.avatar||USER_AVATAR_URL;document.querySelectorAll('.main-top-avatar').forEach(function(av){av.title=p.name?p.name:'مشخصات من';av.innerHTML='<img src="'+avatarSrc+'" alt="" draggable="false">';});}
 
     /* Profile tab */
@@ -1086,7 +1113,7 @@
       if(sv){sv.onclick=function(){var p2=getProfile();p2.name=(pane.querySelector('#profileName')||{}).value||'';p2.bio=(pane.querySelector('#profileBio')||{}).value||'';saveProfile(p2);if(window.toast)window.toast('ذخیره شد ✓','success');if(typeof window.renderPanelForPlanner==='function')window.renderPanelForPlanner();updateMainTopAvatar();};}
     }
 
-    /* ═══ اسلایدر نوار — انیمیشن نرم ═══ */
+    /* ═══ اسلایدر نوار ═══ */
     (function(){
       var _sliderReady=false;
       function getNav(){return document.getElementById('bottomNav');}
@@ -1133,7 +1160,7 @@
       setTimeout(instant,700);setTimeout(function(){paint(true);},1400);
     })();
 
-    /* ═══ سوییچ بین تب‌ها — اول بره، بعد بیاد ═══ */
+    /* ═══ سوییچ بین تب‌ها — اول قدیمی بره، بعد جدید بیاد ═══ */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function')return false;
@@ -1151,16 +1178,13 @@
           var outClass=goingLeft?'view-out-left':'view-out-right';
           var inClass=goingLeft?'view-in-from-right':'view-in-from-left';
           var origArgs=arguments;
-          if(window.switchView.__busy){return;}
+          if(window.switchView.__busy)return;
           window.switchView.__busy=true;
-          /* مرحله ۱: قدیمی بره */
           oldEl.classList.add('leaving',outClass);
           oldEl.style.pointerEvents='none';
           setTimeout(function(){
-            /* مرحله ۲: عوض کن */
             orig.apply(window,origArgs);
             _currentMainView=view;
-            /* مرحله ۳: جدید بیاد */
             newEl.classList.add(inClass);
             setTimeout(function(){
               oldEl.classList.remove('leaving',outClass);
@@ -1177,7 +1201,6 @@
       setTimeout(function(){var a=document.querySelector('.view.active');if(a){var n=a.id.replace('view-','');if(VIEW_ORDER.indexOf(n)!==-1)_currentMainView=n;}},1000);
     })();
 
-    /* رنگ ساعت */
     setTimeout(function(){
       function colorizeHours(){var list=document.querySelector('.hours-list');if(!list)return;list.querySelectorAll('.hour-row').forEach(function(row){var hLabel=row.querySelector('.hour-label span:last-child');if(!hLabel)return;var hh=parseInt(hLabel.textContent,10);if(isNaN(hh))return;row.classList.remove('time-morning','time-noon','time-afternoon','time-evening','time-night');if(hh>=6&&hh<12)row.classList.add('time-morning');else if(hh>=12&&hh<15)row.classList.add('time-noon');else if(hh>=15&&hh<18)row.classList.add('time-afternoon');else if(hh>=18&&hh<21)row.classList.add('time-evening');else row.classList.add('time-night');});}
       new MutationObserver(colorizeHours).observe(document.body,{childList:true,subtree:true});
@@ -1188,6 +1211,6 @@
 
     setTimeout(function(){try{var dv=getDefaultView();if(dv&&dv!=='chat'&&typeof window.switchView==='function'){window.switchView(dv);}}catch(e){}},1200);
 
-    console.log('[Siraj v2.0] planner loaded ✓ (v21)');
+    console.log('[Siraj v2.0] planner loaded ✓ (v22)');
   }
 })();
