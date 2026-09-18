@@ -595,17 +595,6 @@
     setTimeout(injectMainTopActions,1500);
     setTimeout(injectMainTopActions,3000);
 
-    /* ★ MutationObserver سریع برای main-chat ★ */
-    (function(){
-      var mc=document.querySelector('.main-chat');
-      if(!mc)return;
-      var fastT=null;
-      new MutationObserver(function(){
-        if(fastT)clearTimeout(fastT);
-        fastT=setTimeout(function(){injectMainTopActions();},30);
-      }).observe(mc,{childList:true,subtree:true});
-    })();
-
     setInterval(function(){
       var needsFix=false;
       document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
@@ -617,7 +606,7 @@
       var stray=document.querySelectorAll('body > .main-top-avatar, body > .main-top-icon-btn, body > .header-left-actions');
       if(stray.length)needsFix=true;
       if(needsFix)injectMainTopActions();
-    }, 200);
+    }, 900);
 
     function updateMainTopAvatar(){var p=getProfile();var s=p.avatar||USER_AVATAR_URL;document.querySelectorAll('.main-top-avatar').forEach(function(a){a.title=p.name?p.name:'مشخصات من';a.innerHTML='<img src="'+s+'" alt="" draggable="false">';});}
 
