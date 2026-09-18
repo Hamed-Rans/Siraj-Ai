@@ -1796,3 +1796,279 @@
 
 /* ⑦ تقویم — لِجند یادآور */
 .cl-item.evt .cl-icon-svg{ color:#60A5FA!important; }
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v41 — Final Refinements
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① فیکس هاور نوار مخفی — پایین/بالا */
+[data-nav-position="bottom"] .nav-row.collapsed .bottom-nav{
+  transform:translateY(50%)!important;opacity:.72!important;
+  transition:transform .45s cubic-bezier(.34,1.4,.64,1),opacity .3s ease!important;
+}
+[data-nav-position="bottom"] .nav-row.collapsed:hover .bottom-nav,
+[data-nav-position="bottom"] .nav-row.collapsed .bottom-nav:hover{
+  transform:translateY(0)!important;opacity:1!important;
+}
+[data-nav-position="top"] .nav-row.collapsed .bottom-nav{
+  transform:translateY(-75%)!important;opacity:.5!important;
+  transition:transform .45s cubic-bezier(.34,1.4,.64,1),opacity .3s ease!important;
+}
+[data-nav-position="top"] .nav-row.collapsed:hover .bottom-nav,
+[data-nav-position="top"] .nav-row.collapsed .bottom-nav:hover{
+  transform:translateY(0)!important;opacity:1!important;
+}
+
+/* ② نوار چپ/راست — گردتر + فاصله از پنل + فاصله AI */
+[data-nav-position="left"] .nav-row{left:14px!important}
+[data-nav-position="right"] .nav-row{right:14px!important}
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav{
+  border-radius:30px!important;
+  padding:10px 8px!important;
+  gap:8px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="left"] .nav-collapse-tab,
+[data-nav-position="right"] .nav-collapse-tab,
+[data-nav-position="left"] .nav-slider-fill,
+[data-nav-position="right"] .nav-slider-fill{
+  border-radius:20px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat{
+  margin:10px 0!important;
+}
+
+/* ③ فیکس چرخش پین — پایدار */
+.nav-collapse-tab svg{
+  transform:rotate(0deg);
+  transition:transform .55s cubic-bezier(.34,1.4,.64,1)!important;
+  will-change:transform!important;
+}
+[data-nav-position="bottom"] .nav-row.pinned .nav-collapse-tab svg,
+[data-nav-position="bottom"] .nav-row:not(.collapsed) .nav-collapse-tab svg{
+  transform:rotate(0deg)!important;
+}
+[data-nav-position="bottom"] .nav-row.collapsed .nav-collapse-tab svg{
+  transform:rotate(180deg)!important;
+}
+[data-nav-position="top"] .nav-row.pinned .nav-collapse-tab svg,
+[data-nav-position="top"] .nav-row:not(.collapsed) .nav-collapse-tab svg{
+  transform:rotate(180deg)!important;
+}
+[data-nav-position="top"] .nav-row.collapsed .nav-collapse-tab svg{
+  transform:rotate(0deg)!important;
+}
+[data-nav-position="right"] .nav-row.pinned .nav-collapse-tab svg,
+[data-nav-position="right"] .nav-row:not(.collapsed) .nav-collapse-tab svg{
+  transform:rotate(-90deg)!important;
+}
+[data-nav-position="right"] .nav-row.collapsed .nav-collapse-tab svg{
+  transform:rotate(0deg)!important;
+}
+[data-nav-position="left"] .nav-row.pinned .nav-collapse-tab svg,
+[data-nav-position="left"] .nav-row:not(.collapsed) .nav-collapse-tab svg{
+  transform:rotate(90deg)!important;
+}
+[data-nav-position="left"] .nav-row.collapsed .nav-collapse-tab svg{
+  transform:rotate(0deg)!important;
+}
+/* غیرفعال کردن animation قدیمی که جهت رو ریست می‌کنه */
+.nav-collapse-tab.pop svg{animation:none!important}
+
+/* ④ کادر "انجام شده" — غیرشفاف + جمع‌تر */
+.tasks-done-list{
+  background:var(--panel-bg)!important;
+  border:1px solid var(--border-strong)!important;
+  border-radius:14px!important;
+  padding:10px!important;
+  gap:6px!important;
+  box-shadow:0 4px 14px -8px rgba(0,0,0,.35)!important;
+  opacity:1!important;
+}
+.tasks-done-empty{
+  background:var(--panel-bg)!important;
+  border:1px solid var(--border)!important;
+  border-radius:12px!important;
+  padding:12px 14px!important;
+  font-size:11px!important;
+  opacity:.85!important;
+  color:var(--text-muted)!important;
+}
+.tasks-done-list .task-item{
+  padding:8px 11px!important;
+  border-radius:11px!important;
+  background:rgba(255,255,255,.025)!important;
+  border:1px solid var(--border)!important;
+  border-right-width:3px!important;
+  opacity:.85!important;
+}
+.tasks-done-list .task-item:hover{transform:none!important}
+.tasks-done-list .task-title{font-size:11.5px!important}
+.tasks-done-list .task-check{width:18px!important;height:18px!important;min-width:18px!important}
+.tasks-done-list .task-check svg{width:10px!important;height:10px!important}
+.tasks-done-list .task-del{width:22px!important;height:22px!important}
+.tasks-done-list .task-del svg{width:11px!important;height:11px!important}
+.studied-badge,.no-time-badge{font-size:9.5px!important;padding:2px 7px!important}
+.tasks-list-title.done-title{font-size:11.5px!important;margin-top:14px!important}
+
+/* ⑤ کادر بیت امروز — جمع‌تر + ترتیب جدید */
+.daily-cards{margin:12px 20px 0!important}
+.daily-card{
+  padding:12px 14px!important;
+  border-radius:14px!important;
+  box-shadow:0 4px 16px -10px rgba(0,0,0,.35)!important;
+}
+.daily-card-head{
+  margin-bottom:8px!important;
+  padding-bottom:7px!important;
+  gap:6px!important;
+}
+.daily-card-badge{
+  font-size:10.5px!important;
+  padding:3px 10px!important;
+}
+.daily-action-btn{
+  padding:5px 10px!important;
+  font-size:10px!important;
+  border-radius:9px!important;
+}
+.daily-card-body{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:5px!important;
+  margin-top:6px!important;
+}
+.daily-card-text.ar{
+  font-size:16px!important;
+  line-height:1.95!important;
+  padding:0 10px!important;
+}
+.daily-card-meaning{
+  font-size:12px!important;
+  line-height:1.85!important;
+  color:var(--text-muted)!important;
+  text-align:center!important;
+  padding:4px 10px 0!important;
+  margin:0!important;
+  background:transparent!important;
+  border:none!important;
+}
+.daily-card-author{
+  font-size:10px!important;
+  color:var(--text-muted)!important;
+  text-align:left!important;
+  direction:ltr!important;
+  margin-top:2px!important;
+  padding-left:4px!important;
+  opacity:.7!important;
+  font-style:italic!important;
+}
+.daily-card-author::before{content:''!important}
+
+/* ⑥ هدر پلنر — برگشت پس‌زمینه */
+.planner-hero{
+  background:linear-gradient(135deg,var(--accent-soft),transparent)!important;
+}
+[data-header-style="solid"] .planner-hero{
+  background:var(--panel-bg)!important;
+}
+[data-header-style="glass"] .planner-hero{
+  background:rgba(18,22,30,.55)!important;
+  backdrop-filter:blur(22px) saturate(180%) brightness(1.1)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(180%) brightness(1.1)!important;
+}
+[data-theme^="light"][data-header-style="glass"] .planner-hero{
+  background:rgba(255,255,255,.62)!important;
+}
+.planner-hero-card{
+  background:var(--bubble-bot-bg)!important;
+}
+[data-header-style="glass"] .planner-hero-card{
+  background:rgba(18,22,30,.5)!important;
+  backdrop-filter:blur(16px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(180%)!important;
+  border-color:rgba(255,255,255,.1)!important;
+}
+[data-theme^="light"][data-header-style="glass"] .planner-hero-card{
+  background:rgba(255,255,255,.55)!important;
+}
+
+/* ⑦ تم شیشه‌ای — برای همه المان‌ها */
+[data-header-style="glass"] .month-calendar,
+[data-header-style="glass"] .month-goals,
+[data-header-style="glass"] .year-overview,
+[data-header-style="glass"] .daily-card,
+[data-header-style="glass"] .tasks-done-list,
+[data-header-style="glass"] .tasks-done-empty,
+[data-header-style="glass"] .task-add-form,
+[data-header-style="glass"] .week-grid-wrap,
+[data-header-style="glass"] .week-summary,
+[data-header-style="glass"] .panel-card,
+[data-header-style="glass"] .settings-modal,
+[data-header-style="glass"] .tool-card,
+[data-header-style="glass"] .hour-row,
+[data-header-style="glass"] .learn-library-box{
+  background:rgba(18,22,30,.48)!important;
+  backdrop-filter:blur(18px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(180%)!important;
+  border-color:rgba(255,255,255,.1)!important;
+}
+[data-theme^="light"][data-header-style="glass"] .month-calendar,
+[data-theme^="light"][data-header-style="glass"] .month-goals,
+[data-theme^="light"][data-header-style="glass"] .year-overview,
+[data-theme^="light"][data-header-style="glass"] .daily-card,
+[data-theme^="light"][data-header-style="glass"] .tasks-done-list,
+[data-theme^="light"][data-header-style="glass"] .tasks-done-empty,
+[data-theme^="light"][data-header-style="glass"] .task-add-form,
+[data-theme^="light"][data-header-style="glass"] .week-grid-wrap,
+[data-theme^="light"][data-header-style="glass"] .week-summary,
+[data-theme^="light"][data-header-style="glass"] .panel-card,
+[data-theme^="light"][data-header-style="glass"] .tool-card,
+[data-theme^="light"][data-header-style="glass"] .hour-row,
+[data-theme^="light"][data-header-style="glass"] .learn-library-box{
+  background:rgba(255,255,255,.55)!important;
+  border-color:rgba(0,0,0,.08)!important;
+}
+[data-header-style="glass"] .input-bar{
+  background:rgba(18,22,30,.55)!important;
+  backdrop-filter:blur(20px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(180%)!important;
+}
+[data-header-style="glass"] .bottom-nav{
+  background:rgba(18,22,30,.65)!important;
+  backdrop-filter:blur(24px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(200%)!important;
+}
+[data-header-style="glass"] .siraj-select-trigger,
+[data-header-style="glass"] .siraj-select-panel{
+  background:rgba(18,22,30,.7)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+
+/* ⑧ دکمه‌های شبکه اجتماعی — بدون تغییر رنگ + بدون کپی */
+.contact-row,.contact-row-v2{cursor:pointer}
+.contact-row:hover,.contact-row-v2:hover{
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+  transform:translateX(-3px)!important;
+}
+.contact-row .contact-icon,.contact-row-v2 .contact-icon{
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  transition:transform .3s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.contact-row:hover .contact-icon,.contact-row-v2:hover .contact-icon{
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  transform:scale(1.06)!important;
+}
+.contact-row.copied,.contact-row-v2.copied{
+  background:transparent!important;
+  border-color:var(--border)!important;
+}
+.contact-copy,.contact-row .contact-copy,.contact-row-v2 .contact-copy{display:none!important}
