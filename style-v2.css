@@ -4130,3 +4130,143 @@
     border-radius .3s !important;
 }
 .nav-slider.visible { opacity: 1; }
+/* ═══════════════════════════════════════════════════════════════
+   PATCH v25 — Smart Tab Switch + Nav Slider + Profile Fix
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── ۱) انیمیشن هوشمند سوییچ بین تب‌های اصلی ─── */
+.view.leaving {
+  display: flex !important;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.view.view-out-left   { animation: viewOutLeft .4s cubic-bezier(.4,0,1,1) forwards; }
+.view.view-out-right  { animation: viewOutRight .4s cubic-bezier(.4,0,1,1) forwards; }
+.view.view-in-from-left  { animation: viewInFromLeft .42s cubic-bezier(.22,1,.36,1) forwards; }
+.view.view-in-from-right { animation: viewInFromRight .42s cubic-bezier(.22,1,.36,1) forwards; }
+@keyframes viewOutLeft  { to { opacity:0; transform:translateX(-60px); filter:blur(5px); } }
+@keyframes viewOutRight { to { opacity:0; transform:translateX(60px);  filter:blur(5px); } }
+@keyframes viewInFromLeft  { from { opacity:0; transform:translateX(-60px); filter:blur(5px); } to { opacity:1; transform:translateX(0); filter:blur(0); } }
+@keyframes viewInFromRight { from { opacity:0; transform:translateX(60px);  filter:blur(5px); } to { opacity:1; transform:translateX(0); filter:blur(0); } }
+
+/* ─── ۲) انیمیشن ناوبری داخل تب (فقط تاریخ) ─── */
+[data-anim-key] { display: inline-block; will-change: transform, opacity, filter; }
+[data-anim-key].heroOutRight { animation: heroOutRight .24s cubic-bezier(.4,0,1,1) forwards; }
+[data-anim-key].heroOutLeft  { animation: heroOutLeft .24s cubic-bezier(.4,0,1,1) forwards; }
+[data-anim-key].heroInFromLeft  { animation: heroInFromLeft .42s cubic-bezier(.22,1,.36,1) both; }
+[data-anim-key].heroInFromRight { animation: heroInFromRight .42s cubic-bezier(.22,1,.36,1) both; }
+@keyframes heroOutRight { to { opacity:0; transform:translateX(40px);  filter:blur(3px); } }
+@keyframes heroOutLeft  { to { opacity:0; transform:translateX(-40px); filter:blur(3px); } }
+@keyframes heroInFromLeft  { from { opacity:0; transform:translateX(-40px); filter:blur(3px); } to { opacity:1; transform:translateX(0); filter:blur(0); } }
+@keyframes heroInFromRight { from { opacity:0; transform:translateX(40px);  filter:blur(3px); } to { opacity:1; transform:translateX(0); filter:blur(0); } }
+
+/* ─── ۳) انیمیشن سوییچ بین روزانه/هفتگی/ماهانه/سالانه — زوم ملایم ─── */
+@keyframes paneSwitchIn {
+  from { opacity: 0; transform: scale(.96); filter: blur(3px); }
+  to   { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes bodyFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── ۴) اسلایدر نوار — آماده ─── */
+.nav-slider { opacity: 0; transition: none; pointer-events: none; }
+.nav-slider.ready {
+  transition: left .38s cubic-bezier(.22,1,.36,1),
+              top .38s cubic-bezier(.22,1,.36,1),
+              width .34s cubic-bezier(.22,1,.36,1),
+              height .34s cubic-bezier(.22,1,.36,1),
+              border-radius .3s,
+              opacity .2s !important;
+}
+.nav-slider.visible { opacity: 1; }
+
+/* انیمیشن grow اول لود */
+.nav-slider.grow {
+  animation: sliderGrow .55s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes sliderGrow {
+  0%   { transform: scale(.3); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* نوار عمودی — اسلایدر عرض کامل نوار */
+[data-nav-position="left"] .nav-slider,
+[data-nav-position="right"] .nav-slider {
+  min-width: 40px !important;
+}
+
+/* ─── ۵) دکمه پین — جهت فلش ─── */
+[data-nav-position="left"] .nav-row:not(.collapsed) .nav-collapse-tab svg,
+[data-nav-position="left"] .nav-row.pinned .nav-collapse-tab svg { transform: rotate(-90deg) !important; }
+[data-nav-position="left"] .nav-row.collapsed:not(.pinned) .nav-collapse-tab svg { transform: rotate(90deg) !important; }
+[data-nav-position="right"] .nav-row:not(.collapsed) .nav-collapse-tab svg,
+[data-nav-position="right"] .nav-row.pinned .nav-collapse-tab svg { transform: rotate(90deg) !important; }
+[data-nav-position="right"] .nav-row.collapsed:not(.pinned) .nav-collapse-tab svg { transform: rotate(-90deg) !important; }
+
+/* ─── ۶) پروفایل — بدون rip ─── */
+.header-left-actions {
+  position: absolute !important;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  direction: ltr !important;
+  z-index: 50;
+  pointer-events: auto;
+}
+.main-top-avatar,
+.main-top-icon-btn {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  transition: transform .25s cubic-bezier(.34,1.4,.64,1), box-shadow .28s ease !important;
+  will-change: transform !important;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  isolation: isolate;
+}
+.main-top-avatar:hover { transform: scale(1.06) translateZ(0) !important; }
+.main-top-icon-btn:hover { transform: scale(1.05) translateZ(0) !important; }
+.main-top-avatar img {
+  width:100% !important; height:100% !important;
+  object-fit:cover; border-radius:50%;
+  display:block;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+/* ★ مخفی کردن نمونه‌های قدیمی ★ */
+.main-top-actions:not(.header-left-actions) { display: none !important; }
+
+/* ─── ۷) هدر پنل راست — راست‌چین ─── */
+.panel-header {
+  justify-content: flex-start !important;
+  text-align: right !important;
+}
+.panel-title-block {
+  flex: 1;
+  text-align: right !important;
+  padding-right: 8px;
+}
+.panel-title-text,
+.panel-sub-text {
+  text-align: right !important;
+}
+
+/* ─── ۸) اهداف ماه — هم‌تراز با تقویم ─── */
+.monthly-side {
+  padding-top: 72px !important;
+  align-self: flex-start !important;
+}
+
+/* ─── ۹) badge امروز ─── */
+.phc-today.hidden { display: none !important; }
