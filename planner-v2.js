@@ -271,36 +271,47 @@
     });
 
     /* ★★★ انیمیشن هوشمند — فقط عناصری که تغییر کردن ★★★ */
-    function smartUpdateHero(tab, direction){
-      var c = document.querySelector('.phc-center'); if (!c) return;
-      var d = new Date(window.plannerDate || new Date());
-      var map = {};
-      if (tab === 'daily'){
-        var p = dateParts(d);
-        map.weekday = p.weekday; map.dayNum = p.dayNum; map.monthName = p.monthName; map.yearNum = p.yearNum;
-      } else if (tab === 'weekly'){
-        var days = myWeekDays(); var p2 = dateParts(d);
-        map.monthName2 = p2.monthName; map.yearNum2 = p2.yearNum;
-        map.weekOrdinal = 'هفته ' + weekOrd(weekOfMonth()) + ' ماه';
-        map.weekRange = 'از ' + days[0].date + ' تا ' + days[6].date;
-      } else if (tab === 'monthly'){
-        var p3 = dateParts(d); map.monthName3 = p3.monthName; map.yearNum3 = p3.yearNum;
-      } else if (tab === 'yearly'){
-        map.yearNum4 = d.toLocaleDateString('fa-IR',{year:'numeric'});
-      }
-      var cls = direction === 'right' ? 'heroRollRight' : 'heroRollLeft';
-      c.querySelectorAll('[data-anim-key]').forEach(function(el){
-        var k = el.getAttribute('data-anim-key');
-        if (map[k] === undefined) return;
-        var nv = map[k];
-        if (el.textContent.trim() === nv) return;
-        el.classList.remove('heroRollRight','heroRollLeft');
-        void el.offsetWidth;
-        el.textContent = nv;
-        el.classList.add(cls);
-      });
-    }
+  function smartUpdateHero(tab, direction){
+  var c = document.querySelector('.phc-center'); if (!c) return;
+  var d = new Date(window.plannerDate || new Date());
+  var map = {};
+  if (tab === 'daily'){
+    var p = dateParts(d);
+    map.weekday = p.weekday; map.dayNum = p.dayNum; map.monthName = p.monthName; map.yearNum = p.yearNum;
+  } else if (tab === 'weekly'){
+    var days = myWeekDays(); var p2 = dateParts(d);
+    map.monthName2 = p2.monthName; map.yearNum2 = p2.yearNum;
+    map.weekOrdinal = 'هفته ' + weekOrd(weekOfMonth()) + ' ماه';
+    map.weekRange = 'از ' + days[0].date + ' تا ' + days[6].date;
+  } else if (tab === 'monthly'){
+    var p3 = dateParts(d); map.monthName3 = p3.monthName; map.yearNum3 = p3.yearNum;
+  } else if (tab === 'yearly'){
+    map.yearNum4 = d.toLocaleDateString('fa-IR',{year:'numeric'});
+  }
 
+  var isNext = direction !== 'right';
+  var outClass = isNext ? 'heroOutRight' : 'heroOutLeft';
+  var inClass  = isNext ? 'heroInFromLeft' : 'heroInFromRight';
+
+  c.querySelectorAll('[data-anim-key]').forEach(function(el){
+    var k = el.getAttribute('data-anim-key');
+    if (map[k] === undefined) return;
+    var nv = map[k];
+    if (el.textContent.trim() === nv) return;
+
+    el.classList.remove('heroOutRight','heroOutLeft','heroInFromLeft','heroInFromRight');
+    void el.offsetWidth;
+    el.classList.add(outClass);
+
+    setTimeout(function(){
+      el.classList.remove(outClass);
+      el.textContent = nv;
+      void el.offsetWidth;
+      el.classList.add(inClass);
+      setTimeout(function(){ el.classList.remove(inClass); }, 440);
+    }, 230);
+  });
+}
     function moveDate(dir, unit){
       var d = new Date(window.plannerDate || new Date());
       if (unit === 'day') d.setDate(d.getDate() + dir);
@@ -321,68 +332,63 @@
 
     /* ★★★ refreshBody — هوشمند: ناوبری تاریخ = فقط hero، تب‌سوییچ = کل pane ★★★ */
     function refreshBody(direction){
-      var pane = document.getElementById('plannerPane');
-      if (!pane) return;
-      if (pane.dataset.animating === '1') return;
+  var pane = document.getElementById('plannerPane');
+  if (!pane) return;
+  if (pane.dataset.animating === '1') return;
 
-      var tab = getTab();
-      var isSameTab = pane.dataset.lastTab === tab;
-      pane.dataset.lastTab = tab;
+  var tab = getTab();
+  var isSameTab = pane.dataset.lastTab === tab;
+  pane.dataset.lastTab = tab;
+  var dir = direction || 'left';
 
-      var dir = direction || 'left';
-
-      if (isSameTab){
-        /* ناوبری داخل تب — فقط hero به‌روز می‌شه با انیمیشن هوشمند */
-        smartUpdateHero(tab, dir);
-        var body = pane.querySelector('.planner-body-content');
-        if (body){
-          body.style.transition = 'opacity .15s ease';
-          body.style.opacity = '0';
-          setTimeout(function(){
-            var html = '';
-            if (tab === 'daily')        html = dailyContentHTML();
-            else if (tab === 'weekly')  html = weeklyContentHTML();
-            else if (tab === 'monthly') html = monthlyContentHTML();
-            else if (tab === 'yearly')  html = yearlyContentHTML();
-            body.innerHTML = html;
-            bindPaneEvents(tab);
-            if (tab === 'weekly') setTimeout(setupWeekSummaryClicks, 50);
-            body.style.transition = 'opacity .25s ease';
-            body.style.opacity = '1';
-          }, 150);
-        } else {
-          renderPane(tab);
-        }
-      } else {
-        /* سوییچ تب — کل pane با اسلاید میاد */
-        var outClass = dir === 'left' ? 'heroOutRight' : 'heroOutLeft';
-        var inClass  = dir === 'left' ? 'heroInFromLeft' : 'heroInFromRight';
-
-        pane.dataset.animating = '1';
-        pane.style.pointerEvents = 'none';
-        pane.classList.add(outClass);
-
-        setTimeout(function(){
-          pane.classList.remove(outClass);
-          var html = '';
-          if (tab === 'daily')        html = viewDaily();
-          else if (tab === 'weekly')  html = viewWeekly();
-          else if (tab === 'monthly') html = viewMonthly();
-          else if (tab === 'yearly')  html = viewYearly();
-          pane.innerHTML = html;
-          bindPaneEvents(tab);
-          if (tab === 'weekly') setTimeout(setupWeekSummaryClicks, 50);
-
-          pane.classList.add(inClass);
-          pane.style.pointerEvents = '';
-
-          setTimeout(function(){
-            pane.classList.remove(inClass);
-            delete pane.dataset.animating;
-          }, 430);
-        }, 320);
-      }
+  if (isSameTab){
+    smartUpdateHero(tab, dir);
+    var body = pane.querySelector('.planner-body-content');
+    if (body){
+      var html = '';
+      if (tab === 'daily')        html = dailyContentHTML();
+      else if (tab === 'weekly')  html = weeklyContentHTML();
+      else if (tab === 'monthly') html = monthlyContentHTML();
+      else if (tab === 'yearly')  html = yearlyContentHTML();
+      body.innerHTML = html;
+      bindPaneEvents(tab);
+      if (tab === 'weekly') setTimeout(setupWeekSummaryClicks, 50);
+      body.style.animation = 'none';
+      void body.offsetWidth;
+      body.style.animation = 'bodyFadeIn .35s ease';
+    } else {
+      renderPane(tab);
     }
+    return;
+  }
+
+  var outClass = dir === 'left' ? 'heroOutRight' : 'heroOutLeft';
+  var inClass  = dir === 'left' ? 'heroInFromLeft' : 'heroInFromRight';
+
+  pane.dataset.animating = '1';
+  pane.style.pointerEvents = 'none';
+  pane.classList.add(outClass);
+
+  setTimeout(function(){
+    pane.classList.remove(outClass);
+    var html = '';
+    if (tab === 'daily')        html = viewDaily();
+    else if (tab === 'weekly')  html = viewWeekly();
+    else if (tab === 'monthly') html = viewMonthly();
+    else if (tab === 'yearly')  html = viewYearly();
+    pane.innerHTML = html;
+    bindPaneEvents(tab);
+    if (tab === 'weekly') setTimeout(setupWeekSummaryClicks, 50);
+
+    pane.classList.add(inClass);
+    pane.style.pointerEvents = '';
+
+    setTimeout(function(){
+      pane.classList.remove(inClass);
+      delete pane.dataset.animating;
+    }, 440);
+  }, 300);
+}
     window.__refreshCurrentTab = refreshBody;
 
     window.switchPlannerTab = function(tab){
