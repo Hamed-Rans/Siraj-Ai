@@ -1,4 +1,4 @@
-/* Siraj v2.0 — script.js (v40 Final) */
+/* Siraj v2.0 — script.js (v41 Final) */
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
@@ -69,20 +69,19 @@ const APP_CONFIG={
             value:'radial-gradient(rgba(120,150,200,.18) 1px,transparent 1px) 0 0/20px 20px repeat #0B0E14',
             valueLight:'radial-gradient(rgba(70,100,150,.3) 1px,transparent 1px) 0 0/20px 20px repeat #F0F4FA'}
     ],
+    /* ★ فونت‌ها کم شد */
     fonts:{
         persian:[
-            {id:'vazirmatn',name:'وزیرمتن'},{id:'estedad',name:'استعداد'},{id:'shabnam',name:'شبنم'},
-            {id:'sahel',name:'ساحل'},{id:'lalezar',name:'لاله‌زار'},{id:'gulzar',name:'گلزار'},
-            {id:'noto-sans-arabic',name:'نوتو سنس'}
+            {id:'vazirmatn',name:'وزیرمتن'},{id:'estedad',name:'استعداد'},
+            {id:'shabnam',name:'شبنم'},{id:'lalezar',name:'لاله‌زار'}
         ],
         arabic:[
-            {id:'amiri',name:'Amiri'},{id:'cairo',name:'Cairo'},{id:'noto-naskh',name:'Naskh'},
-            {id:'noto-kufi',name:'Kufi'},{id:'tajawal',name:'Tajawal'},{id:'almarai',name:'Almarai'},
-            {id:'scheherazade',name:'Scheherazade'},{id:'reem-kufi',name:'Reem Kufi'}
+            {id:'amiri',name:'Amiri'},{id:'cairo',name:'Cairo'},
+            {id:'noto-naskh',name:'Naskh'},{id:'tajawal',name:'Tajawal'}
         ],
         english:[
-            {id:'inter',name:'Inter'},{id:'poppins',name:'Poppins'},{id:'space-grotesk',name:'Space Grotesk'},
-            {id:'manrope',name:'Manrope'},{id:'dm-sans',name:'DM Sans'},{id:'jetbrains',name:'JetBrains Mono'}
+            {id:'inter',name:'Inter'},{id:'poppins',name:'Poppins'},
+            {id:'space-grotesk',name:'Space Grotesk'}
         ]
     },
     languages:[{id:'fa',name:'فارسی'},{id:'ar',name:'العربیة'},{id:'en',name:'English'}],
@@ -132,7 +131,6 @@ const RateLimiter={queue:[],processing:false,minInterval:1500,lastRequest:0,
     }
 };
 
-/* ★ plannerDate global */
 window.plannerDate = new Date();
 
 let settings=loadSettings();
@@ -523,7 +521,6 @@ function initNavState(){
     if(localStorage.getItem(PIN_KEY)==='1'){isNavPinned=true;document.getElementById('navRow').classList.remove('collapsed');document.getElementById('navRow').classList.add('pinned');}
 }
 
-/* fallback — planner-v2.js override می‌کنه */
 function updateNavSlider(animate){
     const slider=document.getElementById('navSlider');
     const active=document.querySelector('.bottom-nav-btn.active');
@@ -626,7 +623,6 @@ function renderDailyPanel(){
             <div class="list-item" onclick="askAIToPlan()"><div class="li-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="li-body"><div class="li-title">برنامه‌ریزی خودکار</div><div class="li-desc">از AI برنامه بگیر</div></div></div>
         </div>`;
 }
-/* fallback — planner-v2.js override می‌کنه */
 function renderPanelForPlanner(){
     document.getElementById('panelTitleText').textContent='برنامه‌ریزی';
     document.getElementById('panelSubText').textContent='خلاصه هفته';
@@ -665,22 +661,17 @@ function renderPanelForTools(){
         </div>`;
 }
 
-/* fallback — planner-v2.js override می‌کنه */
 function renderPlanner(){
     const view=document.getElementById('view-planner');
     if(!view) return;
     view.innerHTML='<main class="planner-pane" id="plannerPane" style="width:100%"></main>';
     if(typeof window.renderPlannerPane==='function') window.renderPlannerPane();
 }
-
-/* fallback — planner-v2.js override می‌کنه */
 function renderPlannerPane(){
     const pane=document.getElementById('plannerPane');
     if(!pane) return;
     pane.innerHTML='<div style="padding:30px;text-align:center;color:var(--text-muted)">در حال بارگذاری...</div>';
 }
-
-/* fallback — planner-v2.js override می‌کنه */
 function switchPlannerTab(tab){
     plannerTab=tab;
     if(typeof window.switchPlannerTab==='function' && window.switchPlannerTab!==switchPlannerTab){
@@ -689,7 +680,6 @@ function switchPlannerTab(tab){
     }
 }
 
-/* fallback — planner-v2.js override می‌کنه */
 function renderBlog(){
     const v=document.getElementById('view-blog');
     if(!v) return;
@@ -699,7 +689,6 @@ function renderBlog(){
 function addBlogPost(){const t=document.getElementById('blogTitle')?.value.trim();const b=document.getElementById('blogBody')?.value.trim();if(!t||!b){toast('عنوان و متن لازمه','error');return;}const p=loadBlog();p.unshift({title:t,body:b,ts:Date.now()});saveBlog(p);renderBlog();renderPanelForBlog();toast('مقاله منتشر شد','success');}
 function deleteBlogPost(i){const p=loadBlog();p.splice(i,1);saveBlog(p);renderBlog();renderPanelForBlog();}
 
-/* fallback — planner-v2.js override می‌کنه */
 function renderCommunity(){
     const v=document.getElementById('view-videos');
     if(!v) return;
@@ -770,7 +759,6 @@ function renameChat(id){
 function saveRename(id,newTitle){const h=loadHistory();if(!h[id])return;const t=(newTitle||'').trim()||'گفتگو';h[id].title=t;saveHistory(h);renderHistory();}
 function formatTime(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'الان';if(m<60)return m+' د';const hr=Math.floor(m/60);if(hr<24)return hr+' س';const day=Math.floor(hr/24);if(day<7)return day+' روز';return new Date(ts).toLocaleDateString('fa-IR');}
 
-/* ★ loadChat با انیمیشن نرم + گارد رقابتی */
 function loadChat(id){
     const c = loadHistory()[id];
     if(!c) return;
@@ -1316,22 +1304,6 @@ function bgOpt(p){
     return `<div class="bg-opt${isActive?' active':''}" data-key="bgPreset" data-value="${p.id}" onclick="updateDraft('bgPreset','${p.id}')" title="${p.name}"><div style="position:absolute;inset:0;border-radius:11px;background:${v||'transparent'}"></div><div class="bg-label">${p.name}</div></div>`;
 }
 
-function copyContact(text,el){
-    const doCopy=()=>{
-        try{
-            if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(text);
-            const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';
-            document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-            return Promise.resolve();
-        }catch(e){return Promise.reject(e);}
-    };
-    doCopy().then(()=>{
-        el.classList.add('copied');
-        const copy=el.querySelector('.contact-copy');
-        if(copy){const orig=copy.textContent;copy.textContent='کپی شد ✓';setTimeout(()=>{el.classList.remove('copied');copy.textContent=orig;},1400);}
-        toast('کپی شد ✓','success');
-    }).catch(()=>toast('کپی نشد','error'));
-}
 function handleBgUpload(ev){
     const f=ev.target.files?.[0];if(!f)return;
     if(f.size>4*1024*1024){toast('حجم بیش از ۴ مگابایت','error');return;}
@@ -1400,6 +1372,27 @@ function renderSessionsList(){
     }).join('');
 }
 
+/* ★ بایند کردن کلیک روی لینک‌های شبکه اجتماعی */
+function bindContactLinks(){
+    document.querySelectorAll('.contact-row[data-link], .contact-row-v2[data-link]').forEach(function(row){
+        if(row.dataset.bound==='1') return;
+        row.dataset.bound='1';
+        row.style.cursor='pointer';
+        row.addEventListener('click',function(e){
+            if(e.target.closest('a')) return;
+            var link=row.getAttribute('data-link');
+            if(!link) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if(link.indexOf('mailto:')===0){
+                window.location.href=link;
+            } else {
+                window.open(link,'_blank','noopener');
+            }
+        });
+    });
+}
+
 function renderSettingsControls(){
     const s=settingsDraft||settings;
     const tabs=document.getElementById('settingsTabs');
@@ -1454,6 +1447,9 @@ function renderSettingsControls(){
             <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>نوار نوشتن پیام</label>
                 <div class="row-btns">${APP_CONFIG.inputStyles.map(i=>`<button class="row-btn${s.inputStyle===i.id?' active':''}" data-key="inputStyle" data-value="${i.id}" onclick="updateDraft('inputStyle','${i.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${i.icon}</svg><span class="rb-label">${i.name}</span></button>`).join('')}</div>
             </div>
+            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>استایل پس‌زمینه نوار</label>
+                <div class="row-btns">${APP_CONFIG.navStyles.map(st=>`<button class="row-btn${s.navStyle===st.id?' active':''}" data-key="navStyle" data-value="${st.id}" onclick="updateDraft('navStyle','${st.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${st.icon}</svg><span class="rb-label">${st.name}</span></button>`).join('')}</div>
+            </div>
         </div>
 
         <div class="settings-content${settingsCat==='pattern'?' active':''}" data-cat="pattern">
@@ -1505,9 +1501,6 @@ function renderSettingsControls(){
             </div>
             <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>موقعیت نوار</label>
                 <div class="row-btns">${APP_CONFIG.navPositions.map(p=>`<button class="row-btn${s.navPosition===p.id?' active':''}" data-key="navPosition" data-value="${p.id}" onclick="updateDraft('navPosition','${p.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${p.icon}</svg><span class="rb-label">${p.name}</span></button>`).join('')}</div>
-            </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>استایل پس‌زمینه</label>
-                <div class="row-btns">${APP_CONFIG.navStyles.map(st=>`<button class="row-btn${s.navStyle===st.id?' active':''}" data-key="navStyle" data-value="${st.id}" onclick="updateDraft('navStyle','${st.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${st.icon}</svg><span class="rb-label">${st.name}</span></button>`).join('')}</div>
             </div>
             <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>شدت سایه نوار</label>
                 <div class="slider-row"><input type="range" min="0" max="100" step="5" value="${s.navShadowLevel||0}" oninput="updateDraft('navShadowLevel',this.value)"><span class="slider-val">${s.navShadowLevel||0}%</span></div>
@@ -1586,45 +1579,36 @@ function renderSettingsControls(){
                 <div class="about-avatar">${s.profileImage?`<img src="${s.profileImage}" alt="حامد">`:'<span style="font-size:44px">ح ا</span>'}</div>
                 <div class="about-name">حامد انصاری‌فر</div>
                 <div class="about-role">سازنده سراج</div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
-                    <label class="btn-primary" style="cursor:pointer">
-                        <input type="file" accept="image/*" onchange="handleProfileUpload(event)" style="display:none">
-                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
-                        انتخاب عکس پروفایل
-                    </label>
-                    ${s.profileImage?`<button class="btn-secondary" onclick="updateDraft('profileImage','');renderSettingsControls()">حذف عکس</button>`:''}
-                </div>
-                <div style="font-size:10.5px;color:var(--text-muted);text-align:center;margin-top:4px">حداکثر ۱.۵ مگابایت — بعد از انتخاب، دکمه «اعمال تغییرات» را بزن</div>
             </div>
             <div class="about-bio-card">
-                سلام 👋<br>
-                من حامد هستم — یه جوون ۲۰ ساله اهل اراک که عاشق ایران و یادگیریه. الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و کنار درس، به هوش مصنوعی و برنامه‌نویسی هم علاقه‌ی زیادی دارم. یه زمانی ادیتور و مجسمه‌ساز بودم.<br><br>
-                سراج رو با یه ایده‌ی ساده شروع کردم — اینکه بتونم به یادگیری بچه‌های کشورم کمک کنم. الان دارم تلاش می‌کنم سراج رو بهتر و کامل‌تر کنم. هنوز خودم هم در حال یادگیریم و کلی چیز برای کشف کردن هست 🌱
+                سلام 👋<br><br>
+                من حامدم؛ یه جوون ۲۰ ساله اراکی که عاشق ایران، تاریخش و مردمشه و همیشه به یادگرفتن و ساختن چیزهای جدید علاقه داشته.<br><br>
+                الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و در کنار درس، به هوش مصنوعی، برنامه‌نویسی و بازی‌سازی علاقه‌مندم. یه زمانی ادیتور و مجسمه‌ساز بودم و حالا مسیرم به چیزهای تازه‌ای رسیده؛ مسیری که هنوز هم ادامه داره.<br><br>
+                سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر و راحت تر بشه. شاید علاقه‌ام به آموزش و تربیت هم بی‌تأثیر نبوده باشه، اما فکر می‌کنم آدم تا دغدغه‌ی چیزی رو نداشته باشه، برای ساختنش قدم برنمی‌داره.<br><br>
+                شاید سراج رو با زبان و ادبیات عربی شروع کرده باشیم، اما سراج به هیچ چیز محدود نیست و نخواهد بود؛ قراره جایی برای یادگیری و تجربه‌ی چیزهای مختلف باشه و قدم‌به‌قدم بزرگ‌تر بشه.<br><br>
+                منم مثل سراج هنوز اول راهم؛ این تازه شروع ماجراست.<br><br>
+                به دنیای سراج خوش اومدید. 🌱
             </div>
             <div class="about-section-title">
                 <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 راه های ارتباطی
             </div>
             <div class="about-contacts">
-                <div class="contact-row" onclick="copyContact('ranshamed.fr@gmail.com',this)">
+                <div class="contact-row" data-link="mailto:ranshamed.fr@gmail.com">
                     <div class="contact-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg></div>
                     <div class="contact-info"><div class="contact-label">ایمیل</div><div class="contact-value">ranshamed.fr@gmail.com</div></div>
-                    <div class="contact-copy">کپی</div>
                 </div>
-                <div class="contact-row" onclick="copyContact('@Ra_Nsss',this)">
+                <div class="contact-row" data-link="https://t.me/Ra_Nsss">
                     <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M21 3 3 10l6 3 3 6 9-16z"/><path d="M9 13 21 3"/></svg></div>
                     <div class="contact-info"><div class="contact-label">تلگرام</div><div class="contact-value">@Ra_Nsss</div></div>
-                    <div class="contact-copy">کپی</div>
                 </div>
-                <div class="contact-row" onclick="copyContact('Hamed_Rans',this)">
+                <div class="contact-row" data-link="https://instagram.com/Hamed_Rans">
                     <div class="contact-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div>
                     <div class="contact-info"><div class="contact-label">اینستاگرام</div><div class="contact-value">Hamed_Rans</div></div>
-                    <div class="contact-copy">کپی</div>
                 </div>
-                <div class="contact-row" onclick="copyContact('Hamed_Rans',this)">
+                <div class="contact-row" data-link="https://x.com/Hamed_Rans">
                     <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/></svg></div>
                     <div class="contact-info"><div class="contact-label">ایکس</div><div class="contact-value">Hamed_Rans</div></div>
-                    <div class="contact-copy">کپی</div>
                 </div>
             </div>
         </div>`;
@@ -1635,6 +1619,7 @@ function renderSettingsControls(){
             inp.style.setProperty('--slider-pct',pct+'%');
         });
         if(settingsCat==='privacy')renderSessionsList();
+        bindContactLinks();
     },0);
 }
 
