@@ -1,1 +1,864 @@
-/* style-v2.css — همه استایل‌ها به style.css منتقل شدند */
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v2.6 — style-v2.css (Full Patch)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ ۱) دکمه‌های tool-card (رفع پوکیدن صفحه دستیار) ═══ */
+.tool-card{
+  padding:18px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  cursor:pointer;
+  transition:all .25s var(--ease);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  text-align:center;
+}
+.tool-card:hover{
+  border-color:var(--accent);
+  background:var(--accent-soft);
+  transform:translateY(-3px);
+  box-shadow:0 10px 24px -10px var(--accent);
+}
+.tool-card-icon{
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  background:var(--accent-soft);
+  color:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.tool-card-icon svg{
+  width:24px!important;
+  height:24px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+.tool-card-title{
+  font-size:13px;
+  font-weight:800;
+  color:var(--text-main);
+}
+.tool-card-desc{
+  font-size:10.5px;
+  color:var(--text-muted);
+}
+.tools-grid{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr))!important;
+  gap:12px!important;
+  margin:14px 20px!important;
+  padding:0!important;
+}
+.tools-view.active{align-items:stretch!important;padding:0!important}
+
+/* ═══ ۲) دکمه‌های قفل و نوتیف — فیکس هاور ═══ */
+.main-top-icon-btn{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  max-width:38px!important;
+  border-radius:50%!important;
+  background:var(--accent)!important;
+  color:#fff!important;
+  border:none!important;
+  box-shadow:none!important;
+  outline:none!important;
+  filter:none!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0!important;
+  cursor:pointer!important;
+  position:relative!important;
+  transition:transform .28s cubic-bezier(.34,1.4,.64,1),
+             background .25s ease!important;
+}
+.main-top-icon-btn::before,
+.main-top-icon-btn::after{display:none!important;content:none!important}
+.main-top-icon-btn:hover{
+  background:var(--accent-light)!important;
+  transform:translateY(-2px) scale(1.06)!important;
+  box-shadow:none!important;
+}
+.main-top-icon-btn:active{transform:scale(.96)!important}
+.main-top-icon-btn svg{
+  width:17px!important;
+  height:17px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.1!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+.main-top-avatar{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  max-width:38px!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  border:2px solid var(--accent)!important;
+  box-shadow:0 0 0 2px var(--panel-bg)!important;
+  background:var(--accent-soft)!important;
+  transition:transform .28s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.main-top-avatar:hover{
+  transform:scale(1.06)!important;
+  box-shadow:0 0 0 2px var(--panel-bg),0 0 0 3px var(--accent-soft)!important;
+}
+.main-top-avatar img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  -webkit-user-drag:none!important;
+}
+.header-left-actions,
+#sirajHeaderActions{
+  position:absolute!important;
+  left:14px!important;
+  top:50%!important;
+  transform:translateY(-50%) translateZ(0)!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  direction:ltr!important;
+  z-index:50!important;
+  pointer-events:auto!important;
+  border:none!important;
+  box-shadow:none!important;
+  outline:none!important;
+  background:transparent!important;
+  contain:paint!important;
+  -webkit-backface-visibility:hidden!important;
+  backface-visibility:hidden!important;
+}
+
+/* ═══ ۳) input — جمع شدن دو طرفه + انیمیشن نرم ═══ */
+.input-wrapper{
+  position:absolute!important;
+  bottom:0!important;
+  left:0!important;
+  right:0!important;
+  margin-top:0!important;
+  padding:0 20px 16px!important;
+  background:transparent!important;
+  pointer-events:none;
+  z-index:10;
+  box-sizing:border-box;
+}
+.input-wrapper > *{pointer-events:auto}
+.input-wrapper::before,
+.input-wrapper::after{display:none!important;content:none!important}
+.input-bar-shell{
+  width:100%;
+  max-width:100%;
+  margin:0 auto;
+  position:relative;
+  border-radius:26px;
+  isolation:isolate;
+  transition:
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .4s ease!important;
+  will-change:transform!important;
+  transform-origin:center bottom!important;
+}
+.input-bar-shell:focus-within,
+.input-bar-shell:has(.bar-input:focus){
+  transform:translateY(-12px) scale(.94)!important;
+  box-shadow:0 20px 50px -14px var(--accent)!important;
+}
+
+/* ═══ ۴) حلقه‌های چرخان دور input — هر دو هم‌جهت ═══ */
+@property --spin1{syntax:'<angle>';initial-value:0deg;inherits:false}
+@property --spin2{syntax:'<angle>';initial-value:0deg;inherits:false}
+
+.input-bar-shell::before,
+.input-bar-shell::after{
+  content:''!important;
+  position:absolute!important;
+  border-radius:29px!important;
+  padding:3px!important;
+  pointer-events:none!important;
+  opacity:0!important;
+  transition:opacity .4s ease!important;
+  z-index:1!important;
+  will-change:background!important;
+}
+.input-bar-shell::before{
+  inset:-3px!important;
+  background:conic-gradient(from var(--spin1),
+    transparent 0deg, transparent 280deg,
+    rgba(96,165,250,.1) 320deg,
+    var(--accent-light) 345deg,
+    #ffffff 358deg,
+    var(--accent) 360deg)!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+          mask-composite:exclude!important;
+  animation:spinNeon1 3s linear infinite!important;
+}
+.input-bar-shell::after{
+  inset:-5px!important;
+  border-radius:31px!important;
+  background:conic-gradient(from var(--spin2),
+    transparent 0deg, transparent 280deg,
+    rgba(139,92,246,.15) 320deg,
+    #8B5CF6 345deg,
+    #C084FC 358deg,
+    #a78bfa 360deg)!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+          mask-composite:exclude!important;
+  filter:blur(2px)!important;
+  z-index:0!important;
+  animation:spinNeon2 4s linear infinite!important;
+}
+.input-bar-shell:focus-within::before,
+.input-bar-shell:has(.bar-input:focus)::before{opacity:1!important}
+.input-bar-shell:focus-within::after,
+.input-bar-shell:has(.bar-input:focus)::after{opacity:.9!important}
+@keyframes spinNeon1{to{--spin1:360deg}}
+@keyframes spinNeon2{to{--spin2:360deg}}
+
+/* ═══ ۵) آیکون AI — بزرگ‌تر، پس‌زمینه ثابت ═══ */
+.bottom-nav-btn.nav-btn-chat{
+  flex:0 0 46px!important;
+  width:46px!important;
+  min-width:46px!important;
+  max-width:46px!important;
+  height:46px!important;
+  min-height:46px!important;
+  max-height:46px!important;
+  padding:0!important;
+  aspect-ratio:1/1;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
+  color:#fff;
+  border:none!important;
+  box-shadow:0 6px 18px -6px var(--accent)!important;
+  margin:2px 8px;
+  align-self:center;
+  transition:
+    transform .4s cubic-bezier(.34,1.4,.64,1),
+    margin .4s cubic-bezier(.22,1,.36,1),
+    box-shadow .35s ease,
+    filter .3s ease!important;
+  overflow:visible;
+}
+.bottom-nav-btn.nav-btn-chat svg{
+  width:26px!important;
+  height:26px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2!important;
+}
+.bottom-nav-btn.nav-btn-chat:hover{
+  transform:scale(1.08);
+  box-shadow:0 10px 28px -4px var(--accent),0 0 30px var(--accent-soft)!important;
+  filter:brightness(1.15);
+}
+.bottom-nav-btn.nav-btn-chat.active{
+  transform:scale(1.08);
+  filter:brightness(1.15);
+}
+.bottom-nav-btn.nav-btn-chat:active{transform:scale(.94)}
+.bottom-nav-btn.nav-btn-chat::after{display:none}
+
+/* ═══ ۶) دکمه برگشت به امروز — سمت چپ، انیمیشن نرم ═══ */
+.phc-center{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  text-align:center;
+  min-width:0;
+  position:relative!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+.phc-back-inline{
+  position:absolute!important;
+  left:58px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+  padding:3px 10px!important;
+  height:24px!important;
+  width:auto!important;
+  border-radius:12px!important;
+  border:1px solid var(--accent-soft)!important;
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  cursor:pointer!important;
+  font-family:var(--font-text)!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  white-space:nowrap!important;
+  transition:
+    background .3s cubic-bezier(.34,1.4,.64,1),
+    color .3s ease,
+    transform .32s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .3s ease!important;
+  z-index:5!important;
+}
+.phc-back-inline:hover{
+  background:var(--accent)!important;
+  color:#fff!important;
+  transform:translateY(-50%) scale(1.08)!important;
+  box-shadow:0 6px 16px -6px var(--accent)!important;
+}
+.phc-back-inline:active{
+  transform:translateY(-50%) scale(.96)!important;
+}
+.phc-back-inline svg{
+  width:11px!important;
+  height:11px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.4!important;
+  flex-shrink:0!important;
+}
+.phc-back-inline.hidden{display:none!important}
+.phc-back-inline.appearing{
+  animation:backBtnIn2 .55s cubic-bezier(.34,1.4,.64,1) both!important;
+}
+@keyframes backBtnIn2{
+  0%{opacity:0;transform:translateY(-50%) scale(.5) translateX(-10px)}
+  60%{opacity:1;transform:translateY(-50%) scale(1.12) translateX(0)}
+  100%{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
+}
+
+/* ═══ ۷) هدر چت — برگشت به قبل ═══ */
+.chat-header .brand-logo-wrap{
+  width:56px!important;
+  height:56px!important;
+  flex-shrink:0!important;
+  position:relative!important;
+  animation:logoGlowPulse 3s ease-in-out infinite!important;
+}
+.chat-header .brand-logo-wrap img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  display:block!important;
+  animation:logoMotion 15s var(--ease-smooth) infinite!important;
+  transform-origin:center!important;
+}
+.brand-text h1{
+  font-size:20px!important;
+  font-weight:900!important;
+  display:flex!important;
+  align-items:baseline!important;
+  gap:6px!important;
+  line-height:1.15!important;
+  white-space:nowrap!important;
+}
+.brand-text h1 .small-word{
+  font-size:.7em!important;
+  font-weight:700!important;
+  color:var(--text-muted)!important;
+  background:none!important;
+  -webkit-text-fill-color:var(--text-muted)!important;
+}
+.brand-text h1 .accent-word{
+  font-size:1.35em!important;
+  font-weight:900!important;
+  color:#D4AF37!important;
+  background:linear-gradient(135deg,#F4D03F,#D4AF37,#B8860B)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  filter:none!important;
+}
+.brand-text .subtitle{
+  font-size:10px!important;
+  color:var(--text-muted)!important;
+  margin-top:3px!important;
+}
+
+/* ═══ ۸) تنظیمات — چینش سایدبار ═══ */
+.settings-body{
+  display:flex!important;
+  flex-direction:row!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.settings-left{
+  flex:1 1 0!important;
+  min-height:0!important;
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:row!important;
+  overflow:hidden!important;
+}
+.settings-tabs{
+  display:flex!important;
+  flex-direction:column!important;
+  width:200px!important;
+  min-width:200px!important;
+  max-width:200px!important;
+  gap:6px!important;
+  padding:16px 10px!important;
+  border-bottom:none!important;
+  border-left:1px solid var(--border)!important;
+  border-right:none!important;
+  justify-content:flex-start!important;
+  align-items:stretch!important;
+  flex-wrap:nowrap!important;
+  background:var(--panel-bg)!important;
+  flex-shrink:0!important;
+  overflow-y:auto!important;
+  box-sizing:border-box!important;
+}
+.settings-tab-btn{
+  width:100%!important;
+  justify-content:flex-start!important;
+  text-align:right!important;
+  padding:11px 14px!important;
+  border-radius:11px!important;
+  border:1px solid transparent!important;
+  background:transparent!important;
+  color:var(--text-muted)!important;
+  font-family:var(--font-text)!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  cursor:pointer!important;
+  transition:all .25s cubic-bezier(.34,1.4,.64,1)!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  white-space:nowrap!important;
+  box-sizing:border-box!important;
+}
+.settings-tab-btn svg{
+  width:16px!important;
+  height:16px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2!important;
+  flex-shrink:0!important;
+}
+.settings-tab-btn:hover{
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  border-color:var(--border)!important;
+  transform:translateX(-3px)!important;
+}
+.settings-tab-btn.active{
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  border-color:var(--accent)!important;
+  box-shadow:none!important;
+  transform:translateX(-3px)!important;
+  font-weight:800!important;
+}
+.settings-content-wrap{
+  flex:1!important;
+  min-height:0!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+.settings-content{
+  position:absolute!important;
+  inset:0!important;
+  overflow-y:auto!important;
+  padding:20px 22px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:12px!important;
+  opacity:0!important;
+  transform:translateY(10px)!important;
+  pointer-events:none!important;
+  transition:opacity .35s var(--ease-smooth),transform .35s var(--ease-smooth)!important;
+  overscroll-behavior:contain!important;
+}
+.settings-content.active{
+  opacity:1!important;
+  transform:translateY(0)!important;
+  pointer-events:auto!important;
+}
+.settings-preview{
+  width:340px!important;
+  min-width:340px!important;
+  max-width:340px!important;
+  border-left:1px solid var(--border)!important;
+  border-right:none!important;
+  padding:14px!important;
+  background:rgba(0,0,0,.2)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  position:relative!important;
+  z-index:5!important;
+  isolation:isolate!important;
+  flex-shrink:0!important;
+}
+.settings-modal{
+  width:1200px!important;
+  max-width:96vw!important;
+  height:min(94vh,920px)!important;
+  border-radius:22px!important;
+}
+
+/* ═══ ۹) آیکون تاریخچه — فیکس SVG ═══ */
+.history-item .h-icon svg,
+.history-item .h-icon svg *{
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+.panel-card .card-title svg{
+  width:14px!important;
+  height:14px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+
+/* ═══ ۱۰) اسلایدر نوار — بدون کش‌آمدن ═══ */
+.nav-slider{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  pointer-events:none!important;
+  z-index:0!important;
+  opacity:0;
+  background:transparent!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  transition:
+    left .4s cubic-bezier(.32,.72,0,1),
+    top .4s cubic-bezier(.32,.72,0,1),
+    width .4s cubic-bezier(.32,.72,0,1),
+    height .4s cubic-bezier(.32,.72,0,1),
+    opacity .25s ease!important;
+  will-change:left,top,width,height,opacity!important;
+  backface-visibility:hidden!important;
+  transform:translateZ(0)!important;
+}
+.nav-slider.visible{opacity:1!important}
+.nav-slider-fill{
+  width:100%;
+  height:100%;
+  background:var(--accent);
+  border-radius:20px;
+  box-shadow:0 6px 20px -6px var(--accent);
+  transform-origin:center;
+  transition:border-radius .3s ease!important;
+}
+[data-nav-position="left"] .nav-slider-fill,
+[data-nav-position="right"] .nav-slider-fill{
+  border-radius:18px!important;
+}
+
+/* ═══ ۱۱) اسپلش لودر — بهبود ظاهر ═══ */
+.splash-loader{
+  position:fixed!important;
+  inset:0!important;
+  z-index:999999!important;
+  background:linear-gradient(160deg,#0E121B 0%,#0B0E14 100%)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:22px!important;
+  transition:opacity .6s cubic-bezier(.22,1,.36,1),visibility .6s!important;
+  font-family:'Vazirmatn',Tahoma,sans-serif!important;
+}
+.splash-loader.hidden{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.splash-logo{
+  width:100px!important;
+  height:100px!important;
+  animation:splashFloat 3s ease-in-out infinite!important;
+}
+.splash-logo img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  filter:drop-shadow(0 0 40px rgba(59,130,246,.55))!important;
+}
+@keyframes splashFloat{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-10px) scale(1.04)}
+}
+.splash-title{
+  font-size:26px!important;
+  font-weight:900!important;
+  letter-spacing:-.5px!important;
+  background:linear-gradient(135deg,#fff 0%,#60A5FA 50%,#A78BFA 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  animation:splashTitlePulse 2.5s ease-in-out infinite!important;
+}
+@keyframes splashTitlePulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.9;transform:scale(1.02)}
+}
+.splash-sub{
+  font-size:13px!important;
+  color:rgba(255,255,255,.55)!important;
+  font-weight:600!important;
+  letter-spacing:.3px!important;
+}
+.splash-dots{
+  display:flex!important;
+  gap:9px!important;
+  margin-top:6px!important;
+}
+.splash-dots span{
+  width:10px!important;
+  height:10px!important;
+  border-radius:50%!important;
+  background:linear-gradient(135deg,#60A5FA,#3B82F6)!important;
+  box-shadow:0 0 12px rgba(59,130,246,.6)!important;
+  animation:splashDot 1.4s ease-in-out infinite!important;
+}
+.splash-dots span:nth-child(1){animation-delay:0s}
+.splash-dots span:nth-child(2){animation-delay:.18s}
+.splash-dots span:nth-child(3){animation-delay:.36s}
+@keyframes splashDot{
+  0%,60%,100%{transform:scale(.4);opacity:.3}
+  30%{transform:scale(1.1);opacity:1}
+}
+
+/* ═══ ۱۲) صفحه قفل — ظاهر خوشگل‌تر ═══ */
+.lock-screen{
+  position:fixed!important;
+  inset:0!important;
+  background:rgba(0,0,0,.94)!important;
+  backdrop-filter:blur(30px)!important;
+  -webkit-backdrop-filter:blur(30px)!important;
+  z-index:99999!important;
+  display:none!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:20px!important;
+}
+.lock-screen.open{
+  display:flex!important;
+  animation:fadeInLock .4s ease both!important;
+}
+@keyframes fadeInLock{from{opacity:0}to{opacity:1}}
+.lock-box{
+  background:var(--panel-bg)!important;
+  border:1px solid var(--border-strong)!important;
+  border-radius:26px!important;
+  padding:36px 28px 28px!important;
+  max-width:420px!important;
+  width:100%!important;
+  text-align:center!important;
+  box-shadow:
+    0 24px 70px -22px rgba(0,0,0,.85),
+    0 0 0 1px rgba(255,255,255,.03),
+    inset 0 1px 0 rgba(255,255,255,.05)!important;
+  animation:lockBoxIn .55s cubic-bezier(.34,1.4,.64,1)!important;
+}
+@keyframes lockBoxIn{
+  0%{opacity:0;transform:scale(.85) translateY(30px)}
+  60%{opacity:1;transform:scale(1.03) translateY(-4px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+.lock-icon{
+  width:80px!important;
+  height:80px!important;
+  margin:0 auto 22px!important;
+  border-radius:50%!important;
+  background:var(--accent-soft)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  color:var(--accent)!important;
+  box-shadow:
+    0 0 0 4px var(--panel-bg),
+    0 0 0 5px var(--accent-soft),
+    0 12px 30px -10px var(--accent)!important;
+  animation:lockPulse 3s ease-in-out infinite!important;
+}
+@keyframes lockPulse{
+  0%,100%{box-shadow:0 0 0 4px var(--panel-bg),0 0 0 5px var(--accent-soft),0 12px 30px -10px var(--accent)}
+  50%{box-shadow:0 0 0 4px var(--panel-bg),0 0 0 5px var(--accent),0 12px 40px -6px var(--accent)}
+}
+.lock-icon svg{
+  width:38px!important;
+  height:38px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+.lock-title{
+  font-size:20px!important;
+  font-weight:900!important;
+  color:var(--text-main)!important;
+  margin-bottom:8px!important;
+}
+.lock-desc{
+  font-size:12.5px!important;
+  color:var(--text-muted)!important;
+  margin-bottom:22px!important;
+  line-height:1.9!important;
+}
+.lock-pin-row{
+  display:flex!important;
+  gap:12px!important;
+  justify-content:center!important;
+  direction:ltr!important;
+  margin:22px 0!important;
+  flex-wrap:nowrap!important;
+}
+.lock-pin-box{
+  width:44px!important;
+  height:52px!important;
+  border-radius:12px!important;
+  border:2px solid var(--border-strong)!important;
+  background:var(--primary)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-family:'JetBrains Mono',monospace!important;
+  font-size:22px!important;
+  font-weight:900!important;
+  color:var(--text-main)!important;
+  transition:all .3s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.lock-pin-box.active{
+  border-color:var(--accent)!important;
+  box-shadow:0 0 0 3px var(--accent-soft),0 8px 20px -6px var(--accent)!important;
+  transform:translateY(-3px)!important;
+}
+.lock-pin-box.filled{
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  border-color:var(--accent)!important;
+  color:#fff!important;
+}
+.lock-pin-box.success{
+  animation:pinSuccess .4s cubic-bezier(.34,1.4,.64,1)!important;
+  background:linear-gradient(135deg,#10B981,#059669)!important;
+  border-color:#10B981!important;
+}
+@keyframes pinSuccess{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.15) translateY(-6px)}
+  100%{transform:scale(1) translateY(0)}
+}
+.lock-pin-box.blur-out{
+  animation:pinBlurOut .6s ease forwards!important;
+}
+@keyframes pinBlurOut{
+  0%,40%{opacity:1;transform:translateY(0);filter:blur(0)}
+  100%{opacity:0;transform:translateY(-24px);filter:blur(6px)}
+}
+.lock-pin-box.error{
+  animation:pinShake .5s ease!important;
+  border-color:#EF4444!important;
+}
+@keyframes pinShake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(4px)}
+}
+.lock-input{
+  width:100%!important;
+  padding:16px 18px!important;
+  border-radius:16px!important;
+  border:2px solid var(--border)!important;
+  background:var(--primary)!important;
+  color:var(--text-main)!important;
+  font-family:var(--font-text)!important;
+  font-size:17px!important;
+  outline:none!important;
+  text-align:center!important;
+  letter-spacing:6px!important;
+  font-weight:800!important;
+  margin-bottom:14px!important;
+  transition:border-color .25s,box-shadow .3s!important;
+}
+.lock-input:focus{
+  border-color:var(--accent)!important;
+  box-shadow:0 0 0 3px var(--accent-soft),0 8px 24px -10px var(--accent)!important;
+}
+.lock-input::placeholder{
+  color:var(--text-muted)!important;
+  opacity:.5!important;
+  letter-spacing:4px!important;
+}
+.lock-btn{
+  width:100%!important;
+  padding:15px!important;
+  border-radius:14px!important;
+  border:none!important;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  color:#fff!important;
+  font-family:var(--font-text)!important;
+  font-size:14.5px!important;
+  font-weight:800!important;
+  cursor:pointer!important;
+  transition:transform .25s cubic-bezier(.34,1.4,.64,1),box-shadow .3s!important;
+  box-shadow:0 8px 24px -8px var(--accent)!important;
+}
+.lock-btn:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:0 14px 32px -8px var(--accent)!important;
+}
+.lock-btn:active{transform:translateY(0) scale(.98)!important}
+.lock-error{
+  font-size:12px!important;
+  color:#EF4444!important;
+  margin-top:12px!important;
+  min-height:18px!important;
+  font-weight:700!important;
+}
+.app-container.locked-entering{
+  animation:appEnterFromLock 1s cubic-bezier(.22,1,.36,1) both!important;
+}
+@keyframes appEnterFromLock{
+  0%{opacity:0;transform:scale(.96) translateY(20px);filter:blur(8px)}
+  100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}
+}
+
+/* ═══ ۱۳) اسلایدر نوار منو — قاعده‌ی کلی ═══ */
+[data-nav-position="bottom"] .bottom-nav,
+[data-nav-position="top"] .bottom-nav{
+  padding:6px 12px!important;
+  gap:4px!important;
+}
+
+/* ═══ ۱۴) فیکس لود اولیه — جلوگیری از پرش ═══ */
+.view{display:none;visibility:hidden}
+.view.active{display:flex;visibility:visible}
+[data-element-style]{will-change:backdrop-filter,background!important}
+.view, .view *{transform:translateZ(0)}
