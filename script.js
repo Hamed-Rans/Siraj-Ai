@@ -1,8 +1,8 @@
-/* Siraj v2.0 — script.js (v3.0 Final) */
+/* Siraj v2.0 — script.js (v3.1 Final) */
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
-    devNotifUrl:"https://raw.githubusercontent.com/Hamed-Rans/Siraj-Ai/refs/heads/main/notifications.json", /* ★ آدرس JSON اعلان‌های سازنده — بعداً پر کن */
+    devNotifUrl:"",
     defaultSettings:{
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
         animation:'normal',model:'gemini-3.6-flash',dialect:'fusha',
@@ -17,14 +17,11 @@ const APP_CONFIG={
         password:'',passwordEnabled:false,
         autoLockMinutes:0,lockOnTabSwitch:false,
         profileImage:'',
-        /* ★ جدید: اعلان‌ها */
         notifEnabled:true,
         notifPreMinutes:10,
-        /* ★ جدید: مطالعه */
         studyDefaultMinutes:25,
         studyStrictMode:true,
-        /* ★ جدید: نسخه */
-        appVersion:'3.0'
+        appVersion:'3.1'
     },
     themeColors:['navy','crimson','gold','purple','emerald','indigo'],
     colorNames:{navy:'شبانه',crimson:'آتشین',gold:'زرین',purple:'جادویی',emerald:'طبیعی',indigo:'نیلی'},
@@ -482,7 +479,7 @@ function applySettingsToUI(s){
     const qb=document.getElementById('quickBtn');if(qb)qb.classList.toggle('active',t.quick);
     applyPattern(document.getElementById('patternLayer'),t.pattern,t.patternColor1,t.patternColor2,t.patternPerCorner,t.patternSize,t.patternPosition,t.patternOpacity);
     var vb=document.getElementById('versionBadge');
-    if(vb) vb.textContent='v'+(t.appVersion||'3.0');
+    if(vb) vb.textContent='v'+(t.appVersion||'3.1');
     resetInactivityTimer();
     setTimeout(()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);},100);
 }
@@ -662,11 +659,11 @@ function renderPanelForBlog(){
         </div>`;
 }
 function renderPanelForVideos(){
-    document.getElementById('panelTitleText').textContent='انجمن سراج';
+    document.getElementById('panelTitleText').textContent='محفل سراج';
     document.getElementById('panelSubText').textContent='ارتباط با مدرسین و کاربران';
     document.getElementById('panelContent').innerHTML=`
         <div class="panel-card" style="border-color:var(--accent);background:var(--accent-soft)">
-            <div class="card-title" style="border-bottom-color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>انجمن</span></div>
+            <div class="card-title" style="border-bottom-color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>محفل</span></div>
             <div class="empty-state" style="padding:16px"><span class="emoji">🚧</span>به‌زودی</div>
         </div>`;
 }
@@ -745,7 +742,7 @@ function renderCommunity(){
       +'<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
       +'</div>'
       +'<div class="planner-hero-text">'
-      +'<div class="planner-hero-title">انجمن سراج</div>'
+      +'<div class="planner-hero-title">محفل سراج</div>'
       +'<div class="planner-hero-sub">فضایی برای پرسش و پاسخ، تبادل تجربه و هم‌اندیشی</div>'
       +'</div>'
       +'</div>'
@@ -776,7 +773,15 @@ function renderTools(){
         {icon:'<path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/>',title:'برنامه درسی',desc:'اینجا کلیک کن',prompt:'یه برنامه درسی برای امروز بچین'}
     ];
     v.innerHTML=`
-        <div class="page-title-bar"><div class="page-title-text">دستیارهای سراج</div></div>
+        <div class="planner-hero">
+            <div class="planner-hero-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
+                <svg viewBox="0 0 24 24"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/></svg>
+            </div>
+            <div class="planner-hero-text">
+                <div class="planner-hero-title" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6,#6d28d9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">دستیارهای سراج</div>
+                <div class="planner-hero-sub">ابزارهای کاربردی برای یادگیری زبان و ادبیات عربی</div>
+            </div>
+        </div>
         <div class="tools-grid">
             ${tools.map((t,i)=>`<div class="tool-card" onclick="runTool(${i})"><div class="tool-card-icon"><svg viewBox="0 0 24 24">${t.icon}</svg></div><div class="tool-card-title">${t.title}</div><div class="tool-card-desc">${t.desc}</div></div>`).join('')}
         </div>`;
@@ -1592,7 +1597,7 @@ function renderSettingsControls(){
         </div>
 
         <div class="settings-content${settingsCat==='behavior'?' active':''}" data-cat="behavior">
-            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+            <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>اعلان‌ها و یادآورها</label>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
                     <button class="row-btn${s.notifEnabled!==false?' active':''}" onclick="updateDraft('notifEnabled',true)"><span class="rb-label">فعال ✓</span></button>
@@ -1601,14 +1606,14 @@ function renderSettingsControls(){
                 <div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin-top:6px">یادآور پیش‌کار قبل از شروع هر تسک + یادآور پایان تسک</div>
             </div>
 
-            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+            <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>فاصله یادآور پیش‌کار</label>
                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">
                     ${[5,10,15,30].map(m=>`<button class="row-btn${s.notifPreMinutes==m?' active':''}" onclick="updateDraft('notifPreMinutes',${m})"><span class="rb-label">${m} دقیقه</span></button>`).join('')}
                 </div>
             </div>
 
-            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+            <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5"/></svg>تست و مجوز اعلان</label>
                 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
                     <button class="btn-primary" style="flex:1;justify-content:center" onclick="if(window.__sendTestNotification)window.__sendTestNotification()">
@@ -1629,7 +1634,7 @@ function renderSettingsControls(){
                 <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;margin-top:8px">اعلان‌های سازنده از سمت حامد (سازنده سراج) ارسال می‌شن.</div>
             </div>
 
-            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+            <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg>تنظیمات حالت مطالعه</label>
                 <div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin:4px 0">مدت پیش‌فرض تایمر</div>
                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
@@ -1644,7 +1649,7 @@ function renderSettingsControls(){
         </div>
 
         <div class="settings-content${settingsCat==='privacy'?' active':''}" data-cat="privacy">
-            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+            <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>قفل ورود با رمز</label>
                 ${s.passwordEnabled&&s.password?`
                     <div style="text-align:center;padding:8px 0">
@@ -1660,18 +1665,18 @@ function renderSettingsControls(){
                 `}
             </div>
 
-            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+            <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>قفل خودکار بعد از بی‌کاری</label>
                 <div class="slider-row"><input type="range" min="0" max="60" step="5" value="${s.autoLockMinutes||0}" oninput="updateDraft('autoLockMinutes',this.value)"><span class="slider-val">${(s.autoLockMinutes||0)===0?'خاموش':(s.autoLockMinutes+' دقیقه')}</span></div>
             </div>
 
-            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+            <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8"/><path d="M12 18v2"/></svg>دستگاه‌های فعال</label>
                 <div id="sessionsListInner"></div>
                 ${s.passwordEnabled&&s.password?`<button class="btn-secondary" style="width:100%;margin-top:6px;border-color:rgba(239,68,68,.4);color:#F87171" onclick="logoutOtherSessions()">خروج سایر دستگاه‌ها</button>`:''}
             </div>
 
-            <div class="setting-group" style="border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.02)">
+            <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>بکاپ‌گیری</label>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
                     <button class="btn-primary" style="justify-content:center" onclick="exportBackup()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>دانلود</button>
@@ -1679,7 +1684,7 @@ function renderSettingsControls(){
                 </div>
             </div>
 
-            <div class="setting-group" style="border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:14px;background:rgba(239,68,68,.04)">
+            <div class="setting-group" style="border-color:rgba(239,68,68,.4)!important">
                 <label style="color:#F87171"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>منطقه خطر</label>
                 <button class="btn-secondary" style="width:100%;border-color:rgba(239,68,68,.4);color:#F87171" onclick="if(confirm('همه اطلاعات پاک بشه؟')){localStorage.clear();sessionStorage.clear();location.reload();}">پاک کردن همه اطلاعات</button>
             </div>
@@ -1694,8 +1699,10 @@ function renderSettingsControls(){
             <div class="about-bio-card">
                 سلام 👋<br><br>
                 من حامدم؛ یه جوون ۲۰ ساله اراکی که عاشق ایران، تاریخش و مردمشه و همیشه به یادگرفتن و ساختن چیزهای جدید علاقه داشته.<br><br>
-                الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و در کنار درس، به هوش مصنوعی، برنامه‌نویسی و بازی‌سازی علاقه‌مندم.<br><br>
-                سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر باشه.<br><br>
+                الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و در کنار درس، به هوش مصنوعی، برنامه‌نویسی و بازی‌سازی علاقه‌مندم. یه زمانی ادیتور و مجسمه‌ساز بودم و حالا مسیرم به چیزهای تازه‌ای رسیده؛ مسیری که هنوز هم ادامه داره.<br><br>
+                سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر و راحت تر بشه. شاید علاقه‌ام به آموزش و تربیت هم بی‌تأثیر نبوده باشه، اما فکر می‌کنم آدم تا دغدغه‌ی چیزی رو نداشته باشه، برای ساختنش قدم برنمی‌داره.<br><br>
+                شاید سراج رو با زبان و ادبیات عربی شروع کرده باشیم، اما سراج به هیچ چیز محدود نیست و نخواهد بود؛ قراره جایی برای یادگیری و تجربه‌ی چیزهای مختلف باشه و قدم‌به‌قدم بزرگ‌تر بشه.<br><br>
+                منم مثل سراج هنوز اول راهم؛ این تازه شروع ماجراست.<br><br>
                 به دنیای سراج خوش اومدید. 🌱
             </div>
             <div class="about-section-title"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>راه های ارتباطی</div>
@@ -1718,7 +1725,7 @@ function renderSettingsControls(){
                 </div>
             </div>
             <div class="siraj-version-badge" style="text-align:center;padding:14px 0;font-size:12px;color:var(--text-muted)">
-                نسخه <span style="color:var(--accent);font-weight:900">${s.appVersion||'3.0'}</span>
+                نسخه <span style="color:var(--accent);font-weight:900">${s.appVersion||'3.1'}</span>
             </div>
         </div>`;
     setTimeout(()=>{
@@ -1767,23 +1774,8 @@ function unregisterMySession(){
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   DEVELOPER NOTIFICATIONS — ارسال اعلان از سازنده به کاربر
-   ═══════════════════════════════════════════════════════════════
-   ساختار JSON که سازنده در APP_CONFIG.devNotifUrl قرار می‌ده:
-
-   [
-     {
-       "id": "welcome_v3",
-       "title": "سراج نسخه 3.0 اومد!",
-       "body": "امکانات جدید: اعلان‌ها، PWA، تنظیمات دسته‌بندی‌شده",
-       "type": "info",
-       "emoji": "🎉",
-       "expiresAt": 1893456000000,
-       "targetUsers": []
-     }
-   ]
+   DEVELOPER NOTIFICATIONS
    ═══════════════════════════════════════════════════════════════ */
-
 function loadDevNotifSeen(){
     try{return JSON.parse(localStorage.getItem(DEV_NOTIF_SEEN_KEY)||'[]');}catch(e){return [];}
 }
@@ -1796,9 +1788,7 @@ function loadDevNotifCache(){
 function saveDevNotifCache(arr){
     try{localStorage.setItem(DEV_NOTIF_CACHE_KEY,JSON.stringify(arr.slice(-50)));}catch(e){}
 }
-
 function getMyUserId(){
-    /* شناسه‌ی کاربر: ترکیب یک id یونیک که توی localStorage ذخیره می‌شه */
     var uid = localStorage.getItem('siraj_uid');
     if(!uid){
         uid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
@@ -1806,12 +1796,10 @@ function getMyUserId(){
     }
     return uid;
 }
-
 async function fetchDevNotifications(){
     if(!APP_CONFIG.devNotifUrl || !APP_CONFIG.devNotifUrl.trim()) return;
     try{
         var url = APP_CONFIG.devNotifUrl.trim();
-        /* اضافه کردن کش‌باستر برای جلوگیری از کش مرورگر */
         var sep = url.indexOf('?') > -1 ? '&' : '?';
         var res = await fetch(url + sep + '_t=' + Date.now(), { cache: 'no-store' });
         if(!res.ok) return;
@@ -1820,14 +1808,12 @@ async function fetchDevNotifications(){
         saveDevNotifCache(data);
         processDevNotifications(data);
     }catch(e){
-        /* در صورت خطا از کش استفاده کن */
         try{
             var cached = loadDevNotifCache();
             if(cached.length) processDevNotifications(cached);
         }catch(err){}
     }
 }
-
 function processDevNotifications(arr){
     var seen = loadDevNotifSeen();
     var uid = getMyUserId();
@@ -1835,25 +1821,19 @@ function processDevNotifications(arr){
     arr.forEach(function(n){
         if(!n || !n.id) return;
         if(seen.indexOf(n.id) > -1) return;
-        /* انقضا */
         if(n.expiresAt && now > n.expiresAt){ seen.push(n.id); return; }
-        /* هدف‌گذاری */
         if(n.targetUsers && Array.isArray(n.targetUsers) && n.targetUsers.length > 0){
             if(n.targetUsers.indexOf(uid) < 0) return;
         }
-        /* نمایش */
         showDevNotification(n);
         seen.push(n.id);
     });
     saveDevNotifSeen(seen);
 }
-
 function showDevNotification(n){
     var emoji = n.emoji || (n.type === 'warning' ? '⚠️' : n.type === 'success' ? '✅' : n.type === 'error' ? '❌' : '📢');
     var title = n.title || 'اعلان از سراج';
     var body = n.body || '';
-
-    /* اگر سیستم اعلان planner-v2 در دسترسه، از اون استفاده کن */
     if(typeof window.__pushDevNotificationToPanel === 'function'){
         try{
             window.__pushDevNotificationToPanel({
@@ -1868,9 +1848,8 @@ function showDevNotification(n){
             });
         }catch(e){}
     }
-
-    /* نوتیف سیستمی */
-    if('Notification' in window && Notification.permission === 'granted'){
+    /* ★ فقط اگه تب مخفی باشه نوتیف سیستمی بفرست */
+    if(document.hidden && 'Notification' in window && Notification.permission === 'granted'){
         try{
             var sys = new Notification(emoji + ' ' + title, {
                 body: body,
@@ -1881,11 +1860,8 @@ function showDevNotification(n){
             sys.onclick = function(){ window.focus(); sys.close(); };
         }catch(e){}
     }
-
-    /* پاپ‌آپ داخل اپ */
     showDevNotifPopup(emoji, title, body);
 }
-
 function showDevNotifPopup(emoji, title, body){
     var old = document.getElementById('devNotifPopup');
     if(old) old.remove();
@@ -1910,7 +1886,6 @@ function showDevNotifPopup(emoji, title, body){
     el.querySelector('#devNotifOk').onclick = close;
     setTimeout(function(){ if(el.parentNode && el.classList.contains('show')) close(); }, 20000);
 }
-
 window.__checkDevNotifsNow = function(){
     if(!APP_CONFIG.devNotifUrl || !APP_CONFIG.devNotifUrl.trim()){
         if(window.toast) window.toast('آدرس اعلان‌های سازنده تنظیم نشده','error');
@@ -1922,22 +1897,18 @@ window.__checkDevNotifsNow = function(){
         if(window.toast) window.toast('خطا در بررسی اعلان‌ها','error');
     });
 };
-
-/* شروع چک دوره‌ای اعلان‌های سازنده — هر ۵ دقیقه */
 setTimeout(fetchDevNotifications, 8000);
 setInterval(fetchDevNotifications, 5 * 60 * 1000);
 
 /* ═══════════════════════════════════════════════════════════════
-   PWA — Service Worker + Install Prompt
+   PWA
    ═══════════════════════════════════════════════════════════════ */
-
 window._deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
     window._deferredInstallPrompt = e;
     setTimeout(showInstallButton, 5000);
 });
-
 function showInstallButton(){
     if(!window._deferredInstallPrompt) return;
     if(document.getElementById('pwaInstallBtn')) return;
@@ -1972,7 +1943,6 @@ window.addEventListener('load',()=>{
     setTimeout(()=>{const sl=document.getElementById('splashLoader');if(sl)sl.classList.add('hidden');},400);
     try{const savedImg=localStorage.getItem(PROFILE_IMG_KEY);if(savedImg&&!settings.profileImage)settings.profileImage=savedImg;}catch(e){}
 
-    /* ★ Service Worker */
     if('serviceWorker' in navigator){
         navigator.serviceWorker.register('sw.js').then(function(reg){
             console.log('[SW] registered', reg.scope);
