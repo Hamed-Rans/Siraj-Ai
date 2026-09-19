@@ -844,7 +844,8 @@
           btn.classList.add('shake');
           setTimeout(function(){ btn.classList.remove('shake'); }, 750);
         }
-        badge.textContent = unseen > 9 ? '9+' : unseen;
+        var faDigits = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+        badge.textContent = unseen > 9 ? '۹+' : String(unseen).replace(/\d/g, function(d){ return faDigits[+d]; });
       } else if(badge){
         badge.style.transition = 'all .35s cubic-bezier(.34,1.4,.64,1)';
         badge.style.transform = 'scale(0) translateY(-6px)';
@@ -915,7 +916,7 @@
       showNotifLivePopup(n);
       if(document.hidden && 'Notification' in window && Notification.permission === 'granted'){
         try{
-          var title = n.type === 'pre' ? '⏰ یادآور کار' : '🔔 پایان زمان کار';
+          var title = n.type === 'pre' ? '🔔 یادت نره' : '⏰ وقت تمومه';
           var body  = n.type === 'pre'
             ? 'کار «'+n.taskTitle+'» رو شروع کن'
             : 'کار «'+n.taskTitle+'» رو انجام دادی؟';
@@ -954,7 +955,7 @@
       } else {
         el.querySelector('#nlNo').onclick = function(){ close(); showNotifChoicePopup(n); markNotifAnswered(n.id); };
       }
-      setTimeout(function(){ if(el.parentNode && el.classList.contains('show')) close(); }, 30000);
+      setTimeout(function(){ if(el.parentNode && el.classList.contains('show')) close(); }, 5000);
     }
 
     function markNotifAnswered(id){
