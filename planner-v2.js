@@ -2793,106 +2793,99 @@
     /* ═══════════════════════════════════════════════════════════════
        ★ NAV SLIDER — بازنویسی کامل بدون کش‌آمدن و بدون باقی‌موندن
        ═══════════════════════════════════════════════════════════════ */
-    (function(){
-      var nav=null, slider=null;
+        (function(){
+      var nav=null, slider=null, fill=null;
+      var S=null;                       // موقعیت فعلی پس‌زمینه {l,r,t,b}
+      var raf=0, lastT=0, settleUntil=0;
 
-      function init(){
+      function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
+
+      function readTarget(btn){
+        var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
+        var padY=(pos==='left'||pos==='right')?2:4;
+        var l=btn.offsetLeft, t=btn.offsetTop;
+        return {
+          l:l, r:l+btn.offsetWidth,
+          t:t-padY, b:t+btn.offsetHeight+padY,
+          chat:btn.classList.contains('nav-btn-chat')
+        };
+      }
+
+      function frame(now){
+        raf=0;
+        if(!nav||!slider) return;
+        var btn=nav.querySelector('.bottom-nav-btn.active');
+        if(!btn){ imp(slider,'opacity','0'); lastT=0; return; }
+        var row=document.getElementById('navRow');
+        var collapsed=!!(row&&row.classList.contains('collapsed'));
+        var tg=readTarget(btn);
+        var dt=lastT?Math.min(64,now-lastT):16; lastT=now;
+
+        if(!S){
+          S={l:tg.l,r:tg.r,t:tg.t,b:tg.b};
+        }else{
+          var fast=1-Math.exp(-dt/45), slow=1-Math.exp(-dt/95);
+          var right=(tg.l+tg.r)>(S.l+S.r);
+          S.r+=(tg.r-S.r)*(right?fast:slow);
+          S.l+=(tg.l-S.l)*(right?slow:fast);
+          var down=(tg.t+tg.b)>(S.t+S.b);
+          S.b+=(tg.b-S.b)*(down?fast:slow);
+          S.t+=(tg.t-S.t)*(down?slow:fast);
+        }
+
+        slider.style.width=Math.max(0,S.r-S.l)+'px';
+        slider.style.height=Math.max(0,S.b-S.t)+'px';
+        imp(slider,'transform','translate3d('+S.l+'px,'+S.t+'px,0)');
+        imp(slider,'opacity',(tg.chat||collapsed)?'0':'1');
+
+        var moving=Math.abs(tg.l-S.l)>.4||Math.abs(tg.r-S.r)>.4||Math.abs(tg.t-S.t)>.4||Math.abs(tg.b-S.b)>.4;
+        if(moving||now<settleUntil){ raf=requestAnimationFrame(frame); }
+        else{ lastT=0; }
+      }
+
+      function kick(snap){
+        if(snap) S=null;
+        settleUntil=performance.now()+900;
+        if(!raf) raf=requestAnimationFrame(frame);
+      }
+      window.__moveNavSlider=function(){ kick(false); };
+
+      function initNavSlider(){
         nav=document.getElementById('bottomNav'); if(!nav) return false;
         var old=document.getElementById('navSlider'); if(old) old.remove();
         slider=document.createElement('div');
         slider.id='navSlider';
         slider.className='nav-slider';
-        slider.innerHTML='<div class="nav-slider-fill"></div>';
+        fill=document.createElement('div');
+        fill.className='nav-slider-fill';
+        slider.appendChild(fill);
+        imp(slider,'transition','opacity .28s ease');
+        imp(slider,'opacity','0');
         nav.insertBefore(slider,nav.firstChild);
 
         nav.addEventListener('click',function(e){
-        var btn=e.target.closest('.bottom-nav-btn[data-view]');
-        if(!btn) return;
-        nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
-        btn.classList.add('active');
-        setTimeout(function(){track();},20);
-        setTimeout(function(){track();},220);
-        setTimeout(function(){track();},460);
+          var btn=e.target.closest('.bottom-nav-btn[data-view]');
+          if(!btn) return;
+          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
+          btn.classList.add('active');
+          kick(false);
         },true);
 
-        setTimeout(function(){track(true);},150);
-        new MutationObserver(function(){track();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position','data-nav-style']});
-        window.addEventListener('resize',function(){track();});
+        new MutationObserver(function(){kick(false);}).observe(nav,{attributes:true,attributeFilter:['class'],subtree:true});
+        var row=document.getElementById('navRow');
+        if(row) new MutationObserver(function(){kick(false);}).observe(row,{attributes:true,attributeFilter:['class']});
+        new MutationObserver(function(){kick(true);}).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position','data-nav-style']});
+        window.addEventListener('resize',function(){kick(true);});
+        if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){kick(true);});
+        setTimeout(function(){kick(true);},150);
         return true;
       }
 
-      /* ★ بازنویسی‌شده — بدون transform، بدون کش‌آمدن */
-      function track(forceGrow){
-    if(!nav||!slider) return;
-    var btn=nav.querySelector('.bottom-nav-btn.active');
-    var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
-    var vert=(pos==='left'||pos==='right');
-    var navRow=document.getElementById('navRow');
-    var navCollapsed = navRow && navRow.classList.contains('collapsed');
-
-    if(!btn || navCollapsed){
-        slider.classList.remove('visible');
-        slider.style.opacity='0';
-        return;
-    }
-
-    var isChat = btn.classList.contains('nav-btn-chat');
-
-    /* ★ اگه AI فعاله، فوراً مخفی کن (بدون animation) */
-    if(isChat){
-        slider.style.transition='opacity .25s ease';
-        slider.style.opacity='0';
-        setTimeout(function(){
-            slider.classList.remove('visible');
-        }, 260);
-        return;
-    }
-
-    var isHoriz=(pos==='bottom'||pos==='top');
-    var x,y,w,h;
-
-    /* اندازه‌گیری بدون احتساب transition فعلی */
-    var oldT=btn.style.transition;
-    btn.style.transition='none';
-    void btn.offsetWidth;
-    var nr=nav.getBoundingClientRect();
-    var br=btn.getBoundingClientRect();
-    btn.style.transition=oldT;
-
-    x=br.left-nr.left;
-    y=br.top-nr.top;
-    w=br.width;
-    h=br.height;
-
-    var fill=slider.querySelector('.nav-slider-fill');
-    if(fill) fill.style.borderRadius = vert ? '999px' : '20px';
-
-    var extraH = isHoriz ? 8 : 4;
-    var extraY = isHoriz ? -4 : -2;
-
-    var wasVisible = slider.classList.contains('visible');
-
-    if(!wasVisible){
-        slider.style.transition='none';
-        slider.style.left=x+'px';
-        slider.style.top=(y+extraY)+'px';
-        slider.style.width=w+'px';
-        slider.style.height=(h+extraH)+'px';
-        slider.style.opacity='0';
-        void slider.offsetWidth;
-        slider.style.transition='left .4s cubic-bezier(.32,.72,0,1), top .4s cubic-bezier(.32,.72,0,1), width .4s cubic-bezier(.32,.72,0,1), height .4s cubic-bezier(.32,.72,0,1), opacity .3s ease';
-        slider.style.opacity='1';
-        slider.classList.add('visible');
-    } else {
-        slider.style.transition='left .4s cubic-bezier(.32,.72,0,1), top .4s cubic-bezier(.32,.72,0,1), width .4s cubic-bezier(.32,.72,0,1), height .4s cubic-bezier(.32,.72,0,1), opacity .3s ease';
-        slider.style.left=x+'px';
-        slider.style.top=(y+extraY)+'px';
-        slider.style.width=w+'px';
-        slider.style.height=(h+extraH)+'px';
-        slider.style.opacity='1';
-        slider.classList.add('visible');
-    }
-}
+      if(!initNavSlider()){
+        var t=setInterval(function(){ if(initNavSlider()) clearInterval(t); },200);
+        setTimeout(function(){ clearInterval(t); },8000);
+      }
+    })();
     /* ★ انیمیشن سوییچ view — RTL درست */
     (function(){
       function hook(){
