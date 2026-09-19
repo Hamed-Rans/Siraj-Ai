@@ -3055,3 +3055,4 @@ window.addEventListener('load', () => {
 
     resetInactivityTimer();
 });
+window.syncLockTypedRow = syncLockTypedRow;
