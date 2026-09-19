@@ -1911,3 +1911,52 @@
 .settings-acc-panel-content > .setting-group:last-child{
     margin-bottom:0;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX: هدرها — جلوگیری از رد شدن طرح (pattern) از پشت هدر
+   باگ: پرتو/هاله رنگی گوشه هدر دیده می‌شد
+   ═══════════════════════════════════════════════════════════════ */
+.chat-header,
+.page-title-bar,
+.planner-hero{
+  position:relative;
+  isolation:isolate;
+}
+
+.chat-header::before,
+.page-title-bar::before,
+.planner-hero::before{
+  content:''!important;
+  position:absolute!important;
+  inset:0!important;
+  pointer-events:none!important;
+  z-index:-1!important;
+  background:var(--panel-bg)!important;
+  opacity:1!important;
+}
+
+/* حالت شیشه‌ای — پوشش با blur روی طرح */
+[data-header-style="glass"] .chat-header::before,
+[data-header-style="glass"] .page-title-bar::before,
+[data-header-style="glass"] .planner-hero::before{
+  background:rgba(18,22,30,.72)!important;
+  backdrop-filter:blur(28px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(28px) saturate(200%)!important;
+}
+
+[data-theme^="light"][data-header-style="glass"] .chat-header::before,
+[data-theme^="light"][data-header-style="glass"] .page-title-bar::before,
+[data-theme^="light"][data-header-style="glass"] .planner-hero::before{
+  background:rgba(255,255,255,.78)!important;
+}
+
+/* حالت ساده — پوشش کامل با panel-bg */
+[data-header-style="solid"] .chat-header::before,
+[data-header-style="solid"] .page-title-bar::before,
+[data-header-style="solid"] .planner-hero::before{
+  background:var(--panel-bg)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.chat-header, .page-title-bar, .planner-hero{
+  background-image:none!important;
+}
