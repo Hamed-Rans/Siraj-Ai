@@ -1994,3 +1994,18 @@
 .main-top-avatar:active{
   transform:scale(.96)!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX: بهبود performance بستن مودال تنظیمات
+   ═══════════════════════════════════════════════════════════════ */
+.modal-overlay{
+  /* انیمیت فقط opacity و visibility، نه backdrop-filter */
+  transition:opacity .28s cubic-bezier(.4,0,.2,1),visibility .28s cubic-bezier(.4,0,.2,1)!important;
+}
+.modal-overlay.open .settings-modal{
+  /* GPU acceleration روی خود باکس مودال */
+  will-change:transform;
+}
+.settings-modal{
+  transform:translateZ(0);
+  backface-visibility:hidden;
+}
