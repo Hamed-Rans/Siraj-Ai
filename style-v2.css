@@ -4249,3 +4249,167 @@ body[data-theme^="midnight"]{
   font-weight:800!important;
   box-shadow:0 4px 12px -4px #10B981!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v2.6 — Fixes
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① دکمه‌های نوتیف و قفل — گردتر و بدون halo */
+.main-top-icon-btn{
+  border-radius:14px!important;
+  background:var(--accent)!important;
+  color:#fff!important;
+  border:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+}
+.main-top-icon-btn::before,
+.main-top-icon-btn::after{
+  display:none!important;
+}
+.main-top-icon-btn:hover{
+  background:var(--accent-light)!important;
+  box-shadow:0 6px 16px -6px var(--accent)!important;
+}
+
+/* ② بج اعلان — توی دکمه و فارسی */
+.notif-badge{
+  top:4px!important;
+  right:4px!important;
+  min-width:16px!important;
+  height:16px!important;
+  padding:0 4px!important;
+  font-size:9.5px!important;
+  background:linear-gradient(135deg,#EF4444,#DC2626)!important;
+  border:1.5px solid rgba(255,255,255,.3)!important;
+  border-radius:8px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-family:var(--font-text)!important;
+  font-weight:900!important;
+  color:#fff!important;
+  box-shadow:none!important;
+  animation:none!important;
+  line-height:1!important;
+}
+
+/* ③ دکمه برگرد به امروز — چپ‌تر و کوچیک‌تر */
+.phc-back-inline{
+  left:-4px!important;
+  padding:3px 8px!important;
+  font-size:9.5px!important;
+  height:22px!important;
+}
+.phc-center{
+  padding-left:70px!important;
+  padding-right:70px!important;
+}
+
+/* ④ حذف پس‌زمینه‌ی بیخودی پشت المان‌ها */
+.bottom-nav::before,
+.bottom-nav::after{
+  display:none!important;
+}
+.input-bar-shell::after{
+  display:none!important;
+}
+
+/* ⑤ گرادیانت شیک دوتایی برای «هوشواره سراج» */
+.chat-header .brand-text h1 .small-word{
+  background:linear-gradient(135deg,#9CA3AF 0%,#E5E7EB 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  font-weight:700!important;
+}
+.chat-header .brand-text h1 .accent-word{
+  background:linear-gradient(135deg,#60A5FA 0%,#A78BFA 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  font-weight:900!important;
+  filter:none!important;
+}
+
+/* ⑥ نوار چپ/راست — سایه بیشتر وقتی هاور */
+[data-nav-position="left"] .nav-row.collapsed:hover .bottom-nav,
+[data-nav-position="right"] .nav-row.collapsed:hover .bottom-nav,
+[data-nav-position="left"] .nav-row.collapsed .bottom-nav:hover,
+[data-nav-position="right"] .nav-row.collapsed .bottom-nav:hover{
+  box-shadow:0 25px 60px -15px rgba(0,0,0,.7),0 0 40px -10px var(--accent)!important;
+}
+
+/* ⑦ history-item — بازطراحی کامل */
+.history-item{
+  background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(139,92,246,.05))!important;
+  border:1px solid var(--border-strong)!important;
+  border-radius:16px!important;
+  padding:14px!important;
+  margin-bottom:10px!important;
+  transition:all .3s cubic-bezier(.34,1.4,.64,1)!important;
+  position:relative!important;
+  overflow:hidden!important;
+}
+.history-item::before{
+  content:''!important;
+  position:absolute!important;
+  top:0!important;right:0!important;
+  width:3px!important;height:100%!important;
+  background:linear-gradient(180deg,var(--accent-light),var(--accent-dark))!important;
+  transform:scaleY(0)!important;
+  transform-origin:top!important;
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.history-item:hover{
+  transform:translateX(-4px) translateY(-2px)!important;
+  box-shadow:0 12px 30px -12px var(--accent)!important;
+  border-color:var(--accent)!important;
+}
+.history-item:hover::before{transform:scaleY(1)!important;}
+.history-item.active{
+  background:linear-gradient(135deg,var(--accent-soft),rgba(139,92,246,.08))!important;
+  border-color:var(--accent)!important;
+}
+.history-item.pinned{
+  background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.03))!important;
+  border-color:rgba(245,158,11,.5)!important;
+}
+.history-item.pinned::before{
+  background:linear-gradient(180deg,#FBBF24,#F59E0B)!important;
+  transform:scaleY(1)!important;
+}
+/* آیکون پین جدید */
+.history-item .h-pin{
+  width:26px!important;height:26px!important;
+  border-radius:9px!important;
+  border:none!important;
+  background:rgba(255,255,255,.06)!important;
+  color:var(--text-muted)!important;
+  cursor:pointer!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0!important;
+  transition:all .25s!important;
+  flex-shrink:0!important;
+}
+.history-item .h-pin svg{
+  width:13px!important;height:13px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.2!important;
+}
+.history-item .h-pin:hover{
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  transform:scale(1.1)!important;
+}
+.history-item.pinned .h-pin{
+  background:rgba(245,158,11,.2)!important;
+  color:#FBBF24!important;
+}
+
+/* ⑧ notification popup — بدون هدر، یه اسم قشنگ‌تر */
+.task-notif-title{ color:var(--accent)!important; }
