@@ -2009,3 +2009,87 @@
   transform:translateZ(0);
   backface-visibility:hidden;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH B — دسته B (کامل)
+   شامل: انیمیشن بستن تنظیمات + رفع جابجایی پس‌زمینه + انیمیشن نوتیف
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX B1: انیمیشن بستن تنظیمات — هم‌شکل با باز شدن
+   ═══════════════════════════════════════════════════════════════ */
+.modal-overlay.closing{
+  transition:opacity .42s cubic-bezier(.4,0,.2,1),visibility .42s!important;
+}
+.modal-overlay.closing .settings-modal{
+  animation:settingsExitAnim .42s cubic-bezier(.34,1.4,.64,1) both!important;
+}
+@keyframes settingsExitAnim{
+  0%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}
+  100%{opacity:0;transform:scale(.94) translateY(20px);filter:blur(4px)}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX B2: انتقال پس‌زمینه از body به html
+   علت: background-attachment:fixed روی body موقع برگشت از تب جابجا می‌شد
+   ═══════════════════════════════════════════════════════════════ */
+html{
+  background-color:var(--primary);
+  background-image:var(--primary-gradient);
+  background-size:cover;
+  background-position:center center;
+  background-attachment:fixed;
+  background-repeat:no-repeat;
+}
+body{
+  background:transparent!important;
+  background-image:none!important;
+  background-color:transparent!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX B3a: پنل نوتیف — حذف animation، استفاده از transition
+   علت: style-v2.css از animation روی .open استفاده می‌کرد که
+   موقع بستن کلاس، انیمیشن حذف می‌شد و پنل فوراً محو می‌شد
+   ═══════════════════════════════════════════════════════════════ */
+.notif-panel{
+  animation:none!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  visibility:hidden!important;
+  transform:scale(.6) translateY(-20px)!important;
+  transition:
+    opacity .35s cubic-bezier(.4,0,.2,1),
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    visibility .35s!important;
+}
+.notif-panel.open{
+  animation:none!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  visibility:visible!important;
+  transform:scale(1) translateY(0)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX B3b: پاپ‌آپ تسک — حذف animation، استفاده از transition
+   ═══════════════════════════════════════════════════════════════ */
+.task-notif-popup{
+  animation:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  transform:translateX(120%)!important;
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    opacity .35s cubic-bezier(.4,0,.2,1),
+    visibility .4s!important;
+}
+.task-notif-popup.show{
+  animation:none!important;
+  opacity:1!important;
+  visibility:visible!important;
+  transform:translateX(0)!important;
+}
