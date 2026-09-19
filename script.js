@@ -800,7 +800,7 @@ function renderPanelForChat(){
         <div class="panel-pane${currentPanelTab==='daily'?' active':''}" data-pane="daily">${renderDailyPanel()}</div>
         <div class="panel-pane${currentPanelTab==='history'?' active':''}" data-pane="history">
             <div class="panel-card">
-                <div class="card-title"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9"/></svg><span>گفتگوهای قبلی</span></div>
+                <div class="card-title"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><span>گفتگوهای قبلی</span></div>
                 <div class="history-search">
                     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
                     <input type="text" id="historySearchInput" placeholder="جستجو در گفتگوها..." oninput="filterHistoryList(this.value)">
@@ -1384,8 +1384,7 @@ async function send(){
         const w=document.createElement('div');
         w.className='msg-wrap bot';
         w.id='typing-indicator';
-        var _mc=getCurrentModelConfig();
-        var _te=(_mc && _mc.emoji) ? _mc.emoji : '🧘‍♂️';
+        var _te='🧘‍♂️';
         w.innerHTML='<div class="msg"><span class="think-indicator"><span class="think-text">دارم تفکر میکنم صبرله <span class="think-emoji">'+_te+'</span></span><span class="typing"><span></span><span></span><span></span></span></span></div>';
         box.appendChild(w);box.scrollTop=box.scrollHeight;
     }
@@ -2566,7 +2565,18 @@ window.addEventListener('appinstalled', function(){
 });
 
 window.addEventListener('load',()=>{
-    setTimeout(()=>{const sl=document.getElementById('splashLoader');if(sl)sl.classList.add('hidden');},400);
+    /* صبر کن تا محتوا آماده بشه */
+    var splashStart = Date.now();
+    var splashMinTime = 1200; /* حداقل زمان نمایش */
+    var tryHideSplash = function(){
+        var elapsed = Date.now() - splashStart;
+        var wait = Math.max(0, splashMinTime - elapsed);
+        setTimeout(function(){
+            var sl = document.getElementById('splashLoader');
+            if(sl) sl.classList.add('hidden');
+        }, wait);
+    };
+    tryHideSplash();
     try{
         const savedImg=localStorage.getItem(PROFILE_IMG_KEY);
         if(savedImg&&!settings.profileImage)settings.profileImage=savedImg;
