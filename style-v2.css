@@ -862,3 +862,694 @@
 .view.active{display:flex;visibility:visible}
 [data-element-style]{will-change:backdrop-filter,background!important}
 .view, .view *{transform:translateZ(0)}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ — Phase 1 Responsive (Mobile Critical)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── تبلت و موبایل بزرگ (تا ۹۰۰px) ─── */
+@media (max-width: 900px) {
+
+  /* ۱) body — حذف padding و گوشه‌ها */
+  body {
+    padding: 0 !important;
+    align-items: stretch !important;
+  }
+  .app-container {
+    gap: 0 !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+  .top-row {
+    gap: 0 !important;
+    flex-direction: column !important;
+  }
+
+  /* ۲) ساید پنل — کامل مخفی */
+  .side-panel {
+    display: none !important;
+  }
+
+  /* ۳) main-chat — تمام صفحه بدون گوشه */
+  .main-chat {
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
+  }
+
+  /* ۴) chat-header — جمع‌وجورتر */
+  .chat-header {
+    padding: 10px 14px !important;
+    padding-left: 130px !important;
+    min-height: 54px !important;
+  }
+  .chat-header .brand-logo-wrap {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .brand-text h1 {
+    font-size: 17px !important;
+  }
+  .brand-text h1 .accent-word {
+    font-size: 1.3em !important;
+  }
+  .brand-text .subtitle {
+    font-size: 9.5px !important;
+  }
+
+  /* ۵) header actions — فشرده‌تر */
+  .header-left-actions,
+  #sirajHeaderActions {
+    left: 10px !important;
+    gap: 7px !important;
+  }
+  .main-top-avatar,
+  .main-top-icon-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+  }
+  .main-top-icon-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  /* ۶) box (چت) — padding کمتر */
+  #box {
+    padding: 14px 16px 110px !important;
+    gap: 10px !important;
+  }
+  .msg-wrap {
+    max-width: 85% !important;
+  }
+  .msg {
+    padding: 10px 14px !important;
+    font-size: .9em !important;
+  }
+
+  /* ۷) input-wrapper — فشرده */
+  .input-wrapper {
+    padding: 0 12px 12px !important;
+  }
+  .input-bar {
+    padding: 6px 10px !important;
+    gap: 6px !important;
+    border-radius: 22px !important;
+  }
+  .input-bar-shell,
+  .input-bar-shell:focus-within,
+  .input-bar-shell:has(.bar-input:focus) {
+    transform: translateY(-8px) scale(.98) !important;
+  }
+  .bar-input {
+    padding: 9px 12px !important;
+    font-size: 14px !important;
+  }
+  .bar-btn {
+    height: 38px !important;
+    min-width: 38px !important;
+    padding: 0 8px !important;
+    border-radius: 12px !important;
+  }
+  .bar-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+  .bar-btn .btn-label {
+    display: none !important;
+  }
+  .send-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+  }
+  .send-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .send-btn.pause-mode {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+  }
+  .dd-trigger {
+    padding: 6px 8px !important;
+    height: 34px !important;
+    font-size: 10.5px !important;
+  }
+  .dd-trigger span:not(.dd-arrow) {
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ۸) نوار پایین — فشرده‌تر */
+  .nav-row {
+    height: 64px !important;
+    padding-bottom: 4px !important;
+  }
+  .nav-row.collapsed {
+    height: 20px !important;
+  }
+  .bottom-nav {
+    padding: 5px 8px !important;
+    gap: 2px !important;
+    border-radius: 22px !important;
+  }
+  .bottom-nav-btn:not(.nav-btn-chat),
+  .nav-collapse-tab {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    padding: 0 8px !important;
+    border-radius: 12px !important;
+  }
+  .bottom-nav-btn:not(.nav-btn-chat) svg,
+  .nav-collapse-tab svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .bottom-nav-btn.active:not(.nav-btn-chat) {
+    max-width: 100px !important;
+    padding: 0 10px !important;
+  }
+  .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+    max-width: 70px !important;
+    font-size: 10px !important;
+  }
+  .bottom-nav-btn.nav-btn-chat {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    max-width: 42px !important;
+    max-height: 42px !important;
+    margin: 2px 4px !important;
+  }
+  .bottom-nav-btn.nav-btn-chat svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  /* ۹) تنظیمات — فول اسکرین بدون preview */
+  .modal-overlay {
+    padding: 0 !important;
+  }
+  .settings-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+  .settings-preview {
+    display: none !important;
+  }
+  .settings-left {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  .settings-tabs {
+    flex-direction: row !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    border-left: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 10px 8px !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .settings-tab-btn {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    padding: 8px 14px !important;
+    font-size: 11.5px !important;
+    transform: none !important;
+    white-space: nowrap !important;
+    border-radius: 10px !important;
+  }
+  .settings-tab-btn:hover {
+    transform: none !important;
+  }
+  .settings-tab-btn.active {
+    transform: none !important;
+  }
+  .settings-tab-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .settings-content {
+    padding: 16px 14px !important;
+  }
+  .modal-header {
+    padding: 12px 14px !important;
+  }
+  .modal-header h3 {
+    font-size: 14px !important;
+  }
+
+  /* ۱۰) کارت‌های صفحه خالی — جمع‌تر */
+  .page-empty-card {
+    padding: 28px 22px !important;
+    margin: 20px 14px 30px !important;
+    border-radius: 18px !important;
+    max-width: calc(100% - 28px) !important;
+  }
+  .page-empty-icon {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 20px !important;
+    margin-bottom: 14px !important;
+  }
+  .page-empty-icon svg {
+    width: 34px !important;
+    height: 34px !important;
+  }
+  .page-empty-title {
+    font-size: 18px !important;
+  }
+  .page-empty-desc {
+    font-size: 12px !important;
+    line-height: 1.8 !important;
+    margin-bottom: 16px !important;
+  }
+  .page-empty-soon {
+    padding: 9px 18px !important;
+    font-size: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  /* ۱۱) planner-hero — کوچیک‌تر */
+  .planner-hero {
+    padding: 12px 14px !important;
+    padding-left: 130px !important;
+    gap: 10px !important;
+  }
+  .planner-hero-icon {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 13px !important;
+  }
+  .planner-hero-icon svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+  .planner-hero-title {
+    font-size: 17px !important;
+  }
+  .planner-hero-sub {
+    font-size: 10px !important;
+  }
+
+  /* ۱۲) welcome-card — کوچیک‌تر */
+  .welcome-card {
+    padding: 22px 18px !important;
+    border-radius: 22px !important;
+    max-width: 90% !important;
+  }
+  .welcome-logo {
+    width: 66px !important;
+    height: 66px !important;
+  }
+  .welcome-title {
+    font-size: 20px !important;
+  }
+  .welcome-tagline {
+    font-size: 13px !important;
+  }
+  .welcome-sub {
+    font-size: 11.5px !important;
+  }
+  .welcome-halo {
+    width: 240px !important;
+    height: 240px !important;
+  }
+
+  /* ۱۳) site-credit */
+  .site-credit {
+    font-size: 9px !important;
+    bottom: 4px !important;
+    left: 8px !important;
+    padding: 3px 5px !important;
+  }
+  .site-credit img {
+    width: 13px !important;
+    height: 13px !important;
+  }
+  .site-version {
+    font-size: 8.5px !important;
+    padding: 1px 5px !important;
+  }
+
+  /* ۱۴) اسپلش — جمع‌تر */
+  .splash-logo {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  .splash-title {
+    font-size: 22px !important;
+  }
+  .splash-sub {
+    font-size: 12px !important;
+  }
+
+  /* ۱۵) صفحه قفل — جمع‌تر */
+  .lock-box {
+    padding: 28px 22px 22px !important;
+    border-radius: 22px !important;
+    max-width: 92% !important;
+  }
+  .lock-icon {
+    width: 70px !important;
+    height: 70px !important;
+    margin-bottom: 18px !important;
+  }
+  .lock-icon svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .lock-title {
+    font-size: 18px !important;
+  }
+  .lock-desc {
+    font-size: 12px !important;
+    margin-bottom: 18px !important;
+  }
+  .lock-input {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+  }
+  .lock-btn {
+    padding: 13px !important;
+    font-size: 13.5px !important;
+  }
+
+  /* ۱۶) toast — بالاتر از نوار */
+  .toast-container {
+    bottom: 80px !important;
+    padding: 0 12px !important;
+    width: 100% !important;
+  }
+  .toast {
+    max-width: 100% !important;
+    font-size: 11.5px !important;
+    padding: 9px 14px !important;
+  }
+
+  /* ۱۷) پنل اعلان‌ها — تمام عرض */
+  .notif-panel {
+    width: calc(100vw - 16px) !important;
+    left: 8px !important;
+    right: 8px !important;
+    top: 62px !important;
+    max-height: 75vh !important;
+    border-radius: 18px !important;
+  }
+
+  /* ۱۸) task-notif-popup — تمام عرض */
+  .task-notif-popup {
+    right: 10px !important;
+    left: 10px !important;
+    bottom: 78px !important;
+    max-width: calc(100% - 20px) !important;
+    width: auto !important;
+  }
+}
+
+/* ─── موبایل متوسط (تا ۴۸۰px) ─── */
+@media (max-width: 480px) {
+
+  /* chat header — بازهم جمع‌تر */
+  .chat-header {
+    padding: 8px 10px !important;
+    padding-left: 122px !important;
+    min-height: 50px !important;
+  }
+  .chat-header .brand-logo-wrap {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .brand-text h1 {
+    font-size: 15px !important;
+  }
+  .brand-text h1 .small-word {
+    font-size: .65em !important;
+  }
+  .brand-text h1 .accent-word {
+    font-size: 1.25em !important;
+  }
+  .brand-text .subtitle {
+    font-size: 9px !important;
+  }
+
+  /* header actions */
+  .header-left-actions,
+  #sirajHeaderActions {
+    left: 8px !important;
+    gap: 6px !important;
+  }
+  .main-top-avatar,
+  .main-top-icon-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+  }
+  .main-top-icon-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  /* نوار پایین */
+  .bottom-nav {
+    padding: 4px 6px !important;
+    gap: 1px !important;
+  }
+  .bottom-nav-btn:not(.nav-btn-chat),
+  .nav-collapse-tab {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    padding: 0 6px !important;
+  }
+  .bottom-nav-btn.active:not(.nav-btn-chat) {
+    max-width: 90px !important;
+    padding: 0 8px !important;
+  }
+  .bottom-nav-btn.active:not(.nav-btn-chat)::after {
+    max-width: 60px !important;
+    font-size: 9.5px !important;
+  }
+  .bottom-nav-btn.nav-btn-chat {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+  }
+  .bottom-nav-btn.nav-btn-chat svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* input — بازهم جمع‌تر */
+  .input-wrapper {
+    padding: 0 8px 8px !important;
+  }
+  .input-bar {
+    padding: 5px 8px !important;
+    gap: 4px !important;
+    border-radius: 20px !important;
+  }
+  .bar-input {
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+  }
+  .bar-btn {
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 6px !important;
+    border-radius: 10px !important;
+  }
+  .bar-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .send-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+  .send-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .dd-trigger {
+    padding: 5px 6px !important;
+    height: 32px !important;
+    font-size: 10px !important;
+  }
+  .dd-trigger svg,
+  .dd-trigger .dd-icon {
+    width: 13px !important;
+    height: 13px !important;
+  }
+  .dd-trigger span:not(.dd-arrow) {
+    max-width: 45px;
+  }
+
+  /* box */
+  #box {
+    padding: 12px 12px 100px !important;
+  }
+  .msg-wrap {
+    max-width: 90% !important;
+  }
+  .msg {
+    padding: 9px 12px !important;
+    font-size: .87em !important;
+  }
+
+  /* planner-hero */
+  .planner-hero {
+    padding: 10px 12px !important;
+    padding-left: 122px !important;
+  }
+  .planner-hero-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .planner-hero-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .planner-hero-title {
+    font-size: 15px !important;
+  }
+  .planner-hero-sub {
+    font-size: 9.5px !important;
+  }
+
+  /* toast */
+  .toast-container {
+    bottom: 70px !important;
+    padding: 0 8px !important;
+  }
+  .toast {
+    font-size: 11px !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+  }
+
+  /* splash */
+  .splash-logo {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .splash-title {
+    font-size: 20px !important;
+  }
+  .splash-dots span {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  /* welcome */
+  .welcome-title {
+    font-size: 18px !important;
+  }
+  .welcome-logo {
+    width: 58px !important;
+    height: 58px !important;
+  }
+  .welcome-card {
+    padding: 18px 14px !important;
+    gap: 10px !important;
+  }
+}
+
+/* ─── موبایل خیلی کوچیک (تا ۳۶۰px) ─── */
+@media (max-width: 360px) {
+  .chat-header {
+    padding-left: 116px !important;
+  }
+  .planner-hero {
+    padding-left: 116px !important;
+  }
+  .brand-text h1 {
+    font-size: 14px !important;
+  }
+  .bottom-nav-btn:not(.nav-btn-chat),
+  .nav-collapse-tab {
+    min-width: 34px !important;
+    max-width: 34px !important;
+  }
+  .bottom-nav-btn.nav-btn-chat {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+  .main-top-avatar,
+  .main-top-icon-btn {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+  }
+  .welcome-title {
+    font-size: 16px !important;
+  }
+}
+
+/* ─── فیکس‌های خاص موبایل ─── */
+@media (max-width: 900px) and (orientation: landscape) {
+  .side-panel { display: none !important; }
+  .nav-row { height: 54px !important; }
+  .input-wrapper { padding: 0 12px 6px !important; }
+  #box { padding: 10px 14px 90px !important; }
+}
+
+/* ─── لمس بهتر (فقط موبایل) ─── */
+@media (hover: none) and (pointer: coarse) {
+  .bottom-nav-btn,
+  .nav-collapse-tab,
+  .main-top-icon-btn,
+  .main-top-avatar,
+  .send-btn,
+  .bar-btn,
+  .task-check,
+  .task-del {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-nav-btn:active,
+  .send-btn:active,
+  .bar-btn:active {
+    transform: scale(.92) !important;
+  }
+  .main-top-icon-btn:active,
+  .main-top-avatar:active {
+    transform: scale(.94) !important;
+  }
+}
