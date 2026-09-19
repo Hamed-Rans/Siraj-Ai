@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v2.5 Final) */
+/* Siraj v2.6 — planner-v2.js */
 (function(){
   'use strict';
 
@@ -22,7 +22,6 @@
     var DEFAULT_VIEW_KEY = 'siraj-default-view';
     var DAILY_STATE_KEY  = 'siraj-daily-state';
     var USER_AVATAR_URL  = 'siraj-logo.png';
-    /* ★ ترتیب viewها مطابق HTML: planner → tools → chat → blog → videos */
     var VIEW_ORDER       = ['planner','tools','chat','blog','videos'];
     var _currentMainView = 'chat';
     var _lastTab         = 'daily';
@@ -518,6 +517,7 @@
       }
     }
 
+    /* ═══ HERO — دکمه برگشت الان بیرون از phc-day است ═══ */
     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -534,10 +534,10 @@
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
+        +backBtn
         +'<div class="phc-day">'
         +'<span data-anim-key="weekday">'+esc(p.weekday)+'</span>'
         +'<span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span>'
-        +backBtn
         +'</div>'
         +'<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'
         +(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')
@@ -556,10 +556,10 @@
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navWeek(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
+        +backBtn
         +'<div class="phc-day">'
         +'<span data-anim-key="monthName2">'+esc(p.monthName)+'</span>'
         +'<span data-anim-key="yearNum2">'+esc(p.yearNum)+'</span>'
-        +backBtn
         +'</div>'
         +'<div class="phc-date"><span data-anim-key="weekOrdinal">هفته '+weekOrd(weekOfMonth())+' ماه</span> — <span data-anim-key="weekRange">از '+esc(days[0].date)+' تا '+esc(days[6].date)+'</span></div>'
         +'</div>'
@@ -581,10 +581,10 @@
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
+        +backBtn
         +'<div class="phc-day">'
         +'<span data-anim-key="monthName3">'+esc(p.monthName)+'</span>'
         +'<span data-anim-key="yearNum3">'+esc(p.yearNum)+'</span>'
-        +backBtn
         +'</div>'
         +'<div class="phc-date" data-anim-key="monthStat">'+toFa(dg)+' از '+toFa(goals.length)+' هدف این ماه انجام شده</div>'
         +'</div>'
@@ -606,9 +606,9 @@
       return '<div class="planner-hero-card">'
         +'<button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
+        +backBtn
         +'<div class="phc-day">'
         +'<span data-anim-key="yearNum4">'+esc(d.toLocaleDateString('fa-IR',{year:'numeric'}))+'</span>'
-        +backBtn
         +'</div>'
         +'<div class="phc-date">'+toFa(done)+' از '+toFa(goals.length)+' هدف سالانه انجام شده</div>'
         +'</div>'
@@ -792,7 +792,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NOTIFICATION SYSTEM
+       NOTIFICATION SYSTEM — بدون تغییر
        ═══════════════════════════════════════════════════════════════ */
     var NOTIF_KEY      = 'siraj-notif-history';
     var NOTIF_SEEN_KEY = 'siraj-notif-seen';
@@ -1265,6 +1265,7 @@
     setInterval(checkTaskNotifications, 30000);
     setInterval(updateNotifBadge, 15000);
 
+    /* ═══ DAILY CONTENT ═══ */
     function dailyContentHTML(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
@@ -2617,7 +2618,7 @@
     setTimeout(linkifyContacts,1800);
 
     /* ═══════════════════════════════════════════════════════════════
-       HEADER ACTIONS — با آیکون‌های جدید و بدون halo
+       HEADER ACTIONS
        ═══════════════════════════════════════════════════════════════ */
     function injectMainTopActions(){
       if(_injectingHeaderActions) return;
@@ -2635,7 +2636,6 @@
           w.id='sirajHeaderActions';
           w.className='header-left-actions';
 
-          /* ★ آیکون نوتیف جدید (زنگ با نقطه) + آیکون قفل جدید (قفل با کلید) */
           w.innerHTML =
             '<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div>'
             +'<button type="button" class="main-top-icon-btn notif-bell" id="notifBtn" title="اعلان‌ها">'
@@ -2791,8 +2791,12 @@
       }
     }
 
+    /* ═══════════════════════════════════════════════════════════════
+       ★ NAV SLIDER — بازنویسی کامل بدون کش‌آمدن و بدون باقی‌موندن
+       ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null;
+
       function init(){
         nav=document.getElementById('bottomNav'); if(!nav) return false;
         var old=document.getElementById('navSlider'); if(old) old.remove();
@@ -2805,15 +2809,12 @@
         nav.addEventListener('click',function(e){
           var btn=e.target.closest('.bottom-nav-btn[data-view]');
           if(!btn) return;
-          if(btn.classList.contains('nav-btn-chat')){
-            slider.classList.remove('visible');
-            return;
-          }
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
           btn.classList.add('active');
+          /* ★ بدون رها کردن — track یک‌بار کافیه */
           setTimeout(function(){track();},20);
-          setTimeout(function(){track();},200);
-          setTimeout(function(){track();},450);
+          setTimeout(function(){track();},220);
+          setTimeout(function(){track();},460);
         },true);
 
         setTimeout(function(){track(true);},150);
@@ -2822,65 +2823,76 @@
         return true;
       }
 
+      /* ★ بازنویسی‌شده — بدون transform، بدون کش‌آمدن */
       function track(forceGrow){
         if(!nav||!slider) return;
-        var btn=nav.querySelector('.bottom-nav-btn.active:not(.nav-btn-chat)');
+        var btn=nav.querySelector('.bottom-nav-btn.active');
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
         var vert=(pos==='left'||pos==='right');
-
         var navRow=document.getElementById('navRow');
         var navCollapsed = navRow && navRow.classList.contains('collapsed');
 
-        if(!btn || btn.classList.contains('nav-btn-chat') || navCollapsed){
+        if(!btn || navCollapsed){
           slider.classList.remove('visible');
+          slider.style.opacity='0';
           return;
         }
 
+        var isChat = btn.classList.contains('nav-btn-chat');
         var isHoriz=(pos==='bottom'||pos==='top');
         var x,y,w,h;
-        if(isHoriz){
-          var oldT=btn.style.transition;
-          btn.style.transition='none';
-          void btn.offsetWidth;
-          var nr0=nav.getBoundingClientRect();
-          var br0=btn.getBoundingClientRect();
-          btn.style.transition=oldT;
-          x=br0.left-nr0.left;
-          y=br0.top-nr0.top;
-          w=br0.width;
-          h=br0.height;
-        } else {
-          var nr=nav.getBoundingClientRect();
-          var br=btn.getBoundingClientRect();
-          x=br.left-nr.left;
-          y=br.top-nr.top;
-          w=br.width;
-          h=br.height;
-        }
+
+        /* اندازه‌گیری موقعیت نسبت به نوار */
+        var oldT=btn.style.transition;
+        btn.style.transition='none';
+        void btn.offsetWidth;
+        var nr=nav.getBoundingClientRect();
+        var br=btn.getBoundingClientRect();
+        btn.style.transition=oldT;
+
+        x=br.left-nr.left;
+        y=br.top-nr.top;
+        w=br.width;
+        h=br.height;
 
         var fill=slider.querySelector('.nav-slider-fill');
-        if(fill) fill.style.borderRadius= vert ? '999px' : '20px';
+        if(fill) fill.style.borderRadius = vert ? '999px' : '20px';
 
         var extraH = isHoriz ? 8 : 4;
         var extraY = isHoriz ? -4 : -2;
 
         var wasVisible = slider.classList.contains('visible');
 
-        /* ★ فیکس لرزش: بدون grow animation */
+        /* ★ اگه چت فعال شد → انیمیشن fade-out تمیز */
+        if(isChat){
+          slider.style.transition='left .42s cubic-bezier(.32,.72,0,1), top .42s cubic-bezier(.32,.72,0,1), width .42s cubic-bezier(.32,.72,0,1), height .42s cubic-bezier(.32,.72,0,1), opacity .28s ease';
+          slider.style.left=x+'px';
+          slider.style.top=(y+extraY)+'px';
+          slider.style.width=w+'px';
+          slider.style.height=(h+extraH)+'px';
+          slider.style.opacity='0';
+          setTimeout(function(){
+            if(slider.style.opacity==='0') slider.classList.remove('visible');
+          }, 320);
+          return;
+        }
+
+        /* ★ غیر چت → موقعیت‌دهی و نمایش */
         if(!wasVisible){
           slider.style.transition='none';
-          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0) scale(.9)';
+          slider.style.left=x+'px';
+          slider.style.top=(y+extraY)+'px';
           slider.style.width=w+'px';
           slider.style.height=(h+extraH)+'px';
           slider.style.opacity='0';
           void slider.offsetWidth;
-          slider.style.transition='transform .4s cubic-bezier(.34,1.4,.64,1), opacity .3s ease, width .4s cubic-bezier(.22,1,.36,1), height .4s cubic-bezier(.22,1,.36,1)';
-          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0) scale(1)';
+          slider.style.transition='left .42s cubic-bezier(.32,.72,0,1), top .42s cubic-bezier(.32,.72,0,1), width .42s cubic-bezier(.32,.72,0,1), height .42s cubic-bezier(.32,.72,0,1), opacity .3s ease';
           slider.style.opacity='1';
           slider.classList.add('visible');
         } else {
-          slider.style.transition='transform .4s cubic-bezier(.22,1,.36,1), width .4s cubic-bezier(.22,1,.36,1), height .4s cubic-bezier(.22,1,.36,1)';
-          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0) scale(1)';
+          slider.style.transition='left .42s cubic-bezier(.32,.72,0,1), top .42s cubic-bezier(.32,.72,0,1), width .42s cubic-bezier(.32,.72,0,1), height .42s cubic-bezier(.32,.72,0,1), opacity .3s ease';
+          slider.style.left=x+'px';
+          slider.style.top=(y+extraY)+'px';
           slider.style.width=w+'px';
           slider.style.height=(h+extraH)+'px';
           slider.style.opacity='1';
@@ -2894,7 +2906,7 @@
       var iv=setInterval(function(){if(init()||++tries>100) clearInterval(iv);},100);
     })();
 
-    /* ★ انیمیشن سوییچ view — در RTL درست */
+    /* ★ انیمیشن سوییچ view — RTL درست */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function') return false;
@@ -2925,7 +2937,6 @@
             v.classList.remove('leaving','view-out-left','view-out-right','view-in-from-left','view-in-from-right');
             v.style.pointerEvents='';
           });
-          /* ★ در RTL: رفتن به تب بعدی (راست‌تر در نوار) → صفحه قدیمی از راست خارج، جدید از چپ */
           var goingLeft=newIdx>oldIdx;
           var outClass=goingLeft?'view-out-right':'view-out-left';
           var inClass=goingLeft?'view-in-from-left':'view-in-from-right';
@@ -3006,7 +3017,6 @@
       }
     },800);
 
-    /* ★ فیکس پس‌زمینه دکمه‌های نوار وقتی مخفی */
     function updateNavHiddenState(){
       var row=document.getElementById('navRow');
       if(!row) return;
@@ -3030,6 +3040,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v2.5] planner loaded ✓');
+    console.log('[Siraj v2.6] planner loaded ✓');
   }
 })();
