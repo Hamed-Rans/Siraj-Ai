@@ -2093,3 +2093,272 @@ body{
   visibility:visible!important;
   transform:translateX(0)!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH C — دسته C (کامل)
+   شامل: رفع جابجایی پس‌زمینه + هدر ثابت + زیرمنو تنظیمات + انیمیشن دکمه‌های هدر
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX C1: پس‌زمینه در لایه fixed مستقل (رفع جابجایی پس از برگشت از تب)
+   ═══════════════════════════════════════════════════════════════ */
+html{
+  background:transparent!important;
+  background-image:none!important;
+}
+body{
+  background:transparent!important;
+  background-image:none!important;
+}
+body::before{
+  content:''!important;
+  position:fixed!important;
+  inset:0!important;
+  z-index:-1!important;
+  pointer-events:none!important;
+  background:var(--siraj-bg,var(--primary-gradient))!important;
+  background-size:var(--siraj-bg-size,cover)!important;
+  background-repeat:var(--siraj-bg-repeat,no-repeat)!important;
+  background-position:center center!important;
+  background-attachment:fixed!important;
+  will-change:background;
+  transform:translateZ(0);
+  backface-visibility:hidden;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX C2: هدرها در جابجایی تب‌ها ثابت بمونن (counter-animation)
+   ═══════════════════════════════════════════════════════════════ */
+.view.active.view-in-from-right .chat-header,
+.view.active.view-in-from-right .planner-hero,
+.view.active.view-in-from-right .page-title-bar{
+  animation:hdrStayFromRight .5s cubic-bezier(.22,1,.36,1) both!important;
+  will-change:transform;
+}
+.view.active.view-in-from-left .chat-header,
+.view.active.view-in-from-left .planner-hero,
+.view.active.view-in-from-left .page-title-bar{
+  animation:hdrStayFromLeft .5s cubic-bezier(.22,1,.36,1) both!important;
+  will-change:transform;
+}
+.view.leaving.view-out-right .chat-header,
+.view.leaving.view-out-right .planner-hero,
+.view.leaving.view-out-right .page-title-bar{
+  animation:hdrLeaveToRight .28s cubic-bezier(.4,0,.6,1) forwards!important;
+}
+.view.leaving.view-out-left .chat-header,
+.view.leaving.view-out-left .planner-hero,
+.view.leaving.view-out-left .page-title-bar{
+  animation:hdrLeaveToLeft .28s cubic-bezier(.4,0,.6,1) forwards!important;
+}
+@keyframes hdrStayFromRight{
+  0%{transform:translateX(-80px) scale(1.0417)}
+  60%{transform:translateX(-10px) scale(1.008)}
+  100%{transform:translateX(0) scale(1)}
+}
+@keyframes hdrStayFromLeft{
+  0%{transform:translateX(80px) scale(1.0417)}
+  60%{transform:translateX(10px) scale(1.008)}
+  100%{transform:translateX(0) scale(1)}
+}
+@keyframes hdrLeaveToRight{
+  0%{transform:translateX(0) scale(1)}
+  100%{transform:translateX(-80px) scale(1.0417)}
+}
+@keyframes hdrLeaveToLeft{
+  0%{transform:translateX(0) scale(1)}
+  100%{transform:translateX(80px) scale(1.0417)}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX C3: زیرمنوی ظاهر در سایدبار تنظیمات
+   ═══════════════════════════════════════════════════════════════ */
+.settings-tab-parent{
+  position:relative;
+}
+.settings-tab-arrow{
+  width:14px!important;
+  height:14px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.2!important;
+  flex-shrink:0;
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1);
+  opacity:.7;
+}
+.settings-tab-parent.active .settings-tab-arrow{
+  transform:rotate(180deg);
+  opacity:1;
+}
+.settings-submenu{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  margin:2px 0 6px 14px;
+  padding-right:0;
+  border-right:2px solid var(--accent-soft);
+  animation:submenuOpen .38s cubic-bezier(.22,1,.36,1) both;
+  overflow:hidden;
+}
+@keyframes submenuOpen{
+  0%{opacity:0;max-height:0;transform:translateY(-6px)}
+  100%{opacity:1;max-height:220px;transform:translateY(0)}
+}
+.settings-submenu-btn{
+  display:flex;
+  align-items:center;
+  width:100%;
+  padding:8px 12px;
+  border-radius:8px;
+  border:none;
+  background:transparent;
+  color:var(--text-muted);
+  font-family:var(--font-text);
+  font-size:11.5px;
+  font-weight:700;
+  text-align:right;
+  cursor:pointer;
+  transition:background .25s cubic-bezier(.4,0,.2,1),color .25s cubic-bezier(.4,0,.2,1),padding .3s cubic-bezier(.34,1.4,.64,1);
+  position:relative;
+}
+.settings-submenu-btn::before{
+  content:'';
+  position:absolute;
+  right:-14px;
+  top:50%;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--border);
+  transform:translateY(-50%);
+  transition:background .25s,transform .3s cubic-bezier(.34,1.4,.64,1);
+}
+.settings-submenu-btn:hover{
+  background:var(--accent-soft);
+  color:var(--accent);
+  padding-right:16px;
+}
+.settings-submenu-btn:hover::before{
+  background:var(--accent);
+  transform:translateY(-50%) scale(1.3);
+}
+.settings-submenu-btn.active{
+  background:var(--accent-soft);
+  color:var(--accent);
+  font-weight:800;
+  padding-right:16px;
+}
+.settings-submenu-btn.active::before{
+  background:var(--accent);
+  transform:translateY(-50%) scale(1.5);
+  box-shadow:0 0 0 3px var(--accent-soft);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX C4: انیمیشن نرم دکمه‌های هدر (بدون چرخش پروفایل)
+   ═══════════════════════════════════════════════════════════════ */
+.main-top-avatar:hover{
+  transform:scale(1.08)!important;
+  box-shadow:
+    0 0 0 2px var(--panel-bg),
+    0 0 0 3px var(--accent),
+    0 8px 22px -6px var(--accent)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX C5: صفحه قفل — نمایش دونه‌دونه کاراکترها
+   ═══════════════════════════════════════════════════════════════ */
+.lock-typed-row{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  margin:18px 0 10px;
+  direction:ltr;
+  flex-wrap:nowrap;
+}
+.lock-typed-char{
+  width:32px;
+  height:40px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
+  color:#fff;
+  font-family:'JetBrains Mono',monospace;
+  font-size:20px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 12px -4px var(--accent);
+  animation:lockCharPop .38s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes lockCharPop{
+  0%{opacity:0;transform:scale(.3) translateY(-14px)}
+  60%{opacity:1;transform:scale(1.15) translateY(2px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+.lock-typed-char.erasing{
+  animation:lockCharOut .28s cubic-bezier(.4,0,.6,1) forwards;
+}
+@keyframes lockCharOut{
+  0%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(.3) translateY(14px)}
+}
+.lock-typed-char.success{
+  background:linear-gradient(135deg,#10B981,#059669)!important;
+  box-shadow:0 4px 16px -4px #10B981,0 0 20px rgba(16,185,129,.5)!important;
+  animation:lockCharSuccess .55s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes lockCharSuccess{
+  0%{transform:scale(1) rotate(0)}
+  50%{transform:scale(1.35) rotate(-8deg)}
+  100%{transform:scale(1.1) rotate(0)}
+}
+.lock-typed-char.error{
+  background:linear-gradient(135deg,#EF4444,#DC2626)!important;
+  animation:lockCharError .5s cubic-bezier(.4,0,.6,1) both;
+}
+@keyframes lockCharError{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
+}
+.lock-success-check{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px 20px;
+  margin-top:12px;
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(16,185,129,.05));
+  border:1px solid rgba(16,185,129,.4);
+  color:#10B981;
+  font-size:13px;
+  font-weight:800;
+  animation:lockCheckIn .55s cubic-bezier(.34,1.4,.64,1) both;
+}
+.lock-success-check svg{
+  width:24px;
+  height:24px;
+  stroke:#10B981;
+  fill:none;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  animation:lockCheckDraw .55s cubic-bezier(.34,1.4,.64,1) .15s both;
+}
+@keyframes lockCheckIn{
+  0%{opacity:0;transform:scale(.7) translateY(10px)}
+  60%{opacity:1;transform:scale(1.06) translateY(-2px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+@keyframes lockCheckDraw{
+  0%{stroke-dasharray:30;stroke-dashoffset:30}
+  100%{stroke-dasharray:30;stroke-dashoffset:0}
+}
