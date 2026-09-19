@@ -37,7 +37,7 @@
     <div class="lock-pin-row" id="lockPinRow"></div>
     <input type="password" class="lock-input" id="lockInput" inputmode="numeric" maxlength="32"
        placeholder="••••••"
-       oninput="updatePinBoxes(this.value)"
+       oninput="syncLockTypedRow(this.value)"
        onkeydown="if(event.key==='Enter')tryUnlock()">
     <button class="lock-btn" onclick="tryUnlock()">باز کردن</button>
     <div class="lock-error" id="lockError"></div>
