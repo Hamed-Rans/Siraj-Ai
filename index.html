@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- Siraj v2.0 -->
-<html lang="fa" dir="rtl" data-theme="dark-navy" data-bubble-shape="modern" data-anim="normal" data-pattern="boteh" data-input-style="solid" data-header-style="glass" data-font="vazirmatn" data-lang="fa" data-nav-position="bottom" data-nav-style="default">
+<html lang="fa" dir="rtl" data-theme="dark-navy" data-bubble-shape="modern" data-anim="normal" data-pattern="boteh" data-input-style="solid" data-header-style="glass" data-element-style="solid" data-font="vazirmatn" data-lang="fa" data-nav-position="bottom" data-nav-style="default">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +8,17 @@
 <link rel="icon" type="image/png" href="siraj-logo.png">
 <link rel="apple-touch-icon" href="siraj-logo.png">
 <link rel="shortcut icon" href="siraj-logo.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Estedad:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="style-v2.css">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#3B82F6">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="سراج">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Estedad:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style-v2.css">
 </head>
 <body>
 
@@ -34,11 +34,11 @@
     <div class="lock-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
     <div class="lock-title">ورود به سراج</div>
     <div class="lock-desc">برای دسترسی، رمز عبور خود را وارد کنید</div>
-   <div class="lock-pin-row" id="lockPinRow"></div>
-   <input type="password" class="lock-input" id="lockInput" inputmode="numeric" maxlength="32"
-       style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:50%;left:50%;"
-       oninput="updatePinBoxes(this.value)"
-       onkeydown="if(event.key==='Enter')tryUnlock()">
+    <div class="lock-pin-row" id="lockPinRow"></div>
+    <input type="password" class="lock-input" id="lockInput" inputmode="numeric" maxlength="32"
+           style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:50%;left:50%;"
+           oninput="updatePinBoxes(this.value)"
+           onkeydown="if(event.key==='Enter')tryUnlock()">
     <button class="lock-btn" onclick="tryUnlock()">باز کردن</button>
     <div class="lock-error" id="lockError"></div>
   </div>
@@ -133,12 +133,21 @@
         <svg viewBox="0 0 24 24"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
       </button>
       <div class="nav-slider" id="navSlider"></div>
+
+      <!-- ★ ۱. برنامه‌ریز -->
       <button class="bottom-nav-btn" data-view="planner" onclick="switchView('planner')" title="برنامه‌ریز">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>
       </button>
-      <button class="bottom-nav-btn" data-view="blog" onclick="switchView('blog')" title="مقالات">
-        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
+
+      <!-- ★ ۲. دستیار (جای مقالات) -->
+      <button class="bottom-nav-btn" data-view="tools" onclick="switchView('tools')" title="دستیار">
+        <svg viewBox="0 0 24 24">
+          <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/>
+          <path d="m14 7 3 3"/>
+        </svg>
       </button>
+
+      <!-- ★ ۳. گفتگو (دکمه مرکزی) -->
       <button class="bottom-nav-btn nav-btn-chat active" data-view="chat" onclick="switchView('chat')" title="گفتگو">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8">
         <path d="M11 3.5l1.4 4.1a2 2 0 0 0 1.2 1.2l4.1 1.4-4.1 1.4a2 2 0 0 0-1.2 1.2L11 17l-1.4-4.1a2 2 0 0 0-1.2-1.2L4.3 10.3l4.1-1.4a2 2 0 0 0 1.2-1.2L11 3.5z"/>
@@ -146,12 +155,23 @@
         <path d="M6 16.5v2M5 17.5h2" opacity="0.85"/>
         </svg>
       </button>
-      <button class="bottom-nav-btn" data-view="tools" onclick="switchView('tools')" title="دستیار">
-        <svg viewBox="0 0 24 24"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
+
+      <!-- ★ ۴. مقالات (جای قبلی دستیار) -->
+      <button class="bottom-nav-btn" data-view="blog" onclick="switchView('blog')" title="مقالات">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
       </button>
-      <button class="bottom-nav-btn" data-view="videos" onclick="switchView('videos')" title="انجمن">
-        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+
+      <!-- ★ ۵. دیوان (آیکون جدید) -->
+      <button class="bottom-nav-btn" data-view="videos" onclick="switchView('videos')" title="دیوان">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 19.5V5a2 2 0 0 1 2-2h9l5 5v11.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/>
+          <path d="M14 3v5h5"/>
+          <path d="M8 12h8"/>
+          <path d="M8 16h6"/>
+        </svg>
       </button>
+
+      <!-- ★ ۶. تنظیمات -->
       <button class="bottom-nav-btn" id="settingsNavBtn" onclick="openSettings()" title="تنظیمات">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
@@ -159,7 +179,7 @@
   </div>
 </div>
 
-<div class="site-credit"><img src="siraj-logo.png" alt=""><span>created by Hamed Rans</span><span class="site-version">v2.0</span></div>
+<div class="site-credit"><img src="siraj-logo.png" alt=""><span>created by Hamed Rans</span><span class="site-version" id="versionBadge">v3.3</span></div>
 <div class="toast-container" id="toastContainer"></div>
 
 <div class="modal-overlay" id="settingsModal">
@@ -175,7 +195,7 @@
       </div>
       <div class="settings-preview">
         <div class="preview-title"><svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><span>پیش‌نمایش</span></div>
-        <div class="preview-zone" id="previewZone" data-theme="dark-navy" data-header-style="glass" data-input-style="solid" data-nav-position="bottom" data-nav-style="default">
+        <div class="preview-zone" id="previewZone" data-theme="dark-navy" data-header-style="glass" data-input-style="solid" data-element-style="solid" data-nav-position="bottom" data-nav-style="default">
           <div class="pv-bg-img" id="pvBgImg"></div>
           <div class="pattern-layer" id="previewPatternLayer"></div>
           <div class="pv-header">
