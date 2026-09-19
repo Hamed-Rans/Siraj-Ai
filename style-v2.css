@@ -3217,3 +3217,373 @@
   0%{opacity:1;transform:translateY(0)}
   100%{opacity:0;transform:translateY(16px)}
 }
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v3.2 — Visual Polish
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① فیکس باگ تب‌ها: المان‌ها قبل از اعمال CSS رندر نشن */
+[data-element-style]{will-change:backdrop-filter,background!important;}
+.view, .view *{transform:translateZ(0);}
+.view:not(.active){visibility:hidden!important;}
+.view.active{visibility:visible!important;}
+
+/* فیکس فلش شفاف — همه‌ی کارت‌ها از همون اول درست رندر بشن */
+[data-element-style="glass"] .month-calendar,
+[data-element-style="glass"] .month-goals,
+[data-element-style="glass"] .year-overview,
+[data-element-style="glass"] .daily-card,
+[data-element-style="glass"] .planner-hero-card,
+[data-element-style="glass"] .week-grid-wrap,
+[data-element-style="glass"] .week-summary,
+[data-element-style="glass"] .tasks-done-list,
+[data-element-style="glass"] .tasks-done-empty,
+[data-element-style="glass"] .tool-card,
+[data-element-style="glass"] .learn-library-box{
+  transition:background .01s!important;
+}
+
+/* ② هدر مقالات/دستیار/محفل — عرض کامل */
+.blog-view .planner-hero,
+.videos-view .planner-hero,
+.tools-view .planner-hero,
+.view-blog .planner-hero,
+#view-blog .planner-hero,
+#view-videos .planner-hero,
+#view-tools .planner-hero{
+  width:100%!important;
+  max-width:100%!important;
+  margin:0!important;
+  border-radius:0!important;
+  box-sizing:border-box!important;
+}
+
+/* ③ کارت خالی — جمع‌تر و مشخص‌تر */
+.page-empty-card{
+  max-width:640px!important;
+  padding:36px 30px!important;
+  margin:30px auto 40px!important;
+  border-radius:22px!important;
+  border:2px solid var(--border-strong)!important;
+}
+.page-empty-icon{
+  width:90px!important;height:90px!important;
+  border-radius:24px!important;
+  margin-bottom:18px!important;
+}
+.page-empty-icon svg{width:44px!important;height:44px!important;}
+.page-empty-title{font-size:22px!important;margin-bottom:10px!important;}
+.page-empty-desc{font-size:13px!important;line-height:1.9!important;margin-bottom:20px!important;}
+.page-empty-soon{padding:10px 22px!important;font-size:13px!important;}
+
+/* ④ کادرها — پررنگ‌تر، شیک‌تر، سایه رنگی */
+.month-calendar,
+.month-goals,
+.year-overview,
+.daily-card,
+.planner-hero-card,
+.week-grid-wrap,
+.week-summary,
+.tasks-done-list,
+.learn-library-box,
+.panel-card,
+.tool-card,
+.setting-group,
+.planner-stats-card{
+  border-width:1.5px!important;
+  border-color:var(--border-strong)!important;
+  box-shadow:
+    0 10px 30px -12px rgba(0,0,0,.4),
+    0 0 30px -18px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+
+/* ⑤ input — کادر پررنگ‌تر وقتی focus نیست */
+.input-bar{
+  border-width:1.5px!important;
+  border-color:var(--border-strong)!important;
+  box-shadow:
+    0 8px 24px -10px rgba(0,0,0,.5),
+    0 0 20px -8px var(--accent-soft)!important;
+}
+
+/* ⑥ نوتیف پاپ‌آپ — یه کم پایین‌تر */
+.task-notif-popup{bottom:80px!important;}
+
+/* ⑦ blur بیشتر برای المان‌ها — پشتشون مشخص‌تر */
+[data-element-style="glass"] .month-calendar,
+[data-element-style="glass"] .month-goals,
+[data-element-style="glass"] .year-overview,
+[data-element-style="glass"] .daily-card,
+[data-element-style="glass"] .planner-hero-card,
+[data-element-style="glass"] .week-grid-wrap,
+[data-element-style="glass"] .week-summary,
+[data-element-style="glass"] .tasks-done-list,
+[data-element-style="glass"] .tasks-done-empty,
+[data-element-style="glass"] .tool-card,
+[data-element-style="glass"] .learn-library-box,
+[data-element-style="glass"] .panel-card,
+[data-element-style="glass"] .study-tool-card,
+[data-element-style="glass"] .week-cell-task,
+[data-element-style="glass"] .task-item,
+[data-element-style="glass"] .siraj-select-trigger,
+[data-element-style="glass"] .siraj-select-panel,
+[data-element-style="glass"] .hour-row,
+[data-element-style="glass"] .contact-row{
+  background:rgba(18,22,30,.52)!important;
+  backdrop-filter:blur(48px) saturate(220%) brightness(1.1)!important;
+  -webkit-backdrop-filter:blur(48px) saturate(220%) brightness(1.1)!important;
+  border-color:rgba(255,255,255,.16)!important;
+}
+[data-theme^="light"][data-element-style="glass"] .month-calendar,
+[data-theme^="light"][data-element-style="glass"] .month-goals,
+[data-theme^="light"][data-element-style="glass"] .daily-card,
+[data-theme^="light"][data-element-style="glass"] .planner-hero-card,
+[data-theme^="light"][data-element-style="glass"] .week-grid-wrap,
+[data-theme^="light"][data-element-style="glass"] .tool-card{
+  background:rgba(255,255,255,.62)!important;
+  border-color:rgba(0,0,0,.1)!important;
+}
+
+/* ⑧ تم نیمه‌شب — سیاه کامل */
+[data-theme="midnight-navy"],
+[data-theme="midnight-crimson"],
+[data-theme="midnight-gold"],
+[data-theme="midnight-purple"],
+[data-theme="midnight-emerald"],
+[data-theme="midnight-indigo"]{
+  background:#000!important;
+}
+[data-theme^="midnight"] body,
+body[data-theme^="midnight"]{
+  background:#000!important;
+  background-image:none!important;
+}
+[data-theme="midnight-navy"]{
+  --primary:#000;
+  --panel-bg:#080A10;
+  --bubble-bot-bg:#0C1018;
+  --primary-gradient:linear-gradient(180deg,#000 0%,#000 100%);
+}
+[data-theme="midnight-crimson"]{
+  --primary:#000;
+  --panel-bg:#0C070A;
+  --bubble-bot-bg:#120A0E;
+  --primary-gradient:linear-gradient(180deg,#000 0%,#000 100%);
+}
+[data-theme="midnight-gold"]{
+  --primary:#000;
+  --panel-bg:#0A0806;
+  --bubble-bot-bg:#100C08;
+  --primary-gradient:linear-gradient(180deg,#000 0%,#000 100%);
+}
+[data-theme="midnight-purple"]{
+  --primary:#000;
+  --panel-bg:#0A070F;
+  --bubble-bot-bg:#0F0B16;
+  --primary-gradient:linear-gradient(180deg,#000 0%,#000 100%);
+}
+[data-theme="midnight-emerald"]{
+  --primary:#000;
+  --panel-bg:#060B08;
+  --bubble-bot-bg:#0A100D;
+  --primary-gradient:linear-gradient(180deg,#000 0%,#000 100%);
+}
+[data-theme="midnight-indigo"]{
+  --primary:#000;
+  --panel-bg:#06070C;
+  --bubble-bot-bg:#0A0C14;
+  --primary-gradient:linear-gradient(180deg,#000 0%,#000 100%);
+}
+
+/* ⑨ دکمه پیام — توی حالت چپ/راست کمتر جمع بشه */
+[data-nav-position="left"] .input-bar-shell:focus-within,
+[data-nav-position="right"] .input-bar-shell:focus-within,
+[data-nav-position="left"] .input-bar-shell:has(.bar-input:focus),
+[data-nav-position="right"] .input-bar-shell:has(.bar-input:focus){
+  transform:translateY(-8px) scale(1.005)!important;
+  max-width:100%!important;
+}
+
+/* ⑩ انیمیشن نوتیف پنل — از دکمه باز بشه */
+.notif-panel{
+  transform-origin:top left!important;
+  transform:scale(.6) translateY(-20px)!important;
+  opacity:0!important;
+  transition:transform .4s cubic-bezier(.34,1.4,.64,1),
+             opacity .3s ease!important;
+}
+.notif-panel.open{
+  transform:scale(1) translateY(0)!important;
+  opacity:1!important;
+}
+
+/* ⑪ اعلان badge — قشنگ‌تر */
+.notif-badge{
+  min-width:18px!important;
+  height:18px!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  background:linear-gradient(135deg,#EF4444,#DC2626,#B91C1C)!important;
+  border:2px solid var(--panel-bg)!important;
+  box-shadow:
+    0 0 0 1px rgba(239,68,68,.4),
+    0 4px 12px rgba(239,68,68,.6),
+    0 0 12px rgba(239,68,68,.4)!important;
+  animation:notifBadgePulse 1.8s ease-in-out infinite!important;
+}
+@keyframes notifBadgePulse{
+  0%,100%{box-shadow:0 0 0 1px rgba(239,68,68,.4),0 4px 12px rgba(239,68,68,.6),0 0 12px rgba(239,68,68,.4)}
+  50%{box-shadow:0 0 0 1px rgba(239,68,68,.4),0 4px 12px rgba(239,68,68,.6),0 0 20px rgba(239,68,68,.8)}
+}
+
+/* ⑫ دکمه‌های دستیار توی مطالعه — بلر بیشتر */
+[data-element-style="glass"] .study-tool-card{
+  backdrop-filter:blur(52px) saturate(220%)!important;
+  -webkit-backdrop-filter:blur(52px) saturate(220%)!important;
+  background:rgba(18,22,30,.55)!important;
+}
+
+/* ⑬ صفحه قفل — انیمیشن و ساختار جدید */
+.lock-box{
+  animation:lockBoxIn .55s cubic-bezier(.34,1.4,.64,1)!important;
+}
+@keyframes lockBoxIn{
+  0%{opacity:0;transform:scale(.85) translateY(30px)}
+  60%{opacity:1;transform:scale(1.03) translateY(-4px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+
+.lock-pin-row{
+  display:flex;gap:12px;justify-content:center;
+  direction:ltr;margin:20px 0;flex-wrap:nowrap;
+}
+.lock-pin-box{
+  width:44px;height:52px;
+  border-radius:12px;
+  border:2px solid var(--border-strong);
+  background:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono','Vazirmatn',monospace;
+  font-size:22px;font-weight:900;
+  color:var(--text-main);
+  transition:all .3s cubic-bezier(.34,1.4,.64,1);
+  position:relative;
+  overflow:hidden;
+}
+.lock-pin-box.active{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-soft),0 8px 20px -6px var(--accent);
+  transform:translateY(-3px);
+}
+.lock-pin-box.filled{
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));
+  border-color:var(--accent);
+  color:#fff;
+}
+.lock-pin-box.success{
+  animation:pinSuccess .4s cubic-bezier(.34,1.4,.64,1)!important;
+  background:linear-gradient(135deg,#10B981,#059669)!important;
+  border-color:#10B981!important;
+}
+@keyframes pinSuccess{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.15) translateY(-6px)}
+  100%{transform:scale(1) translateY(0)}
+}
+.lock-pin-box.blur-out{
+  animation:pinBlurOut .6s ease forwards!important;
+}
+@keyframes pinBlurOut{
+  0%{opacity:1;transform:translateY(0);filter:blur(0)}
+  40%{opacity:1;transform:translateY(-8px);filter:blur(0)}
+  100%{opacity:0;transform:translateY(-24px);filter:blur(6px)}
+}
+.lock-pin-box.error{
+  animation:pinShake .5s ease!important;
+  border-color:#EF4444!important;
+}
+@keyframes pinShake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(4px)}
+}
+
+/* ورود کل سایت بعد از قفل */
+.app-container.locked-entering{
+  animation:appEnterFromLock 1s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes appEnterFromLock{
+  0%{opacity:0;transform:scale(.96) translateY(20px);filter:blur(8px)}
+  100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}
+}
+
+/* ⑭ چت‌ها — انیمیشن لود نرم */
+.msg-wrap.chat-loading{
+  opacity:0;
+  transform:translateY(20px) scale(.96);
+}
+.msg-wrap.chat-loaded{
+  animation:chatMsgIn .55s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes chatMsgIn{
+  0%{opacity:0;transform:translateY(20px) scale(.96)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ⑮ جستجوی چت */
+.history-search{
+  padding:0 8px 10px;
+  display:flex;gap:6px;align-items:center;
+}
+.history-search input{
+  flex:1;
+  padding:9px 12px;
+  border-radius:10px;
+  border:1.5px solid var(--border);
+  background:var(--primary);
+  color:var(--text-main);
+  font-family:var(--font-text);
+  font-size:12px;
+  outline:none;
+}
+.history-search input:focus{border-color:var(--accent);}
+
+/* ★ پین شده */
+.history-item.pinned{
+  border-color:#F59E0B!important;
+  background:linear-gradient(135deg,rgba(245,158,11,.08),transparent)!important;
+}
+.history-item.pinned::before{
+  background:#F59E0B!important;
+  opacity:1!important;
+}
+
+/* ⑯ تمایز دکمه شب و نیمه‌شب */
+.row-btn[data-value="dark"] .rb-icon{
+  /* ماه */
+}
+.row-btn[data-value="midnight"] .rb-icon{
+  /* ماه پر */
+}
+
+/* ⑰ الگوهای طرح جدید — تخت‌جمشید */
+.th-persepolis,
+.th-hafezieh,
+.th-esfahan,
+.th-yazd{
+  background-size:78%!important;
+}
+.th-persepolis{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23D4AF37' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M20 100 L20 60 M30 100 L30 55 M60 100 L60 55 M90 100 L90 55 M100 100 L100 60'/%3E%3Cpath d='M15 100 L105 100'/%3E%3Cpath d='M25 55 L60 30 L95 55'/%3E%3Cpath d='M45 55 L45 40 L55 40 L55 55'/%3E%3Cpath d='M65 55 L65 40 L75 40 L75 55'/%3E%3C/g%3E%3C/svg%3E")!important;
+}
+.th-hafezieh{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%232AA5B8' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M30 100 L30 70 Q30 55 45 55 Q60 55 60 40 Q60 25 75 25 Q90 25 90 40 L90 100'/%3E%3Ccircle cx='45' cy='40' r='8'/%3E%3Cpath d='M60 100 L60 55'/%3E%3Cpath d='M45 100 L45 70'/%3E%3C/g%3E%3C/svg%3E")!important;
+}
+.th-esfahan{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23F5A623' stroke-width='1.8'%3E%3Ccircle cx='60' cy='60' r='40'/%3E%3Cpath d='M60 20 Q80 40 80 60 Q80 80 60 100 Q40 80 40 60 Q40 40 60 20'/%3E%3Cpath d='M20 60 Q40 40 60 40 Q80 40 100 60 Q80 80 60 80 Q40 80 20 60'/%3E%3C/g%3E%3C/svg%3E")!important;
+}
+.th-yazd{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%232AA5B8' stroke-width='1.8'%3E%3Cpath d='M60 15 L60 105'/%3E%3Ccircle cx='60' cy='30' r='10'/%3E%3Ccircle cx='60' cy='60' r='14'/%3E%3Ccircle cx='60' cy='90' r='12'/%3E%3Cpath d='M40 30 L80 30 M36 60 L84 60 M38 90 L82 90'/%3E%3C/g%3E%3C/svg%3E")!important;
+}
