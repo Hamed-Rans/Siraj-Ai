@@ -1,9 +1,10 @@
-/* Siraj v2.0 — script.js (v3.5 Final) */
+/* Siraj v2.0 — script.js (v2.5 Final) */
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
     devNotifUrl:"",
-    /* ★ سه مدل اصلی — URL و apiModel رو از تنظیمات ویرایش کن */
+    promptsUrl:"", /* ★ آدرس prompts.json توی گیتهاب — بعداً پر کن */
+    adminPassword:"", /* ★ رمز ادمین رو این‌جا بذار — مثلاً "siraj-hamed-2025" */
     models:[
         {
             id:'hakim',
@@ -11,8 +12,8 @@ const APP_CONFIG={
             emoji:'🧠',
             desc:'استاد نحو، صرف و اعراب',
             color:'#8b5cf6',
-            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions',
-            apiModel:'gemini-3.6-flash',
+            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/hakim',
+            apiModel:'gemini-2.5-flash',
             systemExtra:''
         },
         {
@@ -21,8 +22,8 @@ const APP_CONFIG={
             emoji:'✍️',
             desc:'هنرمند ادبیات و ترجمه',
             color:'#F59E0B',
-            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions',
-            apiModel:'gemini-3.6-flash',
+            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/adib',
+            apiModel:'gemini-2.5-flash',
             systemExtra:''
         },
         {
@@ -31,8 +32,8 @@ const APP_CONFIG={
             emoji:'🎯',
             desc:'همراه و مشاور تو',
             color:'#10B981',
-            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions',
-            apiModel:'gemini-3.6-flash',
+            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/siraj-yar',
+            apiModel:'gemini-2.5-flash',
             systemExtra:''
         }
     ],
@@ -48,7 +49,7 @@ const APP_CONFIG={
     ],
     defaultSettings:{
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
-        animation:'normal',model:'gemini-3.6-flash',dialect:'fusha',
+        animation:'normal',model:'gemini-2.5-flash',dialect:'fusha',
         selectedModel:'hakim',
         thinking:false,quick:false,inputStyle:'solid',headerStyle:'glass',
         elementStyle:'solid',
@@ -65,7 +66,7 @@ const APP_CONFIG={
         notifPreMinutes:10,
         studyDefaultMinutes:25,
         studyStrictMode:true,
-        appVersion:'3.5'
+        appVersion:'2.5'
     },
     themeColors:['navy','crimson','gold','purple','emerald','indigo'],
     colorNames:{navy:'شبانه',crimson:'آتشین',gold:'زرین',purple:'جادویی',emerald:'طبیعی',indigo:'نیلی'},
@@ -189,6 +190,7 @@ const SESSION_ID_KEY='siraj-session-id';
 const PROFILE_IMG_KEY='siraj-profile-img';
 const DEV_NOTIF_SEEN_KEY='siraj-dev-notif-seen';
 const DEV_NOTIF_CACHE_KEY='siraj-dev-notif-cache';
+const ADMIN_KEY='siraj_is_admin';
 
 const RateLimiter={queue:[],processing:false,minInterval:1500,lastRequest:0,
     async run(fn){return new Promise((res,rej)=>{this.queue.push({fn,res,rej});this.process();});},
@@ -228,6 +230,73 @@ let plannerTab='daily';
 let currentPanelTab='history';
 window._settingsSub='general';
 
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN SYSTEM
+   ═══════════════════════════════════════════════════════════════ */
+function isAdmin(){ return localStorage.getItem(ADMIN_KEY) === '1'; }
+function setAdmin(v){ localStorage.setItem(ADMIN_KEY, v ? '1' : '0'); }
+
+window.__promptAdminPassword = function(pwd){
+    if(!APP_CONFIG.adminPassword){
+        toast('رمز ادمین تنظیم نشده','error');
+        return false;
+    }
+    if(pwd === APP_CONFIG.adminPassword){
+        setAdmin(true);
+        toast('✓ حالت ادمین فعال شد','success');
+        renderSettingsControls();
+        return true;
+    }
+    toast('رمز اشتباه است','error');
+    return false;
+};
+
+window.__logoutAdmin = function(){
+    setAdmin(false);
+    toast('از حالت ادمین خارج شدی','info');
+    renderSettingsControls();
+};
+
+window.__downloadPromptsJSON = function(){
+    if(!isAdmin()) return;
+    var m = settingsDraft.models || JSON.parse(JSON.stringify(APP_CONFIG.models));
+    var out = {};
+    m.forEach(function(x){ out[x.id] = x.systemExtra || ''; });
+    var blob = new Blob([JSON.stringify(out, null, 2)], { type:'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'prompts.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('prompts.json دانلود شد — توی گیتهاب آپلود کن','success');
+};
+
+async function fetchPromptsFromGitHub(){
+    if(!APP_CONFIG.promptsUrl || !APP_CONFIG.promptsUrl.trim()) return;
+    try{
+        const res = await fetch(APP_CONFIG.promptsUrl.trim() + '?t=' + Date.now(), { cache:'no-store' });
+        if(!res.ok) return;
+        const data = await res.json();
+        if(typeof data !== 'object') return;
+        /* اگه کاربر ادمین باشه، overwrite نکن (چون ممکنه تغییرات لوکال داشته باشه) */
+        if(isAdmin()) return;
+        APP_CONFIG.models.forEach(function(m){
+            if(data[m.id] && typeof data[m.id] === 'string' && data[m.id].trim()){
+                m.systemExtra = data[m.id];
+            }
+        });
+        if(settings.models){
+            settings.models.forEach(function(m){
+                if(data[m.id] && typeof data[m.id] === 'string' && data[m.id].trim()){
+                    m.systemExtra = data[m.id];
+                }
+            });
+        }
+        saveSettings();
+    }catch(e){ console.warn('[Prompts]', e); }
+}
+
 function loadSettings(){try{const l=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};const s=Object.assign({},APP_CONFIG.defaultSettings,l);
     const pi=localStorage.getItem(PROFILE_IMG_KEY);
     if(pi&&!s.profileImage)s.profileImage=pi;
@@ -247,22 +316,13 @@ function loadFontIfNeeded(fontId){
     loadedFonts.add(fontId);
     const fontMap={
         'shabnam':'https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css',
-        'sahel':'https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css',
         'lalezar':'https://fonts.googleapis.com/css2?family=Lalezar&display=swap',
-        'gulzar':'https://fonts.googleapis.com/css2?family=Gulzar&display=swap',
-        'noto-sans-arabic':'https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&display=swap',
         'amiri':'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap',
         'cairo':'https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap',
         'noto-naskh':'https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400..700&display=swap',
-        'noto-kufi':'https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900&display=swap',
         'tajawal':'https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap',
-        'almarai':'https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap',
-        'scheherazade':'https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400..700&display=swap',
-        'reem-kufi':'https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400..700&display=swap',
         'poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@100..900&display=swap',
         'space-grotesk':'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap',
-        'manrope':'https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap',
-        'dm-sans':'https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap',
         'jetbrains':'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap'
     };
     const url=fontMap[fontId];
@@ -544,7 +604,7 @@ function applySettingsToUI(s){
     const qb=document.getElementById('quickBtn');if(qb)qb.classList.toggle('active',t.quick);
     applyPattern(document.getElementById('patternLayer'),t.pattern,t.patternColor1,t.patternColor2,t.patternPerCorner,t.patternSize,t.patternPosition,t.patternOpacity);
     var vb=document.getElementById('versionBadge');
-    if(vb) vb.textContent='v'+(t.appVersion||'3.5');
+    if(vb) vb.textContent='v'+(t.appVersion||'2.5');
     resetInactivityTimer();
     setTimeout(()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);},100);
 }
@@ -565,19 +625,20 @@ function renderDropdown(id,items,value,key){
 function toggleDropdown(id,e){e.stopPropagation();const el=document.getElementById(id);const wasOpen=el.classList.contains('open');document.querySelectorAll('.dropdown.open').forEach(d=>d.classList.remove('open'));if(!wasOpen)el.classList.add('open');}
 function selectDropdown(id,value,key,e){e.stopPropagation();settings[key]=value;saveSettings();applySettingsToUI();document.querySelectorAll('.dropdown.open').forEach(d=>d.classList.remove('open'));renderDropdown(id,APP_CONFIG.dialects,value,key);}
 
-/* ★ رندر مدل‌ها */
+/* ★ آیکون‌های اختصاصی هر مدل */
+var MODEL_ICONS = {
+    hakim: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 6v6c0 5 3.8 9.4 9 10 5.2-.6 9-5 9-10V6l-9-4z"/><path d="M9 12l2 2 4-4"/></svg>',
+    adib: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M18 14l3 3-3 3"/></svg>',
+    'siraj-yar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>'
+};
+
 function renderModelsDropdown(){
     var el = document.getElementById('modelDD');
     if(!el) return;
     var cur = getCurrentModelConfig();
-    var icons = {
-        hakim: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>',
-        adib: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/></svg>',
-        'siraj-yar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>'
-    };
     el.innerHTML =
         '<div class="dd-trigger model-dd-trigger" onclick="toggleDropdown(\'modelDD\', event)" title="'+escapeHtml(cur.desc)+'" style="border-color:'+cur.color+'55;color:'+cur.color+'">'
-        + (icons[cur.id]||'') 
+        + (MODEL_ICONS[cur.id]||'') 
         + '<span>'+escapeHtml(cur.name)+'</span>'
         + '<span class="dd-arrow"></span>'
         +'</div>'
@@ -585,7 +646,7 @@ function renderModelsDropdown(){
         + APP_CONFIG.models.map(function(m){
             return '<div class="dd-item model-dd-item'+(m.id===cur.id?' active':'')+'" data-model="'+m.id+'" onclick="selectModel(\''+m.id+'\', event)" style="flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:12px">'
               +'<div style="display:flex;align-items:center;gap:8px;font-weight:800;color:'+m.color+'">'
-              + (icons[m.id]||'')
+              + (MODEL_ICONS[m.id]||'')
               + '<span>'+escapeHtml(m.name)+'</span>'
               +'</div>'
               +'<div style="font-size:10px;color:var(--text-muted);margin-right:22px">'+escapeHtml(m.desc)+'</div>'
@@ -735,9 +796,6 @@ function renderDailyPanel(){
         return `<div class="panel-card" style="border-color:var(--accent);background:var(--accent-soft)">
             <div class="card-title" style="border-bottom-color:var(--accent)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/></svg><span>برنامه امروز</span></div>
             <div class="list-item" onclick="switchView('planner')"><div class="li-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="li-body"><div class="li-title">هنوز برنامه‌ای نداری</div><div class="li-desc">برای امروز برنامه بساز</div></div></div>
-        </div>
-        <div class="panel-card"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg><span>برنامه با سراج</span></div>
-            <div class="list-item" onclick="askAIToPlan()"><div class="li-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="li-body"><div class="li-title">برنامه‌ریزی خودکار</div><div class="li-desc">از AI برنامه بگیر</div></div></div>
         </div>`;
     }
     return `
@@ -746,9 +804,6 @@ function renderDailyPanel(){
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-align:center">${hourEntries.length} کار ثبت شده</div>
             ${hourEntries.slice(0,6).map(([h,v])=>`<div class="list-item" onclick="switchView('planner')"><div class="li-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="li-body"><div class="li-title">${h}:۰۰ — ${escapeHtml(v.slice(0,40))}</div></div></div>`).join('')}
             <div class="list-item" onclick="switchView('planner')" style="margin-top:8px"><div class="li-icon"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div><div class="li-body"><div class="li-title">مشاهده کامل</div></div></div>
-        </div>
-        <div class="panel-card"><div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg><span>برنامه با سراج</span></div>
-            <div class="list-item" onclick="askAIToPlan()"><div class="li-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="li-body"><div class="li-title">برنامه‌ریزی خودکار</div><div class="li-desc">از AI برنامه بگیر</div></div></div>
         </div>`;
 }
 function renderPanelForPlanner(){
@@ -759,15 +814,10 @@ function renderPanelForPlanner(){
 function renderPanelForBlog(){
     document.getElementById('panelTitleText').textContent='مقالات سراج';
     document.getElementById('panelSubText').textContent='یادداشت‌ها و مقالات';
-    const posts=loadBlog();
-    const words=posts.reduce((s,p)=>s+(p.body||'').split(/\s+/).length,0);
     document.getElementById('panelContent').innerHTML=`
         <div class="panel-card" style="border-color:var(--accent);background:var(--accent-soft)">
-            <div class="card-title" style="border-bottom-color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span>آمار</span></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center;padding:8px 0">
-                <div><div style="font-size:22px;font-weight:900;color:var(--accent)">${posts.length}</div><div style="font-size:10px;color:var(--text-muted)">مقاله</div></div>
-                <div><div style="font-size:22px;font-weight:900;color:var(--accent)">${words}</div><div style="font-size:10px;color:var(--text-muted)">کلمه</div></div>
-            </div>
+            <div class="card-title" style="border-bottom-color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span>به‌زودی</span></div>
+            <div class="empty-state" style="padding:16px"><span class="emoji">🚧</span>در حال آماده‌سازی</div>
         </div>`;
 }
 function renderPanelForVideos(){
@@ -833,18 +883,10 @@ function renderBlog(){
       +'<div class="page-empty-card new-style">'
       +'<div class="page-empty-icon gold"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>'
       +'<div class="page-empty-title gold">به‌زودی در دسترس</div>'
-      +'<div class="page-empty-desc">قراره اینجا بتونید مقالات خودتون رو بنویسید و منتشر کنید، نوشته‌های دیگران رو بخونید و با بقیه به اشتراک بگذارید. جایی برای به اشتراک گذاشتن اندیشه‌ها و تحلیل‌ها 🌱</div>'
+      +'<div class="page-empty-desc">قراره اینجا بتونید مقالات خودتون رو بنویسید و منتشر کنید، نوشته‌های دیگران رو بخونید و با بقیه به اشتراک بگذارید 🌱</div>'
       +'<div class="page-empty-soon gold"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>در حال آماده‌سازی</div>'
-      +'<div class="page-empty-features">'
-      +'<div class="page-empty-feature"><span>✍️</span>نوشتن مقاله</div>'
-      +'<div class="page-empty-feature"><span>📖</span>خواندن مقالات</div>'
-      +'<div class="page-empty-feature"><span>💬</span>نظرات</div>'
-      +'<div class="page-empty-feature"><span>⭐</span>ذخیره‌سازی</div>'
-      +'</div>'
       +'</div>';
 }
-function addBlogPost(){const t=document.getElementById('blogTitle')?.value.trim();const b=document.getElementById('blogBody')?.value.trim();if(!t||!b){toast('عنوان و متن لازمه','error');return;}const p=loadBlog();p.unshift({title:t,body:b,ts:Date.now()});saveBlog(p);renderBlog();renderPanelForBlog();toast('مقاله منتشر شد','success');}
-function deleteBlogPost(i){const p=loadBlog();p.splice(i,1);saveBlog(p);renderBlog();renderPanelForBlog();}
 
 function renderCommunity(){
     const v=document.getElementById('view-videos');
@@ -859,16 +901,10 @@ function renderCommunity(){
       +'</div>'
       +'</div>'
       +'<div class="page-empty-card new-style">'
-      +'<div class="page-empty-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h9l5 5v11.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/><path d="M8 12h8"/><path d="M8 16h6"/></svg></div>'
+      +'<div class="page-empty-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h9l5 5v11.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/></svg></div>'
       +'<div class="page-empty-title">به‌زودی در دسترس</div>'
-      +'<div class="page-empty-desc">اینجا می‌تونید سؤال بپرسید، تجربیاتتون رو با مدرسین و سایر علاقه‌مندان به اشتراک بگذارید و از هم یاد بگیرید. جایی برای هم‌اندیشی و رشد با هم 🌿</div>'
+      +'<div class="page-empty-desc">اینجا می‌تونید سؤال بپرسید و تجربیاتتون رو با دیگران به اشتراک بگذارید 🌿</div>'
       +'<div class="page-empty-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>در حال آماده‌سازی</div>'
-      +'<div class="page-empty-features">'
-      +'<div class="page-empty-feature"><span>❓</span>پرسش و پاسخ</div>'
-      +'<div class="page-empty-feature"><span>👥</span>ارتباط با مدرسین</div>'
-      +'<div class="page-empty-feature"><span>💡</span>تبادل تجربه</div>'
-      +'<div class="page-empty-feature"><span>🎯</span>چالش گروهی</div>'
-      +'</div>'
       +'</div>';
 }
 
@@ -880,7 +916,7 @@ function renderTools(){
         {icon:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',title:'تفاوت دو واژه',desc:'مقایسه',prompt:'تفاوت این دو واژه چیه؟'},
         {icon:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/>',title:'تمرین ساز',desc:'آزمون شخصی',prompt:'یه تمرین درباره عربی بساز'},
         {icon:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',title:'قواعد سریع',desc:'نکات دستوری',prompt:'یه نکته کاربردی نحو یادم بده'},
-        {icon:'<path d="m5 8 6 6m-7 0 6-6 2-3M2 5h12"/><path d="M9 5v14"/><path d="M15 5v14"/><path d="M21 5v14"/>',title:'ترجمه و شرح',desc:'عربی به فارسی',prompt:'این متن رو ترجمه کن: «متن»'},
+        {icon:'<path d="m5 8 6 6m-7 0 6-6 2-3M2 5h12"/>',title:'ترجمه و شرح',desc:'عربی به فارسی',prompt:'این متن رو ترجمه کن: «متن»'},
         {icon:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',title:'واژه تصادفی',desc:'کلمه یاد بگیر',prompt:'یه واژه جدید عربی با ریشه یادم بده'},
         {icon:'<path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/>',title:'برنامه درسی',desc:'اینجا کلیک کن',prompt:'یه برنامه درسی برای امروز بچین'}
     ];
@@ -1051,7 +1087,6 @@ function getSystemPrompt(){
     }catch(e){}
     if(settings.quick)extra+='\n\n⚡ حالت پاسخ سریع: پاسخ‌ها را کوتاه، مختصر و مستقیم بده.';
     if(settings.thinking)extra+='\n\n🧠 حالت تفکر عمیق: با دقت و عمق بیشتر تحلیل کن.';
-    /* ★ اضافه کردن systemExtra مدل انتخابی */
     var modelCfg = getCurrentModelConfig();
     var modelExtra = '';
     try{
@@ -1068,16 +1103,13 @@ function getSystemPrompt(){
 
 👤 شناسنامه:
 • نام: سراج (به معنی چراغ و فروغ)
-• سازنده: حامد انصاری‌فر، اهل اراک، ۲۰ ساله، دانشجوی زبان و ادبیات عربی دانشگاه قم، ادیتور و مجسمه‌ساز سابق، علاقه‌مند به هوش مصنوعی و یادگیری
+• سازنده: حامد انصاری‌فر، اهل اراک، ۲۰ ساله، دانشجوی زبان و ادبیات عربی دانشگاه قم
 
-🎭 لحن: صمیمی، دوستانه، مثل یه رفیق باسواد. از تکرار یه جواب ثابت خودداری کن — هر بار با تعبیر تازه جواب بده.
+🎭 لحن: صمیمی، دوستانه، مثل یه رفیق باسواد.
 
-🎨 ایموجی: اولویت با ایموجی‌های شکلک چهره (😊 🙂 😄 😁 🤗 😌 🤔 😅 😉 😎 🥰 😍 🤩 😇 🙃 😋 🤓 🧐 😂 🤣 😆 😃 😀) — بعد ایموجی‌های موضوعی (📖 ✨ 🌿 💫 🎯 🔍 💡 🌸 🪔 ⭐ 📚 ✏️ 🎓 🕌 🌙 💭 🧠 ⚡ 🔥 💎 🌊 🎨 🎭 🌺 🌷 🍃 🌱 🕊️ 🦋 🎁 🎉 💐 🌈 ☀️). به‌جا و متعادل.
+🎨 ایموجی: به‌جا و متعادل استفاده کن.
 
-🚧 سؤالات خارج از دامنه: هر بار با جمله‌ی متفاوت جواب بده، نه کلیشه‌ای.
 ⚠️ مهم: هرگز از ستاره (*) برای پررنگ‌کردن کلمات استفاده نکن.
-
-📏 طول پاسخ: پیش‌فرض متوسط. «مختصر» → کوتاه. «کامل» → مفصل.
 
 📅 برنامه درسی: [PLAN]- ساعت | عنوان کار[/PLAN]
 
@@ -1126,10 +1158,7 @@ function startTypewriter(el){
 
 function handleInput(){const v=document.getElementById('q').value.trim();document.getElementById('sendBtn').classList.toggle('visible',v.length>0||!!currentFile);}
 function handleKeydown(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
-function handleSendClick(){
-    if(isStreaming){pauseStream();}
-    else{send();}
-}
+function handleSendClick(){if(isStreaming){pauseStream();}else{send();}}
 function pauseStream(){
     if(activeChatId&&pendingRequests[activeChatId]){
         try{pendingRequests[activeChatId].abort();}catch(e){}
@@ -1137,8 +1166,7 @@ function pauseStream(){
     }
     chatInFlight=false;isStreaming=false;
     setSendButton();
-    const sb=document.getElementById('sendBtn');
-    if(sb)sb.classList.add('visible');
+    const sb=document.getElementById('sendBtn');if(sb)sb.classList.add('visible');
     document.getElementById('typing-indicator')?.remove();
     streamFinished=true;
     toast('متوقف شد','info');
@@ -1155,20 +1183,14 @@ function setSendButton(){
 }
 function toggleThink(){
     settings.thinking=!settings.thinking;
-    if(settings.thinking&&settings.quick){
-        settings.quick=false;
-        document.getElementById('quickBtn').classList.remove('active');
-    }
+    if(settings.thinking&&settings.quick){settings.quick=false;document.getElementById('quickBtn').classList.remove('active');}
     saveSettings();
     document.getElementById('thinkBtn').classList.toggle('active',settings.thinking);
     toast(settings.thinking?'🧠 تفکر عمیق فعال':'تفکر خاموش','info');
 }
 function toggleQuick(){
     settings.quick=!settings.quick;
-    if(settings.quick&&settings.thinking){
-        settings.thinking=false;
-        document.getElementById('thinkBtn').classList.remove('active');
-    }
+    if(settings.quick&&settings.thinking){settings.thinking=false;document.getElementById('thinkBtn').classList.remove('active');}
     saveSettings();
     document.getElementById('quickBtn').classList.toggle('active',settings.quick);
     toast(settings.quick?'⚡ پاسخ سریع فعال':'پاسخ سریع خاموش','info');
@@ -1201,14 +1223,14 @@ async function send(){
     await new Promise(r=>setTimeout(r,500));
     if(chatId===currentChatId&&!controller.signal.aborted){
         const w=document.createElement('div');w.className='msg-wrap bot';w.id='typing-indicator';
-        w.innerHTML='<div class="msg"><span class="think-indicator"><span class="think-text">دارم تفکر می‌کنم صبرله <span class="think-emoji">🧘‍♂️</span></span><span class="typing"><span></span><span></span><span></span></span></span></div>';
+        w.innerHTML='<div class="msg"><span class="think-indicator"><span class="think-text">دارم تفکر می‌کنم <span class="think-emoji">🧘‍♂️</span></span><span class="typing"><span></span><span></span><span></span></span></span></div>';
         box.appendChild(w);box.scrollTop=box.scrollHeight;
     }
     const t0=Date.now();
     try{
         const modelCfg = getCurrentModelConfig();
         const url = (modelCfg && modelCfg.baseURL && modelCfg.baseURL.trim()) ? modelCfg.baseURL.trim() : ((APP_CONFIG.baseURL&&APP_CONFIG.baseURL.trim())?APP_CONFIG.baseURL:'/api/chat');
-        const apiModel = (modelCfg && modelCfg.apiModel) ? modelCfg.apiModel : (settings.model || 'gemini-3.6-flash');
+        const apiModel = (modelCfg && modelCfg.apiModel) ? modelCfg.apiModel : (settings.model || 'gemini-2.5-flash');
         const messages=buildMessagesForWorker(chatId,userText,fileData,fileType);
         const res=await RateLimiter.run(()=>fetch(url,{
             method:'POST',
@@ -1222,7 +1244,7 @@ async function send(){
             if(res.status===429)msg='⏳ محدودیت (۴۲۹). ۳۰ ثانیه صبر کن.';
             else if(res.status===401||res.status===403)msg='🔑 کلید API مشکل داره.';
             else if(res.status===404)msg='🔍 مدل در دسترس نیست.';
-            else if(res.status===503)msg='🔄 سرور الان شلوغه. یه بار دیگه امتحان کن.';
+            else if(res.status===503)msg='🔄 سرور الان شلوغه.';
             else{const et=await res.text();msg='خطا ('+res.status+'): '+et.substring(0,200);}
             if(chatId===currentChatId)renderBotMsg(msg);
             addMsgToHistory(chatId,'assistant',msg);
@@ -1296,7 +1318,7 @@ function extractPlanFromResponse(text){
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   LOCK — صفحه قفل با PIN و انیمیشن
+   LOCK
    ═══════════════════════════════════════════════════════════════ */
 function renderLockPinBoxes(length){
     var row = document.getElementById('lockPinRow');
@@ -1342,7 +1364,6 @@ function checkLock(){
     setTimeout(function(){
         var inp = document.getElementById('lockInput');
         if(inp){ inp.value=''; inp.focus(); }
-        /* ★ کلیک روی هر جای صفحه قفل → focus روی input */
         if(ls && !ls.dataset.clickBound){
             ls.dataset.clickBound = '1';
             ls.addEventListener('click', function(){
@@ -1415,10 +1436,11 @@ function lockNow(){
             if(inp2) inp2.focus();
         });
     }
-    const hb=document.getElementById('headerLockBtn');
-    if(hb){hb.classList.add('locked');hb.title='قفل است';}
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   BACKUP
+   ═══════════════════════════════════════════════════════════════ */
 function exportBackup(){
     const data={version:1,exportedAt:Date.now(),settings:settings,history:loadHistory(),planner:loadPlanner(),blog:loadBlog(),videos:loadVideos()};
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -1448,6 +1470,9 @@ function importBackup(ev){
     r.readAsText(f);ev.target.value='';
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS
+   ═══════════════════════════════════════════════════════════════ */
 function openSettings(){
     try{
         settingsCat='appearance';
@@ -1549,6 +1574,7 @@ function updateDraft(key,value){
 
 window.updateModelConfig = function(modelId, field, value){
     if(!settingsDraft) return;
+    if(!isAdmin()) return;
     if(!settingsDraft.models) settingsDraft.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
     var m = settingsDraft.models.find(function(x){return x.id===modelId;});
     if(m){ m[field] = value; }
@@ -1613,7 +1639,7 @@ function refreshBgThumbs(){
     });
 }
 function getFontCSS(id){
-    const map={vazirmatn:"'Vazirmatn',sans-serif",estedad:"'Estedad',sans-serif",shabnam:"'Shabnam',sans-serif",sahel:"'Sahel',sans-serif",lalezar:"'Lalezar',cursive",gulzar:"'Gulzar',serif",'noto-sans-arabic':"'Noto Sans Arabic',sans-serif",amiri:"'Amiri',serif",cairo:"'Cairo',sans-serif",'noto-naskh':"'Noto Naskh Arabic',serif",'noto-kufi':"'Noto Kufi Arabic',sans-serif",tajawal:"'Tajawal',sans-serif",almarai:"'Almarai',sans-serif",scheherazade:"'Scheherazade New',serif",'reem-kufi':"'Reem Kufi',sans-serif",inter:"'Inter',sans-serif",poppins:"'Poppins',sans-serif",'space-grotesk':"'Space Grotesk',sans-serif",manrope:"'Manrope',sans-serif",'dm-sans':"'DM Sans',sans-serif",jetbrains:"'JetBrains Mono',monospace"};
+    const map={vazirmatn:"'Vazirmatn',sans-serif",estedad:"'Estedad',sans-serif",shabnam:"'Shabnam',sans-serif",lalezar:"'Lalezar',cursive",amiri:"'Amiri',serif",cairo:"'Cairo',sans-serif",'noto-naskh':"'Noto Naskh Arabic',serif",tajawal:"'Tajawal',sans-serif",inter:"'Inter',sans-serif",poppins:"'Poppins',sans-serif",'space-grotesk':"'Space Grotesk',sans-serif",jetbrains:"'JetBrains Mono',monospace"};
     return map[id]||"'Vazirmatn',sans-serif";
 }
 function fontRow(f){const s=settingsDraft||settings;return `<button class="row-btn${s.fontFamily===f.id?' active':''}" data-key="fontFamily" data-value="${f.id}" onclick="updateDraft('fontFamily','${f.id}')" style="font-family:${getFontCSS(f.id)}"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg><span class="rb-label">${f.name}</span></button>`;}
@@ -1637,7 +1663,7 @@ function clearBgImage(){if(!settingsDraft)return;settingsDraft.bgImage='';settin
 function handleProfileUpload(ev){
     const f=ev.target.files?.[0];
     if(!f)return;
-    if(f.size>1.5*1024*1024){toast('حجم عکس زیاد است (حداکثر ۱.۵ مگابایت)','error');return;}
+    if(f.size>1.5*1024*1024){toast('حجم عکس زیاد است','error');return;}
     const r=new FileReader();
     r.onload=e=>{
         if(!settingsDraft)return;
@@ -1683,10 +1709,10 @@ function renderSessionsList(){
     el.innerHTML=list.map(s=>{
         const isMe=s.id===myId;
         return `<div class="session-row${isMe?' current':''}">
-            <div class="s-icon"><svg viewBox="0 0 24 24">${isMe?'<rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8"/><path d="M12 18v2"/>':'<rect x="2" y="4" width="20" height="14" rx="2"/>'}</svg></div>
+            <div class="s-icon"><svg viewBox="0 0 24 24">${isMe?'<rect x="2" y="4" width="20" height="14" rx="2"/>':'<rect x="2" y="4" width="20" height="14" rx="2"/>'}</svg></div>
             <div class="s-info">
                 <div class="s-name">${escapeHtml(getDeviceName(s.ua,s.platform))} ${isMe?'<span class="s-badge">دستگاه فعلی</span>':''}</div>
-                <div class="s-sub">${timeAgo(s.lastPing)}${s.lang?' · '+s.lang:''}</div>
+                <div class="s-sub">${timeAgo(s.lastPing)}</div>
             </div>
             ${isMe?'':`<button class="s-del" onclick="removeSession('${s.id}')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`}
         </div>`;
@@ -1694,7 +1720,7 @@ function renderSessionsList(){
 }
 
 function bindContactLinks(){
-    document.querySelectorAll('.contact-row[data-link], .contact-row-v2[data-link]').forEach(function(row){
+    document.querySelectorAll('.contact-row[data-link]').forEach(function(row){
         if(row.dataset.bound==='1') return;
         row.dataset.bound='1';
         row.style.cursor='pointer';
@@ -1704,11 +1730,8 @@ function bindContactLinks(){
             if(!link) return;
             e.preventDefault();
             e.stopPropagation();
-            if(link.indexOf('mailto:')===0){
-                window.location.href=link;
-            } else {
-                window.open(link,'_blank','noopener');
-            }
+            if(link.indexOf('mailto:')===0) window.location.href=link;
+            else window.open(link,'_blank','noopener');
         });
     });
 }
@@ -1720,12 +1743,11 @@ function renderSettingsControls(){
     tabs.innerHTML=`
         <button class="settings-tab-btn${settingsCat==='appearance'?' active':''}" data-cat="appearance" onclick="switchSettingsCat('appearance')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 L14 9 L12 12 L10 9 Z"/></svg>ظاهر</button>
         <button class="settings-tab-btn${settingsCat==='style'?' active':''}" data-cat="style" onclick="switchSettingsCat('style')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>استایل</button>
-        <button class="settings-tab-btn${settingsCat==='behavior'?' active':''}" data-cat="behavior" onclick="switchSettingsCat('behavior')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>رفتار</button>
-        <button class="settings-tab-btn${settingsCat==='models'?' active':''}" data-cat="models" onclick="switchSettingsCat('models')"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>مدل‌ها</button>
+        <button class="settings-tab-btn${settingsCat==='behavior'?' active':''}" data-cat="behavior" onclick="switchSettingsCat('behavior')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>رفتار</button>
+        <button class="settings-tab-btn${settingsCat==='models'?' active':''}" data-cat="models" onclick="switchSettingsCat('models')"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg>مدل‌ها</button>
         <button class="settings-tab-btn${settingsCat==='privacy'?' active':''}" data-cat="privacy" onclick="switchSettingsCat('privacy')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>حریم خصوصی</button>
         <button class="settings-tab-btn${settingsCat==='about'?' active':''}" data-cat="about" onclick="switchSettingsCat('about')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>درباره ما</button>`;
 
-    /* ★ بعد از رندر، تب profile رو برگردون */
     setTimeout(function(){
         var tw = document.getElementById('settingsTabs');
         if(tw && !tw.querySelector('[data-cat="profile"]')){
@@ -1740,30 +1762,56 @@ function renderSettingsControls(){
     }, 20);
 
     var subState = window._settingsSub || 'general';
-
-    /* بخش مدل‌ها */
+    var admin = isAdmin();
     var modelsDraft = settingsDraft.models || JSON.parse(JSON.stringify(APP_CONFIG.models));
+
+    /* ─── مدل‌ها ─── */
     var modelsHTML = '<div class="setting-group">'
-        +'<label style="font-size:13px;font-weight:800;color:var(--accent)">🧠 مدل‌های هوش مصنوعی سراج</label>'
-        +'<div style="font-size:11px;color:var(--text-muted);line-height:1.9;padding:6px 0 10px">هر مدل به یه پروکسی و کلید API خودش وصل می‌شه. این‌ها رو این‌جا تنظیم کن.</div>'
-        + modelsDraft.map(function(m){
-            return '<div style="padding:14px;border-radius:16px;border:1px solid '+m.color+'40;background:'+m.color+'10;margin-bottom:12px">'
-              +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
-              +'<div style="width:36px;height:36px;border-radius:12px;background:'+m.color+'30;display:flex;align-items:center;justify-content:center;font-size:18px">'+m.emoji+'</div>'
-              +'<div>'
-              +'<div style="font-size:14px;font-weight:800;color:'+m.color+'">'+escapeHtml(m.name)+'</div>'
-              +'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+escapeHtml(m.desc)+'</div>'
-              +'</div>'
-              +'</div>'
-              +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">URL پروکسی</label>'
-              +'<input type="text" value="'+escapeHtml(m.baseURL||'')+'" oninput="window.updateModelConfig(\''+m.id+'\',\'baseURL\',this.value)" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px">'
-              +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">نام مدل API</label>'
-              +'<input type="text" value="'+escapeHtml(m.apiModel||'')+'" oninput="window.updateModelConfig(\''+m.id+'\',\'apiModel\',this.value)" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px">'
-              +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">شخصیت و پرامپت اضافی</label>'
-              +'<textarea oninput="window.updateModelConfig(\''+m.id+'\',\'systemExtra\',this.value)" placeholder="اینجا شخصیت مدل رو بنویس..." style="width:100%;min-height:100px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;resize:vertical;line-height:1.8">'+escapeHtml(m.systemExtra||'')+'</textarea>'
-              +'</div>';
-        }).join('')
+        +'<label style="font-size:13px;font-weight:800;color:var(--accent)">🧠 مدل‌های هوش مصنوعی سراج</label>';
+
+    if(!admin){
+        modelsHTML += '<div style="padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(239,68,68,.02));border:1px solid rgba(239,68,68,.25);margin-top:10px;text-align:center">'
+            +'<div style="font-size:26px;margin-bottom:8px">🔒</div>'
+            +'<div style="font-size:12.5px;font-weight:800;color:#F87171;margin-bottom:6px">ویرایش فقط برای سازنده</div>'
+            +'<div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin-bottom:12px">برای ویرایش پرامپت مدل‌ها، رمز ادمین رو وارد کن</div>'
+            +'<input type="password" id="adminPassInput" placeholder="رمز ادمین..." style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;text-align:center;margin-bottom:8px;direction:ltr">'
+            +'<button onclick="window.__promptAdminPassword(document.getElementById(\'adminPassInput\').value)" style="width:100%;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));color:#fff;font-family:var(--font-text);font-size:12.5px;font-weight:800;cursor:pointer">🔓 فعال‌سازی حالت ادمین</button>'
+            +'</div>';
+    }
+
+    modelsHTML += '<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'
+        +'<span style="font-size:12px;font-weight:800;color:var(--text-muted)">مدل‌ها:</span>'
+        +(admin ? '<span class="admin-badge">✓ ادمین</span>' : '<span style="font-size:10px;color:var(--text-muted)">حالت تماشا</span>')
+        +(admin ? '<button onclick="window.__logoutAdmin()" style="margin-right:auto;padding:5px 12px;border-radius:8px;border:1px solid rgba(239,68,68,.3);background:transparent;color:#F87171;font-family:var(--font-text);font-size:10px;font-weight:700;cursor:pointer">خروج</button>' : '')
         +'</div>';
+
+    modelsHTML += modelsDraft.map(function(m){
+        return '<div style="padding:14px;border-radius:16px;border:1px solid '+m.color+'40;background:'+m.color+'08;margin-bottom:12px;position:relative">'
+            +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+            +'<div style="width:42px;height:42px;border-radius:14px;background:'+m.color+'20;border:1px solid '+m.color+'50;display:flex;align-items:center;justify-content:center;color:'+m.color+'">'
+            +(MODEL_ICONS[m.id]||m.emoji)
+            +'</div>'
+            +'<div>'
+            +'<div style="font-size:14px;font-weight:800;color:'+m.color+'">'+escapeHtml(m.name)+'</div>'
+            +'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+escapeHtml(m.desc)+'</div>'
+            +'</div>'
+            +'</div>'
+            +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">URL پروکسی</label>'
+            +'<input type="text" value="'+escapeHtml(m.baseURL||'')+'" '+(admin?'':'disabled')+' oninput="window.updateModelConfig(\''+m.id+'\',\'baseURL\',this.value)" class="'+(admin?'model-field-editable':'model-field-locked')+'" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px;position:relative">'
+            +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">نام مدل API</label>'
+            +'<input type="text" value="'+escapeHtml(m.apiModel||'')+'" '+(admin?'':'disabled')+' oninput="window.updateModelConfig(\''+m.id+'\',\'apiModel\',this.value)" class="'+(admin?'model-field-editable':'model-field-locked')+'" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px;position:relative">'
+            +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">شخصیت و پرامپت (systemExtra)</label>'
+            +'<textarea '+(admin?'':'disabled')+' oninput="window.updateModelConfig(\''+m.id+'\',\'systemExtra\',this.value)" placeholder="اینجا شخصیت مدل رو بنویس..." class="'+(admin?'model-field-editable':'model-field-locked')+'" style="width:100%;min-height:120px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;resize:vertical;line-height:1.8;position:relative">'+escapeHtml(m.systemExtra||'')+'</textarea>'
+            +'</div>';
+    }).join('');
+
+    if(admin){
+        modelsHTML += '<button onclick="window.__downloadPromptsJSON()" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:2px dashed var(--accent);background:rgba(59,130,246,.06);color:var(--accent);font-family:var(--font-text);font-size:12px;font-weight:800;cursor:pointer">'
+            +'📥 دانلود prompts.json (بعدش توی گیتهاب آپلود کن)'
+            +'</button>';
+    }
+
+    modelsHTML += '</div>';
 
     wrap.innerHTML=`
         <div class="settings-content${settingsCat==='appearance'?' active':''}" data-cat="appearance">
@@ -1778,20 +1826,20 @@ function renderSettingsControls(){
                 <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>حالت نمایش</label>
                     <div class="row-btns">
                         <button class="row-btn${s.themeMode==='dark'?' active':''}" data-key="themeMode" data-value="dark" onclick="updateDraft('themeMode','dark')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>
-                        <button class="row-btn${s.themeMode==='light'?' active':''}" data-key="themeMode" data-value="light" onclick="updateDraft('themeMode','light')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg><span class="rb-label">روز</span></button>
+                        <button class="row-btn${s.themeMode==='light'?' active':''}" data-key="themeMode" data-value="light" onclick="updateDraft('themeMode','light')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg><span class="rb-label">روز</span></button>
                         <button class="row-btn${s.themeMode==='midnight'?' active':''}" data-key="themeMode" data-value="midnight" onclick="updateDraft('themeMode','midnight')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" fill="currentColor" fill-opacity=".35"/><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>
                     </div>
                 </div>
                 <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ اصلی</label>
                     <div class="color-row">${APP_CONFIG.themeColors.map(c=>`<div class="color-opt${s.themeColor===c?' active':''}" data-key="themeColor" data-value="${c}" onclick="updateDraft('themeColor','${c}')"><div class="color-orb" data-color="${c}"><svg viewBox="0 0 24 24">${APP_CONFIG.colorIcons[c]}</svg></div><div class="color-label">${APP_CONFIG.colorNames[c]}</div></div>`).join('')}</div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="6"/></svg>شکل حباب</label>
+                <div class="setting-group"><label>شکل حباب</label>
                     <div class="row-btns">${APP_CONFIG.bubbleShapes.map(b=>`<button class="row-btn${s.bubbleShape===b.id?' active':''}" data-key="bubbleShape" data-value="${b.id}" onclick="updateDraft('bubbleShape','${b.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${b.icon}</svg><span class="rb-label">${b.name}</span></button>`).join('')}</div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>اندازه متن</label>
+                <div class="setting-group"><label>اندازه متن</label>
                     <div class="row-btns">${['13px','15px','17px','19px'].map((f,i)=>`<button class="row-btn${s.fontSize===f?' active':''}" data-key="fontSize" data-value="${f}" onclick="updateDraft('fontSize','${f}')"><span class="rb-label">${['کوچیک','معمولی','درشت','بزرگ'][i]}</span></button>`).join('')}</div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15 L9 9 L15 15 L21 9"/></svg>تصویر پس‌زمینه</label>
+                <div class="setting-group"><label>تصویر پس‌زمینه</label>
                     <div class="bg-grid">${APP_CONFIG.bgPresets.map(bgOpt).join('')}</div>
                     <label class="bg-upload-btn" style="margin-top:8px">
                         <input type="file" accept="image/*" onchange="handleBgUpload(event)">
@@ -1800,31 +1848,28 @@ function renderSettingsControls(){
                     </label>
                     ${s.bgImage?`<button class="btn-secondary" style="width:100%;margin-top:6px" onclick="clearBgImage()">حذف تصویر</button>`:''}
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" opacity=".5"/></svg>شفافیت پس‌زمینه</label>
-                    <div class="slider-row"><input type="range" min="10" max="100" step="5" value="${s.bgImageOpacity||100}" oninput="updateDraft('bgImageOpacity',this.value)"><span class="slider-val">${s.bgImageOpacity||100}%</span></div>
-                </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>سرعت انیمیشن</label>
+                <div class="setting-group"><label>سرعت انیمیشن</label>
                     <div class="row-btns">${APP_CONFIG.animations.map(a=>`<button class="row-btn${s.animation===a.id?' active':''}" data-key="animation" data-value="${a.id}" onclick="updateDraft('animation','${a.id}')"><span class="rb-label">${a.name}</span></button>`).join('')}</div>
                 </div>
             </div>
 
             <div class="settings-subcontent${subState==='header'?' active':''}" data-sub="header">
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/></svg>پس‌زمینه هدر</label>
+                <div class="setting-group"><label>پس‌زمینه هدر</label>
                     <div class="row-btns">${APP_CONFIG.headerStyles.map(h=>`<button class="row-btn${s.headerStyle===h.id?' active':''}" data-key="headerStyle" data-value="${h.id}" onclick="updateDraft('headerStyle','${h.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${h.icon}</svg><span class="rb-label">${h.name}</span></button>`).join('')}</div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>نوار نوشتن پیام</label>
+                <div class="setting-group"><label>نوار نوشتن پیام</label>
                     <div class="row-btns">${APP_CONFIG.inputStyles.map(i=>`<button class="row-btn${s.inputStyle===i.id?' active':''}" data-key="inputStyle" data-value="${i.id}" onclick="updateDraft('inputStyle','${i.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${i.icon}</svg><span class="rb-label">${i.name}</span></button>`).join('')}</div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>استایل المان‌ها</label>
+                <div class="setting-group"><label>استایل المان‌ها</label>
                     <div class="row-btns">${APP_CONFIG.elementStyles.map(el=>`<button class="row-btn${s.elementStyle===el.id?' active':''}" data-key="elementStyle" data-value="${el.id}" onclick="updateDraft('elementStyle','${el.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${el.icon}</svg><span class="rb-label">${el.name}</span></button>`).join('')}</div>
                 </div>
             </div>
 
             <div class="settings-subcontent${subState==='pattern'?' active':''}" data-sub="pattern">
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>انتخاب طرح</label>
+                <div class="setting-group"><label>انتخاب طرح</label>
                     <div class="pattern-grid">${APP_CONFIG.patterns.map(p=>`<div class="pattern-opt${s.pattern===p.id?' active':''}" data-key="pattern" data-value="${p.id}" onclick="updateDraft('pattern','${p.id}')"><div class="pattern-thumb th-${p.id}"></div><div class="pattern-name">${p.name}</div></div>`).join('')}</div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>رنگ‌های آماده طرح</label>
+                <div class="setting-group"><label>رنگ‌های آماده طرح</label>
                     <div class="pattern-preset-colors">
                         ${APP_CONFIG.patternPresets.map(function(p){
                             var isActive = s.patternColor1===p.c1 && s.patternColor2===p.c2;
@@ -1832,24 +1877,22 @@ function renderSettingsControls(){
                         }).join('')}
                     </div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>موقعیت</label>
+                <div class="setting-group"><label>موقعیت</label>
                     <div class="row-btns">
                         <button class="row-btn${s.patternPosition==='both'?' active':''}" data-key="patternPosition" data-value="both" onclick="updateDraft('patternPosition','both')"><span class="rb-label">دو گوشه</span></button>
                         <button class="row-btn${s.patternPosition==='reverse'?' active':''}" data-key="patternPosition" data-value="reverse" onclick="updateDraft('patternPosition','reverse')"><span class="rb-label">برعکس</span></button>
-                        <button class="row-btn${s.patternPosition==='tr'?' active':''}" data-key="patternPosition" data-value="tr" onclick="updateDraft('patternPosition','tr')"><span class="rb-label">راست</span></button>
-                        <button class="row-btn${s.patternPosition==='bl'?' active':''}" data-key="patternPosition" data-value="bl" onclick="updateDraft('patternPosition','bl')"><span class="rb-label">چپ</span></button>
                     </div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>تعداد در گوشه</label>
+                <div class="setting-group"><label>تعداد در گوشه</label>
                     <div class="slider-row"><input type="range" min="1" max="8" step="1" value="${s.patternPerCorner}" oninput="updateDraft('patternPerCorner',this.value)"><span class="slider-val">${s.patternPerCorner}×</span></div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>اندازه</label>
+                <div class="setting-group"><label>اندازه</label>
                     <div class="slider-row"><input type="range" min="60" max="350" step="10" value="${s.patternSize}" oninput="updateDraft('patternSize',this.value)"><span class="slider-val">${s.patternSize}px</span></div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" opacity=".5"/></svg>شفافیت</label>
+                <div class="setting-group"><label>شفافیت</label>
                     <div class="slider-row"><input type="range" min="10" max="100" step="5" value="${s.patternOpacity}" oninput="updateDraft('patternOpacity',this.value)"><span class="slider-val">${s.patternOpacity}%</span></div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ‌های دلخواه</label>
+                <div class="setting-group"><label>رنگ‌های دلخواه</label>
                     <div class="color-picker-row">
                         <div class="color-picker-wrap"><label>رنگ ۱</label><input type="color" value="${s.patternColor1}" oninput="updateDraft('patternColor1',this.value)"></div>
                         <div class="color-picker-wrap"><label>رنگ ۲</label><input type="color" value="${s.patternColor2}" oninput="updateDraft('patternColor2',this.value)"></div>
@@ -1870,66 +1913,36 @@ function renderSettingsControls(){
         </div>
 
         <div class="settings-content${settingsCat==='style'?' active':''}" data-cat="style">
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>حالت باز/بسته نوار</label>
+            <div class="setting-group"><label>حالت باز/بسته نوار</label>
                 <div class="row-btns">
-                    <button class="row-btn${!s.navStartCollapsed?' active':''}" data-key="navStartCollapsed" data-value="false" onclick="updateDraft('navStartCollapsed',false)"><span class="rb-label">باز</span></button>
-                    <button class="row-btn${s.navStartCollapsed?' active':''}" data-key="navStartCollapsed" data-value="true" onclick="updateDraft('navStartCollapsed',true)"><span class="rb-label">جمع‌شده</span></button>
+                    <button class="row-btn${!s.navStartCollapsed?' active':''}" onclick="updateDraft('navStartCollapsed',false)"><span class="rb-label">باز</span></button>
+                    <button class="row-btn${s.navStartCollapsed?' active':''}" onclick="updateDraft('navStartCollapsed',true)"><span class="rb-label">جمع‌شده</span></button>
                 </div>
             </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>موقعیت نوار</label>
+            <div class="setting-group"><label>موقعیت نوار</label>
                 <div class="row-btns">${APP_CONFIG.navPositions.map(p=>`<button class="row-btn${s.navPosition===p.id?' active':''}" data-key="navPosition" data-value="${p.id}" onclick="updateDraft('navPosition','${p.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${p.icon}</svg><span class="rb-label">${p.name}</span></button>`).join('')}</div>
             </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>استایل پس‌زمینه نوار</label>
+            <div class="setting-group"><label>استایل پس‌زمینه نوار</label>
                 <div class="row-btns">${APP_CONFIG.navStyles.map(st=>`<button class="row-btn${s.navStyle===st.id?' active':''}" data-key="navStyle" data-value="${st.id}" onclick="updateDraft('navStyle','${st.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${st.icon}</svg><span class="rb-label">${st.name}</span></button>`).join('')}</div>
             </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>شدت سایه نوار</label>
+            <div class="setting-group"><label>شدت سایه نوار</label>
                 <div class="slider-row"><input type="range" min="0" max="100" step="5" value="${s.navShadowLevel||0}" oninput="updateDraft('navShadowLevel',this.value)"><span class="slider-val">${s.navShadowLevel||0}%</span></div>
             </div>
         </div>
 
         <div class="settings-content${settingsCat==='behavior'?' active':''}" data-cat="behavior">
             <div class="setting-group">
-                <label><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>اعلان‌ها و یادآورها</label>
+                <label>اعلان‌ها و یادآورها</label>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
                     <button class="row-btn${s.notifEnabled!==false?' active':''}" onclick="updateDraft('notifEnabled',true)"><span class="rb-label">فعال ✓</span></button>
                     <button class="row-btn${s.notifEnabled===false?' active':''}" onclick="updateDraft('notifEnabled',false)"><span class="rb-label">خاموش ✗</span></button>
                 </div>
             </div>
             <div class="setting-group">
-                <label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>فاصله یادآور پیش‌کار</label>
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">
-                    ${[5,10,15,30].map(m=>`<button class="row-btn${s.notifPreMinutes==m?' active':''}" onclick="updateDraft('notifPreMinutes',${m})"><span class="rb-label">${m} دقیقه</span></button>`).join('')}
-                </div>
-            </div>
-            <div class="setting-group">
-                <label><svg viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5"/></svg>تست و مجوز اعلان</label>
+                <label>تست و مجوز اعلان</label>
                 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-                    <button class="btn-primary" style="flex:1;justify-content:center" onclick="if(window.__sendTestNotification)window.__sendTestNotification()">
-                        <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>
-                        ارسال نوتیف تست
-                    </button>
-                    <button class="btn-secondary" style="flex:1;justify-content:center" onclick="if(window.__requestNotifPermission)window.__requestNotifPermission()">
-                        <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-                        درخواست مجوز
-                    </button>
-                </div>
-                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-                    <button class="btn-secondary" style="flex:1;justify-content:center" onclick="if(window.__checkDevNotifsNow)window.__checkDevNotifsNow()">
-                        <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
-                        بررسی اعلان‌های سازنده
-                    </button>
-                </div>
-            </div>
-            <div class="setting-group">
-                <label><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg>تنظیمات حالت مطالعه</label>
-                <div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin:4px 0">مدت پیش‌فرض تایمر</div>
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
-                    ${[15,25,45,60].map(m=>`<button class="row-btn${s.studyDefaultMinutes==m?' active':''}" onclick="updateDraft('studyDefaultMinutes',${m})"><span class="rb-label">${m} د</span></button>`).join('')}
-                </div>
-                <div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin:8px 0 4px">اجبار به اتمام تایمر</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                    <button class="row-btn${s.studyStrictMode!==false?' active':''}" onclick="updateDraft('studyStrictMode',true)"><span class="rb-label">سخت‌گیر ✓</span></button>
-                    <button class="row-btn${s.studyStrictMode===false?' active':''}" onclick="updateDraft('studyStrictMode',false)"><span class="rb-label">آزاد</span></button>
+                    <button class="btn-primary" style="flex:1;justify-content:center" onclick="if(window.__sendTestNotification)window.__sendTestNotification()">ارسال نوتیف تست</button>
+                    <button class="btn-secondary" style="flex:1;justify-content:center" onclick="if(window.__requestNotifPermission)window.__requestNotifPermission()">درخواست مجوز</button>
                 </div>
             </div>
         </div>
@@ -1940,14 +1953,12 @@ function renderSettingsControls(){
 
         <div class="settings-content${settingsCat==='privacy'?' active':''}" data-cat="privacy">
             <div class="setting-group">
-                <label><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>قفل ورود با رمز</label>
+                <label>قفل ورود با رمز</label>
                 ${s.passwordEnabled&&s.password?`
                     <div style="text-align:center;padding:8px 0">
-                        <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#10B981;font-size:11.5px;font-weight:700">
-                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M20 6 9 17l-5-5"/></svg>قفل فعال است
-                        </div>
+                        <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:#10B981;font-size:11.5px;font-weight:700">✓ قفل فعال است</div>
                     </div>
-                    <button class="btn-secondary" style="width:100%" onclick="removePassword()"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>حذف رمز</button>
+                    <button class="btn-secondary" style="width:100%" onclick="removePassword()">حذف رمز</button>
                 `:`
                     <input type="password" class="password-input" id="newPass1" placeholder="رمز جدید" maxlength="32" style="margin-bottom:8px">
                     <input type="password" class="password-input" id="newPass2" placeholder="تکرار رمز" maxlength="32" style="margin-bottom:10px">
@@ -1955,24 +1966,15 @@ function renderSettingsControls(){
                 `}
             </div>
             <div class="setting-group">
-                <label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>قفل خودکار بعد از بی‌کاری</label>
-                <div class="slider-row"><input type="range" min="0" max="60" step="5" value="${s.autoLockMinutes||0}" oninput="updateDraft('autoLockMinutes',this.value)"><span class="slider-val">${(s.autoLockMinutes||0)===0?'خاموش':(s.autoLockMinutes+' دقیقه')}</span></div>
-            </div>
-            <div class="setting-group">
-                <label><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8"/><path d="M12 18v2"/></svg>دستگاه‌های فعال</label>
+                <label>دستگاه‌های فعال</label>
                 <div id="sessionsListInner"></div>
-                ${s.passwordEnabled&&s.password?`<button class="btn-secondary" style="width:100%;margin-top:6px;border-color:rgba(239,68,68,.4);color:#F87171" onclick="logoutOtherSessions()">خروج سایر دستگاه‌ها</button>`:''}
             </div>
             <div class="setting-group">
-                <label><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>بکاپ‌گیری</label>
+                <label>بکاپ‌گیری</label>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-                    <button class="btn-primary" style="justify-content:center" onclick="exportBackup()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>دانلود</button>
-                    <label class="btn-secondary" style="cursor:pointer;justify-content:center"><input type="file" accept=".json" onchange="importBackup(event)" style="display:none"><svg viewBox="0 0 24 24"><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>بازیابی</label>
+                    <button class="btn-primary" style="justify-content:center" onclick="exportBackup()">دانلود</button>
+                    <label class="btn-secondary" style="cursor:pointer;justify-content:center"><input type="file" accept=".json" onchange="importBackup(event)" style="display:none">بازیابی</label>
                 </div>
-            </div>
-            <div class="setting-group" style="border-color:rgba(239,68,68,.4)!important">
-                <label style="color:#F87171"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>منطقه خطر</label>
-                <button class="btn-secondary" style="width:100%;border-color:rgba(239,68,68,.4);color:#F87171" onclick="if(confirm('همه اطلاعات پاک بشه؟')){localStorage.clear();sessionStorage.clear();location.reload();}">پاک کردن همه اطلاعات</button>
             </div>
         </div>
 
@@ -1985,33 +1987,9 @@ function renderSettingsControls(){
             <div class="about-bio-card">
                 سلام 👋<br><br>
                 من حامدم؛ یه جوون ۲۰ ساله اراکی که عاشق ایران، تاریخش و مردمشه و همیشه به یادگرفتن و ساختن چیزهای جدید علاقه داشته.<br><br>
-                الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و در کنار درس، به هوش مصنوعی، برنامه‌نویسی و بازی‌سازی علاقه‌مندم. یه زمانی ادیتور و مجسمه‌ساز بودم و حالا مسیرم به چیزهای تازه‌ای رسیده؛ مسیری که هنوز هم ادامه داره.<br><br>
-                سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر و راحت تر بشه. شاید علاقه‌ام به آموزش و تربیت هم بی‌تأثیر نبوده باشه، اما فکر می‌کنم آدم تا دغدغه‌ی چیزی رو نداشته باشه، برای ساختنش قدم برنمی‌داره.<br><br>
-                شاید سراج رو با زبان و ادبیات عربی شروع کرده باشیم، اما سراج به هیچ چیز محدود نیست و نخواهد بود؛ قراره جایی برای یادگیری و تجربه‌ی چیزهای مختلف باشه و قدم‌به‌قدم بزرگ‌تر بشه.<br><br>
-                منم مثل سراج هنوز اول راهم؛ این تازه شروع ماجراست.<br><br>
+                الان دانشجوی زبان و ادبیات عربی دانشگاه قمم.<br><br>
+                سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر بشه.<br><br>
                 به دنیای سراج خوش اومدید. 🌱
-            </div>
-            <div class="about-section-title"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>راه های ارتباطی</div>
-            <div class="about-contacts">
-                <div class="contact-row" data-link="mailto:ranshamed.fr@gmail.com">
-                    <div class="contact-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg></div>
-                    <div class="contact-info"><div class="contact-label">ایمیل</div><div class="contact-value">ranshamed.fr@gmail.com</div></div>
-                </div>
-                <div class="contact-row" data-link="https://t.me/Ra_Nsss">
-                    <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M21 3 3 10l6 3 3 6 9-16z"/><path d="M9 13 21 3"/></svg></div>
-                    <div class="contact-info"><div class="contact-label">تلگرام</div><div class="contact-value">@Ra_Nsss</div></div>
-                </div>
-                <div class="contact-row" data-link="https://instagram.com/Hamed_Rans">
-                    <div class="contact-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div>
-                    <div class="contact-info"><div class="contact-label">اینستاگرام</div><div class="contact-value">Hamed_Rans</div></div>
-                </div>
-                <div class="contact-row" data-link="https://x.com/Hamed_Rans">
-                    <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/></svg></div>
-                    <div class="contact-info"><div class="contact-label">ایکس</div><div class="contact-value">Hamed_Rans</div></div>
-                </div>
-            </div>
-            <div class="siraj-version-badge" style="text-align:center;padding:14px 0;font-size:12px;color:var(--text-muted)">
-                نسخه <span style="color:var(--accent);font-weight:900">${s.appVersion||'3.5'}</span>
             </div>
         </div>`;
     setTimeout(()=>{
@@ -2037,10 +2015,7 @@ document.addEventListener('visibilitychange',()=>{
         setTimeout(()=>{ensureClickable();if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);},100);
         if(settings.lockOnTabSwitch&&settings.passwordEnabled&&settings.password){
             sessionStorage.removeItem(LOCK_SESSION_KEY);
-            const ls=document.getElementById('lockScreen');
-            if(ls)ls.classList.add('open');
-            const hb=document.getElementById('headerLockBtn');
-            if(hb)hb.classList.add('locked');
+            const ls=document.getElementById('lockScreen');if(ls)ls.classList.add('open');
         }
         if(settings.passwordEnabled&&settings.password&&sessionStorage.getItem(LOCK_SESSION_KEY)==='1'){
             pingMySession();
@@ -2049,9 +2024,7 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('scroll',ensureClickable,{passive:true});
 window.addEventListener('resize',()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);});
-window.addEventListener('beforeunload',()=>{
-    try{unregisterMySession();}catch(e){}
-});
+window.addEventListener('beforeunload',()=>{try{unregisterMySession();}catch(e){}});
 function unregisterMySession(){
     const id=getMySessionId();
     const sessions=loadSessions();
@@ -2062,18 +2035,10 @@ function unregisterMySession(){
 /* ═══════════════════════════════════════════════════════════════
    DEVELOPER NOTIFICATIONS
    ═══════════════════════════════════════════════════════════════ */
-function loadDevNotifSeen(){
-    try{return JSON.parse(localStorage.getItem(DEV_NOTIF_SEEN_KEY)||'[]');}catch(e){return [];}
-}
-function saveDevNotifSeen(arr){
-    try{localStorage.setItem(DEV_NOTIF_SEEN_KEY,JSON.stringify(arr.slice(-200)));}catch(e){}
-}
-function loadDevNotifCache(){
-    try{return JSON.parse(localStorage.getItem(DEV_NOTIF_CACHE_KEY)||'[]');}catch(e){return [];}
-}
-function saveDevNotifCache(arr){
-    try{localStorage.setItem(DEV_NOTIF_CACHE_KEY,JSON.stringify(arr.slice(-50)));}catch(e){}
-}
+function loadDevNotifSeen(){try{return JSON.parse(localStorage.getItem(DEV_NOTIF_SEEN_KEY)||'[]');}catch(e){return [];}}
+function saveDevNotifSeen(arr){try{localStorage.setItem(DEV_NOTIF_SEEN_KEY,JSON.stringify(arr.slice(-200)));}catch(e){}}
+function loadDevNotifCache(){try{return JSON.parse(localStorage.getItem(DEV_NOTIF_CACHE_KEY)||'[]');}catch(e){return [];}}
+function saveDevNotifCache(arr){try{localStorage.setItem(DEV_NOTIF_CACHE_KEY,JSON.stringify(arr.slice(-50)));}catch(e){}}
 function getMyUserId(){
     var uid = localStorage.getItem('siraj_uid');
     if(!uid){
@@ -2094,10 +2059,7 @@ async function fetchDevNotifications(){
         saveDevNotifCache(data);
         processDevNotifications(data);
     }catch(e){
-        try{
-            var cached = loadDevNotifCache();
-            if(cached.length) processDevNotifications(cached);
-        }catch(err){}
+        try{var cached = loadDevNotifCache();if(cached.length) processDevNotifications(cached);}catch(err){}
     }
 }
 function processDevNotifications(arr){
@@ -2117,31 +2079,15 @@ function processDevNotifications(arr){
     saveDevNotifSeen(seen);
 }
 function showDevNotification(n){
-    var emoji = n.emoji || (n.type === 'warning' ? '⚠️' : n.type === 'success' ? '✅' : n.type === 'error' ? '❌' : '📢');
+    var emoji = n.emoji || (n.type === 'warning' ? '⚠️' : n.type === 'success' ? '✅' : '❌');
     var title = n.title || 'اعلان از سراج';
     var body = n.body || '';
     if(typeof window.__pushDevNotificationToPanel === 'function'){
-        try{
-            window.__pushDevNotificationToPanel({
-                id: 'dev_' + n.id,
-                type: 'dev',
-                title: title,
-                body: body,
-                emoji: emoji,
-                devType: n.type || 'info',
-                ts: Date.now(),
-                answered: true
-            });
-        }catch(e){}
+        try{window.__pushDevNotificationToPanel({id:'dev_'+n.id,type:'dev',title:title,body:body,emoji:emoji,devType:n.type||'info',ts:Date.now(),answered:true});}catch(e){}
     }
     if(document.hidden && 'Notification' in window && Notification.permission === 'granted'){
         try{
-            var sys = new Notification(emoji + ' ' + title, {
-                body: body,
-                icon: 'siraj-logo.png',
-                tag: 'siraj_dev_' + n.id,
-                requireInteraction: false
-            });
+            var sys = new Notification(emoji + ' ' + title, {body:body,icon:'siraj-logo.png',tag:'siraj_dev_'+n.id});
             sys.onclick = function(){ window.focus(); sys.close(); };
         }catch(e){}
     }
@@ -2155,15 +2101,10 @@ function showDevNotifPopup(emoji, title, body){
     el.className = 'task-notif-popup';
     el.innerHTML =
         '<button class="task-notif-close" id="devNotifClose">✕</button>'
-        +'<div class="task-notif-head">'
-        +'<div class="task-notif-icon">'+emoji+'</div>'
-        +'<div class="task-notif-title">اعلان از سراج</div>'
-        +'</div>'
+        +'<div class="task-notif-head"><div class="task-notif-icon">'+emoji+'</div><div class="task-notif-title">اعلان از سراج</div></div>'
         +'<div class="task-notif-task"><b>'+escapeHtml(title)+'</b></div>'
         +(body?'<div style="font-size:12px;color:var(--text-muted);line-height:1.8;margin-bottom:12px">'+escapeHtml(body)+'</div>':'')
-        +'<div class="task-notif-actions">'
-        +'<button class="yes-btn" id="devNotifOk">متوجه شدم</button>'
-        +'</div>';
+        +'<div class="task-notif-actions"><button class="yes-btn" id="devNotifOk">متوجه شدم</button></div>';
     document.body.appendChild(el);
     requestAnimationFrame(function(){ el.classList.add('show'); });
     var close = function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 450); };
@@ -2172,15 +2113,8 @@ function showDevNotifPopup(emoji, title, body){
     setTimeout(function(){ if(el.parentNode && el.classList.contains('show')) close(); }, 20000);
 }
 window.__checkDevNotifsNow = function(){
-    if(!APP_CONFIG.devNotifUrl || !APP_CONFIG.devNotifUrl.trim()){
-        if(window.toast) window.toast('آدرس اعلان‌های سازنده تنظیم نشده','error');
-        return;
-    }
-    fetchDevNotifications().then(function(){
-        if(window.toast) window.toast('بررسی اعلان‌های سازنده انجام شد ✓','success');
-    }).catch(function(){
-        if(window.toast) window.toast('خطا در بررسی اعلان‌ها','error');
-    });
+    if(!APP_CONFIG.devNotifUrl || !APP_CONFIG.devNotifUrl.trim()){toast('آدرس اعلان‌های سازنده تنظیم نشده','error');return;}
+    fetchDevNotifications().then(function(){toast('بررسی انجام شد ✓','success');});
 };
 setTimeout(fetchDevNotifications, 8000);
 setInterval(fetchDevNotifications, 5 * 60 * 1000);
@@ -2189,11 +2123,7 @@ setInterval(fetchDevNotifications, 5 * 60 * 1000);
    PWA
    ═══════════════════════════════════════════════════════════════ */
 window._deferredInstallPrompt = null;
-window.addEventListener('beforeinstallprompt', function(e){
-    e.preventDefault();
-    window._deferredInstallPrompt = e;
-    setTimeout(showInstallButton, 5000);
-});
+window.addEventListener('beforeinstallprompt', function(e){e.preventDefault();window._deferredInstallPrompt = e;setTimeout(showInstallButton, 5000);});
 function showInstallButton(){
     if(!window._deferredInstallPrompt) return;
     if(document.getElementById('pwaInstallBtn')) return;
@@ -2206,13 +2136,8 @@ function showInstallButton(){
         if(!window._deferredInstallPrompt) return;
         window._deferredInstallPrompt.prompt();
         var result = await window._deferredInstallPrompt.userChoice;
-        if(result.outcome === 'accepted'){
-            if(window.toast) window.toast('سراج نصب شد! 🎉','success');
-            btn.remove();
-        } else {
-            localStorage.setItem('siraj_install_dismissed','1');
-            btn.remove();
-        }
+        if(result.outcome === 'accepted'){toast('سراج نصب شد! 🎉','success');btn.remove();}
+        else {localStorage.setItem('siraj_install_dismissed','1');btn.remove();}
         window._deferredInstallPrompt = null;
     };
     document.body.appendChild(btn);
@@ -2221,7 +2146,7 @@ function showInstallButton(){
 window.addEventListener('appinstalled', function(){
     var b = document.getElementById('pwaInstallBtn');
     if(b) b.remove();
-    if(window.toast) window.toast('سراج با موفقیت نصب شد! 🎉','success');
+    toast('سراج با موفقیت نصب شد! 🎉','success');
 });
 
 window.addEventListener('load',()=>{
@@ -2229,14 +2154,13 @@ window.addEventListener('load',()=>{
     try{const savedImg=localStorage.getItem(PROFILE_IMG_KEY);if(savedImg&&!settings.profileImage)settings.profileImage=savedImg;}catch(e){}
 
     if('serviceWorker' in navigator){
-        navigator.serviceWorker.register('sw.js').then(function(reg){
-            console.log('[SW] registered', reg.scope);
-        }).catch(function(err){ console.warn('[SW] failed', err); });
+        navigator.serviceWorker.register('sw.js').catch(function(err){ console.warn('[SW]', err); });
     }
 
     initNavState();
     applySettingsToUI();
     ensureCurrentFontLoaded();
+    fetchPromptsFromGitHub();
     if(!currentChatId)createNewChat(true);
     toggleWelcome();
     renderPanelForChat();
