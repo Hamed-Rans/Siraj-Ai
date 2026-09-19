@@ -3803,3 +3803,449 @@ body[data-theme^="midnight"]{
   border-color:var(--accent)!important;
   box-shadow:0 0 0 2px var(--panel-bg),0 0 0 3px var(--accent),0 8px 20px -6px var(--accent)!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v2.5 — Final Polish
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① هدر اکشن‌ها — فیکس کامل */
+.header-left-actions,
+#sirajHeaderActions{
+  position:absolute!important;
+  left:14px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  direction:ltr!important;
+  z-index:50!important;
+  pointer-events:auto!important;
+}
+.header-left-actions .main-top-avatar,
+#sirajHeaderActions .main-top-avatar{
+  width:46px!important;
+  height:46px!important;
+  min-width:46px!important;
+  max-width:46px!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  border:2px solid var(--accent)!important;
+  box-shadow:0 0 0 2px var(--panel-bg),0 0 0 3px var(--accent-soft)!important;
+  background:var(--accent-soft)!important;
+  transition:transform .3s cubic-bezier(.34,1.4,.64,1)!important;
+  /* حذف halo قدیمی */
+  filter:none!important;
+}
+.header-left-actions .main-top-avatar:hover,
+#sirajHeaderActions .main-top-avatar:hover{
+  transform:scale(1.08)!important;
+}
+.header-left-actions .main-top-avatar img,
+#sirajHeaderActions .main-top-avatar img{
+  width:100%!important;height:100%!important;
+  object-fit:cover!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  -webkit-user-drag:none!important;
+}
+.header-left-actions .main-top-icon-btn,
+#sirajHeaderActions .main-top-icon-btn{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  max-width:38px!important;
+  border-radius:12px!important;
+  background:var(--accent)!important;
+  color:#fff!important;
+  border:none!important;
+  /* حذف همه‌ی سایه‌ها و halo */
+  box-shadow:none!important;
+  outline:none!important;
+  filter:none!important;
+  transition:transform .28s cubic-bezier(.34,1.4,.64,1),
+             background .25s ease!important;
+  position:relative!important;
+  overflow:hidden!important;
+}
+/* حذف تمام ::before و ::after که ممکنه halo بسازن */
+.header-left-actions .main-top-icon-btn::before,
+.header-left-actions .main-top-icon-btn::after,
+#sirajHeaderActions .main-top-icon-btn::before,
+#sirajHeaderActions .main-top-icon-btn::after{
+  display:none!important;
+}
+.header-left-actions .main-top-icon-btn:hover,
+#sirajHeaderActions .main-top-icon-btn:hover{
+  background:var(--accent-light)!important;
+  transform:translateY(-2px) scale(1.05)!important;
+}
+.header-left-actions .main-top-icon-btn svg,
+#sirajHeaderActions .main-top-icon-btn svg{
+  width:18px!important;
+  height:18px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+/* فیکس باگ halo زیر دکمه قفل */
+.header-left-actions .main-top-icon-btn,
+#sirajHeaderActions .main-top-icon-btn{
+  isolation:isolate!important;
+}
+
+/* ② دکمه برگرد به امروز — چپ و جمع‌وجور */
+.phc-back-inline{
+  position:absolute!important;
+  left:0!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+  height:24px!important;
+  padding:4px 10px!important;
+  font-size:10px!important;
+  border-radius:12px!important;
+  z-index:2!important;
+  white-space:nowrap!important;
+}
+.phc-back-inline:hover{
+  transform:translateY(-50%) translateX(-2px)!important;
+}
+.phc-back-inline.appearing{
+  animation:backBtnIn2 .5s cubic-bezier(.34,1.4,.64,1) both!important;
+}
+@keyframes backBtnIn2{
+  0%{opacity:0;transform:translateY(-50%) scale(.5) translateX(-10px)}
+  60%{opacity:1;transform:translateY(-50%) scale(1.1) translateX(0)}
+  100%{opacity:1;transform:translateY(-50%) scale(1) translateX(0)}
+}
+
+/* ③ نوار پایین/بالا — جمع‌وجورتر */
+[data-nav-position="bottom"] .bottom-nav,
+[data-nav-position="top"] .bottom-nav{
+  padding:4px 10px!important;
+  gap:2px!important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="top"] .bottom-nav-btn:not(.nav-btn-chat){
+  height:36px!important;
+  min-height:36px!important;
+  padding:0 7px!important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="top"] .bottom-nav-btn.nav-btn-chat{
+  width:42px!important;height:42px!important;
+  min-width:42px!important;min-height:42px!important;
+  margin:2px 6px!important;
+}
+[data-nav-position="bottom"] .nav-collapse-tab,
+[data-nav-position="top"] .nav-collapse-tab{
+  height:36px!important;
+  width:42px!important;
+}
+
+/* ④ فیکس پس‌زمینه دکمه‌ها وقتی نوار مخفی */
+[data-nav-position="bottom"] .nav-row.collapsed .bottom-nav,
+[data-nav-position="top"] .nav-row.collapsed .bottom-nav{
+  background:transparent!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  border-color:transparent!important;
+}
+[data-nav-position="bottom"] .nav-row.collapsed:hover .bottom-nav,
+[data-nav-position="bottom"] .nav-row.collapsed .bottom-nav:hover,
+[data-nav-position="top"] .nav-row.collapsed:hover .bottom-nav,
+[data-nav-position="top"] .nav-row.collapsed .bottom-nav:hover{
+  background:var(--panel-bg)!important;
+  backdrop-filter:blur(20px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(200%)!important;
+  border-color:var(--border-strong)!important;
+}
+
+/* ⑤ نوار بالا — نصفه مخفی بشه */
+[data-nav-position="top"] .nav-row.collapsed .bottom-nav{
+  transform:translateY(calc(-50% + var(--nav-collapsed) / 2))!important;
+  opacity:.6!important;
+}
+[data-nav-position="top"] .nav-row.collapsed:hover .bottom-nav,
+[data-nav-position="top"] .nav-row.collapsed .bottom-nav:hover{
+  transform:translateY(0)!important;
+  opacity:1!important;
+}
+
+/* ⑥ نوار پایین — نصفه مخفی */
+[data-nav-position="bottom"] .nav-row.collapsed .bottom-nav{
+  transform:translateY(calc(50% - var(--nav-collapsed) / 2))!important;
+  opacity:.6!important;
+}
+[data-nav-position="bottom"] .nav-row.collapsed:hover .bottom-nav,
+[data-nav-position="bottom"] .nav-row.collapsed .bottom-nav:hover{
+  transform:translateY(0)!important;
+  opacity:1!important;
+}
+
+/* ⑦ نوار چپ/راست — نصفه + هاور کامل */
+[data-nav-position="left"] .nav-row.collapsed{
+  transform:translateY(-50%) translateX(-60%)!important;
+}
+[data-nav-position="left"] .nav-row.collapsed:hover{
+  transform:translateY(-50%) translateX(0)!important;
+}
+[data-nav-position="right"] .nav-row.collapsed{
+  transform:translateY(-50%) translateX(60%)!important;
+}
+[data-nav-position="right"] .nav-row.collapsed:hover{
+  transform:translateY(-50%) translateX(0)!important;
+}
+[data-nav-position="left"] .nav-row.collapsed .bottom-nav,
+[data-nav-position="right"] .nav-row.collapsed .bottom-nav{
+  background:var(--panel-bg)!important;
+  backdrop-filter:blur(20px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(200%)!important;
+}
+
+/* ⑧ صفحات توی حالت چپ/راست — انیمیشن عمودی */
+[data-nav-position="left"] .view.view-in-from-left,
+[data-nav-position="right"] .view.view-in-from-left{
+  animation:viewInFromTop .35s cubic-bezier(.22,1,.36,1) both!important;
+}
+[data-nav-position="left"] .view.view-in-from-right,
+[data-nav-position="right"] .view.view-in-from-right{
+  animation:viewInFromBottom .35s cubic-bezier(.22,1,.36,1) both!important;
+}
+[data-nav-position="left"] .view.leaving.view-out-left,
+[data-nav-position="right"] .view.leaving.view-out-left{
+  animation:viewOutToTop .2s cubic-bezier(.4,0,.7,.5) forwards!important;
+}
+[data-nav-position="left"] .view.leaving.view-out-right,
+[data-nav-position="right"] .view.leaving.view-out-right{
+  animation:viewOutToBottom .2s cubic-bezier(.4,0,.7,.5) forwards!important;
+}
+@keyframes viewInFromTop{
+  0%{opacity:0;transform:translateY(-22px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes viewInFromBottom{
+  0%{opacity:0;transform:translateY(22px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes viewOutToTop{
+  0%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(-16px)}
+}
+@keyframes viewOutToBottom{
+  0%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(16px)}
+}
+
+/* ⑨ ناحیه امن گوشه پایین چپ — هیچی نره اونجا */
+.site-credit{
+  position:fixed!important;
+  bottom:8px!important;
+  left:14px!important;
+  right:auto!important;
+  z-index:99997!important;
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  padding:4px 6px!important;
+  pointer-events:none!important;
+  opacity:.5!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  font-size:10px!important;
+  color:var(--text-muted)!important;
+  direction:ltr!important;
+  transition:opacity .3s ease!important;
+}
+.site-credit:hover{opacity:.8!important}
+.site-credit img{
+  width:16px!important;height:16px!important;
+  object-fit:contain!important;
+  filter:grayscale(1) brightness(1.4) drop-shadow(0 0 4px rgba(0,0,0,.6))!important;
+  opacity:.7!important;flex-shrink:0!important;
+  border-radius:50%!important;
+}
+.site-version{
+  font-size:9.5px!important;
+  padding:2px 7px!important;
+  border-radius:8px!important;
+  background:rgba(0,0,0,.45)!important;
+  border:none!important;
+  color:var(--text-muted)!important;
+  font-weight:800!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.6)!important;
+}
+[data-theme^="light"] .site-version{
+  background:rgba(255,255,255,.7)!important;
+  color:#333!important;
+}
+
+/* ⑩ گرادیانت شیک برای «هوشواره سراج» */
+.chat-header .brand-text h1 .small-word{
+  background:linear-gradient(135deg,#8A9AB5 0%,#E8EDF5 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  font-weight:700!important;
+}
+.chat-header .brand-text h1 .accent-word{
+  background:linear-gradient(135deg,#F4D03F 0%,#3B82F6 50%,#8B5CF6 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  font-weight:900!important;
+  filter:drop-shadow(0 2px 6px rgba(59,130,246,.4))!important;
+}
+
+/* ⑪ دو حلقه چرخان دور input — درست و نرم */
+.input-bar-shell::before,
+.input-bar-shell::after{
+  content:''!important;
+  position:absolute!important;
+  border-radius:29px!important;
+  padding:3px!important;
+  pointer-events:none!important;
+  opacity:0!important;
+  transition:opacity .4s ease!important;
+  z-index:1!important;
+  will-change:background!important;
+}
+.input-bar-shell::before{
+  inset:-3px!important;
+  background:conic-gradient(from var(--spin1),
+    transparent 0deg, transparent 280deg,
+    rgba(96,165,250,.1) 320deg,
+    var(--accent-light) 345deg,
+    #ffffff 358deg,
+    var(--accent) 360deg)!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+          mask-composite:exclude!important;
+  animation:spinNeon1 3s linear infinite!important;
+}
+.input-bar-shell::after{
+  inset:-5px!important;
+  border-radius:31px!important;
+  background:conic-gradient(from var(--spin2),
+    transparent 0deg, transparent 280deg,
+    rgba(139,92,246,.15) 320deg,
+    #8B5CF6 345deg,
+    #C084FC 358deg,
+    #a78bfa 360deg)!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+          mask-composite:exclude!important;
+  filter:blur(2px)!important;
+  z-index:0!important;
+  animation:spinNeon2 4s linear infinite reverse!important;
+}
+.input-bar-shell:focus-within::before,
+.input-bar-shell:has(.bar-input:focus)::before{opacity:1!important}
+.input-bar-shell:focus-within::after,
+.input-bar-shell:has(.bar-input:focus)::after{opacity:.9!important}
+@property --spin1{syntax:'<angle>';initial-value:0deg;inherits:false}
+@property --spin2{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes spinNeon1{to{--spin1:360deg}}
+@keyframes spinNeon2{to{--spin2:360deg}}
+
+/* ⑫ تب‌های پنل مدل — آیکون اختصاصی */
+.model-dd-item svg{
+  width:18px!important;height:18px!important;
+  stroke:currentColor!important;fill:none!important;
+  stroke-width:1.9!important;
+  flex-shrink:0!important;
+}
+
+/* ⑬ انیمیشن نوار پایین‌تر از دکمه هوش مصنوعی */
+.bottom-nav-btn.nav-btn-chat.active ~ .nav-slider,
+.bottom-nav-btn:not(.nav-btn-chat).active + .bottom-nav-btn.nav-btn-chat ~ .nav-slider{
+  /* noop - handled in JS */
+}
+
+/* ⑭ فیکس باگ پس‌زمینه باقی‌مونده روی دکمه */
+.bottom-nav-btn.active{
+  background:transparent!important;
+}
+.bottom-nav-btn.nav-btn-chat.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark))!important;
+}
+
+/* ⑮ کارت‌ها و کادرها — شیک‌تر با گرادیانت ملایم */
+.month-calendar,
+.month-goals,
+.year-overview,
+.daily-card,
+.planner-hero-card,
+.week-grid-wrap,
+.week-summary,
+.tasks-done-list,
+.learn-library-box,
+.panel-card,
+.tool-card,
+.planner-stats-card{
+  background:linear-gradient(160deg,
+    rgba(255,255,255,.045) 0%,
+    rgba(255,255,255,.015) 100%)!important;
+  border-width:1.5px!important;
+  border-color:var(--border-strong)!important;
+  box-shadow:
+    0 10px 32px -14px rgba(0,0,0,.5),
+    0 0 40px -25px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+[data-element-style="glass"] .month-calendar,
+[data-element-style="glass"] .month-goals,
+[data-element-style="glass"] .year-overview,
+[data-element-style="glass"] .daily-card,
+[data-element-style="glass"] .planner-hero-card,
+[data-element-style="glass"] .week-grid-wrap,
+[data-element-style="glass"] .week-summary,
+[data-element-style="glass"] .tasks-done-list,
+[data-element-style="glass"] .learn-library-box,
+[data-element-style="glass"] .panel-card,
+[data-element-style="glass"] .tool-card,
+[data-element-style="glass"] .planner-stats-card{
+  background:linear-gradient(160deg,
+    rgba(18,22,30,.52) 0%,
+    rgba(18,22,30,.38) 100%)!important;
+  backdrop-filter:blur(48px) saturate(220%) brightness(1.1)!important;
+  -webkit-backdrop-filter:blur(48px) saturate(220%) brightness(1.1)!important;
+}
+
+/* ⑯ فیلد مدل — ویرایش‌گر ادمین */
+.model-field-editable{
+  background:rgba(16,185,129,.05)!important;
+  border-color:rgba(16,185,129,.3)!important;
+}
+.model-field-locked{
+  background:rgba(120,120,120,.05)!important;
+  border-color:rgba(120,120,120,.2)!important;
+  opacity:.7!important;
+  cursor:not-allowed!important;
+}
+.model-field-locked::after{
+  content:'🔒';
+  position:absolute;
+  left:12px;top:12px;
+  font-size:14px;
+  opacity:.5;
+}
+
+/* ⑰ ادمین بج */
+.admin-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  padding:5px 12px!important;
+  border-radius:10px!important;
+  background:linear-gradient(135deg,#10B981,#059669)!important;
+  color:#fff!important;
+  font-size:10.5px!important;
+  font-weight:800!important;
+  box-shadow:0 4px 12px -4px #10B981!important;
+}
