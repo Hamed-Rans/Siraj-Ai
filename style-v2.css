@@ -1818,3 +1818,96 @@
   contain:none!important;
   overflow:visible!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS ACCORDION — باز شدن نرم زیر دکمه‌های ظاهر
+   ═══════════════════════════════════════════════════════════════ */
+.settings-accordion{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:4px 0;
+}
+.settings-acc-item{
+    border-radius:14px;
+    background:rgba(255,255,255,.025);
+    border:1px solid var(--border);
+    overflow:hidden;
+    transition:
+        border-color .3s cubic-bezier(.4,0,.2,1),
+        background .3s cubic-bezier(.4,0,.2,1),
+        box-shadow .35s cubic-bezier(.22,1,.36,1);
+}
+.settings-acc-item.active{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+    box-shadow:0 6px 20px -10px var(--accent);
+}
+.settings-acc-trigger{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:14px 16px;
+    border:none;
+    background:transparent;
+    color:var(--text-main);
+    font-family:var(--font-text);
+    font-size:12.5px;
+    font-weight:800;
+    cursor:pointer;
+    text-align:right;
+    transition:
+        color .25s cubic-bezier(.4,0,.2,1),
+        background .25s cubic-bezier(.4,0,.2,1);
+}
+.settings-acc-trigger:hover{
+    background:var(--accent-soft);
+    color:var(--accent);
+}
+.settings-acc-item.active .settings-acc-trigger{
+    color:var(--accent);
+}
+.settings-acc-trigger:active{
+    transform:scale(.985);
+    transition:transform .12s ease;
+}
+.settings-acc-title{
+    flex:1;
+    min-width:0;
+}
+.settings-acc-arrow{
+    width:16px;
+    height:16px;
+    stroke:currentColor;
+    fill:none;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    flex-shrink:0;
+    transition:transform .4s cubic-bezier(.34,1.4,.64,1);
+}
+.settings-acc-item.active .settings-acc-arrow{
+    transform:rotate(180deg);
+}
+.settings-acc-panel{
+    display:grid;
+    grid-template-rows:0fr;
+    transition:grid-template-rows .45s cubic-bezier(.22,1,.36,1);
+}
+.settings-acc-item.active .settings-acc-panel{
+    grid-template-rows:1fr;
+}
+.settings-acc-panel-inner{
+    overflow:hidden;
+    min-height:0;
+}
+.settings-acc-panel-content{
+    padding:0 14px 14px;
+}
+.settings-acc-panel-content > .setting-group{
+    animation:fadeSlideUp .4s var(--ease-smooth) both;
+}
+.settings-acc-panel-content > .setting-group:last-child{
+    margin-bottom:0;
+}
