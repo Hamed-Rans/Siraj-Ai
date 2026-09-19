@@ -3587,3 +3587,192 @@ body[data-theme^="midnight"]{
 .th-yazd{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%232AA5B8' stroke-width='1.8'%3E%3Cpath d='M60 15 L60 105'/%3E%3Ccircle cx='60' cy='30' r='10'/%3E%3Ccircle cx='60' cy='60' r='14'/%3E%3Ccircle cx='60' cy='90' r='12'/%3E%3Cpath d='M40 30 L80 30 M36 60 L84 60 M38 90 L82 90'/%3E%3C/g%3E%3C/svg%3E")!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v3.4 — Header + Nav + Patterns + Fixes
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① دکمه‌های هدر — مربع گوشه گرد + رنگ تم */
+.header-left-actions,
+#sirajHeaderActions{
+  position:absolute!important;
+  left:14px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  direction:ltr!important;
+  z-index:50!important;
+  pointer-events:auto!important;
+}
+.header-left-actions .main-top-avatar,
+#sirajHeaderActions .main-top-avatar{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  border-radius:12px!important;
+  overflow:hidden!important;
+}
+.header-left-actions .main-top-icon-btn,
+#sirajHeaderActions .main-top-icon-btn{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  border-radius:12px!important;
+  /* ★ رنگ تم */
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  border:1px solid var(--accent)!important;
+  box-shadow:0 4px 12px -6px var(--accent)!important;
+  transition:all .3s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.header-left-actions .main-top-icon-btn:hover,
+#sirajHeaderActions .main-top-icon-btn:hover{
+  background:var(--accent)!important;
+  color:#fff!important;
+  transform:translateY(-2px) scale(1.05)!important;
+  box-shadow:0 6px 18px -4px var(--accent)!important;
+}
+.header-left-actions .main-top-icon-btn svg,
+#sirajHeaderActions .main-top-icon-btn svg{
+  width:18px!important;
+  height:18px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:1.9!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+/* آواتار هم گوشه گرد */
+.main-top-avatar{
+  border-radius:12px!important;
+  border:1.5px solid var(--accent)!important;
+  box-shadow:0 0 0 2px var(--panel-bg),0 4px 12px -6px var(--accent)!important;
+}
+
+/* ② فیکس لرزش/کشیدگی nav slider */
+.nav-slider{
+  transition:transform .38s cubic-bezier(.22,1,.36,1),
+             width .38s cubic-bezier(.22,1,.36,1),
+             height .38s cubic-bezier(.22,1,.36,1),
+             opacity .2s ease!important;
+  will-change:transform!important;
+  backface-visibility:hidden!important;
+  transform:translate3d(0,0,0);
+}
+.nav-slider.grow .nav-slider-fill{
+  animation:none!important;
+}
+.nav-slider-fill{
+  transition:none!important;
+}
+
+/* ③ فیکس نوار پیام — فقط یه حلقه بچرخه */
+.input-bar-shell::after{
+  display:none!important;
+}
+.input-bar-shell::before{
+  animation:spinNeon 4s linear infinite!important;
+}
+
+/* ④ فیکس آیکون گفتگوهای قبلی در تاریخچه */
+.history-item .h-icon svg,
+.history-item .h-icon svg *{
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+
+/* ⑤ تنظیمات — کادرهای گوشه گرد */
+.settings-content .setting-group,
+.settings-content[data-cat="privacy"] .setting-group,
+.settings-content[data-cat="behavior"] .setting-group{
+  border:1px solid var(--border)!important;
+  background:rgba(255,255,255,.02)!important;
+  padding:14px 16px!important;
+  border-radius:16px!important;
+  margin-bottom:12px!important;
+}
+.setting-group:last-child{
+  margin-bottom:0!important;
+}
+
+/* ⑥ تنظیمات — دکمه‌های row-btn گوشه گرد */
+.row-btn{
+  border-radius:14px!important;
+  transition:all .28s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.row-btn:hover{
+  transform:translateY(-2px)!important;
+  border-radius:18px!important;
+}
+.row-btn.active{
+  border-radius:18px!important;
+  background:linear-gradient(135deg,var(--accent-soft),var(--accent-soft))!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 8px 20px -8px var(--accent)!important;
+}
+
+/* ⑦ هدر چت — لوگو و متن بزرگ‌تر با گرادیانت */
+.chat-header .brand-logo-wrap{
+  width:52px!important;
+  height:52px!important;
+}
+.chat-header .brand-text h1{
+  font-size:22px!important;
+}
+.chat-header .brand-text h1 .small-word{
+  font-size:.75em!important;
+  background:linear-gradient(135deg,var(--text-main),var(--accent-light))!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+}
+.chat-header .brand-text h1 .accent-word{
+  font-size:1.5em!important;
+  background:linear-gradient(135deg,#F4D03F,var(--accent),var(--accent-dark))!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+}
+.chat-header .brand-text .subtitle{
+  font-size:11px!important;
+  color:var(--text-muted)!important;
+}
+
+/* ⑧ الگوهای طرح — مینیمال وسط + تزئینی گوشه */
+.pattern-thumb{
+  background-size:72%!important;
+  transition:transform .3s ease!important;
+}
+.pattern-opt:hover .pattern-thumb{
+  transform:scale(1.05)!important;
+}
+
+/* ⑨ پیکرهای رنگی آماده برای طرح */
+.pattern-preset-colors{
+  display:flex!important;
+  gap:8px!important;
+  flex-wrap:wrap!important;
+  margin-top:8px!important;
+}
+.pattern-preset{
+  width:32px!important;
+  height:32px!important;
+  border-radius:10px!important;
+  border:2px solid var(--border)!important;
+  cursor:pointer!important;
+  transition:all .25s cubic-bezier(.34,1.4,.64,1)!important;
+  position:relative!important;
+  overflow:hidden!important;
+}
+.pattern-preset:hover{
+  transform:scale(1.12)!important;
+  border-color:var(--accent)!important;
+}
+.pattern-preset.active{
+  border-color:var(--accent)!important;
+  box-shadow:0 0 0 2px var(--panel-bg),0 0 0 3px var(--accent)!important;
+}
