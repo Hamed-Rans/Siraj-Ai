@@ -2362,3 +2362,205 @@ body::before{
   0%{stroke-dasharray:30;stroke-dashoffset:30}
   100%{stroke-dasharray:30;stroke-dashoffset:0}
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH D — دسته D
+   شامل: دکمه‌های مربع هدر + فاصله حلقه‌ها + input bar + هدر ثابت +
+         نوار چپ/راست + اسلایدر + انیمیشن بسته کتابخانه و مطالعه
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   D1: دکمه‌های نوتیف و قفل — مربع با گوشه گرد + برجسته
+   ═══════════════════════════════════════════════════════════════ */
+.main-top-icon-btn{
+  border-radius:14px!important;
+  background:linear-gradient(145deg,var(--accent),var(--accent-dark))!important;
+  box-shadow:
+    0 2px 4px -1px rgba(0,0,0,.3),
+    0 4px 12px -4px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.25),
+    inset 0 -1px 0 rgba(0,0,0,.15)!important;
+  transition:
+    transform .28s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .3s cubic-bezier(.22,1,.36,1)!important;
+}
+.main-top-icon-btn:hover{
+  transform:translateY(-2px) scale(1.06)!important;
+  box-shadow:
+    0 4px 8px -2px rgba(0,0,0,.35),
+    0 8px 20px -4px var(--accent),
+    0 0 0 3px var(--accent-soft),
+    inset 0 1px 0 rgba(255,255,255,.3),
+    inset 0 -1px 0 rgba(0,0,0,.15)!important;
+}
+.main-top-icon-btn:active{
+  transform:translateY(0) scale(.96)!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.2),
+    inset 0 2px 4px rgba(0,0,0,.2)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   D2: فاصله حلقه‌های چرخان input bar بیشتر
+   ═══════════════════════════════════════════════════════════════ */
+.input-bar-shell::before{
+  inset:-5px!important;
+}
+.input-bar-shell::after{
+  inset:-9px!important;
+  border-radius:35px!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   D3: input bar بیشتر جمع بشه موقع فوکوس
+   ═══════════════════════════════════════════════════════════════ */
+.input-bar-shell:focus-within,
+.input-bar-shell:has(.bar-input:focus){
+  transform:translateY(-16px) scale(.88)!important;
+  box-shadow:0 26px 60px -18px var(--accent)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   D4: هدرها ثابت بمونن موقع جابجایی تب‌ها (counter-animation دقیق)
+   ═══════════════════════════════════════════════════════════════ */
+.view.active.view-in-from-right .chat-header,
+.view.active.view-in-from-right .planner-hero,
+.view.active.view-in-from-right .page-title-bar{
+  animation:hdrCounterFromRight .5s cubic-bezier(.22,1,.36,1) both!important;
+  will-change:transform;
+}
+.view.active.view-in-from-left .chat-header,
+.view.active.view-in-from-left .planner-hero,
+.view.active.view-in-from-left .page-title-bar{
+  animation:hdrCounterFromLeft .5s cubic-bezier(.22,1,.36,1) both!important;
+  will-change:transform;
+}
+.view.leaving.view-out-right .chat-header,
+.view.leaving.view-out-right .planner-hero,
+.view.leaving.view-out-right .page-title-bar{
+  animation:hdrCounterOutRight .28s cubic-bezier(.4,0,.6,1) forwards!important;
+}
+.view.leaving.view-out-left .chat-header,
+.view.leaving.view-out-left .planner-hero,
+.view.leaving.view-out-left .page-title-bar{
+  animation:hdrCounterOutLeft .28s cubic-bezier(.4,0,.6,1) forwards!important;
+}
+@keyframes hdrCounterFromRight{
+  0%{transform:translateX(83.33px) scale(1.0417)}
+  60%{transform:translateX(10.42px) scale(1.008)}
+  100%{transform:translateX(0) scale(1)}
+}
+@keyframes hdrCounterFromLeft{
+  0%{transform:translateX(-83.33px) scale(1.0417)}
+  60%{transform:translateX(-10.42px) scale(1.008)}
+  100%{transform:translateX(0) scale(1)}
+}
+@keyframes hdrCounterOutRight{
+  0%{transform:translateX(0) scale(1)}
+  100%{transform:translateX(83.33px) scale(1.0417)}
+}
+@keyframes hdrCounterOutLeft{
+  0%{transform:translateX(0) scale(1)}
+  100%{transform:translateX(-83.33px) scale(1.0417)}
+}
+/* حذف blur از هدرها */
+.view.active.view-in-from-right .chat-header,
+.view.active.view-in-from-right .planner-hero,
+.view.active.view-in-from-right .page-title-bar,
+.view.active.view-in-from-left .chat-header,
+.view.active.view-in-from-left .planner-hero,
+.view.active.view-in-from-left .page-title-bar{
+  filter:none!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   D5: نوار چپ/راست — فاصله کمتر + فاصله بیشتر دور FAB
+   ═══════════════════════════════════════════════════════════════ */
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav{
+  padding:5px 4px!important;
+  gap:1px!important;
+  min-width:74px!important;
+  width:74px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat){
+  width:64px!important;
+  min-width:64px!important;
+  max-width:64px!important;
+  min-height:30px!important;
+  padding:3px 4px 2px!important;
+}
+[data-nav-position="left"] .bottom-nav-btn.active:not(.nav-btn-chat),
+[data-nav-position="right"] .bottom-nav-btn.active:not(.nav-btn-chat){
+  min-height:46px!important;
+  padding:5px 4px 4px!important;
+}
+/* فاصله بیشتر دور FAB */
+[data-nav-position="left"] .bottom-nav-btn.nav-btn-chat,
+[data-nav-position="right"] .bottom-nav-btn.nav-btn-chat{
+  margin:10px 0!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   D6: پس‌زمینه اسلایدر نوار — ارتفاع کمتر + گوشه کامل گرد
+   ═══════════════════════════════════════════════════════════════ */
+.nav-slider-fill{
+  border-radius:999px!important;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent),var(--accent-dark))!important;
+}
+[data-nav-position="bottom"] .nav-slider-fill,
+[data-nav-position="top"] .nav-slider-fill{
+  border-radius:999px!important;
+}
+[data-nav-position="left"] .nav-slider-fill,
+[data-nav-position="right"] .nav-slider-fill{
+  border-radius:999px!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   D7: انیمیشن نرم بسته شدن کتابخانه و حالت مطالعه
+   ═══════════════════════════════════════════════════════════════ */
+.learn-library-overlay{
+  opacity:1;
+  transition:
+    opacity .45s cubic-bezier(.22,1,.36,1),
+    visibility .45s cubic-bezier(.22,1,.36,1)!important;
+}
+.learn-library-overlay:not(.open){
+  opacity:0!important;
+}
+.learn-library-box{
+  transition:transform .5s cubic-bezier(.34,1.4,.64,1),opacity .42s cubic-bezier(.22,1,.36,1)!important;
+}
+.learn-library-overlay:not(.open) .learn-library-box{
+  transform:scale(.92) translateY(28px)!important;
+  opacity:0!important;
+}
+
+.study-overlay{
+  opacity:1;
+  transition:
+    opacity .55s cubic-bezier(.22,1,.36,1),
+    transform .6s cubic-bezier(.34,1.4,.64,1),
+    visibility .55s cubic-bezier(.22,1,.36,1)!important;
+}
+.study-overlay:not(.open){
+  opacity:0!important;
+  visibility:hidden!important;
+  transform:scale(.92) translateY(28px)!important;
+  pointer-events:none!important;
+}
+.study-overlay.open{
+  animation:none!important;
+  opacity:1!important;
+  visibility:visible!important;
+  transform:scale(1) translateY(0)!important;
+}
