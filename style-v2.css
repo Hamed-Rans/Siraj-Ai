@@ -1960,3 +1960,37 @@
 .chat-header, .page-title-bar, .planner-hero{
   background-image:none!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX: حذف کادر/پس‌زمینه دور دکمه‌های غیرفعال نوار
+   ═══════════════════════════════════════════════════════════════ */
+.bottom-nav-btn:not(.nav-btn-chat):not(.active){
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+[data-nav-position="bottom"] .bottom-nav-btn:not(.nav-btn-chat):not(.active),
+[data-nav-position="top"] .bottom-nav-btn:not(.nav-btn-chat):not(.active),
+[data-nav-position="left"] .bottom-nav-btn:not(.nav-btn-chat):not(.active),
+[data-nav-position="right"] .bottom-nav-btn:not(.nav-btn-chat):not(.active){
+  background:transparent!important;
+  border-color:transparent!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   FIX: دکمه پروفایل بزرگتر + هاور برجسته بدون چرخش
+   ═══════════════════════════════════════════════════════════════ */
+.main-top-avatar{
+  width:46px!important;
+  height:46px!important;
+  min-width:46px!important;
+  max-width:46px!important;
+}
+.main-top-avatar:hover{
+  transform:scale(1.08)!important;
+  box-shadow:
+    0 0 0 2px var(--panel-bg),
+    0 0 0 3px var(--accent),
+    0 8px 22px -6px var(--accent)!important;
+}
+.main-top-avatar:active{
+  transform:scale(.96)!important;
+}
