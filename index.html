@@ -36,9 +36,9 @@
     <div class="lock-desc">برای دسترسی، رمز عبور خود را وارد کنید</div>
     <div class="lock-pin-row" id="lockPinRow"></div>
     <input type="password" class="lock-input" id="lockInput" inputmode="numeric" maxlength="32"
-           style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:50%;left:50%;"
-           oninput="updatePinBoxes(this.value)"
-           onkeydown="if(event.key==='Enter')tryUnlock()">
+       placeholder="••••••"
+       oninput="updatePinBoxes(this.value)"
+       onkeydown="if(event.key==='Enter')tryUnlock()">
     <button class="lock-btn" onclick="tryUnlock()">باز کردن</button>
     <div class="lock-error" id="lockError"></div>
   </div>
