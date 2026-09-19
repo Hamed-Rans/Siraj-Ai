@@ -69,9 +69,9 @@ const APP_CONFIG = {
         notifPreMinutes: 10,
         studyDefaultMinutes: 25,
         studyStrictMode: true,
-        appVersion: '2.5'
         aiLevel: 'intermediate',
         aiLang: 'fa',
+        appVersion: '2.5'
     },
     themeColors: ['navy', 'crimson', 'gold', 'purple', 'emerald', 'indigo'],
     colorNames: { navy: 'شبانه', crimson: 'آتشین', gold: 'زرین', purple: 'جادویی', emerald: 'طبیعی', indigo: 'نیلی' },
