@@ -618,34 +618,46 @@ function getBgValue(t) {
 }
 
 function applyBodyBackground(t) {
+    const html = document.documentElement;
     const body = document.body;
     const v = getBgValue(t);
+    /* ★ body همیشه شفاف */
+    body.style.background = '';
+    body.style.backgroundImage = '';
+    body.style.backgroundSize = '';
+    body.style.backgroundPosition = '';
+    body.style.backgroundAttachment = '';
+    body.style.backgroundRepeat = '';
+    body.style.backgroundColor = '';
     if (v === 'none') {
-        body.style.background = '';
-        body.style.backgroundImage = '';
-        body.style.backgroundSize = '';
-        body.style.backgroundPosition = '';
-        body.style.backgroundAttachment = '';
-        body.style.backgroundRepeat = '';
-        body.style.backgroundColor = '';
-        body.style.backgroundImage = 'var(--primary-gradient)';
+        html.style.background = '';
+        html.style.backgroundImage = '';
+        html.style.backgroundSize = '';
+        html.style.backgroundPosition = '';
+        html.style.backgroundAttachment = '';
+        html.style.backgroundRepeat = '';
+        html.style.backgroundColor = '';
+        html.style.backgroundImage = 'var(--primary-gradient)';
+        html.style.backgroundAttachment = 'fixed';
+        html.style.backgroundPosition = 'center center';
+        html.style.backgroundSize = 'cover';
+        html.style.backgroundRepeat = 'no-repeat';
     } else {
-        body.style.background = v;
-        body.style.backgroundAttachment = 'fixed';
-        body.style.backgroundPosition = 'center';
+        html.style.background = v;
+        html.style.backgroundAttachment = 'fixed';
+        html.style.backgroundPosition = 'center center';
         if (t.bgImage) {
-            body.style.backgroundSize = 'cover';
-            body.style.backgroundRepeat = 'no-repeat';
+            html.style.backgroundSize = 'cover';
+            html.style.backgroundRepeat = 'no-repeat';
         } else if (t.bgPreset === 'dots') {
-            body.style.backgroundSize = '20px 20px';
-            body.style.backgroundRepeat = 'repeat';
+            html.style.backgroundSize = '20px 20px';
+            html.style.backgroundRepeat = 'repeat';
         } else {
-            body.style.backgroundSize = 'cover';
-            body.style.backgroundRepeat = 'no-repeat';
+            html.style.backgroundSize = 'cover';
+            html.style.backgroundRepeat = 'no-repeat';
         }
     }
 }
-
 /* ═══════════════════════════════════════════════════════════════
    APPLY SETTINGS
    ═══════════════════════════════════════════════════════════════ */
@@ -2011,23 +2023,25 @@ function openSettings() {
 function closeSettings() {
     const m = document.getElementById('settingsModal');
     if (!m || !m.classList.contains('open')) return;
-    /* ★ حذف فوری backdrop-filter برای جلوگیری از لگ انیمیشن بستن */
+    /* ★ حذف فوری backdrop-filter برای جلوگیری از لگ */
     m.style.backdropFilter = 'none';
     m.style.webkitBackdropFilter = 'none';
+    /* ★ اضافه کردن کلاس closing برای انیمیشن خروج هم‌شکل با ورود */
+    m.classList.add('closing');
     m.classList.remove('open');
     setTimeout(() => {
+        m.classList.remove('closing');
+        m.style.backdropFilter = '';
+        m.style.webkitBackdropFilter = '';
         if (!m.classList.contains('open')) {
             m.style.visibility = 'hidden';
             m.style.pointerEvents = 'none';
         }
-        /* ★ برگرداندن backdrop-filter برای دفعه بعد */
-        m.style.backdropFilter = '';
-        m.style.webkitBackdropFilter = '';
         document.querySelectorAll('.bottom-nav-btn').forEach(b => { b.style.pointerEvents = 'auto'; b.style.position = 'relative'; b.style.zIndex = '2'; });
         const s = document.getElementById('navSlider');
         if (s) s.style.pointerEvents = 'none';
         if (typeof window.updateNavSlider === 'function') window.updateNavSlider(true);
-    }, 340);
+    }, 460);
     settingsDraft = null;
 }
 function applySettings() {
@@ -2750,6 +2764,14 @@ document.addEventListener('visibilitychange', () => {
         setTimeout(() => {
             ensureClickable();
             if (typeof window.updateNavSlider === 'function') window.updateNavSlider(false);
+            /* ★ رفرش اجباری پس‌زمینه برای رفع جابجایی */
+            const html = document.documentElement;
+            const bgImg = html.style.backgroundImage;
+            if (bgImg && bgImg !== 'none') {
+                html.style.backgroundImage = 'none';
+                void html.offsetWidth;
+                html.style.backgroundImage = bgImg;
+            }
         }, 100);
         if (settings.lockOnTabSwitch && settings.passwordEnabled && settings.password) {
             sessionStorage.removeItem(LOCK_SESSION_KEY);
