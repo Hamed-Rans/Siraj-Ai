@@ -532,18 +532,18 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امروز</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امروز</span></button>';
       return '<div class="planner-hero-card">'
-        +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
-        +'<div class="phc-center">'
-        +backBtn
-        +'<div class="phc-day">'
-        +'<span data-anim-key="weekday">'+esc(p.weekday)+'</span>'
-        +'<span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span>'
-        +'</div>'
-        +'<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'
-        +(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')
-        +'</div>'
-        +'<button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
-        +'</div>';
+       +backBtn
+       +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
+       +'<div class="phc-center">'
+       +'<div class="phc-day">'
+       +'<span data-anim-key="weekday">'+esc(p.weekday)+'</span>'
+       +'<span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span>'
+       +'</div>'
+       +'<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'
+       +(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')
+       +'</div>'
+       +'<button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
+       +'</div>';
     }
     function heroWeekly(){
       var d=new Date(window.plannerDate||new Date());
@@ -2807,14 +2807,13 @@
         nav.insertBefore(slider,nav.firstChild);
 
         nav.addEventListener('click',function(e){
-          var btn=e.target.closest('.bottom-nav-btn[data-view]');
-          if(!btn) return;
-          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
-          btn.classList.add('active');
-          /* ★ بدون رها کردن — track یک‌بار کافیه */
-          setTimeout(function(){track();},20);
-          setTimeout(function(){track();},220);
-          setTimeout(function(){track();},460);
+        var btn=e.target.closest('.bottom-nav-btn[data-view]');
+        if(!btn) return;
+        nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        setTimeout(function(){track();},20);
+        setTimeout(function(){track();},220);
+        setTimeout(function(){track();},460);
         },true);
 
         setTimeout(function(){track(true);},150);
@@ -2825,87 +2824,76 @@
 
       /* ★ بازنویسی‌شده — بدون transform، بدون کش‌آمدن */
       function track(forceGrow){
-        if(!nav||!slider) return;
-        var btn=nav.querySelector('.bottom-nav-btn.active');
-        var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
-        var vert=(pos==='left'||pos==='right');
-        var navRow=document.getElementById('navRow');
-        var navCollapsed = navRow && navRow.classList.contains('collapsed');
+    if(!nav||!slider) return;
+    var btn=nav.querySelector('.bottom-nav-btn.active');
+    var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
+    var vert=(pos==='left'||pos==='right');
+    var navRow=document.getElementById('navRow');
+    var navCollapsed = navRow && navRow.classList.contains('collapsed');
 
-        if(!btn || navCollapsed){
-          slider.classList.remove('visible');
-          slider.style.opacity='0';
-          return;
-        }
+    if(!btn || navCollapsed){
+        slider.classList.remove('visible');
+        slider.style.opacity='0';
+        return;
+    }
 
-        var isChat = btn.classList.contains('nav-btn-chat');
-        var isHoriz=(pos==='bottom'||pos==='top');
-        var x,y,w,h;
+    var isChat = btn.classList.contains('nav-btn-chat');
 
-        /* اندازه‌گیری موقعیت نسبت به نوار */
-        var oldT=btn.style.transition;
-        btn.style.transition='none';
-        void btn.offsetWidth;
-        var nr=nav.getBoundingClientRect();
-        var br=btn.getBoundingClientRect();
-        btn.style.transition=oldT;
+    /* ★ اگه AI فعاله، فوراً مخفی کن (بدون animation) */
+    if(isChat){
+        slider.style.transition='opacity .25s ease';
+        slider.style.opacity='0';
+        setTimeout(function(){
+            slider.classList.remove('visible');
+        }, 260);
+        return;
+    }
 
-        x=br.left-nr.left;
-        y=br.top-nr.top;
-        w=br.width;
-        h=br.height;
+    var isHoriz=(pos==='bottom'||pos==='top');
+    var x,y,w,h;
 
-        var fill=slider.querySelector('.nav-slider-fill');
-        if(fill) fill.style.borderRadius = vert ? '999px' : '20px';
+    /* اندازه‌گیری بدون احتساب transition فعلی */
+    var oldT=btn.style.transition;
+    btn.style.transition='none';
+    void btn.offsetWidth;
+    var nr=nav.getBoundingClientRect();
+    var br=btn.getBoundingClientRect();
+    btn.style.transition=oldT;
 
-        var extraH = isHoriz ? 8 : 4;
-        var extraY = isHoriz ? -4 : -2;
+    x=br.left-nr.left;
+    y=br.top-nr.top;
+    w=br.width;
+    h=br.height;
 
-        var wasVisible = slider.classList.contains('visible');
+    var fill=slider.querySelector('.nav-slider-fill');
+    if(fill) fill.style.borderRadius = vert ? '999px' : '20px';
 
-        /* ★ اگه چت فعال شد → انیمیشن fade-out تمیز */
-        if(isChat){
-          slider.style.transition='left .42s cubic-bezier(.32,.72,0,1), top .42s cubic-bezier(.32,.72,0,1), width .42s cubic-bezier(.32,.72,0,1), height .42s cubic-bezier(.32,.72,0,1), opacity .28s ease';
-          slider.style.left=x+'px';
-          slider.style.top=(y+extraY)+'px';
-          slider.style.width=w+'px';
-          slider.style.height=(h+extraH)+'px';
-          slider.style.opacity='0';
-          setTimeout(function(){
-            if(slider.style.opacity==='0') slider.classList.remove('visible');
-          }, 320);
-          return;
-        }
+    var extraH = isHoriz ? 8 : 4;
+    var extraY = isHoriz ? -4 : -2;
 
-        /* ★ غیر چت → موقعیت‌دهی و نمایش */
-        if(!wasVisible){
-          slider.style.transition='none';
-          slider.style.left=x+'px';
-          slider.style.top=(y+extraY)+'px';
-          slider.style.width=w+'px';
-          slider.style.height=(h+extraH)+'px';
-          slider.style.opacity='0';
-          void slider.offsetWidth;
-          slider.style.transition='left .42s cubic-bezier(.32,.72,0,1), top .42s cubic-bezier(.32,.72,0,1), width .42s cubic-bezier(.32,.72,0,1), height .42s cubic-bezier(.32,.72,0,1), opacity .3s ease';
-          slider.style.opacity='1';
-          slider.classList.add('visible');
-        } else {
-          slider.style.transition='left .42s cubic-bezier(.32,.72,0,1), top .42s cubic-bezier(.32,.72,0,1), width .42s cubic-bezier(.32,.72,0,1), height .42s cubic-bezier(.32,.72,0,1), opacity .3s ease';
-          slider.style.left=x+'px';
-          slider.style.top=(y+extraY)+'px';
-          slider.style.width=w+'px';
-          slider.style.height=(h+extraH)+'px';
-          slider.style.opacity='1';
-        }
-      }
+    var wasVisible = slider.classList.contains('visible');
 
-      window.__moveNavSlider=function(){track();};
-      window.updateNavSlider=function(animate){track(animate===false);};
-
-      var tries=0;
-      var iv=setInterval(function(){if(init()||++tries>100) clearInterval(iv);},100);
-    })();
-
+    if(!wasVisible){
+        slider.style.transition='none';
+        slider.style.left=x+'px';
+        slider.style.top=(y+extraY)+'px';
+        slider.style.width=w+'px';
+        slider.style.height=(h+extraH)+'px';
+        slider.style.opacity='0';
+        void slider.offsetWidth;
+        slider.style.transition='left .4s cubic-bezier(.32,.72,0,1), top .4s cubic-bezier(.32,.72,0,1), width .4s cubic-bezier(.32,.72,0,1), height .4s cubic-bezier(.32,.72,0,1), opacity .3s ease';
+        slider.style.opacity='1';
+        slider.classList.add('visible');
+    } else {
+        slider.style.transition='left .4s cubic-bezier(.32,.72,0,1), top .4s cubic-bezier(.32,.72,0,1), width .4s cubic-bezier(.32,.72,0,1), height .4s cubic-bezier(.32,.72,0,1), opacity .3s ease';
+        slider.style.left=x+'px';
+        slider.style.top=(y+extraY)+'px';
+        slider.style.width=w+'px';
+        slider.style.height=(h+extraH)+'px';
+        slider.style.opacity='1';
+        slider.classList.add('visible');
+    }
+}
     /* ★ انیمیشن سوییچ view — RTL درست */
     (function(){
       function hook(){
