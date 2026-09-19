@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v3.2 Final) */
+/* Siraj v2.0 — planner-v2.js (v3.5 Final) */
 (function(){
   'use strict';
 
@@ -819,7 +819,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NOTIFICATION SYSTEM v3.2
+       NOTIFICATION SYSTEM v3.5
        ═══════════════════════════════════════════════════════════════ */
     var NOTIF_KEY      = 'siraj-notif-history';
     var NOTIF_SEEN_KEY = 'siraj-notif-seen';
@@ -852,13 +852,12 @@
       if(panel && panel.classList.contains('open')) renderNotifPanel();
     }
 
-    /* ★ بج داینامیک — فقط pre/end و انیمیشن حذف نرم */
+    /* ★ بج داینامیک — فقط pre/end + انیمیشن نرم */
     function updateNotifBadge(){
       var btn = document.getElementById('notifBtn');
       if(!btn) return;
       var list = loadNotifHistory();
       var seen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
-      /* فقط نوتیف‌های تسک (نه dev) و خوانده‌نشده */
       var unseen = list.filter(function(n){
         return (n.ts||0) > seen && (n.type === 'pre' || n.type === 'end');
       }).length;
@@ -880,7 +879,6 @@
         }
         badge.textContent = unseen > 9 ? '9+' : unseen;
       } else if(badge){
-        /* ★ انیمیشن حذف نرم */
         badge.style.transition = 'all .35s cubic-bezier(.34,1.4,.64,1)';
         badge.style.transform = 'scale(0) translateY(-6px)';
         badge.style.opacity = '0';
@@ -899,11 +897,6 @@
       if(changed) saveNotifHistory(list);
       localStorage.setItem(NOTIF_SEEN_KEY, String(now));
       updateNotifBadge();
-    }
-
-    /* نگه داشتن برای سازگاری با کد قدیمی */
-    function markNotifsSeen(){
-      markAllNotifsRead();
     }
 
     function checkTaskNotifications(){
@@ -970,7 +963,7 @@
       }catch(e){ console.warn('[NotifCheck]', e); }
     }
 
-    /* ★ نوتیف سیستمی فقط وقتی تب مخفی یا غیرفعاله */
+    /* ★ نوتیف سیستمی فقط وقتی تب مخفی */
     function fireNotification(n){
       addNotifToHistory(n);
       showNotifLivePopup(n);
@@ -1128,7 +1121,7 @@
       el.querySelector('#ncpKeep').onclick = close;
     }
 
-    /* ★ رندر پنل با تب‌های خوانده/نخوانده */
+    /* ★ پنل اعلان‌ها با تب‌های خوانده/نخوانده */
     function renderNotifPanel(){
       var list = document.getElementById('notifList');
       if(!list) return;
@@ -1192,7 +1185,7 @@
       }).join('');
     }
 
-    /* ★ تغییر تب فعال — با stopPropagation */
+    /* ★ تغییر تب فعال */
     window.__setNotifTab = function(t, ev){
       if(ev && ev.stopPropagation) ev.stopPropagation();
       _notifTab = t;
@@ -1258,6 +1251,7 @@
         renderNotifPanel();
         updateNotifBadge();
       };
+      /* ★ جلوی بستن با کلیک توی پنل رو بگیر */
       panel.addEventListener('click', function(e){ e.stopPropagation(); });
       setTimeout(function(){ document.addEventListener('click', __notifOutsideClose); }, 100);
       renderNotifPanel();
@@ -1331,7 +1325,6 @@
       }
     };
 
-    /* ★ درخواست مجدد اجازه نوتیف */
     window.__requestNotifPermission = function(){
       if(!('Notification' in window)){ if(window.toast) window.toast('مرورگر پشتیبانی نمی‌کنه','error'); return; }
       if(Notification.permission === 'granted'){ if(window.toast) window.toast('اجازه نوتیف از قبل داده شده ✓','success'); return; }
@@ -1341,14 +1334,10 @@
       });
     };
 
-    /* ★ اتصال نوتیف سازنده به پنل اعلان‌ها */
     window.__pushDevNotificationToPanel = function(n){
-      try{
-        addNotifToHistory(n);
-      }catch(e){ console.warn('[DevNotif]', e); }
+      try{ addNotifToHistory(n); }catch(e){ console.warn('[DevNotif]', e); }
     };
 
-    /* راه‌اندازی */
     setTimeout(function(){
       if('Notification' in window && Notification.permission === 'default'){
         try{ Notification.requestPermission(); }catch(e){}
@@ -2482,7 +2471,6 @@
           box.querySelector('#stayBtn').onclick=function(){
             el.classList.remove('open');setTimeout(function(){el.remove();},320);
           };
-          /* ★ فیکس باگ تاریخ تنبیه */
           box.querySelector('#acceptPunish').onclick=function(){
             try{
               var baseDate = window.plannerDate || new Date();
@@ -2790,7 +2778,7 @@
     setTimeout(linkifyContacts,800);
     setTimeout(linkifyContacts,1800);
 
-    /* ★ هدر اکشن‌ها با آیکون‌های جدید */
+    /* ★ هدر اکشن‌ها — آیکون‌های جدید + مربع گوشه گرد */
     function injectMainTopActions(){
       if(_injectingHeaderActions) return;
       _injectingHeaderActions=true;
@@ -2799,7 +2787,7 @@
         var src=p.avatar||USER_AVATAR_URL;
         var name=p.name?p.name:'مشخصات من';
 
-        document.querySelectorAll('.main-top-avatar, .main-top-icon-btn, .header-left-actions, #sirajHeaderActions, #mainProfileAvatar, #mainLockBtn, #mainTopActions, .main-top-actions').forEach(function(el){el.remove();});
+        document.querySelectorAll('#sirajHeaderActions, .header-left-actions').forEach(function(el){el.remove();});
         document.querySelectorAll('#headerLockBtn').forEach(function(el){el.style.display='none';});
 
         document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
@@ -2807,26 +2795,34 @@
           w.id='sirajHeaderActions';
           w.className='header-left-actions';
 
-          /* ★ آیکون‌های جدید */
           w.innerHTML =
             '<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div>'
             +'<button type="button" class="main-top-icon-btn notif-bell" id="notifBtn" title="اعلان‌ها">'
-            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
-            +'<path d="M6 8a6 6 0 1 1 12 0c0 4 1 6 2 7H4c1-1 2-3 2-7z"/>'
-            +'<path d="M10 17a2 2 0 0 0 4 0"/>'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'
+            +'<path d="M18 8.5a6 6 0 1 0-12 0c0 4.5-2 6-2 6h16s-2-1.5-2-6z"/>'
+            +'<path d="M10.5 17a1.5 1.5 0 0 0 3 0"/>'
+            +'<circle cx="18" cy="5" r="2" fill="currentColor" stroke="none"/>'
             +'</svg></button>'
             +'<button type="button" class="main-top-icon-btn" id="lockHeaderBtn" title="قفل کردن سایت">'
-            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'
             +'<rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/>'
             +'<path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>'
-            +'<circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none"/>'
+            +'<circle cx="12" cy="15" r="1.5" fill="currentColor" stroke="none"/>'
+            +'<path d="M12 16.5v2"/>'
             +'</svg></button>';
 
           h.appendChild(w);
 
           w.querySelector('.main-top-avatar').onclick=function(){
             if(typeof window.openSettings==='function') window.openSettings();
-            setTimeout(function(){var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');if(b) b.click();},400);
+            setTimeout(function(){
+              var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');
+              if(b){ b.click(); }
+              else {
+                var about=document.querySelector('.settings-tab-btn[data-cat="about"]');
+                if(about) about.click();
+              }
+            },350);
           };
           w.querySelector('#notifBtn').onclick=function(e){
             e.stopPropagation();
@@ -2874,15 +2870,16 @@
     }
     function injectProfileTab(){
       var tw=document.getElementById('settingsTabs');if(!tw) return;
-      if(!tw.querySelector('[data-cat="profile"]')){
-        var btn=document.createElement('button');
-        btn.className='settings-tab-btn';
-        btn.setAttribute('data-cat','profile');
-        btn.setAttribute('onclick',"switchSettingsCat('profile')");
-        btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
-        var aboutBtn=tw.querySelector('[data-cat="about"]');
-        tw.insertBefore(btn,aboutBtn||null);
-      }
+      if(tw.querySelector('[data-cat="profile"]')) return;
+
+      var btn=document.createElement('button');
+      btn.className='settings-tab-btn';
+      btn.setAttribute('data-cat','profile');
+      btn.setAttribute('onclick',"switchSettingsCat('profile')");
+      btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
+      var aboutBtn=tw.querySelector('[data-cat="about"]');
+      tw.insertBefore(btn,aboutBtn||null);
+
       var cw=document.getElementById('settingsContentWrap');
       if(cw&&!cw.querySelector('[data-cat="profile"]')){
         var p=document.createElement('div');
@@ -3035,20 +3032,24 @@
 
         var wasVisible = slider.classList.contains('visible');
 
-        if(!wasVisible || forceGrow){
+        /* ★ فیکس لرزش: بدون grow animation */
+        if(!wasVisible){
           slider.style.transition='none';
-          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0)';
+          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0) scale(.9)';
           slider.style.width=w+'px';
           slider.style.height=(h+extraH)+'px';
+          slider.style.opacity='0';
           void slider.offsetWidth;
-          slider.style.transition='';
-          slider.classList.add('visible','grow');
-          setTimeout(function(){slider.classList.remove('grow');},520);
+          slider.style.transition='transform .4s cubic-bezier(.34,1.4,.64,1), opacity .3s ease, width .4s cubic-bezier(.22,1,.36,1), height .4s cubic-bezier(.22,1,.36,1)';
+          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0) scale(1)';
+          slider.style.opacity='1';
+          slider.classList.add('visible');
         } else {
-          slider.style.transition='transform .42s cubic-bezier(.22,1,.36,1), width .42s cubic-bezier(.22,1,.36,1), height .42s cubic-bezier(.22,1,.36,1), opacity .25s ease';
-          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0)';
+          slider.style.transition='transform .4s cubic-bezier(.22,1,.36,1), width .4s cubic-bezier(.22,1,.36,1), height .4s cubic-bezier(.22,1,.36,1)';
+          slider.style.transform='translate3d('+x+'px,'+(y+extraY)+'px,0) scale(1)';
           slider.style.width=w+'px';
           slider.style.height=(h+extraH)+'px';
+          slider.style.opacity='1';
         }
       }
 
@@ -3186,6 +3187,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v3.2] planner loaded ✓');
+    console.log('[Siraj v3.5] planner loaded ✓');
   }
 })();
