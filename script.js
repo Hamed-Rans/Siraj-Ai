@@ -1326,7 +1326,15 @@ function checkLock(){
     ls.classList.add('open');
     setTimeout(function(){
         var inp = document.getElementById('lockInput');
-        if(inp) inp.focus();
+        if(inp){ inp.value=''; inp.focus(); }
+        /* ★ کلیک روی هر جای صفحه قفل → focus روی input */
+        if(ls && !ls.dataset.clickBound){
+            ls.dataset.clickBound = '1';
+            ls.addEventListener('click', function(e){
+                var inp2 = document.getElementById('lockInput');
+                if(inp2) inp2.focus();
+            });
+        }
     }, 400);
 }
 function tryUnlock(){
