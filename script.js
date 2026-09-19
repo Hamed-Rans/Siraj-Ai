@@ -5,7 +5,7 @@
    ═══════════════════════════════════════════════════════════════ */
 const APP_CONFIG = {
     baseURL: "https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
-    devNotifUrl: "",
+    devNotifUrl: "https://raw.githubusercontent.com/Hamed-Rans/Siraj-Ai/refs/heads/main/notifications.json",
     promptsUrl: "https://raw.githubusercontent.com/Hamed-Rans/Siraj-Ai/refs/heads/main/prompts.json",
     adminPassword: "Ransari0185",
     models: [
