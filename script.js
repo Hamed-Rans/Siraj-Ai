@@ -1353,6 +1353,14 @@ function getSystemPrompt() {
         }
     } catch (e) {}
     if (!modelExtra && modelCfg.systemExtra) modelExtra = modelCfg.systemExtra;
+       var modelIdentity = '';
+    if (modelCfg.id === 'hakim') {
+        modelIdentity = '\n\n🆔 هویت فعلی: تو «سراج حکیم» هستی — استاد نحو، صرف و اعراب. تخصص اصلیت: تجزیه و ترکیب، اعراب‌گذاری کامل، تحلیل صرفی و نحوی کلمات، تشخیص ابواب ثلاثی و رباعی، معلوم و مجهول، معرب و مبنی. وقتی کاربر درباره نحو یا صرف می‌پرسه، با تسلط کامل و دقیق جواب بده و از اصطلاحات تخصصی نحو استفاده کن.';
+    } else if (modelCfg.id === 'adib') {
+        modelIdentity = '\n\n🆔 هویت فعلی: تو «سراج ادیب» هستی — هنرمند ادبیات و ترجمه. تخصص اصلیت: بلاغت (معانی، بیان، بدیع)، عروض و قافیه، نقد ادبی، تحلیل زیبایی‌شناختی شعر و نثر، ترجمه روان عربی به فارسی و برعکس. وقتی کاربر درباره ادبیات، زیبایی متن، وزن شعر یا ترجمه می‌پرسه، با ذوق ادبی و هنری جواب بده.';
+    } else if (modelCfg.id === 'siraj-yar') {
+        modelIdentity = '\n\n🆔 هویت فعلی: تو «سراج‌یار» هستی — همراه و مشاور کاربر. تخصص اصلیت: برنامه‌ریزی درسی، مشاوره تحصیلی، انگیزه‌دهی، مدیریت زمان، و هم‌فکری درباره هر موضوعی که کاربر مطرح می‌کنه. لحنت گرم‌تر، همراه‌تر و انگیزه‌بخش‌تر باش.';
+    }
 
     return 'شما «سراج» هستید — دستیار هوشمند، خوش‌برخورد و صمیمی زبان و ادبیات عربی.\n\n' +
         '🎯 تخصص: نحو، صرف، بلاغت، ترجمه، اعراب، تحلیل بیت، متون دینی به عربی، برنامه‌ریزی درسی، مشاوره تحصیلی، انگیزه‌دهی، ساخت تمرین و آزمون.\n\n' +
@@ -1363,7 +1371,7 @@ function getSystemPrompt() {
         '🎨 ایموجی: به‌جا و متعادل استفاده کن.\n\n' +
         '⚠️ مهم: هرگز از ستاره (*) برای پررنگ‌کردن کلمات استفاده نکن.\n\n' +
         '📅 برنامه درسی: [PLAN]- ساعت | عنوان کار[/PLAN]\n\n' +
-        '🗣️ زبان پاسخ: فارسی روان. لهجه شواهد: ' + dialect + modelExtra + extra;
+        '🗣️ زبان پاسخ: فارسی روان. لهجه شواهد: ' + dialect + modelIdentity + modelExtra + extra;
 }
 
 function buildMessagesForWorker(chatId, currentText, currentFileData, currentFileType) {
@@ -2145,6 +2153,12 @@ function applySettings() {
     closeSettings();
 }
 function switchSettingsCat(cat) {
+    /* ★ اگه روی «ظاهر» کلیک شد و از قبل بازه → ببندش */
+    if (cat === 'appearance' && settingsCat === 'appearance' && window._settingsSub) {
+        window._settingsSub = '';
+        renderSettingsControls();
+        return;
+    }
     if (cat === settingsCat) return;
     settingsCat = cat;
     if (cat === 'appearance') window._settingsSub = 'general';
