@@ -69,7 +69,9 @@ const APP_CONFIG = {
         notifPreMinutes: 10,
         studyDefaultMinutes: 25,
         studyStrictMode: true,
-        appVersion: '2.6'
+        appVersion: '2.5'
+        aiLevel: 'intermediate',
+        aiLang: 'fa',
     },
     themeColors: ['navy', 'crimson', 'gold', 'purple', 'emerald', 'indigo'],
     colorNames: { navy: 'شبانه', crimson: 'آتشین', gold: 'زرین', purple: 'جادویی', emerald: 'طبیعی', indigo: 'نیلی' },
@@ -81,16 +83,15 @@ const APP_CONFIG = {
         emerald: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>',
         indigo: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/><circle cx="19" cy="5" r="1" fill="currentColor"/>'
     },
-    patterns: [
+        patterns: [
         { id: 'boteh', name: 'بته جقه' },
-        { id: 'eslimi', name: 'اسلیمی' },
-        { id: 'tazhib', name: 'ترنج' },
-        { id: 'flower', name: 'گل' },
-        { id: 'star', name: 'ستاره' },
-        { id: 'persepolis', name: 'تخت‌جمشید' },
-        { id: 'hafezieh', name: 'حافظیه' },
-        { id: 'esfahan', name: 'نقش اصفهان' },
-        { id: 'yazd', name: 'بادگیر یزد' },
+        { id: 'circles', name: 'دایره‌های متقارن' },
+        { id: 'waves', name: 'موج' },
+        { id: 'dots', name: 'نقطه‌ای' },
+        { id: 'grid', name: 'شبکه' },
+        { id: 'leaf', name: 'برگ' },
+        { id: 'mosaic', name: 'کاشی' },
+        { id: 'arc', name: 'طاق' },
         { id: 'none', name: 'بدون طرح' }
     ],
     inputStyles: [
@@ -151,15 +152,14 @@ const APP_CONFIG = {
    PATTERN TEMPLATES
    ═══════════════════════════════════════════════════════════════ */
 const PATTERN_TEMPLATES = {
-    flower: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><defs><linearGradient id='g1' x1='100%' y1='0%' x2='0%' y2='100%'><stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c1}' stop-opacity='0'/></linearGradient><linearGradient id='g2' x1='0%' y1='100%' x2='100%' y2='0%'><stop offset='0%' stop-color='${c2}'/><stop offset='100%' stop-color='${c2}' stop-opacity='0'/></linearGradient></defs><g fill='none' stroke='url(#g1)' stroke-width='1.5' stroke-linecap='round'><path d='M235 15 Q200 25 175 55 Q148 90 132 130'/><circle cx='130' cy='135' r='9'/><circle cx='130' cy='135' r='3.5'/></g><g fill='none' stroke='url(#g2)' stroke-width='1.5' stroke-linecap='round'><path d='M5 225 Q40 215 65 185 Q92 150 108 110'/><circle cx='110' cy='105' r='9'/><circle cx='110' cy='105' r='3.5'/></g></svg>`,
-    star: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5'><rect x='55' y='55' width='130' height='130'/><rect x='55' y='55' width='130' height='130' transform='rotate(45 120 120)'/></g><g fill='none' stroke='${c2}' stroke-width='1.5'><circle cx='120' cy='120' r='100'/></g></svg>`,
-    tazhib: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g transform='translate(120 120)' fill='none' stroke='${c1}' stroke-width='1.5'><circle r='92'/><circle r='70'/><circle r='44'/></g><g transform='translate(120 120)' fill='none' stroke='${c2}' stroke-width='1.5'><circle r='80'/><circle r='58'/><circle r='32'/></g></svg>`,
-    eslimi: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5' stroke-linecap='round'><path d='M10 10 Q60 40 80 90 Q95 130 60 170 Q30 200 60 230'/></g><g fill='none' stroke='${c2}' stroke-width='1.5' stroke-linecap='round'><path d='M230 230 Q180 200 160 150 Q145 110 180 70 Q210 40 180 10'/></g></svg>`,
-    boteh: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5' stroke-linecap='round'><path d='M135 30 Q95 50 80 95 Q65 145 95 185 Q125 215 165 200 Q200 180 200 140 Q200 105 170 88 Q140 72 145 50 Q148 35 135 30 Z'/><circle cx='130' cy='120' r='10'/></g><g fill='none' stroke='${c2}' stroke-width='1.5' stroke-linecap='round'><path d='M105 30 Q145 50 160 95 Q175 145 145 185 Q115 215 75 200 Q40 180 40 140 Q40 105 70 88 Q100 72 95 50 Q92 35 105 30 Z'/><circle cx='110' cy='120' r='10'/></g></svg>`,
-    persepolis: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5' stroke-linecap='round'><path d='M120 60 L120 200'/><path d='M100 200 L100 140 L140 140 L140 200'/><path d='M90 200 L150 200'/></g><g fill='none' stroke='${c2}' stroke-width='1.3'><path d='M100 60 Q120 40 140 60'/><circle cx='120' cy='35' r='6'/></g><g fill='none' stroke='${c1}' stroke-width='1' opacity='.6'><path d='M60 200 L60 120'/><path d='M180 200 L180 120'/><path d='M50 120 Q60 100 70 120'/><path d='M170 120 Q180 100 190 120'/></g></svg>`,
-    hafezieh: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5'><path d='M80 200 L80 130 Q80 90 120 70 Q160 90 160 130 L160 200'/><path d='M95 130 Q120 100 145 130'/></g><g fill='none' stroke='${c2}' stroke-width='1.3'><path d='M95 200 L95 130'/><path d='M145 200 L145 130'/><circle cx='120' cy='60' r='6'/></g><g fill='none' stroke='${c1}' stroke-width='1' opacity='.5'><path d='M50 200 Q50 150 70 130'/><path d='M190 200 Q190 150 170 130'/></g></svg>`,
-    esfahan: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5'><circle cx='120' cy='120' r='60'/><circle cx='120' cy='120' r='30'/></g><g fill='none' stroke='${c2}' stroke-width='1.2'><path d='M120 60 Q140 90 140 120'/><path d='M120 180 Q100 150 100 120'/><path d='M60 120 Q90 100 120 100'/><path d='M180 120 Q150 140 120 140'/></g><circle cx='120' cy='120' r='4' fill='${c1}'/></svg>`,
-    yazd: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5'><path d='M120 60 L120 200'/><circle cx='120' cy='80' r='12'/><circle cx='120' cy='130' r='18'/><circle cx='120' cy='180' r='14'/></g><g fill='none' stroke='${c2}' stroke-width='1.3'><path d='M100 80 L140 80'/><path d='M94 130 L146 130'/><path d='M100 180 L140 180'/></g></svg>`
+    boteh: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.2' stroke-linecap='round'><path d='M140 40 Q100 55 90 100 Q78 148 105 185 Q135 212 172 196 Q202 180 200 142 Q198 108 168 92 Q142 78 148 55 Q150 45 140 40 Z'/></g><g fill='none' stroke='${c2}' stroke-width='1.2' stroke-linecap='round'><path d='M100 40 Q140 55 150 100 Q162 148 135 185 Q105 212 68 196 Q38 180 40 142 Q42 108 72 92 Q98 78 92 55 Q90 45 100 40 Z'/></g></svg>`,
+    circles: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.2'><circle cx='120' cy='120' r='85'/><circle cx='120' cy='120' r='55'/></g><circle cx='120' cy='120' r='25' fill='none' stroke='${c2}' stroke-width='1.2'/></svg>`,
+    waves: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.2' stroke-linecap='round'><path d='M10 60 Q60 30 120 60 T230 60'/><path d='M10 120 Q60 90 120 120 T230 120'/><path d='M10 180 Q60 150 120 180 T230 180'/></g><circle cx='200' cy='40' r='4' fill='${c2}'/></svg>`,
+    dots: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='${c1}' opacity='.6'><circle cx='40' cy='40' r='4'/><circle cx='120' cy='40' r='4'/><circle cx='200' cy='40' r='4'/><circle cx='80' cy='90' r='4'/><circle cx='160' cy='90' r='4'/><circle cx='40' cy='140' r='4'/><circle cx='120' cy='140' r='4'/><circle cx='200' cy='140' r='4'/></g><g fill='${c2}' opacity='.8'><circle cx='80' cy='190' r='5'/><circle cx='160' cy='190' r='5'/></g></svg>`,
+    grid: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g stroke='${c1}' stroke-width='1' opacity='.5'><line x1='40' y1='20' x2='40' y2='220'/><line x1='120' y1='20' x2='120' y2='220'/><line x1='200' y1='20' x2='200' y2='220'/><line x1='20' y1='40' x2='220' y2='40'/><line x1='20' y1='120' x2='220' y2='120'/><line x1='20' y1='200' x2='220' y2='200'/></g><rect x='110' y='110' width='20' height='20' fill='none' stroke='${c2}' stroke-width='1.5'/><circle cx='120' cy='120' r='3' fill='${c2}'/></svg>`,
+    leaf: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.2' stroke-linecap='round'><path d='M120 30 Q120 90 120 150 Q120 210 120 230'/><path d='M120 60 Q90 70 75 100 Q60 130 90 150 Q120 165 120 150'/><path d='M120 60 Q150 70 165 100 Q180 130 150 150 Q120 165 120 150'/></g><circle cx='120' cy='40' r='3' fill='${c2}'/></svg>`,
+    mosaic: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.2'><rect x='60' y='60' width='40' height='40'/><rect x='140' y='60' width='40' height='40'/><rect x='60' y='140' width='40' height='40'/><rect x='140' y='140' width='40' height='40'/></g><g fill='none' stroke='${c2}' stroke-width='1.2'><rect x='100' y='100' width='40' height='40'/></g></svg>`,
+    arc: (c1, c2) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.3' stroke-linecap='round'><path d='M40 200 Q40 100 120 100 Q200 100 200 200'/><path d='M60 200 Q60 120 120 120 Q180 120 180 200'/></g><g fill='none' stroke='${c2}' stroke-width='1.3'><path d='M80 200 Q80 140 120 140 Q160 140 160 200'/></g></svg>`
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -320,6 +320,8 @@ function loadSettings() {
         const pi = localStorage.getItem(PROFILE_IMG_KEY);
         if (pi && !s.profileImage) s.profileImage = pi;
         if (!s.models) s.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
+        /* ★ اجبار نسخه به 2.5 */
+        if (s.appVersion !== '2.5') s.appVersion = '2.5';
         return s;
     } catch (e) {
         return Object.assign({}, APP_CONFIG.defaultSettings, { models: JSON.parse(JSON.stringify(APP_CONFIG.models)) });
@@ -580,7 +582,7 @@ function applyPattern(layer, patternId, c1, c2, perCorner, size, position, opaci
     const url = 'url("data:image/svg+xml,' + encodeURIComponent(tpl(c1, c2)) + '")';
     const corners = position === 'tr' ? ['tr'] : position === 'bl' ? ['bl'] : position === 'reverse' ? ['tl', 'br'] : ['tr', 'bl'];
     const N = Math.max(1, Math.min(8, perCorner));
-    const gap = 10;
+    const gap = size * 0.06;
     const step = size * 0.42;
     corners.forEach(corner => {
         for (let i = 0; i < N; i++) {
@@ -2250,7 +2252,8 @@ function updatePreview() {
         }
     }
     if (!pl) return;
-    const pvSize = Math.max(30, settingsDraft.patternSize * 0.35);
+    /* ★ مقیاس نسبت به اندازه واقعی */  
+    const scale = pz.offsetWidth / 900;     const pvSize = Math.max(20, settingsDraft.patternSize * scale);
     pl.style.position = 'absolute';
     pl.style.inset = '0';
     pl.style.zIndex = '1';
@@ -2438,9 +2441,10 @@ function renderSettingsControls() {
             '<svg class="settings-tab-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
         '</button>';
 
-    if (isAppearanceOpen) {
+        if (isAppearanceOpen) {
         var subs = [
             { id: 'general', label: 'تم و رنگ' },
+            { id: 'background', label: 'پس‌زمینه' },
             { id: 'header', label: 'هدر و المان' },
             { id: 'pattern', label: 'طرح' },
             { id: 'font', label: 'فونت' }
@@ -2492,6 +2496,28 @@ function renderSettingsControls() {
                     '<button class="row-btn' + (s.animation === a.id ? ' active' : '') + '" onclick="updateDraft(\'animation\',\'' + a.id + '\')"><span class="rb-label">' + a.name + '</span></button>'
                 ).join('') + '</div>' +
             '</div>',
+               background:
+            '<div class="setting-group"><label>پیش‌فرض‌های آماده</label>' +
+                '<div class="row-btns" style="grid-template-columns:repeat(3,1fr)">' +
+                    APP_CONFIG.bgPresets.map(function(bp){
+                        var isActive = (s.bgPreset||'none') === bp.id && !s.bgImage;
+                        return '<button class="row-btn'+(isActive?' active':'')+'" onclick="updateDraft(\'bgPreset\',\''+bp.id+'\')" style="min-height:60px;padding:6px">' +
+                            '<div style="width:100%;height:26px;border-radius:6px;background:'+(bp.value||'var(--panel-bg)')+';border:1px solid var(--border)"></div>' +
+                            '<span class="rb-label" style="font-size:9.5px;margin-top:4px">'+bp.name+'</span>' +
+                        '</button>';
+                    }).join('') +
+                '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>تصویر پس‌زمینه</label>' +
+                '<div style="display:flex;gap:8px;align-items:center;margin-top:6px">' +
+                    '<label class="btn-primary" style="cursor:pointer;flex:1;justify-content:center"><input type="file" accept="image/*" onchange="handleBgUpload(event)" style="display:none">📷 آپلود تصویر</label>' +
+                    (s.bgImage ? '<button class="btn-secondary" onclick="clearBgImage()">✕ حذف</button>' : '') +
+                '</div>' +
+            '</div>' +
+            (s.bgImage ? '<div class="setting-group"><label>شفافیت تصویر</label>' +
+                '<div class="slider-row"><input type="range" min="20" max="100" step="5" value="'+(s.bgImageOpacity||100)+'" oninput="updateDraft(\'bgImageOpacity\',this.value)"><span class="slider-val">'+(s.bgImageOpacity||100)+'%</span></div>' +
+            '</div>' : ''),
+        header:        // ⬅️ این خط همچنان اینجا می‌مونه
         header:
             '<div class="setting-group"><label>پس‌زمینه هدر</label>' +
                 '<div class="row-btns">' + APP_CONFIG.headerStyles.map(h =>
@@ -2653,7 +2679,43 @@ function renderSettingsControls() {
             '</div>' +
         '</div>' +
 
-        '<div class="settings-content' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior">' +
+                '<div class="settings-content' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior">' +
+            '<div class="setting-group">' +
+                '<label>مدل پیش‌فرض</label>' +
+                '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
+                    APP_CONFIG.models.map(function(m){
+                        var isActive = (s.selectedModel||'hakim') === m.id;
+                        return '<button class="row-btn' + (isActive ? ' active' : '') + '" onclick="updateDraft(\'selectedModel\',\'' + m.id + '\')" style="border-color:'+m.color+'40">' +
+                            '<span style="font-size:22px">'+m.emoji+'</span>' +
+                            '<span class="rb-label" style="color:'+m.color+'">'+escapeHtml(m.name)+'</span>' +
+                        '</button>';
+                    }).join('') +
+                '</div>' +
+            '</div>' +
+            '<div class="setting-group">' +
+                '<label>حالت پیش‌فرض پاسخ</label>' +
+                '<div class="row-btns" style="grid-template-columns:1fr 1fr">' +
+                    '<button class="row-btn' + (!s.thinking && !s.quick ? ' active' : '') + '" onclick="updateDraft(\'thinking\',false);updateDraft(\'quick\',false)"><span class="rb-label">معمولی</span></button>' +
+                    '<button class="row-btn' + (s.thinking ? ' active' : '') + '" onclick="updateDraft(\'thinking\',true);updateDraft(\'quick\',false)"><span class="rb-label">🧠 تفکر عمیق</span></button>' +
+                    '<button class="row-btn' + (s.quick ? ' active' : '') + '" onclick="updateDraft(\'quick\',true);updateDraft(\'thinking\',false)"><span class="rb-label">⚡ پاسخ سریع</span></button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="setting-group">' +
+                '<label>سطح پاسخ‌دهی سراج</label>' +
+                '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
+                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='beginner'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'beginner\')"><span class="rb-label">ساده و خودی</span></button>' +
+                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='intermediate'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'intermediate\')"><span class="rb-label">متوسط</span></button>' +
+                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='advanced'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'advanced\')"><span class="rb-label">تخصصی و عمیق</span></button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="setting-group">' +
+                '<label>زبان پاسخ</label>' +
+                '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
+                    '<button class="row-btn' + ((s.aiLang||'fa')==='fa'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'fa\')"><span class="rb-label">فارسی</span></button>' +
+                    '<button class="row-btn' + ((s.aiLang||'fa')==='ar'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'ar\')"><span class="rb-label">عربی</span></button>' +
+                    '<button class="row-btn' + ((s.aiLang||'fa')==='en'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'en\')"><span class="rb-label">English</span></button>' +
+                '</div>' +
+            '</div>' +
             '<div class="setting-group">' +
                 '<label>اعلان‌ها و یادآورها</label>' +
                 '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">' +
@@ -2661,6 +2723,14 @@ function renderSettingsControls() {
                     '<button class="row-btn' + (s.notifEnabled === false ? ' active' : '') + '" onclick="updateDraft(\'notifEnabled\',false)"><span class="rb-label">خاموش ✗</span></button>' +
                 '</div>' +
             '</div>' +
+            '<div class="setting-group">' +
+                '<label>تست و مجوز اعلان</label>' +
+                '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">' +
+                    '<button class="btn-primary" style="flex:1;justify-content:center" onclick="if(window.__sendTestNotification)window.__sendTestNotification()">ارسال نوتیف تست</button>' +
+                    '<button class="btn-secondary" style="flex:1;justify-content:center" onclick="if(window.__requestNotifPermission)window.__requestNotifPermission()">درخواست مجوز</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
             '<div class="setting-group">' +
                 '<label>تست و مجوز اعلان</label>' +
                 '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">' +
