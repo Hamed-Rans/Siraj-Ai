@@ -2870,9 +2870,13 @@ function showDevNotifPopup(emoji, title, body) {
         '<div class="task-notif-task"><b>' + escapeHtml(title) + '</b></div>' +
         (body ? '<div style="font-size:12px;color:var(--text-muted);line-height:1.8;margin-bottom:12px">' + escapeHtml(body) + '</div>' : '') +
         '<div class="task-notif-actions"><button class="yes-btn" id="devNotifOk">متوجه شدم</button></div>';
-    document.body.appendChild(el);
-    requestAnimationFrame(function () { el.classList.add('show'); });
-    var close = function () { el.classList.remove('show'); setTimeout(function () { el.remove(); }, 450); };
+        document.body.appendChild(el);
+    requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+            el.classList.add('show');
+        });
+    });
+    var close = function () { el.classList.remove('show'); setTimeout(function () { el.remove(); }, 550); };
     el.querySelector('#devNotifClose').onclick = close;
     el.querySelector('#devNotifOk').onclick = close;
     setTimeout(function () { if (el.parentNode && el.classList.contains('show')) close(); }, 20000);
