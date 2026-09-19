@@ -2624,3 +2624,291 @@ body::before{
   animation:none!important;
   transform:translateY(-50%) translateZ(0)!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH E — ظاهر بالغ و حرفه‌ای
+   شامل: shadows نرم، gradients ظریف، borders نازک، typography بالغ
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   E1: کاهش درخشش (glow) رنگی — جایگزین با سایه‌های خنثی
+   ═══════════════════════════════════════════════════════════════ */
+.main-chat{
+  box-shadow:
+    0 1px 3px -1px rgba(0,0,0,.3),
+    0 8px 28px -12px rgba(0,0,0,.5)!important;
+}
+.side-panel{
+  box-shadow:
+    0 1px 3px -1px rgba(0,0,0,.3),
+    0 8px 28px -12px rgba(0,0,0,.5)!important;
+}
+.bottom-nav{
+  box-shadow:
+    0 1px 3px -1px rgba(0,0,0,.35),
+    0 12px 32px -14px rgba(0,0,0,.6)!important;
+}
+.daily-card,
+.panel-card,
+.tool-card,
+.month-calendar,
+.month-goals,
+.year-overview,
+.planner-hero-card,
+.planner-stats-card,
+.week-grid-wrap,
+.week-summary{
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.25),
+    0 4px 14px -8px rgba(0,0,0,.35)!important;
+}
+.settings-modal{
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.4),
+    0 24px 70px -22px rgba(0,0,0,.85)!important;
+}
+.notif-panel{
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.4),
+    0 20px 50px -18px rgba(0,0,0,.75)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   E2: سایه‌های element hover نرم‌تر (بدون هاله رنگی)
+   ═══════════════════════════════════════════════════════════════ */
+.task-item:hover{
+  box-shadow:0 4px 14px -8px rgba(0,0,0,.5)!important;
+}
+.tool-card:hover{
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.25),
+    0 8px 20px -10px rgba(0,0,0,.5)!important;
+}
+.cal-day:hover{
+  box-shadow:0 4px 12px -6px rgba(0,0,0,.4)!important;
+}
+.history-item:hover{
+  box-shadow:0 6px 18px -10px rgba(0,0,0,.5)!important;
+}
+.panel-planner-tab.active{
+  box-shadow:0 6px 18px -10px rgba(0,0,0,.5)!important;
+}
+.panel-study-btn{
+  box-shadow:0 6px 18px -10px rgba(0,0,0,.5)!important;
+}
+.panel-library-btn{
+  box-shadow:0 6px 18px -10px rgba(0,0,0,.5)!important;
+}
+.btn-primary,
+.lock-btn,
+.send-btn.visible,
+.ll-action.ask-siraj:hover,
+.task-add-btn{
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.3),
+    0 4px 12px -6px rgba(0,0,0,.4)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   E3: گرادیانت‌های ظریف‌تر — بدون پرش رنگی شدید
+   ═══════════════════════════════════════════════════════════════ */
+.me .msg{
+  background:linear-gradient(160deg,var(--accent-light) 0%,var(--accent) 100%)!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.25),
+    0 4px 12px -8px rgba(0,0,0,.4)!important;
+}
+.send-btn{
+  background:linear-gradient(160deg,var(--accent-light) 0%,var(--accent-dark) 100%)!important;
+}
+.main-top-icon-btn{
+  background:linear-gradient(160deg,var(--accent) 0%,var(--accent-dark) 100%)!important;
+}
+.task-add-btn,
+.btn-primary,
+.pv-apply-btn,
+.lock-btn,
+.study-btn{
+  background:linear-gradient(160deg,var(--accent-light) 0%,var(--accent-dark) 100%)!important;
+}
+.nav-slider-fill{
+  background:linear-gradient(160deg,var(--accent) 0%,var(--accent-dark) 100%)!important;
+  box-shadow:
+    0 2px 6px -2px rgba(0,0,0,.4),
+    0 4px 14px -8px rgba(0,0,0,.5)!important;
+}
+.cal-day.selected{
+  background:linear-gradient(160deg,var(--accent-light),var(--accent-dark))!important;
+  box-shadow:0 4px 14px -8px rgba(0,0,0,.5)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   E4: borders نازک‌تر و ملایم‌تر
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --border:rgba(120,150,200,.14);
+  --border-strong:rgba(120,150,200,.22);
+}
+[data-theme="dark-navy"]{--border:rgba(120,150,200,.14);--border-strong:rgba(120,150,200,.22)}
+[data-theme="dark-crimson"]{--border:rgba(239,120,120,.14);--border-strong:rgba(239,120,120,.22)}
+[data-theme="dark-gold"]{--border:rgba(212,175,55,.14);--border-strong:rgba(212,175,55,.24)}
+[data-theme="dark-purple"]{--border:rgba(168,85,247,.14);--border-strong:rgba(168,85,247,.22)}
+[data-theme="dark-emerald"]{--border:rgba(16,185,129,.14);--border-strong:rgba(16,185,129,.22)}
+[data-theme="dark-indigo"]{--border:rgba(99,102,241,.14);--border-strong:rgba(99,102,241,.22)}
+
+/* حذف borders اضافی */
+.daily-card,
+.panel-card,
+.tool-card,
+.month-calendar,
+.month-goals,
+.year-overview,
+.planner-hero-card,
+.week-grid-wrap,
+.week-summary{
+  border-width:1px!important;
+}
+.task-item{
+  border-right-width:2px!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   E5: typography بالغ — عناوین هدرها
+   ═══════════════════════════════════════════════════════════════ */
+.planner-hero-title{
+  font-size:19px!important;
+  font-weight:800!important;
+  letter-spacing:-.3px!important;
+}
+.panel-title-text{
+  font-size:13px!important;
+  font-weight:800!important;
+  letter-spacing:-.2px!important;
+}
+.brand-text h1{
+  font-size:19px!important;
+  font-weight:800!important;
+  letter-spacing:-.3px!important;
+}
+.brand-text h1 .accent-word{
+  font-size:1.3em!important;
+  font-weight:800!important;
+  letter-spacing:-.5px!important;
+}
+.brand-text .subtitle{
+  font-size:9.5px!important;
+  letter-spacing:.2px!important;
+  opacity:.75;
+}
+.welcome-title{
+  font-size:26px!important;
+  font-weight:800!important;
+  letter-spacing:-.4px!important;
+}
+.welcome-tagline{
+  font-size:14px!important;
+  letter-spacing:-.1px!important;
+}
+.settings-acc-title,
+.settings-submenu-btn,
+.settings-tab-btn{
+  letter-spacing:-.1px!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   E6: کاهش وزن بصری ایموجی‌ها (کمتر کارتونی)
+   ═══════════════════════════════════════════════════════════════ */
+.planner-hero-icon{
+  box-shadow:0 4px 14px -8px rgba(0,0,0,.5)!important;
+}
+.planner-hero-icon svg{
+  stroke-width:1.6!important;
+  opacity:.95;
+}
+.page-empty-icon{
+  box-shadow:
+    0 1px 3px -1px rgba(0,0,0,.3),
+    0 12px 30px -12px rgba(0,0,0,.5)!important;
+}
+.page-empty-icon svg{
+  stroke-width:1.5!important;
+}
+.tool-card-icon svg,
+.study-tool-card svg{
+  stroke-width:1.6!important;
+}
+.card-title svg,
+.about-section-title svg{
+  stroke-width:1.7!important;
+}
+.phc-nav-btn svg,
+.main-top-icon-btn svg,
+.bottom-nav-btn svg,
+.nav-collapse-tab svg{
+  stroke-width:1.8!important;
+}
+.phc-nav-btn{
+  border-color:var(--border)!important;
+  background:rgba(255,255,255,.025)!important;
+}
+.phc-nav-btn:hover{
+  border-color:var(--border-strong)!important;
+  color:var(--accent)!important;
+  background:rgba(255,255,255,.05)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   E7: heading ها با weight بالاتر و letter-spacing منفی
+   ═══════════════════════════════════════════════════════════════ */
+.section-title,
+.page-empty-title,
+.about-name{
+  letter-spacing:-.3px;
+}
+.phc-day{
+  font-size:19px!important;
+  font-weight:800!important;
+  letter-spacing:-.3px;
+}
+.phc-date{
+  font-size:12px!important;
+  letter-spacing:.1px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   E8: کاهش درخشش دکمه‌های accent در حالت عادی
+   ═══════════════════════════════════════════════════════════════ */
+.main-top-icon-btn{
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.3),
+    0 3px 10px -6px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(0,0,0,.12)!important;
+}
+.main-top-icon-btn:hover{
+  box-shadow:
+    0 2px 4px -1px rgba(0,0,0,.35),
+    0 6px 16px -8px rgba(0,0,0,.5),
+    0 0 0 3px var(--accent-soft),
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(0,0,0,.12)!important;
+}
+.main-top-avatar{
+  box-shadow:
+    0 0 0 2px var(--panel-bg),
+    0 0 0 3px var(--border-strong),
+    0 3px 10px -6px rgba(0,0,0,.4)!important;
+}
+.main-top-avatar:hover{
+  box-shadow:
+    0 0 0 2px var(--panel-bg),
+    0 0 0 3px var(--accent),
+    0 6px 16px -6px rgba(0,0,0,.5)!important;
+}
