@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v3.1 Final) */
+/* Siraj v2.0 — planner-v2.js (v3.2 Final) */
 (function(){
   'use strict';
 
@@ -33,7 +33,7 @@
     };
 
     var LEVEL_LABELS = {beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته'};
-    var VIEW_LABELS  = {chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'محفل', tools:'دستیار'};
+    var VIEW_LABELS  = {chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'دیوان', tools:'دستیار'};
 
     if(typeof window._plannerNavState === 'undefined'){
       window._plannerNavState = { daily:false, weekly:false, monthly:false, yearly:false };
@@ -819,7 +819,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NOTIFICATION SYSTEM v3.1
+       NOTIFICATION SYSTEM v3.2
        ═══════════════════════════════════════════════════════════════ */
     var NOTIF_KEY      = 'siraj-notif-history';
     var NOTIF_SEEN_KEY = 'siraj-notif-seen';
@@ -851,29 +851,59 @@
       var panel = document.getElementById('notifPanel');
       if(panel && panel.classList.contains('open')) renderNotifPanel();
     }
+
+    /* ★ بج داینامیک — فقط pre/end و انیمیشن حذف نرم */
     function updateNotifBadge(){
       var btn = document.getElementById('notifBtn');
       if(!btn) return;
       var list = loadNotifHistory();
       var seen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
-      var unseen = list.filter(function(n){ return (n.ts||0) > seen; }).length;
+      /* فقط نوتیف‌های تسک (نه dev) و خوانده‌نشده */
+      var unseen = list.filter(function(n){
+        return (n.ts||0) > seen && (n.type === 'pre' || n.type === 'end');
+      }).length;
       var badge = btn.querySelector('.notif-badge');
       if(unseen > 0){
         if(!badge){
           badge = document.createElement('span');
           badge.className = 'notif-badge';
+          badge.style.transition = 'all .35s cubic-bezier(.34,1.4,.64,1)';
+          badge.style.transform = 'scale(0) translateY(-6px)';
+          badge.style.opacity = '0';
           btn.appendChild(badge);
+          requestAnimationFrame(function(){
+            badge.style.transform = 'scale(1) translateY(0)';
+            badge.style.opacity = '1';
+          });
           btn.classList.add('shake');
           setTimeout(function(){ btn.classList.remove('shake'); }, 750);
         }
         badge.textContent = unseen > 9 ? '9+' : unseen;
       } else if(badge){
-        badge.remove();
+        /* ★ انیمیشن حذف نرم */
+        badge.style.transition = 'all .35s cubic-bezier(.34,1.4,.64,1)';
+        badge.style.transform = 'scale(0) translateY(-6px)';
+        badge.style.opacity = '0';
+        setTimeout(function(){ if(badge.parentNode) badge.remove(); }, 360);
       }
     }
-    function markNotifsSeen(){
-      localStorage.setItem(NOTIF_SEEN_KEY, String(Date.now()));
+
+    /* ★ علامت‌گذاری همه اعلان‌ها به عنوان خوانده‌شده */
+    function markAllNotifsRead(){
+      var list = loadNotifHistory();
+      var now = Date.now();
+      var changed = false;
+      list.forEach(function(n){
+        if(!n.readAt){ n.readAt = now; changed = true; }
+      });
+      if(changed) saveNotifHistory(list);
+      localStorage.setItem(NOTIF_SEEN_KEY, String(now));
       updateNotifBadge();
+    }
+
+    /* نگه داشتن برای سازگاری با کد قدیمی */
+    function markNotifsSeen(){
+      markAllNotifsRead();
     }
 
     function checkTaskNotifications(){
@@ -1104,8 +1134,8 @@
       if(!list) return;
       var all = loadNotifHistory();
       var seen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
-      var unreadList = all.filter(function(n){ return (n.ts||0) > seen; });
-      var readList = all.filter(function(n){ return (n.ts||0) <= seen; });
+      var unreadList = all.filter(function(n){ return !n.readAt && (n.ts||0) > seen; });
+      var readList = all.filter(function(n){ return n.readAt || (n.ts||0) <= seen; });
       var history;
       if(_notifTab === 'unread') history = unreadList.slice().reverse();
       else if(_notifTab === 'read') history = readList.slice().reverse();
@@ -1114,9 +1144,9 @@
       var tabsEl = document.getElementById('notifTabs');
       if(tabsEl){
         tabsEl.innerHTML =
-          '<button class="notif-tab'+(_notifTab==='all'?' active':'')+'" onclick="window.__setNotifTab(\'all\')">همه <span class="notif-tab-count">'+toFaPl(all.length)+'</span></button>'
-          +'<button class="notif-tab'+(_notifTab==='unread'?' active':'')+'" onclick="window.__setNotifTab(\'unread\')">نخوانده <span class="notif-tab-count">'+toFaPl(unreadList.length)+'</span></button>'
-          +'<button class="notif-tab'+(_notifTab==='read'?' active':'')+'" onclick="window.__setNotifTab(\'read\')">خوانده <span class="notif-tab-count">'+toFaPl(readList.length)+'</span></button>';
+          '<button class="notif-tab'+(_notifTab==='all'?' active':'')+'" onclick="event.stopPropagation();window.__setNotifTab(\'all\',event)">همه <span class="notif-tab-count">'+toFaPl(all.length)+'</span></button>'
+          +'<button class="notif-tab'+(_notifTab==='unread'?' active':'')+'" onclick="event.stopPropagation();window.__setNotifTab(\'unread\',event)">نخوانده <span class="notif-tab-count">'+toFaPl(unreadList.length)+'</span></button>'
+          +'<button class="notif-tab'+(_notifTab==='read'?' active':'')+'" onclick="event.stopPropagation();window.__setNotifTab(\'read\',event)">خوانده <span class="notif-tab-count">'+toFaPl(readList.length)+'</span></button>';
       }
 
       if(history.length === 0){
@@ -1126,7 +1156,7 @@
       }
 
       list.innerHTML = history.map(function(n){
-        var isUnread = (n.ts||0) > seen;
+        var isUnread = !n.readAt && (n.ts||0) > seen;
         var unread = isUnread ? ' unread' : '';
         var typeCls = n.type === 'pre' ? ' notif-pre' : n.type === 'end' ? ' notif-end' : n.type === 'dev' ? ' notif-dev' : '';
         var icon = n.emoji || (n.type === 'pre' ? '⏰' : n.type === 'end' ? '🔔' : '📢');
@@ -1162,13 +1192,14 @@
       }).join('');
     }
 
-    /* ★ تغییر تب فعال */
-    window.__setNotifTab = function(t){
+    /* ★ تغییر تب فعال — با stopPropagation */
+    window.__setNotifTab = function(t, ev){
+      if(ev && ev.stopPropagation) ev.stopPropagation();
       _notifTab = t;
       renderNotifPanel();
     };
 
-    /* ★ علامت‌گذاری یک نوتیف به‌عنوان خوانده‌شده (با کلیک روش) */
+    /* ★ علامت‌گذاری یک نوتیف به‌عنوان خوانده‌شده */
     window.__markOneNotifRead = function(id){
       var list = loadNotifHistory();
       var n = list.find(function(x){ return x.id === id; });
@@ -1203,7 +1234,7 @@
           document.removeEventListener('click', __notifOutsideClose);
         } else {
           renderNotifPanel();
-          markNotifsSeen();
+          markAllNotifsRead();
           panel.classList.add('open');
           setTimeout(function(){ document.addEventListener('click', __notifOutsideClose); }, 50);
         }
@@ -1227,9 +1258,10 @@
         renderNotifPanel();
         updateNotifBadge();
       };
+      panel.addEventListener('click', function(e){ e.stopPropagation(); });
       setTimeout(function(){ document.addEventListener('click', __notifOutsideClose); }, 100);
       renderNotifPanel();
-      markNotifsSeen();
+      markAllNotifsRead();
     };
 
     window.__notifDone = function(id){
@@ -2758,7 +2790,7 @@
     setTimeout(linkifyContacts,800);
     setTimeout(linkifyContacts,1800);
 
-    /* هدر اکشن‌ها — دکمه اعلان و قفل */
+    /* ★ هدر اکشن‌ها با آیکون‌های جدید */
     function injectMainTopActions(){
       if(_injectingHeaderActions) return;
       _injectingHeaderActions=true;
@@ -2766,17 +2798,32 @@
         var p=getProfile();
         var src=p.avatar||USER_AVATAR_URL;
         var name=p.name?p.name:'مشخصات من';
+
         document.querySelectorAll('.main-top-avatar, .main-top-icon-btn, .header-left-actions, #sirajHeaderActions, #mainProfileAvatar, #mainLockBtn, #mainTopActions, .main-top-actions').forEach(function(el){el.remove();});
         document.querySelectorAll('#headerLockBtn').forEach(function(el){el.style.display='none';});
+
         document.querySelectorAll('.chat-header, .planner-hero, .page-title-bar').forEach(function(h){
           var w=document.createElement('div');
           w.id='sirajHeaderActions';
           w.className='header-left-actions';
-          /* ★ آیکون نوتیف و قفل با SVG خوشگل‌تر */
-          w.innerHTML='<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div>'
-            +'<button type="button" class="main-top-icon-btn notif-bell" id="notifBtn" title="اعلان‌ها"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><circle cx="19" cy="5" r="2.5" fill="currentColor" stroke="none" opacity="0.9"/></svg></button>'
-            +'<button type="button" class="main-top-icon-btn" id="lockHeaderBtn" title="قفل کردن سایت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg></button>';
+
+          /* ★ آیکون‌های جدید */
+          w.innerHTML =
+            '<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div>'
+            +'<button type="button" class="main-top-icon-btn notif-bell" id="notifBtn" title="اعلان‌ها">'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+            +'<path d="M6 8a6 6 0 1 1 12 0c0 4 1 6 2 7H4c1-1 2-3 2-7z"/>'
+            +'<path d="M10 17a2 2 0 0 0 4 0"/>'
+            +'</svg></button>'
+            +'<button type="button" class="main-top-icon-btn" id="lockHeaderBtn" title="قفل کردن سایت">'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+            +'<rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/>'
+            +'<path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>'
+            +'<circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none"/>'
+            +'</svg></button>';
+
           h.appendChild(w);
+
           w.querySelector('.main-top-avatar').onclick=function(){
             if(typeof window.openSettings==='function') window.openSettings();
             setTimeout(function(){var b=document.querySelector('.settings-tab-btn[data-cat="profile"]');if(b) b.click();},400);
@@ -3139,6 +3186,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v3.1] planner loaded ✓');
+    console.log('[Siraj v3.2] planner loaded ✓');
   }
 })();
