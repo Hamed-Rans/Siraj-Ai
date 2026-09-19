@@ -618,10 +618,10 @@ function getBgValue(t) {
 }
 
 function applyBodyBackground(t) {
-    const html = document.documentElement;
+    const root = document.documentElement;
     const body = document.body;
     const v = getBgValue(t);
-    /* ★ body همیشه شفاف */
+    /* body همیشه شفاف بمونه */
     body.style.background = '';
     body.style.backgroundImage = '';
     body.style.backgroundSize = '';
@@ -629,32 +629,22 @@ function applyBodyBackground(t) {
     body.style.backgroundAttachment = '';
     body.style.backgroundRepeat = '';
     body.style.backgroundColor = '';
+    /* ★ پس‌زمینه در CSS variable ذخیره میشه و body::before نمایشش میده */
     if (v === 'none') {
-        html.style.background = '';
-        html.style.backgroundImage = '';
-        html.style.backgroundSize = '';
-        html.style.backgroundPosition = '';
-        html.style.backgroundAttachment = '';
-        html.style.backgroundRepeat = '';
-        html.style.backgroundColor = '';
-        html.style.backgroundImage = 'var(--primary-gradient)';
-        html.style.backgroundAttachment = 'fixed';
-        html.style.backgroundPosition = 'center center';
-        html.style.backgroundSize = 'cover';
-        html.style.backgroundRepeat = 'no-repeat';
+        root.style.setProperty('--siraj-bg', 'var(--primary-gradient)');
+        root.style.setProperty('--siraj-bg-size', 'cover');
+        root.style.setProperty('--siraj-bg-repeat', 'no-repeat');
     } else {
-        html.style.background = v;
-        html.style.backgroundAttachment = 'fixed';
-        html.style.backgroundPosition = 'center center';
+        root.style.setProperty('--siraj-bg', v);
         if (t.bgImage) {
-            html.style.backgroundSize = 'cover';
-            html.style.backgroundRepeat = 'no-repeat';
+            root.style.setProperty('--siraj-bg-size', 'cover');
+            root.style.setProperty('--siraj-bg-repeat', 'no-repeat');
         } else if (t.bgPreset === 'dots') {
-            html.style.backgroundSize = '20px 20px';
-            html.style.backgroundRepeat = 'repeat';
+            root.style.setProperty('--siraj-bg-size', '20px 20px');
+            root.style.setProperty('--siraj-bg-repeat', 'repeat');
         } else {
-            html.style.backgroundSize = 'cover';
-            html.style.backgroundRepeat = 'no-repeat';
+            root.style.setProperty('--siraj-bg-size', 'cover');
+            root.style.setProperty('--siraj-bg-repeat', 'no-repeat');
         }
     }
 }
@@ -1880,12 +1870,16 @@ function checkLock() {
     }
     const ls = document.getElementById('lockScreen');
     if (!ls) return;
+    /* ★ مخفی کردن پی‌های قدیمی، استفاده از نمایش جدید */
     const pinRow = document.getElementById('lockPinRow');
     if (pinRow) pinRow.style.display = 'none';
+    /* ★ اضافه کردن ردیف نمایش کاراکترها */
+    injectLockTypedRow();
     ls.classList.add('open');
     setTimeout(function () {
         var inp = document.getElementById('lockInput');
         if (inp) { inp.value = ''; inp.focus(); }
+        syncLockTypedRow('');
         if (ls && !ls.dataset.clickBound) {
             ls.dataset.clickBound = '1';
             ls.addEventListener('click', function () {
@@ -1896,6 +1890,64 @@ function checkLock() {
     }, 400);
 }
 
+function injectLockTypedRow() {
+    if (document.getElementById('lockTypedRow')) return;
+    var box = document.querySelector('.lock-box');
+    if (!box) return;
+    var pinRow = document.getElementById('lockPinRow');
+    var row = document.createElement('div');
+    row.className = 'lock-typed-row';
+    row.id = 'lockTypedRow';
+    if (pinRow && pinRow.parentNode) {
+        pinRow.parentNode.insertBefore(row, pinRow);
+    } else {
+        var inp = document.getElementById('lockInput');
+        if (inp) inp.parentNode.insertBefore(row, inp);
+    }
+}
+
+function syncLockTypedRow(val, mode) {
+    var row = document.getElementById('lockTypedRow');
+    if (!row) return;
+    var chars = String(val || '').split('');
+    var existing = row.querySelectorAll('.lock-typed-char');
+
+    /* اگر حالت success/error داده شده، همه رو با انیمیشن ست کن */
+    if (mode === 'success' || mode === 'error') {
+        existing.forEach(function (c) {
+            c.classList.remove('success', 'error');
+            c.classList.add(mode);
+        });
+        return;
+    }
+
+    /* کم شد؟ حذف با انیمیشن */
+    if (chars.length < existing.length) {
+        for (var i = existing.length - 1; i >= chars.length; i--) {
+            (function (el) {
+                el.classList.add('erasing');
+                setTimeout(function () { if (el.parentNode) el.remove(); }, 280);
+            })(existing[i]);
+        }
+        /* آپدیت بقیی */
+        for (var j = 0; j < chars.length && j < existing.length; j++) {
+            if (existing[j].textContent !== chars[j]) existing[j].textContent = chars[j];
+        }
+        return;
+    }
+
+    /* اضافه شد؟ چار جدید با انیمیشن */
+    for (var k = 0; k < chars.length; k++) {
+        if (existing[k]) {
+            if (existing[k].textContent !== chars[k]) existing[k].textContent = chars[k];
+        } else {
+            var el = document.createElement('div');
+            el.className = 'lock-typed-char';
+            el.textContent = chars[k];
+            row.appendChild(el);
+        }
+    }
+}
 function tryUnlock() {
     const inp = document.getElementById('lockInput');
     const err = document.getElementById('lockError');
@@ -1904,12 +1956,22 @@ function tryUnlock() {
     if (!val) { err.textContent = 'رمز را وارد کنید'; return; }
     if (val === settings.password) {
         sessionStorage.setItem(LOCK_SESSION_KEY, '1');
-        const box = document.querySelector('.lock-box');
-        if (box) {
-            box.style.transition = 'transform .35s cubic-bezier(.34,1.4,.64,1), opacity .3s ease';
-            box.style.transform = 'scale(.9) translateY(-10px)';
-            box.style.opacity = '0';
+        /* ★ نمایش موفقیت با انیمیشن تیک */
+        syncLockTypedRow(val, 'success');
+        /* ★ مخفی کردن input */
+        inp.style.opacity = '0';
+        inp.style.pointerEvents = 'none';
+        /* ★ نمایش پیام موفقیت */
+        var box = document.querySelector('.lock-box');
+        if (box && !box.querySelector('.lock-success-check')) {
+            var chk = document.createElement('div');
+            chk.className = 'lock-success-check';
+            chk.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>خوش آمدی!</span>';
+            box.appendChild(chk);
         }
+        /* ★ پنهان کردن دکمه */
+        var btn = document.querySelector('.lock-btn');
+        if (btn) btn.style.opacity = '0';
         setTimeout(function () {
             document.getElementById('lockScreen').classList.remove('open');
             const app = document.getElementById('appContainer');
@@ -1921,22 +1983,39 @@ function tryUnlock() {
             err.textContent = '';
             var hb = document.getElementById('headerLockBtn');
             if (hb) hb.classList.remove('locked');
+            /* ★ پاکسازی */
+            setTimeout(function () {
+                var row = document.getElementById('lockTypedRow');
+                if (row) row.innerHTML = '';
+                var chk = document.querySelector('.lock-success-check');
+                if (chk) chk.remove();
+                inp.style.opacity = '';
+                inp.style.pointerEvents = '';
+                var btn = document.querySelector('.lock-btn');
+                if (btn) btn.style.opacity = '';
+            }, 400);
             registerMySession();
             resetInactivityTimer();
-        }, 400);
+        }, 900);
     } else {
         err.textContent = 'رمز اشتباه است';
+        /* ★ انیمیشن خطا روی کاراکترها */
+        syncLockTypedRow(val, 'error');
         const box = document.querySelector('.lock-box');
         if (box) {
             box.style.animation = 'none';
             void box.offsetWidth;
             box.style.animation = 'pinShake .5s ease';
         }
-        inp.value = '';
-        setTimeout(function () { err.textContent = ''; }, 2500);
+        /* ★ پاک کردن پس از انیمیشن خطا */
+        setTimeout(function () {
+            var row = document.getElementById('lockTypedRow');
+            if (row) row.innerHTML = '';
+            inp.value = '';
+            err.textContent = '';
+        }, 700);
     }
 }
-
 function lockNow() {
     if (!settings.passwordEnabled || !settings.password) {
         toast('اول از تنظیمات، رمز قفل رو تنظیم کن', 'error');
@@ -1947,11 +2026,17 @@ function lockNow() {
     if (!ls) return;
     const pinRow = document.getElementById('lockPinRow');
     if (pinRow) pinRow.style.display = 'none';
+    /* ★ فعال‌سازی نمایش دونه‌دونه */
+    injectLockTypedRow();
     ls.classList.add('open');
     const inp = document.getElementById('lockInput');
     const err = document.getElementById('lockError');
     if (inp) { inp.value = ''; setTimeout(() => inp.focus(), 350); }
     if (err) err.textContent = '';
+    syncLockTypedRow('');
+    /* پاک کردن success/check قبلی */
+    var oldChk = document.querySelector('.lock-success-check');
+    if (oldChk) oldChk.remove();
     if (ls && !ls.dataset.clickBound) {
         ls.dataset.clickBound = '1';
         ls.addEventListener('click', function () {
@@ -1960,7 +2045,6 @@ function lockNow() {
         });
     }
 }
-
 /* ═══════════════════════════════════════════════════════════════
    BACKUP
    ═══════════════════════════════════════════════════════════════ */
@@ -2328,8 +2412,32 @@ function renderSettingsControls() {
     var admin = (typeof isAdmin === 'function') ? isAdmin() : false;
     var modelsDraft = settingsDraft.models || JSON.parse(JSON.stringify(APP_CONFIG.models));
 
+    var subState = window._settingsSub || 'general';
+    var isAppearanceOpen = (settingsCat === 'appearance');
+
+    /* ═══ تب‌ها + زیرمنوی ظاهر ═══ */
     var tabsHTML = '';
-    tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'appearance' ? ' active' : '') + '" data-cat="appearance" onclick="switchSettingsCat(\'appearance\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 L14 9 L12 12 L10 9 Z"/></svg>ظاهر</button>';
+    tabsHTML +=
+        '<button class="settings-tab-btn' + (isAppearanceOpen ? ' active' : '') + ' settings-tab-parent' + (isAppearanceOpen ? ' has-sub' : '') + '" data-cat="appearance" onclick="switchSettingsCat(\'appearance\')">' +
+            '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 L14 9 L12 12 L10 9 Z"/></svg>' +
+            '<span style="flex:1;text-align:right">ظاهر</span>' +
+            '<svg class="settings-tab-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
+        '</button>';
+
+    if (isAppearanceOpen) {
+        var subs = [
+            { id: 'general', label: 'تم و رنگ' },
+            { id: 'header', label: 'هدر و المان' },
+            { id: 'pattern', label: 'طرح' },
+            { id: 'font', label: 'فونت' }
+        ];
+        tabsHTML += '<div class="settings-submenu">';
+        tabsHTML += subs.map(function (sub) {
+            return '<button class="settings-submenu-btn' + (subState === sub.id ? ' active' : '') + '" onclick="event.stopPropagation();window._settingsSub=\'' + sub.id + '\';renderSettingsControls();">' + sub.label + '</button>';
+        }).join('');
+        tabsHTML += '</div>';
+    }
+
     tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'style' ? ' active' : '') + '" data-cat="style" onclick="switchSettingsCat(\'style\')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>استایل</button>';
     tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior" onclick="switchSettingsCat(\'behavior\')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>رفتار</button>';
     if (admin) {
@@ -2340,8 +2448,99 @@ function renderSettingsControls() {
     tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'about' ? ' active' : '') + '" data-cat="about" onclick="switchSettingsCat(\'about\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>درباره ما</button>';
     tabs.innerHTML = tabsHTML;
 
-    var subState = window._settingsSub || 'general';
+    /* ═══ محتوای هر زیردسته ═══ */
+    var appearanceContent = {
+        general:
+            '<div class="setting-group"><label>حالت نمایش</label>' +
+                '<div class="row-btns">' +
+                    '<button class="row-btn' + (s.themeMode === 'dark' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'dark\')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>' +
+                    '<button class="row-btn' + (s.themeMode === 'light' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'light\')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg><span class="rb-label">روز</span></button>' +
+                    '<button class="row-btn' + (s.themeMode === 'midnight' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'midnight\')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" fill="currentColor" fill-opacity=".35"/><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>رنگ اصلی</label>' +
+                '<div class="color-row">' + APP_CONFIG.themeColors.map(c =>
+                    '<div class="color-opt' + (s.themeColor === c ? ' active' : '') + '" onclick="updateDraft(\'themeColor\',\'' + c + '\')"><div class="color-orb" data-color="' + c + '"><svg viewBox="0 0 24 24">' + APP_CONFIG.colorIcons[c] + '</svg></div><div class="color-label">' + APP_CONFIG.colorNames[c] + '</div></div>'
+                ).join('') + '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>شکل حباب</label>' +
+                '<div class="row-btns">' + APP_CONFIG.bubbleShapes.map(b =>
+                    '<button class="row-btn' + (s.bubbleShape === b.id ? ' active' : '') + '" onclick="updateDraft(\'bubbleShape\',\'' + b.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + b.icon + '</svg><span class="rb-label">' + b.name + '</span></button>'
+                ).join('') + '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>اندازه متن</label>' +
+                '<div class="row-btns">' + ['13px', '15px', '17px', '19px'].map((f, i) =>
+                    '<button class="row-btn' + (s.fontSize === f ? ' active' : '') + '" onclick="updateDraft(\'fontSize\',\'' + f + '\')"><span class="rb-label">' + ['کوچیک', 'معمولی', 'درشت', 'بزرگ'][i] + '</span></button>'
+                ).join('') + '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>سرعت انیمیشن</label>' +
+                '<div class="row-btns">' + APP_CONFIG.animations.map(a =>
+                    '<button class="row-btn' + (s.animation === a.id ? ' active' : '') + '" onclick="updateDraft(\'animation\',\'' + a.id + '\')"><span class="rb-label">' + a.name + '</span></button>'
+                ).join('') + '</div>' +
+            '</div>',
+        header:
+            '<div class="setting-group"><label>پس‌زمینه هدر</label>' +
+                '<div class="row-btns">' + APP_CONFIG.headerStyles.map(h =>
+                    '<button class="row-btn' + (s.headerStyle === h.id ? ' active' : '') + '" onclick="updateDraft(\'headerStyle\',\'' + h.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + h.icon + '</svg><span class="rb-label">' + h.name + '</span></button>'
+                ).join('') + '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>نوار نوشتن پیام</label>' +
+                '<div class="row-btns">' + APP_CONFIG.inputStyles.map(i =>
+                    '<button class="row-btn' + (s.inputStyle === i.id ? ' active' : '') + '" onclick="updateDraft(\'inputStyle\',\'' + i.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + i.icon + '</svg><span class="rb-label">' + i.name + '</span></button>'
+                ).join('') + '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>استایل المان‌ها</label>' +
+                '<div class="row-btns">' + APP_CONFIG.elementStyles.map(el =>
+                    '<button class="row-btn' + (s.elementStyle === el.id ? ' active' : '') + '" onclick="updateDraft(\'elementStyle\',\'' + el.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + el.icon + '</svg><span class="rb-label">' + el.name + '</span></button>'
+                ).join('') + '</div>' +
+            '</div>',
+        pattern:
+            '<div class="setting-group"><label>انتخاب طرح</label>' +
+                '<div class="pattern-grid">' + APP_CONFIG.patterns.map(pat =>
+                    '<div class="pattern-opt' + (s.pattern === pat.id ? ' active' : '') + '" onclick="updateDraft(\'pattern\',\'' + pat.id + '\')"><div class="pattern-thumb th-' + pat.id + '"></div><div class="pattern-name">' + pat.name + '</div></div>'
+                ).join('') + '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>رنگ‌های آماده طرح</label>' +
+                '<div class="pattern-preset-colors">' +
+                    APP_CONFIG.patternPresets.map(function (pr) {
+                        var isActive = s.patternColor1 === pr.c1 && s.patternColor2 === pr.c2;
+                        return '<div class="pattern-preset' + (isActive ? ' active' : '') + '" title="' + pr.n + '" onclick="updateDraft(\'patternColor1\',\'' + pr.c1 + '\');updateDraft(\'patternColor2\',\'' + pr.c2 + '\')" style="background:linear-gradient(135deg,' + pr.c1 + ' 0%,' + pr.c1 + ' 50%,' + pr.c2 + ' 50%,' + pr.c2 + ' 100%)"></div>';
+                    }).join('') +
+                '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>موقعیت</label>' +
+                '<div class="row-btns">' +
+                    '<button class="row-btn' + (s.patternPosition === 'both' ? ' active' : '') + '" onclick="updateDraft(\'patternPosition\',\'both\')"><span class="rb-label">دو گوشه</span></button>' +
+                    '<button class="row-btn' + (s.patternPosition === 'reverse' ? ' active' : '') + '" onclick="updateDraft(\'patternPosition\',\'reverse\')"><span class="rb-label">برعکس</span></button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="setting-group"><label>تعداد در گوشه</label>' +
+                '<div class="slider-row"><input type="range" min="1" max="8" step="1" value="' + s.patternPerCorner + '" oninput="updateDraft(\'patternPerCorner\',this.value)"><span class="slider-val">' + s.patternPerCorner + '×</span></div>' +
+            '</div>' +
+            '<div class="setting-group"><label>اندازه</label>' +
+                '<div class="slider-row"><input type="range" min="60" max="350" step="10" value="' + s.patternSize + '" oninput="updateDraft(\'patternSize\',this.value)"><span class="slider-val">' + s.patternSize + 'px</span></div>' +
+            '</div>' +
+            '<div class="setting-group"><label>شفافیت</label>' +
+                '<div class="slider-row"><input type="range" min="10" max="100" step="5" value="' + s.patternOpacity + '" oninput="updateDraft(\'patternOpacity\',this.value)"><span class="slider-val">' + s.patternOpacity + '%</span></div>' +
+            '</div>' +
+            '<div class="setting-group"><label>رنگ‌های دلخواه</label>' +
+                '<div class="color-picker-row">' +
+                    '<div class="color-picker-wrap"><label>رنگ ۱</label><input type="color" value="' + s.patternColor1 + '" oninput="updateDraft(\'patternColor1\',this.value)"></div>' +
+                    '<div class="color-picker-wrap"><label>رنگ ۲</label><input type="color" value="' + s.patternColor2 + '" oninput="updateDraft(\'patternColor2\',this.value)"></div>' +
+                '</div>' +
+            '</div>',
+        font:
+            '<div class="setting-group">' +
+                '<div class="group-subtitle">فونت‌های فارسی</div>' +
+                '<div class="row-btns">' + APP_CONFIG.fonts.persian.map(fontRow).join('') + '</div>' +
+                '<div class="group-subtitle">فونت‌های عربی</div>' +
+                '<div class="row-btns">' + APP_CONFIG.fonts.arabic.map(fontRow).join('') + '</div>' +
+                '<div class="group-subtitle">فونت‌های انگلیسی</div>' +
+                '<div class="row-btns">' + APP_CONFIG.fonts.english.map(fontRow).join('') + '</div>' +
+            '</div>'
+    };
 
+    /* ═══ محتوای مدل‌ها (فقط ادمین) ═══ */
     var modelsHTML = '';
     if (admin) {
         modelsHTML = '<div class="setting-group">' +
@@ -2386,6 +2585,7 @@ function renderSettingsControls() {
         '</div>';
     }
 
+    /* ═══ محتوای پروفایل ═══ */
     var p = getProfile();
     var src = p.avatar || 'siraj-logo.png';
     var lvl = getUserLevel();
@@ -2411,135 +2611,10 @@ function renderSettingsControls() {
             '<div class="default-view-options">' + vh + '</div>' +
         '</div>';
 
+    /* ═══ ساخت wrap ═══ */
     wrap.innerHTML =
         '<div class="settings-content' + (settingsCat === 'appearance' ? ' active' : '') + '" data-cat="appearance">' +
-            '<div class="settings-accordion">' +
-
-                /* ═══ ۱) تم و رنگ ═══ */
-                '<div class="settings-acc-item' + (subState === 'general' ? ' active' : '') + '" data-sub="general">' +
-                    '<button type="button" class="settings-acc-trigger" onclick="toggleSettingsSub(\'general\')">' +
-                        '<span class="settings-acc-title">تم و رنگ</span>' +
-                        '<svg class="settings-acc-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
-                    '</button>' +
-                    '<div class="settings-acc-panel"><div class="settings-acc-panel-inner"><div class="settings-acc-panel-content">' +
-                        '<div class="setting-group"><label>حالت نمایش</label>' +
-                            '<div class="row-btns">' +
-                                '<button class="row-btn' + (s.themeMode === 'dark' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'dark\')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>' +
-                                '<button class="row-btn' + (s.themeMode === 'light' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'light\')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg><span class="rb-label">روز</span></button>' +
-                                '<button class="row-btn' + (s.themeMode === 'midnight' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'midnight\')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" fill="currentColor" fill-opacity=".35"/><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>رنگ اصلی</label>' +
-                            '<div class="color-row">' + APP_CONFIG.themeColors.map(c =>
-                                '<div class="color-opt' + (s.themeColor === c ? ' active' : '') + '" onclick="updateDraft(\'themeColor\',\'' + c + '\')"><div class="color-orb" data-color="' + c + '"><svg viewBox="0 0 24 24">' + APP_CONFIG.colorIcons[c] + '</svg></div><div class="color-label">' + APP_CONFIG.colorNames[c] + '</div></div>'
-                            ).join('') + '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>شکل حباب</label>' +
-                            '<div class="row-btns">' + APP_CONFIG.bubbleShapes.map(b =>
-                                '<button class="row-btn' + (s.bubbleShape === b.id ? ' active' : '') + '" onclick="updateDraft(\'bubbleShape\',\'' + b.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + b.icon + '</svg><span class="rb-label">' + b.name + '</span></button>'
-                            ).join('') + '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>اندازه متن</label>' +
-                            '<div class="row-btns">' + ['13px', '15px', '17px', '19px'].map((f, i) =>
-                                '<button class="row-btn' + (s.fontSize === f ? ' active' : '') + '" onclick="updateDraft(\'fontSize\',\'' + f + '\')"><span class="rb-label">' + ['کوچیک', 'معمولی', 'درشت', 'بزرگ'][i] + '</span></button>'
-                            ).join('') + '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>سرعت انیمیشن</label>' +
-                            '<div class="row-btns">' + APP_CONFIG.animations.map(a =>
-                                '<button class="row-btn' + (s.animation === a.id ? ' active' : '') + '" onclick="updateDraft(\'animation\',\'' + a.id + '\')"><span class="rb-label">' + a.name + '</span></button>'
-                            ).join('') + '</div>' +
-                        '</div>' +
-                    '</div></div></div>' +
-                '</div>' +
-
-                /* ═══ ۲) هدر و المان ═══ */
-                '<div class="settings-acc-item' + (subState === 'header' ? ' active' : '') + '" data-sub="header">' +
-                    '<button type="button" class="settings-acc-trigger" onclick="toggleSettingsSub(\'header\')">' +
-                        '<span class="settings-acc-title">هدر و المان</span>' +
-                        '<svg class="settings-acc-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
-                    '</button>' +
-                    '<div class="settings-acc-panel"><div class="settings-acc-panel-inner"><div class="settings-acc-panel-content">' +
-                        '<div class="setting-group"><label>پس‌زمینه هدر</label>' +
-                            '<div class="row-btns">' + APP_CONFIG.headerStyles.map(h =>
-                                '<button class="row-btn' + (s.headerStyle === h.id ? ' active' : '') + '" onclick="updateDraft(\'headerStyle\',\'' + h.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + h.icon + '</svg><span class="rb-label">' + h.name + '</span></button>'
-                            ).join('') + '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>نوار نوشتن پیام</label>' +
-                            '<div class="row-btns">' + APP_CONFIG.inputStyles.map(i =>
-                                '<button class="row-btn' + (s.inputStyle === i.id ? ' active' : '') + '" onclick="updateDraft(\'inputStyle\',\'' + i.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + i.icon + '</svg><span class="rb-label">' + i.name + '</span></button>'
-                            ).join('') + '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>استایل المان‌ها</label>' +
-                            '<div class="row-btns">' + APP_CONFIG.elementStyles.map(el =>
-                                '<button class="row-btn' + (s.elementStyle === el.id ? ' active' : '') + '" onclick="updateDraft(\'elementStyle\',\'' + el.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + el.icon + '</svg><span class="rb-label">' + el.name + '</span></button>'
-                            ).join('') + '</div>' +
-                        '</div>' +
-                    '</div></div></div>' +
-                '</div>' +
-
-                /* ═══ ۳) طرح ═══ */
-                '<div class="settings-acc-item' + (subState === 'pattern' ? ' active' : '') + '" data-sub="pattern">' +
-                    '<button type="button" class="settings-acc-trigger" onclick="toggleSettingsSub(\'pattern\')">' +
-                        '<span class="settings-acc-title">طرح</span>' +
-                        '<svg class="settings-acc-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
-                    '</button>' +
-                    '<div class="settings-acc-panel"><div class="settings-acc-panel-inner"><div class="settings-acc-panel-content">' +
-                        '<div class="setting-group"><label>انتخاب طرح</label>' +
-                            '<div class="pattern-grid">' + APP_CONFIG.patterns.map(pat =>
-                                '<div class="pattern-opt' + (s.pattern === pat.id ? ' active' : '') + '" onclick="updateDraft(\'pattern\',\'' + pat.id + '\')"><div class="pattern-thumb th-' + pat.id + '"></div><div class="pattern-name">' + pat.name + '</div></div>'
-                            ).join('') + '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>رنگ‌های آماده طرح</label>' +
-                            '<div class="pattern-preset-colors">' +
-                                APP_CONFIG.patternPresets.map(function (pr) {
-                                    var isActive = s.patternColor1 === pr.c1 && s.patternColor2 === pr.c2;
-                                    return '<div class="pattern-preset' + (isActive ? ' active' : '') + '" title="' + pr.n + '" onclick="updateDraft(\'patternColor1\',\'' + pr.c1 + '\');updateDraft(\'patternColor2\',\'' + pr.c2 + '\')" style="background:linear-gradient(135deg,' + pr.c1 + ' 0%,' + pr.c1 + ' 50%,' + pr.c2 + ' 50%,' + pr.c2 + ' 100%)"></div>';
-                                }).join('') +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>موقعیت</label>' +
-                            '<div class="row-btns">' +
-                                '<button class="row-btn' + (s.patternPosition === 'both' ? ' active' : '') + '" onclick="updateDraft(\'patternPosition\',\'both\')"><span class="rb-label">دو گوشه</span></button>' +
-                                '<button class="row-btn' + (s.patternPosition === 'reverse' ? ' active' : '') + '" onclick="updateDraft(\'patternPosition\',\'reverse\')"><span class="rb-label">برعکس</span></button>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>تعداد در گوشه</label>' +
-                            '<div class="slider-row"><input type="range" min="1" max="8" step="1" value="' + s.patternPerCorner + '" oninput="updateDraft(\'patternPerCorner\',this.value)"><span class="slider-val">' + s.patternPerCorner + '×</span></div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>اندازه</label>' +
-                            '<div class="slider-row"><input type="range" min="60" max="350" step="10" value="' + s.patternSize + '" oninput="updateDraft(\'patternSize\',this.value)"><span class="slider-val">' + s.patternSize + 'px</span></div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>شفافیت</label>' +
-                            '<div class="slider-row"><input type="range" min="10" max="100" step="5" value="' + s.patternOpacity + '" oninput="updateDraft(\'patternOpacity\',this.value)"><span class="slider-val">' + s.patternOpacity + '%</span></div>' +
-                        '</div>' +
-                        '<div class="setting-group"><label>رنگ‌های دلخواه</label>' +
-                            '<div class="color-picker-row">' +
-                                '<div class="color-picker-wrap"><label>رنگ ۱</label><input type="color" value="' + s.patternColor1 + '" oninput="updateDraft(\'patternColor1\',this.value)"></div>' +
-                                '<div class="color-picker-wrap"><label>رنگ ۲</label><input type="color" value="' + s.patternColor2 + '" oninput="updateDraft(\'patternColor2\',this.value)"></div>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div></div></div>' +
-                '</div>' +
-
-                /* ═══ ۴) فونت ═══ */
-                '<div class="settings-acc-item' + (subState === 'font' ? ' active' : '') + '" data-sub="font">' +
-                    '<button type="button" class="settings-acc-trigger" onclick="toggleSettingsSub(\'font\')">' +
-                        '<span class="settings-acc-title">فونت</span>' +
-                        '<svg class="settings-acc-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
-                    '</button>' +
-                    '<div class="settings-acc-panel"><div class="settings-acc-panel-inner"><div class="settings-acc-panel-content">' +
-                        '<div class="setting-group">' +
-                            '<div class="group-subtitle">فونت‌های فارسی</div>' +
-                            '<div class="row-btns">' + APP_CONFIG.fonts.persian.map(fontRow).join('') + '</div>' +
-                            '<div class="group-subtitle">فونت‌های عربی</div>' +
-                            '<div class="row-btns">' + APP_CONFIG.fonts.arabic.map(fontRow).join('') + '</div>' +
-                            '<div class="group-subtitle">فونت‌های انگلیسی</div>' +
-                            '<div class="row-btns">' + APP_CONFIG.fonts.english.map(fontRow).join('') + '</div>' +
-                        '</div>' +
-                    '</div></div></div>' +
-                '</div>' +
-
-            '</div>' +
+            (appearanceContent[subState] || appearanceContent.general) +
         '</div>' +
 
         '<div class="settings-content' + (settingsCat === 'style' ? ' active' : '') + '" data-cat="style">' +
@@ -2622,11 +2697,14 @@ function renderSettingsControls() {
             '</div>' +
             '<div class="about-bio-card">' +
                 'سلام 👋<br><br>' +
-                'من حامدم؛ یه جوون ۲۰ ساله اراکی که عاشق ایران، تاریخش و مردمشه و همیشه به یادگرفتن و ساختن چیزهای جدید علاقه داشته.<br><br>' +
-                'الان دانشجوی زبان و ادبیات عربی دانشگاه قمم.<br><br>' +
-                'سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر بشه.<br><br>' +
+                'من حامدم؛ یه جوون ۲۰ ساله اهل اراک که عاشق ایران، تاریخش و مردمشه و همیشه به یادگرفتن و ساختن چیزهای جدید علاقه داشته.<br><br>' +
+                'الان دانشجوی زبان و ادبیات عربی دانشگاه قمم و در کنار درس، به هوش مصنوعی، برنامه‌نویسی و بازی‌سازی علاقه‌مندم. یه زمانی ادیتور و مجسمه‌ساز بودم و حالا مسیرم به چیزهای تازه‌ای رسیده؛ مسیری که هنوز هم ادامه داره.<br><br>' +
+                'سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری رو برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر کنم. شاید علاقه‌ام به آموزش و تربیت هم بی‌تأثیر نبوده باشه، اما فکر می‌کنم چیزای بزرگ از همین ایده‌های ساده و یهویی شروع شده. و انسان تا دغدغه‌ی چیزی رو نداشته باشه، برای ساختنش قدم برنمی‌داره.<br><br>' +
+                'شاید سراج رو با زبان و ادبیات عربی شروع کرده باشیم، اما سراج به هیچ چیز محدود نبوده و نخواهد بود. سراج برای من فقط یه برنامه برای یک رشته یا یک موضوع خاص نیست؛ قراره جایی برای یادگیری و تجربه‌ی چیزهای مختلف باشه و قدم‌به‌قدم به اهداف خودش برسه.<br><br>' +
+                'من هم مثل سراج هنوز اول راهم؛ هنوز چیزهای زیادی هست که باید یاد بگیریم، تجربه کنیم و بسازیم.<br><br>' +
+                'این تازه شروع ماجراست.<br><br>' +
                 'به دنیای سراج خوش اومدید. 🌱' +
-            '</div>' +
+                    '</div>' +
             '<div class="about-section-title">' +
                 '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' +
                 'راه های ارتباطی' +
@@ -2720,7 +2798,6 @@ function renderSettingsControls() {
         }
     }, 30);
 }
-
 /* ═══════════════════════════════════════════════════════════════
    SETTINGS ACCORDION — باز/بسته کردن زیر‌دسته‌های ظاهر
    ═══════════════════════════════════════════════════════════════ */
@@ -2764,13 +2841,13 @@ document.addEventListener('visibilitychange', () => {
         setTimeout(() => {
             ensureClickable();
             if (typeof window.updateNavSlider === 'function') window.updateNavSlider(false);
-            /* ★ رفرش اجباری پس‌زمینه برای رفع جابجایی */
-            const html = document.documentElement;
-            const bgImg = html.style.backgroundImage;
-            if (bgImg && bgImg !== 'none') {
-                html.style.backgroundImage = 'none';
-                void html.offsetWidth;
-                html.style.backgroundImage = bgImg;
+            /* ★ بازمحاسبه پس‌زمینه برای رفع جابجایی */
+            const root = document.documentElement;
+            const cur = root.style.getPropertyValue('--siraj-bg');
+            if (cur) {
+                root.style.setProperty('--siraj-bg', '');
+                void root.offsetWidth;
+                root.style.setProperty('--siraj-bg', cur);
             }
         }, 100);
         if (settings.lockOnTabSwitch && settings.passwordEnabled && settings.password) {
