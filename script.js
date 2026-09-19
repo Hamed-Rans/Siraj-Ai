@@ -6,37 +6,37 @@ const APP_CONFIG={
     promptsUrl:"https://raw.githubusercontent.com/Hamed-Rans/Siraj-Ai/refs/heads/main/prompts.json",
     adminPassword:"Ransari0185",
     models:[
-        {
-            id:'hakim',
-            name:'حکیم',
-            emoji:'🧠',
-            desc:'استاد نحو، صرف و اعراب',
-            color:'#8b5cf6',
-            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/hakim',
-            apiModel:'gemini-2.5-flash', /* ★ اصلاح شد */
-            systemExtra:''
-        },
-        {
-            id:'adib',
-            name:'ادیب',
-            emoji:'✍️',
-            desc:'هنرمند ادبیات و ترجمه',
-            color:'#F59E0B',
-            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/adib',
-            apiModel:'gemini-2.5-flash', /* ★ اصلاح شد */
-            systemExtra:''
-        },
-        {
-            id:'siraj-yar',
-            name:'سراج‌یار',
-            emoji:'🎯',
-            desc:'همراه و مشاور تو',
-            color:'#10B981',
-            baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/siraj-yar',
-            apiModel:'gemini-2.5-flash', /* ★ اصلاح شد */
-            systemExtra:''
-        }
-    ],
+    {
+        id:'hakim',
+        name:'حکیم',
+        emoji:'🧠',
+        desc:'استاد نحو، صرف و اعراب',
+        color:'#8b5cf6',
+        baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/hakim',
+        apiModel:'gemini-3.6-flash',   /* ★ برگشت */
+        systemExtra:''
+    },
+    {
+        id:'adib',
+        name:'ادیب',
+        emoji:'✍️',
+        desc:'هنرمند ادبیات و ترجمه',
+        color:'#F59E0B',
+        baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/adib',
+        apiModel:'gemini-3.6-flash',   /* ★ برگشت */
+        systemExtra:''
+    },
+    {
+        id:'siraj-yar',
+        name:'سراج‌یار',
+        emoji:'🎯',
+        desc:'همراه و مشاور تو',
+        color:'#10B981',
+        baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/siraj-yar',
+        apiModel:'gemini-3.6-flash',   /* ★ برگشت */
+        systemExtra:''
+    }
+],
     patternPresets:[
         {c1:'#2AA5B8',c2:'#F5A623',n:'کلاسیک'},
         {c1:'#D4AF37',c2:'#B8860B',n:'زرین'},
@@ -49,7 +49,7 @@ const APP_CONFIG={
     ],
     defaultSettings:{
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
-        animation:'normal',model:'gemini-2.5-flash',dialect:'fusha',
+        animation:'normal',model:'gemini-3.6-flash',dialect:'fusha',
         selectedModel:'hakim',
         thinking:false,quick:false,inputStyle:'solid',headerStyle:'glass',
         elementStyle:'solid',
@@ -1372,11 +1372,18 @@ async function send(){
     const box=document.getElementById('box');
     const controller=new AbortController();
     pendingRequests[chatId]=controller;
+
+    /* ★ timeout ۱۲۰ ثانیه */
+    const timeoutId = setTimeout(function(){
+        try{ controller.abort('timeout'); }catch(e){}
+    }, 120000);
+
     await new Promise(r=>setTimeout(r,500));
 
-    /* ★ پیام تفکر با ایموجی مدل انتخابی — دقیقاً طبق درخواست */
     if(chatId===currentChatId&&!controller.signal.aborted){
-        const w=document.createElement('div');w.className='msg-wrap bot';w.id='typing-indicator';
+        const w=document.createElement('div');
+        w.className='msg-wrap bot';
+        w.id='typing-indicator';
         var _mc=getCurrentModelConfig();
         var _te=(_mc && _mc.emoji) ? _mc.emoji : '🧘‍♂️';
         w.innerHTML='<div class="msg"><span class="think-indicator"><span class="think-text">دارم تفکر میکنم صبرله <span class="think-emoji">'+_te+'</span></span><span class="typing"><span></span><span></span><span></span></span></span></div>';
@@ -1388,30 +1395,44 @@ async function send(){
         const url = (modelCfg && modelCfg.baseURL && modelCfg.baseURL.trim())
                     ? modelCfg.baseURL.trim()
                     : ((APP_CONFIG.baseURL&&APP_CONFIG.baseURL.trim())?APP_CONFIG.baseURL:'/api/chat');
-        const apiModel = (modelCfg && modelCfg.apiModel) ? modelCfg.apiModel : (settings.model || 'gemini-2.5-flash');
+        const apiModel = (modelCfg && modelCfg.apiModel) ? modelCfg.apiModel : (settings.model || 'gemini-3.6-flash');
         const messages=buildMessagesForWorker(chatId,userText,fileData,fileType);
+
+        console.log('[Siraj] POST →', url);
+        console.log('[Siraj] Payload:', {model: apiModel, messageCount: messages.length, stream: true});
+
+        /* ★ Accept بازتر — جلوی رفتار عجیب پروکسی رو می‌گیره */
         const res=await RateLimiter.run(()=>fetch(url,{
             method:'POST',
-            headers:{'Content-Type':'application/json','Accept':'text/event-stream'},
+            headers:{
+                'Content-Type':'application/json',
+                'Accept':'application/json, text/event-stream, */*'
+            },
             body:JSON.stringify({model:apiModel,messages,temperature:0.75,stream:true}),
             signal:controller.signal
         }));
+
+        const ctypeRaw = res.headers.get('content-type')||'';
+        console.log('[Siraj] ← Status:', res.status, '| CT:', ctypeRaw);
+        clearTimeout(timeoutId);
+
         if(!res.ok){
             document.getElementById('typing-indicator')?.remove();
             let msg='';
+            let errBody='';
+            try{ errBody = await res.text(); }catch(e){}
+            console.error('[Siraj] Error body:', errBody);
             if(res.status===429)msg='⏳ محدودیت (۴۲۹). ۳۰ ثانیه صبر کن.';
             else if(res.status===401||res.status===403)msg='🔑 کلید API مشکل داره.';
-            else if(res.status===404)msg='🔍 مدل در دسترس نیست.';
+            else if(res.status===404)msg='🔍 مدل یا مسیر پیدا نشد (۴۰۴).';
             else if(res.status===503)msg='🔄 سرور الان شلوغه.';
-            else{
-                const et=await res.text();
-                msg='خطا ('+res.status+'): '+et.substring(0,200);
-            }
+            else msg='خطا ('+res.status+'): '+(errBody.substring(0,250) || 'بدون توضیح');
             if(chatId===currentChatId)renderBotMsg(msg);
             addMsgToHistory(chatId,'assistant',msg);
             delete pendingRequests[chatId];chatInFlight=false;isStreaming=false;setSendButton();
             return;
         }
+
         streamQueue='';streamFinished=false;streamResultFull='';streamWriting=false;
         let streamEl=null;
         if(chatId===currentChatId){
@@ -1424,47 +1445,115 @@ async function send(){
             startTypewriter(streamEl);
         }
 
-        /* ★ Fallback: اگه پروکسی JSON معمولی داد، همون رو پارس کن */
-        const ctype = (res.headers.get('content-type')||'').toLowerCase();
-        if(ctype.indexOf('text/event-stream') < 0){
-            const raw = await res.text();
+        let gotAnyData = false;
+        let rawBody = '';
+        const ctype = ctypeRaw.toLowerCase();
+        const ctypeIsSSE = ctype.indexOf('text/event-stream') >= 0;
+
+        /* ★ استخراج delta از هر فرمت ممکن */
+        function extractDeltaFromJSON(j){
+            if(!j || typeof j !== 'object') return '';
+            if(j.choices && j.choices[0]){
+                const c = j.choices[0];
+                if(c.delta && c.delta.content) return c.delta.content;
+                if(c.message && c.message.content) return c.message.content;
+                if(c.text) return c.text;
+            }
+            if(j.candidates && j.candidates[0]){
+                const c = j.candidates[0];
+                if(c.content && c.content.parts && c.content.parts[0] && c.content.parts[0].text){
+                    return c.content.parts[0].text;
+                }
+            }
+            if(j.message && typeof j.message.content === 'string') return j.message.content;
+            if(j.response && typeof j.response === 'string') return j.response;
+            if(j.content && typeof j.content === 'string') return j.content;
+            if(j.output_text && typeof j.output_text === 'string') return j.output_text;
+            return '';
+        }
+
+        /* ★ پارس کامل SSE (چند خطی) */
+        function consumeSSEText(text){
+            const lines = text.split('\n');
+            for(let i=0;i<lines.length;i++){
+                const tr = lines[i].trim();
+                if(!tr || !tr.startsWith('data:')) continue;
+                const d = tr.slice(5).trim();
+                if(!d || d === '[DONE]') continue;
+                try{
+                    const j = JSON.parse(d);
+                    const delta = extractDeltaFromJSON(j);
+                    if(delta){ streamQueue += delta; gotAnyData = true; }
+                }catch(e){}
+            }
+        }
+
+        if(ctypeIsSSE){
+            /* ★ SSE واقعی — خواندن تدریجی */
             try{
-                const j = JSON.parse(raw);
-                const content = (j.choices?.[0]?.message?.content)
-                              || (j.choices?.[0]?.text)
-                              || (j.candidates?.[0]?.content?.parts?.[0]?.text)
-                              || '';
-                if(content) streamQueue += content;
+                const reader = res.body.getReader();
+                const dec = new TextDecoder();
+                let buf = '';
+                while(true){
+                    const {done, value} = await reader.read();
+                    if(done) break;
+                    buf += dec.decode(value, {stream:true});
+                    const lines = buf.split('\n');
+                    buf = lines.pop();
+                    for(let i=0;i<lines.length;i++){
+                        const tr = lines[i].trim();
+                        if(!tr || !tr.startsWith('data:')) continue;
+                        const d = tr.slice(5).trim();
+                        if(!d || d === '[DONE]') continue;
+                        try{
+                            const j = JSON.parse(d);
+                            const delta = extractDeltaFromJSON(j);
+                            if(delta){ streamQueue += delta; gotAnyData = true; }
+                        }catch(e){}
+                    }
+                }
+                if(buf.trim()) consumeSSEText(buf);
             }catch(e){
-                if(raw && raw.trim()) streamQueue += raw;
+                console.warn('[Siraj] SSE read error:', e);
             }
         } else {
-            const reader=res.body.getReader();
-            const dec=new TextDecoder();
-            let buf='';
-            while(true){
-                const {done,value}=await reader.read();if(done)break;
-                buf+=dec.decode(value,{stream:true});
-                const lines=buf.split('\n');buf=lines.pop();
-                for(const line of lines){
-                    const tr=line.trim();
-                    if(!tr||!tr.startsWith('data:'))continue;
-                    const d=tr.slice(5).trim();
-                    if(d==='[DONE]')continue;
-                    try{
-                        const j=JSON.parse(d);
-                        const delta=j.choices?.[0]?.delta?.content
-                                  || j.choices?.[0]?.message?.content
-                                  || '';
-                        if(delta){streamQueue+=delta;}
-                    }catch(e){}
+            /* ★ Non-SSE — کل بدنه رو بگیر و هوشمند پارس کن */
+            try{ rawBody = await res.text(); }catch(e){ console.warn('[Siraj] Body read:', e); }
+            console.log('[Siraj] Body length:', rawBody.length, '| First 200:', rawBody.substring(0,200));
+
+            /* گاهی پروکسی content-type درست نمی‌ده */
+            if(rawBody.indexOf('data:') >= 0){
+                consumeSSEText(rawBody);
+            }
+
+            /* اگه هنوز چیزی نگرفتیم — JSON کامل */
+            if(!gotAnyData && rawBody.trim()){
+                try{
+                    const j = JSON.parse(rawBody);
+                    const content = extractDeltaFromJSON(j);
+                    if(content){ streamQueue += content; gotAnyData = true; }
+                }catch(e){
+                    /* متن ساده؟ */
+                    if(rawBody.indexOf('<') !== 0 && rawBody.indexOf('{') !== 0){
+                        streamQueue += rawBody;
+                        gotAnyData = true;
+                    }
                 }
             }
         }
+
+        console.log('[Siraj] gotAnyData:', gotAnyData, '| Queue length:', streamQueue.length);
+
         streamFinished=true;
         let waitGuard=0;
         while(streamWriting&&waitGuard<900){await new Promise(r=>setTimeout(r,40));waitGuard++;}
-        const full=streamResultFull||'(بدون پاسخ)';
+
+        let full = streamResultFull;
+        if(!full || !full.trim()){
+            full = '⚠️ پاسخی از سرور نیامد.\n\nلطفاً کنسول مرورگر (F12) رو باز کن و پیام‌های [Siraj] رو برام بفرست تا دقیق بفهمیم کجای مسیر مشکل داره.';
+            console.warn('[Siraj] Empty response. Raw body:', rawBody);
+        }
+
         extractPlanFromResponse(full);
         const elapsed=((Date.now()-t0)/1000).toFixed(1);
         if(chatId===currentChatId&&streamEl){
@@ -1472,20 +1561,28 @@ async function send(){
             pm.innerHTML=formatMd(full);
             pm.querySelector('.cursor-blink')?.remove();
             const lat=document.createElement('div');
-            lat.className='latency-timer';lat.textContent=elapsed+'s';
+            lat.className='latency-timer';
+            lat.textContent=elapsed+'s';
             pm.parentElement.appendChild(lat);
         }
         addMsgToHistory(chatId,'assistant',full);
         delete pendingRequests[chatId];
     }catch(err){
+        clearTimeout(timeoutId);
         document.getElementById('typing-indicator')?.remove();
         delete pendingRequests[chatId];
-        if(err.name==='AbortError'){chatInFlight=false;isStreaming=false;setSendButton();return;}
-        if(chatId===currentChatId)renderBotMsg('خطا: '+err.message);
+        console.error('[Siraj] Caught error:', err);
+        if(err.name==='AbortError'){
+            if(controller.signal.reason === 'timeout'){
+                if(chatId===currentChatId) renderBotMsg('⏱️ زمان انتظار تمام شد (۱۲۰ ثانیه). اتصال اینترنت یا سرور رو چک کن و دوباره امتحان کن.');
+            }
+            chatInFlight=false;isStreaming=false;setSendButton();
+            return;
+        }
+        if(chatId===currentChatId)renderBotMsg('خطای شبکه: '+err.message);
     }
     chatInFlight=false;isStreaming=false;setSendButton();
 }
-
 function extractPlanFromResponse(text){
     const matches=[...text.matchAll(/\[PLAN\]\s*([-\d:]+\s*)?[|]?\s*([^\[\]]+?)\s*\[\/PLAN\]/g)];
     if(!matches.length)return;
