@@ -203,6 +203,8 @@ const RateLimiter={queue:[],processing:false,minInterval:1500,lastRequest:0,
 
 window.plannerDate = new Date();
 
+function isAdmin(){ return localStorage.getItem('siraj_is_admin') === '1'; }
+function setAdmin(v){ localStorage.setItem('siraj_is_admin', v ? '1' : '0'); }
 let settings=loadSettings();
 let settingsDraft=null;
 let settingsCat='appearance';
@@ -970,26 +972,21 @@ function renderHistory(){
     list.innerHTML=items.map(c=>{
         const last=c.messages[c.messages.length-1];
         const preview=last?(last.role==='user'?'تو: ':'سراج: ')+String(last.content||'').substring(0,50):'';
-        return `<div class="history-item${c.id===currentChatId?' active':''}${c.pinned?' pinned':''}" onclick="loadChat('${c.id}')"><span class="h-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div class="h-info"><div class="h-title" id="htitle-${c.id}">${escapeHtml(c.title)}</div><div class="h-preview">${escapeHtml(preview)}</div><div class="h-time">${formatTime(c.updatedAt)} · ${c.messages.length} پیام</div></div><button class="h-edit" onclick="event.stopPropagation();renameChat('${c.id}')" title="تغییر نام"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="h-edit" onclick="event.stopPropagation();window.__togglePinChat('${c.id}')" title="${c.pinned?'برداشتن پین':'پین'}">${c.pinned?'📌':'📍'}</button><button class="h-del" onclick="event.stopPropagation();deleteChat('${c.id}')"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></div>`;
+        var pinIcon = c.pinned 
+            ? '<svg viewBox="0 0 24 24"><path d="M12 17v5M9 10.76V6h6v4.76a2 2 0 0 0 1.11 1.79l1.78.9A2 2 0 0 1 19 15.24V16H5v-.76a2 2 0 0 1 1.11-1.79l1.78-.9A2 2 0 0 0 9 10.76z"/></svg>'
+            : '<svg viewBox="0 0 24 24"><path d="M12 17v5M9 10.76V6h6v4.76a2 2 0 0 0 1.11 1.79l1.78.9A2 2 0 0 1 19 15.24V16H5v-.76a2 2 0 0 1 1.11-1.79l1.78-.9A2 2 0 0 0 9 10.76z" opacity=".4"/></svg>';
+        return `<div class="history-item${c.id===currentChatId?' active':''}${c.pinned?' pinned':''}" onclick="loadChat('${c.id}')">
+            <div class="h-info">
+                <div class="h-title" id="htitle-${c.id}">${escapeHtml(c.title)}</div>
+                <div class="h-preview">${escapeHtml(preview)}</div>
+                <div class="h-time">${formatTime(c.updatedAt)} · ${c.messages.length} پیام</div>
+            </div>
+            <button class="h-pin" onclick="event.stopPropagation();window.__togglePinChat('${c.id}')" title="${c.pinned?'برداشتن پین':'پین'}">${pinIcon}</button>
+            <button class="h-edit" onclick="event.stopPropagation();renameChat('${c.id}')" title="تغییر نام"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="h-del" onclick="event.stopPropagation();deleteChat('${c.id}')"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+        </div>`;
     }).join('');
 }
-window.filterHistoryList = function(q){
-    q = (q||'').trim().toLowerCase();
-    var items = document.querySelectorAll('#historyList .history-item');
-    items.forEach(function(it){
-        var text = (it.textContent || '').toLowerCase();
-        it.style.display = (!q || text.indexOf(q) > -1) ? '' : 'none';
-    });
-};
-window.__togglePinChat = function(id, e){
-    if(e) e.stopPropagation();
-    var h = loadHistory();
-    if(!h[id]) return;
-    h[id].pinned = !h[id].pinned;
-    saveHistory(h);
-    renderHistory();
-    if(window.toast) window.toast(h[id].pinned ? '📌 پین شد' : 'از پین خارج شد', 'info');
-};
 function renameChat(id){
     const h=loadHistory();if(!h[id])return;
     const el=document.getElementById('htitle-'+id);if(!el)return;
@@ -1740,83 +1737,99 @@ function renderSettingsControls(){
     const s=settingsDraft||settings;
     const tabs=document.getElementById('settingsTabs');
     const wrap=document.getElementById('settingsContentWrap');
-    tabs.innerHTML=`
-        <button class="settings-tab-btn${settingsCat==='appearance'?' active':''}" data-cat="appearance" onclick="switchSettingsCat('appearance')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 L14 9 L12 12 L10 9 Z"/></svg>ظاهر</button>
-        <button class="settings-tab-btn${settingsCat==='style'?' active':''}" data-cat="style" onclick="switchSettingsCat('style')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>استایل</button>
-        <button class="settings-tab-btn${settingsCat==='behavior'?' active':''}" data-cat="behavior" onclick="switchSettingsCat('behavior')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>رفتار</button>
-        <button class="settings-tab-btn${settingsCat==='models'?' active':''}" data-cat="models" onclick="switchSettingsCat('models')"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg>مدل‌ها</button>
-        <button class="settings-tab-btn${settingsCat==='privacy'?' active':''}" data-cat="privacy" onclick="switchSettingsCat('privacy')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>حریم خصوصی</button>
-        <button class="settings-tab-btn${settingsCat==='about'?' active':''}" data-cat="about" onclick="switchSettingsCat('about')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>درباره ما</button>`;
-         /* ★ حذف تب مدل‌ها برای کاربرای عادی */
-if(!isAdmin()){
-  var modelsTabBtn = tabs.querySelector('[data-cat="models"]');
-  if(modelsTabBtn) modelsTabBtn.remove();
-}
-    setTimeout(function(){
-        var tw = document.getElementById('settingsTabs');
-        if(tw && !tw.querySelector('[data-cat="profile"]')){
-            var btn=document.createElement('button');
-            btn.className='settings-tab-btn';
-            btn.setAttribute('data-cat','profile');
-            btn.setAttribute('onclick',"switchSettingsCat('profile')");
-            btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
-            var aboutBtn=tw.querySelector('[data-cat="about"]');
-            tw.insertBefore(btn,aboutBtn||null);
-        }
-    }, 20);
-
-    var subState = window._settingsSub || 'general';
-    var admin = isAdmin();
+    
+    /* ★ isAdmin رو از همون اول چک کن */
+    var admin = (typeof isAdmin === 'function') ? isAdmin() : false;
     var modelsDraft = settingsDraft.models || JSON.parse(JSON.stringify(APP_CONFIG.models));
-
-    /* ─── مدل‌ها ─── */
-    var modelsHTML = '<div class="setting-group">'
-        +'<label style="font-size:13px;font-weight:800;color:var(--accent)">🧠 مدل‌های هوش مصنوعی سراج</label>';
-
-    if(!admin){
-        modelsHTML += '<div style="padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(239,68,68,.02));border:1px solid rgba(239,68,68,.25);margin-top:10px;text-align:center">'
+    
+    /* ★ ساخت تب‌ها — models فقط برای ادمین */
+    var tabsHTML = '';
+    tabsHTML += '<button class="settings-tab-btn'+(settingsCat==='appearance'?' active':'')+'" data-cat="appearance" onclick="switchSettingsCat(\'appearance\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3 L14 9 L12 12 L10 9 Z"/></svg>ظاهر</button>';
+    tabsHTML += '<button class="settings-tab-btn'+(settingsCat==='style'?' active':'')+'" data-cat="style" onclick="switchSettingsCat(\'style\')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>استایل</button>';
+    tabsHTML += '<button class="settings-tab-btn'+(settingsCat==='behavior'?' active':'')+'" data-cat="behavior" onclick="switchSettingsCat(\'behavior\')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>رفتار</button>';
+    if(admin){
+        tabsHTML += '<button class="settings-tab-btn'+(settingsCat==='models'?' active':'')+'" data-cat="models" onclick="switchSettingsCat(\'models\')"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg>مدل‌ها</button>';
+    }
+    tabsHTML += '<button class="settings-tab-btn'+(settingsCat==='profile'?' active':'')+'" data-cat="profile" onclick="switchSettingsCat(\'profile\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من</button>';
+    tabsHTML += '<button class="settings-tab-btn'+(settingsCat==='privacy'?' active':'')+'" data-cat="privacy" onclick="switchSettingsCat(\'privacy\')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>حریم خصوصی</button>';
+    tabsHTML += '<button class="settings-tab-btn'+(settingsCat==='about'?' active':'')+'" data-cat="about" onclick="switchSettingsCat(\'about\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>درباره ما</button>';
+    tabs.innerHTML = tabsHTML;
+    
+    var subState = window._settingsSub || 'general';
+    
+    /* ★ بخش مدل‌ها */
+    var modelsHTML = '';
+    if(admin){
+        modelsHTML = '<div class="setting-group">'
+            +'<label style="font-size:13px;font-weight:800;color:var(--accent)">🧠 مدل‌های هوش مصنوعی سراج</label>'
+            +'<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'
+            +'<span style="font-size:12px;font-weight:800;color:var(--text-muted)">مدل‌ها:</span>'
+            +'<span class="admin-badge">✓ ادمین</span>'
+            +'<button onclick="window.__logoutAdmin()" style="margin-right:auto;padding:5px 12px;border-radius:8px;border:1px solid rgba(239,68,68,.3);background:transparent;color:#F87171;font-family:var(--font-text);font-size:10px;font-weight:700;cursor:pointer">خروج</button>'
+            +'</div>'
+            + modelsDraft.map(function(m){
+                return '<div style="padding:14px;border-radius:16px;border:1px solid '+m.color+'40;background:'+m.color+'08;margin-bottom:12px">'
+                  +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+                  +'<div style="width:42px;height:42px;border-radius:14px;background:'+m.color+'20;border:1px solid '+m.color+'50;display:flex;align-items:center;justify-content:center;color:'+m.color+'">'
+                  +(window.MODEL_ICONS&&window.MODEL_ICONS[m.id]?window.MODEL_ICONS[m.id]:m.emoji)
+                  +'</div>'
+                  +'<div>'
+                  +'<div style="font-size:14px;font-weight:800;color:'+m.color+'">'+escapeHtml(m.name)+'</div>'
+                  +'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+escapeHtml(m.desc)+'</div>'
+                  +'</div>'
+                  +'</div>'
+                  +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">URL پروکسی</label>'
+                  +'<input type="text" value="'+escapeHtml(m.baseURL||'')+'" oninput="window.updateModelConfig(\''+m.id+'\',\'baseURL\',this.value)" class="model-field-editable" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px">'
+                  +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">نام مدل API</label>'
+                  +'<input type="text" value="'+escapeHtml(m.apiModel||'')+'" oninput="window.updateModelConfig(\''+m.id+'\',\'apiModel\',this.value)" class="model-field-editable" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px">'
+                  +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">شخصیت و پرامپت (systemExtra)</label>'
+                  +'<textarea oninput="window.updateModelConfig(\''+m.id+'\',\'systemExtra\',this.value)" placeholder="اینجا شخصیت مدل رو بنویس..." class="model-field-editable" style="width:100%;min-height:120px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;resize:vertical;line-height:1.8">'+escapeHtml(m.systemExtra||'')+'</textarea>'
+                  +'</div>';
+            }).join('')
+            +'<button onclick="window.__downloadPromptsJSON()" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:2px dashed var(--accent);background:rgba(59,130,246,.06);color:var(--accent);font-family:var(--font-text);font-size:12px;font-weight:800;cursor:pointer">'
+            +'📥 دانلود prompts.json (بعدش توی گیتهاب آپلود کن)'
+            +'</button>'
+            +'</div>';
+    } else {
+        modelsHTML = '<div class="setting-group">'
+            +'<div style="padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(239,68,68,.02));border:1px solid rgba(239,68,68,.25);text-align:center">'
             +'<div style="font-size:26px;margin-bottom:8px">🔒</div>'
             +'<div style="font-size:12.5px;font-weight:800;color:#F87171;margin-bottom:6px">ویرایش فقط برای سازنده</div>'
             +'<div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin-bottom:12px">برای ویرایش پرامپت مدل‌ها، رمز ادمین رو وارد کن</div>'
             +'<input type="password" id="adminPassInput" placeholder="رمز ادمین..." style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;text-align:center;margin-bottom:8px;direction:ltr">'
             +'<button onclick="window.__promptAdminPassword(document.getElementById(\'adminPassInput\').value)" style="width:100%;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));color:#fff;font-family:var(--font-text);font-size:12.5px;font-weight:800;cursor:pointer">🔓 فعال‌سازی حالت ادمین</button>'
+            +'</div>'
             +'</div>';
     }
-
-    modelsHTML += '<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">'
-        +'<span style="font-size:12px;font-weight:800;color:var(--text-muted)">مدل‌ها:</span>'
-        +(admin ? '<span class="admin-badge">✓ ادمین</span>' : '<span style="font-size:10px;color:var(--text-muted)">حالت تماشا</span>')
-        +(admin ? '<button onclick="window.__logoutAdmin()" style="margin-right:auto;padding:5px 12px;border-radius:8px;border:1px solid rgba(239,68,68,.3);background:transparent;color:#F87171;font-family:var(--font-text);font-size:10px;font-weight:700;cursor:pointer">خروج</button>' : '')
-        +'</div>';
-
-    modelsHTML += modelsDraft.map(function(m){
-        return '<div style="padding:14px;border-radius:16px;border:1px solid '+m.color+'40;background:'+m.color+'08;margin-bottom:12px;position:relative">'
-            +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
-            +'<div style="width:42px;height:42px;border-radius:14px;background:'+m.color+'20;border:1px solid '+m.color+'50;display:flex;align-items:center;justify-content:center;color:'+m.color+'">'
-            +(MODEL_ICONS[m.id]||m.emoji)
+    
+    /* ★ بخش مشخصات من — همیشه ساخته می‌شه */
+    var profilePane = document.querySelector('.settings-content[data-cat="profile"]');
+    var profileHTML = '';
+    if(!profilePane){
+        var p=getProfile();
+        var src=p.avatar||'siraj-logo.png';
+        var lvl=getUserLevel();
+        var dv=getDefaultView();
+        var lo=['beginner','intermediate','advanced'];
+        var lh=lo.map(function(k){return '<button class="level-opt'+(k===lvl?' active':'')+'" data-level="'+k+'">'+LEVEL_LABELS[k]+'</button>';}).join('');
+        var vo=['chat','planner','blog','videos','tools'];
+        var vh=vo.map(function(k){return '<button class="default-view-opt'+(k===dv?' active':'')+'" data-view="'+k+'">'+VIEW_LABELS[k]+'</button>';}).join('');
+        profileHTML =
+            '<div class="setting-group profile-section">'
+            +'<label style="font-size:13px;font-weight:800;color:var(--accent)">👤 مشخصات شخصی</label>'
+            +'<div class="about-avatar" style="margin:14px auto"><img src="'+src+'" alt=""></div>'
+            +'<div class="profile-access-note">ℹ️ دستیار هوشمند سراج به این اطلاعات دسترسی داره.</div>'
+            +'<input type="text" id="profileName" placeholder="اسمت چیه؟" value="'+(p.name?escapeHtml(p.name):'')+'" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;margin-bottom:8px;margin-top:8px">'
+            +'<textarea id="profileBio" placeholder="یه توضیح کوتاه..." style="width:100%;min-height:90px;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;resize:vertical;line-height:1.8;margin-bottom:8px">'+(p.bio?escapeHtml(p.bio):'')+'</textarea>'
+            +'<button class="btn-primary" id="profileSaveBtn" style="width:100%;justify-content:center;margin-top:6px">💾 ذخیره</button>'
             +'</div>'
-            +'<div>'
-            +'<div style="font-size:14px;font-weight:800;color:'+m.color+'">'+escapeHtml(m.name)+'</div>'
-            +'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+escapeHtml(m.desc)+'</div>'
-            +'</div>'
-            +'</div>'
-            +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">URL پروکسی</label>'
-            +'<input type="text" value="'+escapeHtml(m.baseURL||'')+'" '+(admin?'':'disabled')+' oninput="window.updateModelConfig(\''+m.id+'\',\'baseURL\',this.value)" class="'+(admin?'model-field-editable':'model-field-locked')+'" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px;position:relative">'
-            +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">نام مدل API</label>'
-            +'<input type="text" value="'+escapeHtml(m.apiModel||'')+'" '+(admin?'':'disabled')+' oninput="window.updateModelConfig(\''+m.id+'\',\'apiModel\',this.value)" class="'+(admin?'model-field-editable':'model-field-locked')+'" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px;position:relative">'
-            +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">شخصیت و پرامپت (systemExtra)</label>'
-            +'<textarea '+(admin?'':'disabled')+' oninput="window.updateModelConfig(\''+m.id+'\',\'systemExtra\',this.value)" placeholder="اینجا شخصیت مدل رو بنویس..." class="'+(admin?'model-field-editable':'model-field-locked')+'" style="width:100%;min-height:120px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;resize:vertical;line-height:1.8;position:relative">'+escapeHtml(m.systemExtra||'')+'</textarea>'
-            +'</div>';
-    }).join('');
-
-    if(admin){
-        modelsHTML += '<button onclick="window.__downloadPromptsJSON()" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:2px dashed var(--accent);background:rgba(59,130,246,.06);color:var(--accent);font-family:var(--font-text);font-size:12px;font-weight:800;cursor:pointer">'
-            +'📥 دانلود prompts.json (بعدش توی گیتهاب آپلود کن)'
-            +'</button>';
+            +'<div class="level-selector"><div class="level-selector-title">🎯 سطح زبان عربیت</div>'
+            +'<div class="level-options">'+lh+'</div>'
+            +'<button class="level-determine-btn" id="determineLevelBtn">سطحمو نمی‌دونم، با هوش مصنوعی تعیین کن</button></div>'
+            +'<div class="default-view-selector"><div class="default-view-title">📌 تب دیفالت هنگام ورود</div>'
+            +'<div class="default-view-options">'+vh+'</div></div>';
     }
-
-    modelsHTML += '</div>';
-
+    
     wrap.innerHTML=`
         <div class="settings-content${settingsCat==='appearance'?' active':''}" data-cat="appearance">
             <div class="settings-subtabs">
@@ -1827,51 +1840,42 @@ if(!isAdmin()){
             </div>
 
             <div class="settings-subcontent${subState==='general'?' active':''}" data-sub="general">
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>حالت نمایش</label>
+                <div class="setting-group"><label>حالت نمایش</label>
                     <div class="row-btns">
-                        <button class="row-btn${s.themeMode==='dark'?' active':''}" data-key="themeMode" data-value="dark" onclick="updateDraft('themeMode','dark')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>
-                        <button class="row-btn${s.themeMode==='light'?' active':''}" data-key="themeMode" data-value="light" onclick="updateDraft('themeMode','light')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg><span class="rb-label">روز</span></button>
-                        <button class="row-btn${s.themeMode==='midnight'?' active':''}" data-key="themeMode" data-value="midnight" onclick="updateDraft('themeMode','midnight')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" fill="currentColor" fill-opacity=".35"/><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>
+                        <button class="row-btn${s.themeMode==='dark'?' active':''}" onclick="updateDraft('themeMode','dark')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>
+                        <button class="row-btn${s.themeMode==='light'?' active':''}" onclick="updateDraft('themeMode','light')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg><span class="rb-label">روز</span></button>
+                        <button class="row-btn${s.themeMode==='midnight'?' active':''}" onclick="updateDraft('themeMode','midnight')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" fill="currentColor" fill-opacity=".35"/><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>
                     </div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ اصلی</label>
-                    <div class="color-row">${APP_CONFIG.themeColors.map(c=>`<div class="color-opt${s.themeColor===c?' active':''}" data-key="themeColor" data-value="${c}" onclick="updateDraft('themeColor','${c}')"><div class="color-orb" data-color="${c}"><svg viewBox="0 0 24 24">${APP_CONFIG.colorIcons[c]}</svg></div><div class="color-label">${APP_CONFIG.colorNames[c]}</div></div>`).join('')}</div>
+                <div class="setting-group"><label>رنگ اصلی</label>
+                    <div class="color-row">${APP_CONFIG.themeColors.map(c=>`<div class="color-opt${s.themeColor===c?' active':''}" onclick="updateDraft('themeColor','${c}')"><div class="color-orb" data-color="${c}"><svg viewBox="0 0 24 24">${APP_CONFIG.colorIcons[c]}</svg></div><div class="color-label">${APP_CONFIG.colorNames[c]}</div></div>`).join('')}</div>
                 </div>
                 <div class="setting-group"><label>شکل حباب</label>
-                    <div class="row-btns">${APP_CONFIG.bubbleShapes.map(b=>`<button class="row-btn${s.bubbleShape===b.id?' active':''}" data-key="bubbleShape" data-value="${b.id}" onclick="updateDraft('bubbleShape','${b.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${b.icon}</svg><span class="rb-label">${b.name}</span></button>`).join('')}</div>
+                    <div class="row-btns">${APP_CONFIG.bubbleShapes.map(b=>`<button class="row-btn${s.bubbleShape===b.id?' active':''}" onclick="updateDraft('bubbleShape','${b.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${b.icon}</svg><span class="rb-label">${b.name}</span></button>`).join('')}</div>
                 </div>
                 <div class="setting-group"><label>اندازه متن</label>
-                    <div class="row-btns">${['13px','15px','17px','19px'].map((f,i)=>`<button class="row-btn${s.fontSize===f?' active':''}" data-key="fontSize" data-value="${f}" onclick="updateDraft('fontSize','${f}')"><span class="rb-label">${['کوچیک','معمولی','درشت','بزرگ'][i]}</span></button>`).join('')}</div>
-                </div>
-                <div class="setting-group"><label>تصویر پس‌زمینه</label>
-                    <div class="bg-grid">${APP_CONFIG.bgPresets.map(bgOpt).join('')}</div>
-                    <label class="bg-upload-btn" style="margin-top:8px">
-                        <input type="file" accept="image/*" onchange="handleBgUpload(event)">
-                        <svg viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                        <span>آپلود تصویر</span>
-                    </label>
-                    ${s.bgImage?`<button class="btn-secondary" style="width:100%;margin-top:6px" onclick="clearBgImage()">حذف تصویر</button>`:''}
+                    <div class="row-btns">${['13px','15px','17px','19px'].map((f,i)=>`<button class="row-btn${s.fontSize===f?' active':''}" onclick="updateDraft('fontSize','${f}')"><span class="rb-label">${['کوچیک','معمولی','درشت','بزرگ'][i]}</span></button>`).join('')}</div>
                 </div>
                 <div class="setting-group"><label>سرعت انیمیشن</label>
-                    <div class="row-btns">${APP_CONFIG.animations.map(a=>`<button class="row-btn${s.animation===a.id?' active':''}" data-key="animation" data-value="${a.id}" onclick="updateDraft('animation','${a.id}')"><span class="rb-label">${a.name}</span></button>`).join('')}</div>
+                    <div class="row-btns">${APP_CONFIG.animations.map(a=>`<button class="row-btn${s.animation===a.id?' active':''}" onclick="updateDraft('animation','${a.id}')"><span class="rb-label">${a.name}</span></button>`).join('')}</div>
                 </div>
             </div>
 
             <div class="settings-subcontent${subState==='header'?' active':''}" data-sub="header">
                 <div class="setting-group"><label>پس‌زمینه هدر</label>
-                    <div class="row-btns">${APP_CONFIG.headerStyles.map(h=>`<button class="row-btn${s.headerStyle===h.id?' active':''}" data-key="headerStyle" data-value="${h.id}" onclick="updateDraft('headerStyle','${h.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${h.icon}</svg><span class="rb-label">${h.name}</span></button>`).join('')}</div>
+                    <div class="row-btns">${APP_CONFIG.headerStyles.map(h=>`<button class="row-btn${s.headerStyle===h.id?' active':''}" onclick="updateDraft('headerStyle','${h.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${h.icon}</svg><span class="rb-label">${h.name}</span></button>`).join('')}</div>
                 </div>
                 <div class="setting-group"><label>نوار نوشتن پیام</label>
-                    <div class="row-btns">${APP_CONFIG.inputStyles.map(i=>`<button class="row-btn${s.inputStyle===i.id?' active':''}" data-key="inputStyle" data-value="${i.id}" onclick="updateDraft('inputStyle','${i.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${i.icon}</svg><span class="rb-label">${i.name}</span></button>`).join('')}</div>
+                    <div class="row-btns">${APP_CONFIG.inputStyles.map(i=>`<button class="row-btn${s.inputStyle===i.id?' active':''}" onclick="updateDraft('inputStyle','${i.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${i.icon}</svg><span class="rb-label">${i.name}</span></button>`).join('')}</div>
                 </div>
                 <div class="setting-group"><label>استایل المان‌ها</label>
-                    <div class="row-btns">${APP_CONFIG.elementStyles.map(el=>`<button class="row-btn${s.elementStyle===el.id?' active':''}" data-key="elementStyle" data-value="${el.id}" onclick="updateDraft('elementStyle','${el.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${el.icon}</svg><span class="rb-label">${el.name}</span></button>`).join('')}</div>
+                    <div class="row-btns">${APP_CONFIG.elementStyles.map(el=>`<button class="row-btn${s.elementStyle===el.id?' active':''}" onclick="updateDraft('elementStyle','${el.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${el.icon}</svg><span class="rb-label">${el.name}</span></button>`).join('')}</div>
                 </div>
             </div>
 
             <div class="settings-subcontent${subState==='pattern'?' active':''}" data-sub="pattern">
                 <div class="setting-group"><label>انتخاب طرح</label>
-                    <div class="pattern-grid">${APP_CONFIG.patterns.map(p=>`<div class="pattern-opt${s.pattern===p.id?' active':''}" data-key="pattern" data-value="${p.id}" onclick="updateDraft('pattern','${p.id}')"><div class="pattern-thumb th-${p.id}"></div><div class="pattern-name">${p.name}</div></div>`).join('')}</div>
+                    <div class="pattern-grid">${APP_CONFIG.patterns.map(p=>`<div class="pattern-opt${s.pattern===p.id?' active':''}" onclick="updateDraft('pattern','${p.id}')"><div class="pattern-thumb th-${p.id}"></div><div class="pattern-name">${p.name}</div></div>`).join('')}</div>
                 </div>
                 <div class="setting-group"><label>رنگ‌های آماده طرح</label>
                     <div class="pattern-preset-colors">
@@ -1883,8 +1887,8 @@ if(!isAdmin()){
                 </div>
                 <div class="setting-group"><label>موقعیت</label>
                     <div class="row-btns">
-                        <button class="row-btn${s.patternPosition==='both'?' active':''}" data-key="patternPosition" data-value="both" onclick="updateDraft('patternPosition','both')"><span class="rb-label">دو گوشه</span></button>
-                        <button class="row-btn${s.patternPosition==='reverse'?' active':''}" data-key="patternPosition" data-value="reverse" onclick="updateDraft('patternPosition','reverse')"><span class="rb-label">برعکس</span></button>
+                        <button class="row-btn${s.patternPosition==='both'?' active':''}" onclick="updateDraft('patternPosition','both')"><span class="rb-label">دو گوشه</span></button>
+                        <button class="row-btn${s.patternPosition==='reverse'?' active':''}" onclick="updateDraft('patternPosition','reverse')"><span class="rb-label">برعکس</span></button>
                     </div>
                 </div>
                 <div class="setting-group"><label>تعداد در گوشه</label>
@@ -1924,10 +1928,10 @@ if(!isAdmin()){
                 </div>
             </div>
             <div class="setting-group"><label>موقعیت نوار</label>
-                <div class="row-btns">${APP_CONFIG.navPositions.map(p=>`<button class="row-btn${s.navPosition===p.id?' active':''}" data-key="navPosition" data-value="${p.id}" onclick="updateDraft('navPosition','${p.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${p.icon}</svg><span class="rb-label">${p.name}</span></button>`).join('')}</div>
+                <div class="row-btns">${APP_CONFIG.navPositions.map(p=>`<button class="row-btn${s.navPosition===p.id?' active':''}" onclick="updateDraft('navPosition','${p.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${p.icon}</svg><span class="rb-label">${p.name}</span></button>`).join('')}</div>
             </div>
             <div class="setting-group"><label>استایل پس‌زمینه نوار</label>
-                <div class="row-btns">${APP_CONFIG.navStyles.map(st=>`<button class="row-btn${s.navStyle===st.id?' active':''}" data-key="navStyle" data-value="${st.id}" onclick="updateDraft('navStyle','${st.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${st.icon}</svg><span class="rb-label">${st.name}</span></button>`).join('')}</div>
+                <div class="row-btns">${APP_CONFIG.navStyles.map(st=>`<button class="row-btn${s.navStyle===st.id?' active':''}" onclick="updateDraft('navStyle','${st.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${st.icon}</svg><span class="rb-label">${st.name}</span></button>`).join('')}</div>
             </div>
             <div class="setting-group"><label>شدت سایه نوار</label>
                 <div class="slider-row"><input type="range" min="0" max="100" step="5" value="${s.navShadowLevel||0}" oninput="updateDraft('navShadowLevel',this.value)"><span class="slider-val">${s.navShadowLevel||0}%</span></div>
@@ -1951,8 +1955,10 @@ if(!isAdmin()){
             </div>
         </div>
 
-        <div class="settings-content${settingsCat==='models'?' active':''}" data-cat="models">
-            ${modelsHTML}
+        ${admin?'<div class="settings-content'+(settingsCat==='models'?' active':'')+'" data-cat="models">'+modelsHTML+'</div>':''}
+
+        <div class="settings-content${settingsCat==='profile'?' active':''}" data-cat="profile">
+            ${profileHTML || '<div style="padding:20px;text-align:center;color:var(--text-muted)">در حال بارگذاری...</div>'}
         </div>
 
         <div class="settings-content${settingsCat==='privacy'?' active':''}" data-cat="privacy">
@@ -1995,18 +2001,94 @@ if(!isAdmin()){
                 سراج با یه ایده‌ی ساده و یهویی شروع شد؛ ایده‌ای برای اینکه یادگیری برای آدم‌های بیشتری ساده‌تر و در دسترس‌تر بشه.<br><br>
                 به دنیای سراج خوش اومدید. 🌱
             </div>
+            <div class="about-section-title">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                راه های ارتباطی
+            </div>
+            <div class="about-contacts">
+                <div class="contact-row" data-link="mailto:ranshamed.fr@gmail.com">
+                    <div class="contact-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg></div>
+                    <div class="contact-info"><div class="contact-label">ایمیل</div><div class="contact-value">ranshamed.fr@gmail.com</div></div>
+                </div>
+                <div class="contact-row" data-link="https://t.me/Ra_Nsss">
+                    <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M21 3 3 10l6 3 3 6 9-16z"/><path d="M9 13 21 3"/></svg></div>
+                    <div class="contact-info"><div class="contact-label">تلگرام</div><div class="contact-value">@Ra_Nsss</div></div>
+                </div>
+                <div class="contact-row" data-link="https://instagram.com/Hamed_Rans">
+                    <div class="contact-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div>
+                    <div class="contact-info"><div class="contact-label">اینستاگرام</div><div class="contact-value">Hamed_Rans</div></div>
+                </div>
+                <div class="contact-row" data-link="https://x.com/Hamed_Rans">
+                    <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" stroke="none"/></svg></div>
+                    <div class="contact-info"><div class="contact-label">ایکس</div><div class="contact-value">Hamed_Rans</div></div>
+                </div>
+            </div>
+            <div class="siraj-version-badge" style="text-align:center;padding:14px 0;font-size:12px;color:var(--text-muted)">
+                نسخه <span style="color:var(--accent);font-weight:900">${s.appVersion||'2.6'}</span>
+            </div>
         </div>`;
-    setTimeout(()=>{
-        document.querySelectorAll('#settingsContentWrap input[type=range]').forEach(inp=>{
+    
+    /* ★ Bind profile actions if profile pane exists */
+    setTimeout(function(){
+        document.querySelectorAll('#settingsContentWrap input[type=range]').forEach(function(inp){
             inp.setAttribute('dir','ltr');inp.style.direction='ltr';
-            const pct=((inp.value-inp.min)/(inp.max-inp.min))*100;
+            var pct=((inp.value-inp.min)/(inp.max-inp.min))*100;
             inp.style.setProperty('--slider-pct',pct+'%');
         });
         if(settingsCat==='privacy')renderSessionsList();
         bindContactLinks();
-    },0);
+        
+        /* ★ اگه تب profile فعاله، دکمه‌هاش رو bind کن */
+        var profilePaneEl = document.querySelector('.settings-content[data-cat="profile"]');
+        if(profilePaneEl){
+            var lvl = getUserLevel();
+            profilePaneEl.querySelectorAll('.level-opt').forEach(function(b){
+                b.classList.toggle('active', b.getAttribute('data-level')===lvl);
+                b.onclick=function(){
+                    var l=b.getAttribute('data-level');
+                    setUserLevel(l);
+                    profilePaneEl.querySelectorAll('.level-opt').forEach(function(x){x.classList.remove('active');});
+                    b.classList.add('active');
+                    if(window.toast) window.toast('سطح '+LEVEL_LABELS[l]+' انتخاب شد ✓','success');
+                };
+            });
+            var dv2 = getDefaultView();
+            profilePaneEl.querySelectorAll('.default-view-opt').forEach(function(b){
+                b.classList.toggle('active', b.getAttribute('data-view')===dv2);
+                b.onclick=function(){
+                    var v=b.getAttribute('data-view');
+                    setDefaultView(v);
+                    profilePaneEl.querySelectorAll('.default-view-opt').forEach(function(x){x.classList.remove('active');});
+                    b.classList.add('active');
+                    if(window.toast) window.toast('تب دیفالت: '+VIEW_LABELS[v],'success');
+                };
+            });
+            var dlvl = profilePaneEl.querySelector('#determineLevelBtn');
+            if(dlvl){
+                dlvl.onclick=function(){
+                    var m=document.getElementById('settingsModal');
+                    if(m) m.classList.remove('open');
+                    if(typeof window.switchView==='function') window.switchView('chat');
+                    setTimeout(function(){
+                        var q=document.getElementById('q');
+                        if(q){q.value='میخوام سطح عربیم رو تعیین کنی. چند سوال از آسون به سخت ازم بپرس و آخرش سطحم رو مشخص کن.';if(typeof window.handleInput==='function') window.handleInput();q.focus();}
+                    },500);
+                };
+            }
+            var sp = profilePaneEl.querySelector('#profileSaveBtn');
+            if(sp){
+                sp.onclick=function(){
+                    var p2=getProfile();
+                    p2.name=(profilePaneEl.querySelector('#profileName')||{}).value||'';
+                    p2.bio=(profilePaneEl.querySelector('#profileBio')||{}).value||'';
+                    saveProfile(p2);
+                    if(window.toast) window.toast('ذخیره شد ✓','success');
+                    if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
+                };
+            }
+        }
+    }, 30);
 }
-
 function ensureClickable(){
     const s=document.getElementById('navSlider');
     if(s){s.style.pointerEvents='none';s.style.zIndex='0';}
