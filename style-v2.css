@@ -1809,3 +1809,12 @@
   animation:none!important;
 }
 .bottom-nav-btn:not(.nav-btn-chat):not(.active){background:rgba(255,255,255,.04)}
+/* ═══════════════════════════════════════════════════════════════
+   FIX: هدر اکشن‌ها — حذف Paint Containment که باعث "کادر شدن"
+   دکمه‌های قفل/نوتیف/پروفایل موقع هاور می‌شد
+   ═══════════════════════════════════════════════════════════════ */
+.header-left-actions,
+#sirajHeaderActions{
+  contain:none!important;
+  overflow:visible!important;
+}
