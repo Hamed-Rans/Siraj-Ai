@@ -1510,10 +1510,6 @@
     box-shadow .38s cubic-bezier(.22,1,.36,1),
     transform .35s cubic-bezier(.34,1.4,.64,1)!important;
 }
-.page-empty-card:hover{
-  transform:translateY(-4px)!important;
-  box-shadow:0 28px 70px -25px rgba(0,0,0,.7),0 0 0 1px var(--accent-soft)!important;
-}
 .page-empty-icon{
   animation:emptyIconFloatAnim 4.2s ease-in-out infinite!important;
 }
@@ -1812,3 +1808,4 @@
   transform:translateY(0) scale(1)!important;
   animation:none!important;
 }
+.bottom-nav-btn:not(.nav-btn-chat):not(.active){background:rgba(255,255,255,.04)}
