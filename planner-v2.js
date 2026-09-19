@@ -518,7 +518,7 @@
     }
 
     /* ═══ HERO — دکمه برگشت الان بیرون از phc-day است ═══ */
-    function heroDaily(){
+        function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
       var key=window.dateKey(d);
@@ -532,20 +532,20 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امروز</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امروز</span></button>';
       return '<div class="planner-hero-card">'
-       +backBtn
-       +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
-       +'<div class="phc-center">'
-       +'<div class="phc-day">'
-       +'<span data-anim-key="weekday">'+esc(p.weekday)+'</span>'
-       +'<span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span>'
-       +'</div>'
-       +'<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'
-       +(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')
-       +'</div>'
-       +'<button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
-       +'</div>';
+        +backBtn
+        +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
+        +'<div class="phc-center">'
+        +'<div class="phc-day">'
+        +'<span data-anim-key="weekday">'+esc(p.weekday)+'</span>'
+        +'<span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span>'
+        +'</div>'
+        +'<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum)+'</span> <span data-anim-key="monthName">'+esc(p.monthName)+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum)+'</span></div>'
+        +(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')
+        +'</div>'
+        +'<button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
+        +'</div>';
     }
-    function heroWeekly(){
+        function heroWeekly(){
       var d=new Date(window.plannerDate||new Date());
       var days=myWeekDays();
       var p=dateParts(d);
@@ -554,9 +554,9 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این هفته</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این هفته</span></button>';
       return '<div class="planner-hero-card">'
+        +backBtn
         +'<button class="phc-nav-btn" onclick="window.__navWeek(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
-        +backBtn
         +'<div class="phc-day">'
         +'<span data-anim-key="monthName2">'+esc(p.monthName)+'</span>'
         +'<span data-anim-key="yearNum2">'+esc(p.yearNum)+'</span>'
@@ -566,7 +566,7 @@
         +'<button class="phc-nav-btn" onclick="window.__navWeek(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-    function heroMonthly(){
+        function heroMonthly(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
       var p=dateParts(d);
@@ -579,9 +579,9 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این ماه</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این ماه</span></button>';
       return '<div class="planner-hero-card">'
+        +backBtn
         +'<button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
-        +backBtn
         +'<div class="phc-day">'
         +'<span data-anim-key="monthName3">'+esc(p.monthName)+'</span>'
         +'<span data-anim-key="yearNum3">'+esc(p.yearNum)+'</span>'
@@ -591,7 +591,7 @@
         +'<button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-    function heroYearly(){
+        function heroYearly(){
       var d=new Date(window.plannerDate||new Date());
       var y=d.getFullYear();
       var pl=window.loadPlannerNew();
@@ -604,9 +604,9 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امسال</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امسال</span></button>';
       return '<div class="planner-hero-card">'
+        +backBtn
         +'<button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
-        +backBtn
         +'<div class="phc-day">'
         +'<span data-anim-key="yearNum4">'+esc(d.toLocaleDateString('fa-IR',{year:'numeric'}))+'</span>'
         +'</div>'
@@ -615,7 +615,6 @@
         +'<button class="phc-nav-btn" onclick="window.__navYear(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-
     function weekStatsHTML(){
       var pl=window.loadPlannerNew();var days=myWeekDays();
       var sm=0,dw=0,dwo=0;
