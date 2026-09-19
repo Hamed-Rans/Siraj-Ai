@@ -2517,7 +2517,6 @@ function renderSettingsControls() {
             (s.bgImage ? '<div class="setting-group"><label>شفافیت تصویر</label>' +
                 '<div class="slider-row"><input type="range" min="20" max="100" step="5" value="'+(s.bgImageOpacity||100)+'" oninput="updateDraft(\'bgImageOpacity\',this.value)"><span class="slider-val">'+(s.bgImageOpacity||100)+'%</span></div>' +
             '</div>' : ''),
-        header:        // ⬅️ این خط همچنان اینجا می‌مونه
         header:
             '<div class="setting-group"><label>پس‌زمینه هدر</label>' +
                 '<div class="row-btns">' + APP_CONFIG.headerStyles.map(h =>
