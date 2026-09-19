@@ -2819,7 +2819,7 @@
         };
       }
 
-      function frame(now){
+        function frame(now){
         raf=0;
         if(!nav||!slider) return;
         var btn=nav.querySelector('.bottom-nav-btn.active');
@@ -2829,35 +2829,35 @@
         var tg=readTarget(btn);
         var dt=lastT?Math.min(64,now-lastT):16; lastT=now;
 
-              if(!S){
-        S={l:tg.l,r:tg.r,t:tg.t,b:tg.b};
-      }else{
-        /* ★ سرعت آرام‌تر (قبلاً 45 و 95 بود) */
-        var fast=1-Math.exp(-dt/85), slow=1-Math.exp(-dt/170);
-        var right=(tg.l+tg.r)>(S.l+S.r);
-        S.r+=(tg.r-S.r)*(right?fast:slow);
-        S.l+=(tg.l-S.l)*(right?slow:fast);
-        var down=(tg.t+tg.b)>(S.t+S.b);
-        S.b+=(tg.b-S.b)*(down?fast:slow);
-        S.t+=(tg.t-S.t)*(down?slow:fast);
+        if(!S){
+          S={l:tg.l,r:tg.r,t:tg.t,b:tg.b};
+        }else{
+          var fast=1-Math.exp(-dt/85), slow=1-Math.exp(-dt/170);
+          var right=(tg.l+tg.r)>(S.l+S.r);
+          S.r+=(tg.r-S.r)*(right?fast:slow);
+          S.l+=(tg.l-S.l)*(right?slow:fast);
+          var down=(tg.t+tg.b)>(S.t+S.b);
+          S.b+=(tg.b-S.b)*(down?fast:slow);
+          S.t+=(tg.t-S.t)*(down?slow:fast);
+        }
+
+        slider.style.width=Math.max(0,S.r-S.l)+'px';
+        slider.style.height=Math.max(0,S.b-S.t)+'px';
+        imp(slider,'transform','translate3d('+S.l+'px,'+S.t+'px,0)');
+
+        var dist=Math.abs(tg.l-S.l)+Math.abs(tg.r-S.r)+Math.abs(tg.t-S.t)+Math.abs(tg.b-S.b);
+        var shouldHide=(tg.chat||collapsed);
+        if(shouldHide && dist<12){
+          imp(slider,'opacity','0');
+        } else {
+          imp(slider,'opacity','1');
+        }
+
+        var moving=dist>.4;
+        if(moving||now<settleUntil){ raf=requestAnimationFrame(frame); }
+        else{ lastT=0; }
       }
 
-      slider.style.width=Math.max(0,S.r-S.l)+'px';
-      slider.style.height=Math.max(0,S.b-S.t)+'px';
-      imp(slider,'transform','translate3d('+S.l+'px,'+S.t+'px,0)');
-
-      /* ★ اصلاح انیمیشن بین FAB چت و بقیه تب‌ها */
-      var dist=Math.abs(tg.l-S.l)+Math.abs(tg.r-S.r)+Math.abs(tg.t-S.t)+Math.abs(tg.b-S.b);
-      var shouldHide=(tg.chat||collapsed);
-      if(shouldHide && dist<12){
-        imp(slider,'opacity','0');
-      } else {
-        imp(slider,'opacity','1');
-      }
-
-      var moving=dist>.4;
-      if(moving||now<settleUntil){ raf=requestAnimationFrame(frame); }
-      else{ lastT=0; }
       function kick(snap){
         if(snap) S=null;
         settleUntil=performance.now()+900;
