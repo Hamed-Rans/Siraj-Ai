@@ -1393,8 +1393,16 @@ function lockNow(){
     ls.classList.add('open');
     const inp=document.getElementById('lockInput');
     const err=document.getElementById('lockError');
-    if(inp){inp.value='';setTimeout(()=>inp.focus(),300);}
+    if(inp){inp.value='';setTimeout(()=>inp.focus(),350);}
     if(err)err.textContent='';
+    /* ★ کلیک روی هر جای صفحه قفل → focus */
+    if(ls && !ls.dataset.clickBound){
+        ls.dataset.clickBound = '1';
+        ls.addEventListener('click', function(){
+            var inp2 = document.getElementById('lockInput');
+            if(inp2) inp2.focus();
+        });
+    }
     const hb=document.getElementById('headerLockBtn');
     if(hb){hb.classList.add('locked');hb.title='قفل است';}
 }
