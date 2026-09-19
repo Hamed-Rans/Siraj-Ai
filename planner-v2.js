@@ -944,9 +944,13 @@
         +'<div class="task-notif-head"><div class="task-notif-icon">'+icon+'</div><div class="task-notif-title">'+title+'</div></div>'
         +'<div class="task-notif-task">'+text+'</div>'
         +'<div class="task-notif-actions">'+actions+'</div>';
-      document.body.appendChild(el);
-      requestAnimationFrame(function(){ el.classList.add('show'); });
-      var close = function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 450); };
+            document.body.appendChild(el);
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          el.classList.add('show');
+        });
+      });
+      var close = function(){ el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 550); };
       el.querySelector('#nlClose').onclick = close;
       el.querySelector('#nlYes').onclick = function(){ close(); markTaskDone(n.taskId, n.dayKey); markNotifAnswered(n.id); };
       if(n.type === 'pre'){
@@ -1182,7 +1186,11 @@
         +'<div class="notif-tabs" id="notifTabs"></div>'
         +'<div class="notif-list" id="notifList"></div>';
       document.body.appendChild(panel);
-      requestAnimationFrame(function(){ panel.classList.add('open'); });
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          panel.classList.add('open');
+        });
+      });
       panel.querySelector('#notifClearBtn').onclick = function(e){
         e.stopPropagation();
         saveNotifHistory([]);
