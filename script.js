@@ -180,7 +180,6 @@ const DEV_NOTIF_SEEN_KEY = 'siraj-dev-notif-seen';
 const DEV_NOTIF_CACHE_KEY = 'siraj-dev-notif-cache';
 const ADMIN_KEY = 'siraj_is_admin';
 
-/* ★ کلیدها و متغیرهای گمشده */
 const LEVEL_KEY = 'siraj-user-level';
 const DEFAULT_VIEW_KEY = 'siraj-default-view';
 const PROFILE_KEY = 'siraj-profile';
@@ -188,7 +187,6 @@ const PROFILE_KEY = 'siraj-profile';
 const LEVEL_LABELS = { beginner: 'مبتدی', intermediate: 'متوسط', advanced: 'پیشرفته' };
 const VIEW_LABELS = { chat: 'گفتگو', planner: 'برنامه‌ریز', blog: 'مقالات', videos: 'دیوان', tools: 'دستیار' };
 
-/* ★ توابع سراسری پروفایل و سطح */
 function getUserLevel() { try { return localStorage.getItem(LEVEL_KEY) || 'beginner'; } catch (e) { return 'beginner'; } }
 function setUserLevel(l) { try { localStorage.setItem(LEVEL_KEY, l); } catch (e) {} }
 function getDefaultView() { try { return localStorage.getItem(DEFAULT_VIEW_KEY) || 'chat'; } catch (e) { return 'chat'; } }
@@ -2397,107 +2395,132 @@ function renderSettingsControls() {
 
     wrap.innerHTML =
         '<div class="settings-content' + (settingsCat === 'appearance' ? ' active' : '') + '" data-cat="appearance">' +
-            '<div class="settings-subtabs">' +
-                '<button class="settings-subtab' + (subState === 'general' ? ' active' : '') + '" onclick="window._settingsSub=\'general\';renderSettingsControls();">تم و رنگ</button>' +
-                '<button class="settings-subtab' + (subState === 'header' ? ' active' : '') + '" onclick="window._settingsSub=\'header\';renderSettingsControls();">هدر و المان</button>' +
-                '<button class="settings-subtab' + (subState === 'pattern' ? ' active' : '') + '" onclick="window._settingsSub=\'pattern\';renderSettingsControls();">طرح</button>' +
-                '<button class="settings-subtab' + (subState === 'font' ? ' active' : '') + '" onclick="window._settingsSub=\'font\';renderSettingsControls();">فونت</button>' +
-            '</div>' +
+            '<div class="settings-accordion">' +
 
-            '<div class="settings-subcontent' + (subState === 'general' ? ' active' : '') + '" data-sub="general">' +
-                '<div class="setting-group"><label>حالت نمایش</label>' +
-                    '<div class="row-btns">' +
-                        '<button class="row-btn' + (s.themeMode === 'dark' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'dark\')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>' +
-                        '<button class="row-btn' + (s.themeMode === 'light' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'light\')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg><span class="rb-label">روز</span></button>' +
-                        '<button class="row-btn' + (s.themeMode === 'midnight' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'midnight\')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" fill="currentColor" fill-opacity=".35"/><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>' +
-                    '</div>' +
+                /* ═══ ۱) تم و رنگ ═══ */
+                '<div class="settings-acc-item' + (subState === 'general' ? ' active' : '') + '" data-sub="general">' +
+                    '<button type="button" class="settings-acc-trigger" onclick="toggleSettingsSub(\'general\')">' +
+                        '<span class="settings-acc-title">تم و رنگ</span>' +
+                        '<svg class="settings-acc-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
+                    '</button>' +
+                    '<div class="settings-acc-panel"><div class="settings-acc-panel-inner"><div class="settings-acc-panel-content">' +
+                        '<div class="setting-group"><label>حالت نمایش</label>' +
+                            '<div class="row-btns">' +
+                                '<button class="row-btn' + (s.themeMode === 'dark' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'dark\')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span class="rb-label">شب</span></button>' +
+                                '<button class="row-btn' + (s.themeMode === 'light' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'light\')"><svg class="rb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2"/></svg><span class="rb-label">روز</span></button>' +
+                                '<button class="row-btn' + (s.themeMode === 'midnight' ? ' active' : '') + '" onclick="updateDraft(\'themeMode\',\'midnight\')"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" fill="currentColor" fill-opacity=".35"/><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg><span class="rb-label">نیمه‌شب</span></button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>رنگ اصلی</label>' +
+                            '<div class="color-row">' + APP_CONFIG.themeColors.map(c =>
+                                '<div class="color-opt' + (s.themeColor === c ? ' active' : '') + '" onclick="updateDraft(\'themeColor\',\'' + c + '\')"><div class="color-orb" data-color="' + c + '"><svg viewBox="0 0 24 24">' + APP_CONFIG.colorIcons[c] + '</svg></div><div class="color-label">' + APP_CONFIG.colorNames[c] + '</div></div>'
+                            ).join('') + '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>شکل حباب</label>' +
+                            '<div class="row-btns">' + APP_CONFIG.bubbleShapes.map(b =>
+                                '<button class="row-btn' + (s.bubbleShape === b.id ? ' active' : '') + '" onclick="updateDraft(\'bubbleShape\',\'' + b.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + b.icon + '</svg><span class="rb-label">' + b.name + '</span></button>'
+                            ).join('') + '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>اندازه متن</label>' +
+                            '<div class="row-btns">' + ['13px', '15px', '17px', '19px'].map((f, i) =>
+                                '<button class="row-btn' + (s.fontSize === f ? ' active' : '') + '" onclick="updateDraft(\'fontSize\',\'' + f + '\')"><span class="rb-label">' + ['کوچیک', 'معمولی', 'درشت', 'بزرگ'][i] + '</span></button>'
+                            ).join('') + '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>سرعت انیمیشن</label>' +
+                            '<div class="row-btns">' + APP_CONFIG.animations.map(a =>
+                                '<button class="row-btn' + (s.animation === a.id ? ' active' : '') + '" onclick="updateDraft(\'animation\',\'' + a.id + '\')"><span class="rb-label">' + a.name + '</span></button>'
+                            ).join('') + '</div>' +
+                        '</div>' +
+                    '</div></div></div>' +
                 '</div>' +
-                '<div class="setting-group"><label>رنگ اصلی</label>' +
-                    '<div class="color-row">' + APP_CONFIG.themeColors.map(c =>
-                        '<div class="color-opt' + (s.themeColor === c ? ' active' : '') + '" onclick="updateDraft(\'themeColor\',\'' + c + '\')"><div class="color-orb" data-color="' + c + '"><svg viewBox="0 0 24 24">' + APP_CONFIG.colorIcons[c] + '</svg></div><div class="color-label">' + APP_CONFIG.colorNames[c] + '</div></div>'
-                    ).join('') + '</div>' +
-                '</div>' +
-                '<div class="setting-group"><label>شکل حباب</label>' +
-                    '<div class="row-btns">' + APP_CONFIG.bubbleShapes.map(b =>
-                        '<button class="row-btn' + (s.bubbleShape === b.id ? ' active' : '') + '" onclick="updateDraft(\'bubbleShape\',\'' + b.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + b.icon + '</svg><span class="rb-label">' + b.name + '</span></button>'
-                    ).join('') + '</div>' +
-                '</div>' +
-                '<div class="setting-group"><label>اندازه متن</label>' +
-                    '<div class="row-btns">' + ['13px', '15px', '17px', '19px'].map((f, i) =>
-                        '<button class="row-btn' + (s.fontSize === f ? ' active' : '') + '" onclick="updateDraft(\'fontSize\',\'' + f + '\')"><span class="rb-label">' + ['کوچیک', 'معمولی', 'درشت', 'بزرگ'][i] + '</span></button>'
-                    ).join('') + '</div>' +
-                '</div>' +
-                '<div class="setting-group"><label>سرعت انیمیشن</label>' +
-                    '<div class="row-btns">' + APP_CONFIG.animations.map(a =>
-                        '<button class="row-btn' + (s.animation === a.id ? ' active' : '') + '" onclick="updateDraft(\'animation\',\'' + a.id + '\')"><span class="rb-label">' + a.name + '</span></button>'
-                    ).join('') + '</div>' +
-                '</div>' +
-            '</div>' +
 
-            '<div class="settings-subcontent' + (subState === 'header' ? ' active' : '') + '" data-sub="header">' +
-                '<div class="setting-group"><label>پس‌زمینه هدر</label>' +
-                    '<div class="row-btns">' + APP_CONFIG.headerStyles.map(h =>
-                        '<button class="row-btn' + (s.headerStyle === h.id ? ' active' : '') + '" onclick="updateDraft(\'headerStyle\',\'' + h.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + h.icon + '</svg><span class="rb-label">' + h.name + '</span></button>'
-                    ).join('') + '</div>' +
+                /* ═══ ۲) هدر و المان ═══ */
+                '<div class="settings-acc-item' + (subState === 'header' ? ' active' : '') + '" data-sub="header">' +
+                    '<button type="button" class="settings-acc-trigger" onclick="toggleSettingsSub(\'header\')">' +
+                        '<span class="settings-acc-title">هدر و المان</span>' +
+                        '<svg class="settings-acc-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
+                    '</button>' +
+                    '<div class="settings-acc-panel"><div class="settings-acc-panel-inner"><div class="settings-acc-panel-content">' +
+                        '<div class="setting-group"><label>پس‌زمینه هدر</label>' +
+                            '<div class="row-btns">' + APP_CONFIG.headerStyles.map(h =>
+                                '<button class="row-btn' + (s.headerStyle === h.id ? ' active' : '') + '" onclick="updateDraft(\'headerStyle\',\'' + h.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + h.icon + '</svg><span class="rb-label">' + h.name + '</span></button>'
+                            ).join('') + '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>نوار نوشتن پیام</label>' +
+                            '<div class="row-btns">' + APP_CONFIG.inputStyles.map(i =>
+                                '<button class="row-btn' + (s.inputStyle === i.id ? ' active' : '') + '" onclick="updateDraft(\'inputStyle\',\'' + i.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + i.icon + '</svg><span class="rb-label">' + i.name + '</span></button>'
+                            ).join('') + '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>استایل المان‌ها</label>' +
+                            '<div class="row-btns">' + APP_CONFIG.elementStyles.map(el =>
+                                '<button class="row-btn' + (s.elementStyle === el.id ? ' active' : '') + '" onclick="updateDraft(\'elementStyle\',\'' + el.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + el.icon + '</svg><span class="rb-label">' + el.name + '</span></button>'
+                            ).join('') + '</div>' +
+                        '</div>' +
+                    '</div></div></div>' +
                 '</div>' +
-                '<div class="setting-group"><label>نوار نوشتن پیام</label>' +
-                    '<div class="row-btns">' + APP_CONFIG.inputStyles.map(i =>
-                        '<button class="row-btn' + (s.inputStyle === i.id ? ' active' : '') + '" onclick="updateDraft(\'inputStyle\',\'' + i.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + i.icon + '</svg><span class="rb-label">' + i.name + '</span></button>'
-                    ).join('') + '</div>' +
-                '</div>' +
-                '<div class="setting-group"><label>استایل المان‌ها</label>' +
-                    '<div class="row-btns">' + APP_CONFIG.elementStyles.map(el =>
-                        '<button class="row-btn' + (s.elementStyle === el.id ? ' active' : '') + '" onclick="updateDraft(\'elementStyle\',\'' + el.id + '\')"><svg class="rb-icon" viewBox="0 0 24 24">' + el.icon + '</svg><span class="rb-label">' + el.name + '</span></button>'
-                    ).join('') + '</div>' +
-                '</div>' +
-            '</div>' +
 
-            '<div class="settings-subcontent' + (subState === 'pattern' ? ' active' : '') + '" data-sub="pattern">' +
-                '<div class="setting-group"><label>انتخاب طرح</label>' +
-                    '<div class="pattern-grid">' + APP_CONFIG.patterns.map(pat =>
-                        '<div class="pattern-opt' + (s.pattern === pat.id ? ' active' : '') + '" onclick="updateDraft(\'pattern\',\'' + pat.id + '\')"><div class="pattern-thumb th-' + pat.id + '"></div><div class="pattern-name">' + pat.name + '</div></div>'
-                    ).join('') + '</div>' +
+                /* ═══ ۳) طرح ═══ */
+                '<div class="settings-acc-item' + (subState === 'pattern' ? ' active' : '') + '" data-sub="pattern">' +
+                    '<button type="button" class="settings-acc-trigger" onclick="toggleSettingsSub(\'pattern\')">' +
+                        '<span class="settings-acc-title">طرح</span>' +
+                        '<svg class="settings-acc-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
+                    '</button>' +
+                    '<div class="settings-acc-panel"><div class="settings-acc-panel-inner"><div class="settings-acc-panel-content">' +
+                        '<div class="setting-group"><label>انتخاب طرح</label>' +
+                            '<div class="pattern-grid">' + APP_CONFIG.patterns.map(pat =>
+                                '<div class="pattern-opt' + (s.pattern === pat.id ? ' active' : '') + '" onclick="updateDraft(\'pattern\',\'' + pat.id + '\')"><div class="pattern-thumb th-' + pat.id + '"></div><div class="pattern-name">' + pat.name + '</div></div>'
+                            ).join('') + '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>رنگ‌های آماده طرح</label>' +
+                            '<div class="pattern-preset-colors">' +
+                                APP_CONFIG.patternPresets.map(function (pr) {
+                                    var isActive = s.patternColor1 === pr.c1 && s.patternColor2 === pr.c2;
+                                    return '<div class="pattern-preset' + (isActive ? ' active' : '') + '" title="' + pr.n + '" onclick="updateDraft(\'patternColor1\',\'' + pr.c1 + '\');updateDraft(\'patternColor2\',\'' + pr.c2 + '\')" style="background:linear-gradient(135deg,' + pr.c1 + ' 0%,' + pr.c1 + ' 50%,' + pr.c2 + ' 50%,' + pr.c2 + ' 100%)"></div>';
+                                }).join('') +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>موقعیت</label>' +
+                            '<div class="row-btns">' +
+                                '<button class="row-btn' + (s.patternPosition === 'both' ? ' active' : '') + '" onclick="updateDraft(\'patternPosition\',\'both\')"><span class="rb-label">دو گوشه</span></button>' +
+                                '<button class="row-btn' + (s.patternPosition === 'reverse' ? ' active' : '') + '" onclick="updateDraft(\'patternPosition\',\'reverse\')"><span class="rb-label">برعکس</span></button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>تعداد در گوشه</label>' +
+                            '<div class="slider-row"><input type="range" min="1" max="8" step="1" value="' + s.patternPerCorner + '" oninput="updateDraft(\'patternPerCorner\',this.value)"><span class="slider-val">' + s.patternPerCorner + '×</span></div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>اندازه</label>' +
+                            '<div class="slider-row"><input type="range" min="60" max="350" step="10" value="' + s.patternSize + '" oninput="updateDraft(\'patternSize\',this.value)"><span class="slider-val">' + s.patternSize + 'px</span></div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>شفافیت</label>' +
+                            '<div class="slider-row"><input type="range" min="10" max="100" step="5" value="' + s.patternOpacity + '" oninput="updateDraft(\'patternOpacity\',this.value)"><span class="slider-val">' + s.patternOpacity + '%</span></div>' +
+                        '</div>' +
+                        '<div class="setting-group"><label>رنگ‌های دلخواه</label>' +
+                            '<div class="color-picker-row">' +
+                                '<div class="color-picker-wrap"><label>رنگ ۱</label><input type="color" value="' + s.patternColor1 + '" oninput="updateDraft(\'patternColor1\',this.value)"></div>' +
+                                '<div class="color-picker-wrap"><label>رنگ ۲</label><input type="color" value="' + s.patternColor2 + '" oninput="updateDraft(\'patternColor2\',this.value)"></div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div></div></div>' +
                 '</div>' +
-                '<div class="setting-group"><label>رنگ‌های آماده طرح</label>' +
-                    '<div class="pattern-preset-colors">' +
-                        APP_CONFIG.patternPresets.map(function (pr) {
-                            var isActive = s.patternColor1 === pr.c1 && s.patternColor2 === pr.c2;
-                            return '<div class="pattern-preset' + (isActive ? ' active' : '') + '" title="' + pr.n + '" onclick="updateDraft(\'patternColor1\',\'' + pr.c1 + '\');updateDraft(\'patternColor2\',\'' + pr.c2 + '\')" style="background:linear-gradient(135deg,' + pr.c1 + ' 0%,' + pr.c1 + ' 50%,' + pr.c2 + ' 50%,' + pr.c2 + ' 100%)"></div>';
-                        }).join('') +
-                    '</div>' +
-                '</div>' +
-                '<div class="setting-group"><label>موقعیت</label>' +
-                    '<div class="row-btns">' +
-                        '<button class="row-btn' + (s.patternPosition === 'both' ? ' active' : '') + '" onclick="updateDraft(\'patternPosition\',\'both\')"><span class="rb-label">دو گوشه</span></button>' +
-                        '<button class="row-btn' + (s.patternPosition === 'reverse' ? ' active' : '') + '" onclick="updateDraft(\'patternPosition\',\'reverse\')"><span class="rb-label">برعکس</span></button>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="setting-group"><label>تعداد در گوشه</label>' +
-                    '<div class="slider-row"><input type="range" min="1" max="8" step="1" value="' + s.patternPerCorner + '" oninput="updateDraft(\'patternPerCorner\',this.value)"><span class="slider-val">' + s.patternPerCorner + '×</span></div>' +
-                '</div>' +
-                '<div class="setting-group"><label>اندازه</label>' +
-                    '<div class="slider-row"><input type="range" min="60" max="350" step="10" value="' + s.patternSize + '" oninput="updateDraft(\'patternSize\',this.value)"><span class="slider-val">' + s.patternSize + 'px</span></div>' +
-                '</div>' +
-                '<div class="setting-group"><label>شفافیت</label>' +
-                    '<div class="slider-row"><input type="range" min="10" max="100" step="5" value="' + s.patternOpacity + '" oninput="updateDraft(\'patternOpacity\',this.value)"><span class="slider-val">' + s.patternOpacity + '%</span></div>' +
-                '</div>' +
-                '<div class="setting-group"><label>رنگ‌های دلخواه</label>' +
-                    '<div class="color-picker-row">' +
-                        '<div class="color-picker-wrap"><label>رنگ ۱</label><input type="color" value="' + s.patternColor1 + '" oninput="updateDraft(\'patternColor1\',this.value)"></div>' +
-                        '<div class="color-picker-wrap"><label>رنگ ۲</label><input type="color" value="' + s.patternColor2 + '" oninput="updateDraft(\'patternColor2\',this.value)"></div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
 
-            '<div class="settings-subcontent' + (subState === 'font' ? ' active' : '') + '" data-sub="font">' +
-                '<div class="setting-group">' +
-                    '<div class="group-subtitle">فونت‌های فارسی</div>' +
-                    '<div class="row-btns">' + APP_CONFIG.fonts.persian.map(fontRow).join('') + '</div>' +
-                    '<div class="group-subtitle">فونت‌های عربی</div>' +
-                    '<div class="row-btns">' + APP_CONFIG.fonts.arabic.map(fontRow).join('') + '</div>' +
-                    '<div class="group-subtitle">فونت‌های انگلیسی</div>' +
-                    '<div class="row-btns">' + APP_CONFIG.fonts.english.map(fontRow).join('') + '</div>' +
+                /* ═══ ۴) فونت ═══ */
+                '<div class="settings-acc-item' + (subState === 'font' ? ' active' : '') + '" data-sub="font">' +
+                    '<button type="button" class="settings-acc-trigger" onclick="toggleSettingsSub(\'font\')">' +
+                        '<span class="settings-acc-title">فونت</span>' +
+                        '<svg class="settings-acc-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
+                    '</button>' +
+                    '<div class="settings-acc-panel"><div class="settings-acc-panel-inner"><div class="settings-acc-panel-content">' +
+                        '<div class="setting-group">' +
+                            '<div class="group-subtitle">فونت‌های فارسی</div>' +
+                            '<div class="row-btns">' + APP_CONFIG.fonts.persian.map(fontRow).join('') + '</div>' +
+                            '<div class="group-subtitle">فونت‌های عربی</div>' +
+                            '<div class="row-btns">' + APP_CONFIG.fonts.arabic.map(fontRow).join('') + '</div>' +
+                            '<div class="group-subtitle">فونت‌های انگلیسی</div>' +
+                            '<div class="row-btns">' + APP_CONFIG.fonts.english.map(fontRow).join('') + '</div>' +
+                        '</div>' +
+                    '</div></div></div>' +
                 '</div>' +
+
             '</div>' +
         '</div>' +
 
@@ -2681,6 +2704,31 @@ function renderSettingsControls() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   SETTINGS ACCORDION — باز/بسته کردن زیر‌دسته‌های ظاهر
+   ═══════════════════════════════════════════════════════════════ */
+window.toggleSettingsSub = function (sub) {
+    var content = document.querySelector('.settings-content[data-cat="appearance"]');
+    if (!content) return;
+    var items = content.querySelectorAll('.settings-acc-item');
+    var target = null;
+    items.forEach(function (it) {
+        if (it.getAttribute('data-sub') === sub) target = it;
+    });
+    if (!target) return;
+
+    var wasActive = target.classList.contains('active');
+
+    items.forEach(function (it) { it.classList.remove('active'); });
+
+    if (!wasActive) {
+        target.classList.add('active');
+        window._settingsSub = sub;
+    } else {
+        window._settingsSub = '';
+    }
+};
+
+/* ═══════════════════════════════════════════════════════════════
    CLICKABLE
    ═══════════════════════════════════════════════════════════════ */
 function ensureClickable() {
@@ -2850,7 +2898,6 @@ window.addEventListener('appinstalled', function () {
    INIT
    ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('load', () => {
-    /* ★ اسپلش با حداقل زمان نمایش */
     var splashStart = Date.now();
     var splashMinTime = 1200;
     var tryHideSplash = function () {
