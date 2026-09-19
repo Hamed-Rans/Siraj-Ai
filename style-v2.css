@@ -1603,3 +1603,212 @@
   }
   .nav-slider-fill::after{animation:none!important}
 }
+/* ═══ FIX 1: Nav Slider ═══ */
+.nav-slider{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  pointer-events:none!important;
+  z-index:0!important;
+  opacity:0;
+  background:transparent!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  transition:
+    left .5s cubic-bezier(.22,1,.36,1),
+    top .5s cubic-bezier(.22,1,.36,1),
+    width .5s cubic-bezier(.22,1,.36,1),
+    height .5s cubic-bezier(.22,1,.36,1),
+    opacity .28s ease!important;
+  will-change:left,top,width,height!important;
+  backface-visibility:hidden!important;
+  contain:none!important;
+}
+.nav-slider.visible{opacity:1!important}
+.nav-slider-fill{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent),var(--accent-dark))!important;
+  border-radius:20px!important;
+  box-shadow:
+    0 8px 24px -8px var(--accent),
+    0 2px 8px -2px var(--accent-soft)!important;
+  transform-origin:center!important;
+  transition:border-radius .3s ease!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+/* shine رو حذف کن چون مشکوک بود */
+.nav-slider-fill::after,
+.nav-slider-fill::before{display:none!important}
+[data-nav-position="left"] .nav-slider-fill,
+[data-nav-position="right"] .nav-slider-fill{border-radius:18px!important}
+/* ═══ FIX 2: Header Structure ═══ */
+.chat-header{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  min-height:56px!important;
+  padding:10px 16px 10px 110px!important;
+}
+.chat-header .header-brand{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  gap:10px!important;
+  flex:1!important;
+  min-width:0!important;
+}
+.chat-header .brand-logo-wrap{
+  width:52px!important;
+  height:52px!important;
+  flex-shrink:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.chat-header .brand-logo-wrap img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+}
+.chat-header .brand-text{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  min-width:0!important;
+  flex:1!important;
+}
+.chat-header .brand-text h1{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:baseline!important;
+  gap:6px!important;
+}
+.header-left-actions,
+#sirajHeaderActions{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  z-index:100!important;
+}
+.header-left-actions .main-top-avatar,
+.header-left-actions .main-top-icon-btn,
+#sirajHeaderActions .main-top-avatar,
+#sirajHeaderActions .main-top-icon-btn{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+/* ═══ FIX 3: View Transitions (Smart Direction, All Pages) ═══ */
+.view.leaving.view-out-right{
+  animation:viewOutRightStrong .28s cubic-bezier(.4,0,.6,1) forwards!important;
+  pointer-events:none!important;
+}
+.view.leaving.view-out-left{
+  animation:viewOutLeftStrong .28s cubic-bezier(.4,0,.6,1) forwards!important;
+  pointer-events:none!important;
+}
+.view.active.view-in-from-left{
+  animation:viewInFromLeftStrong .5s cubic-bezier(.22,1,.36,1) both!important;
+}
+.view.active.view-in-from-right{
+  animation:viewInFromRightStrong .5s cubic-bezier(.22,1,.36,1) both!important;
+}
+
+@keyframes viewOutRightStrong{
+  0%{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}
+  100%{opacity:0;transform:translateX(80px) scale(.96);filter:blur(6px)}
+}
+@keyframes viewOutLeftStrong{
+  0%{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}
+  100%{opacity:0;transform:translateX(-80px) scale(.96);filter:blur(6px)}
+}
+@keyframes viewInFromLeftStrong{
+  0%{opacity:0;transform:translateX(-80px) scale(.96);filter:blur(6px)}
+  60%{filter:blur(0)}
+  100%{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}
+}
+@keyframes viewInFromRightStrong{
+  0%{opacity:0;transform:translateX(80px) scale(.96);filter:blur(6px)}
+  60%{filter:blur(0)}
+  100%{opacity:1;transform:translateX(0) scale(1);filter:blur(0)}
+}
+
+/* حالت عمودی نوار چپ/راست */
+[data-nav-position="left"] .view.leaving.view-out-right,
+[data-nav-position="right"] .view.leaving.view-out-right{
+  animation:viewOutBottomStrong .28s cubic-bezier(.4,0,.6,1) forwards!important;
+}
+[data-nav-position="left"] .view.leaving.view-out-left,
+[data-nav-position="right"] .view.leaving.view-out-left{
+  animation:viewOutTopStrong .28s cubic-bezier(.4,0,.6,1) forwards!important;
+}
+[data-nav-position="left"] .view.active.view-in-from-left,
+[data-nav-position="right"] .view.active.view-in-from-left{
+  animation:viewInFromTopStrong .5s cubic-bezier(.22,1,.36,1) both!important;
+}
+[data-nav-position="left"] .view.active.view-in-from-right,
+[data-nav-position="right"] .view.active.view-in-from-right{
+  animation:viewInFromBottomStrong .5s cubic-bezier(.22,1,.36,1) both!important;
+}
+@keyframes viewOutTopStrong{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(-60px) scale(.96)}
+}
+@keyframes viewOutBottomStrong{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:0;transform:translateY(60px) scale(.96)}
+}
+@keyframes viewInFromTopStrong{
+  0%{opacity:0;transform:translateY(-60px) scale(.96);filter:blur(6px)}
+  60%{filter:blur(0)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+@keyframes viewInFromBottomStrong{
+  0%{opacity:0;transform:translateY(60px) scale(.96);filter:blur(6px)}
+  60%{filter:blur(0)}
+  100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+/* ═══ FIX 5: Dropdown Panel Symmetric Open/Close ═══ */
+.dd-panel{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  transform:translateY(10px) scale(.92)!important;
+  transform-origin:bottom right!important;
+  transition:
+    opacity .35s cubic-bezier(.4,0,.2,1),
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    visibility .35s!important;
+  animation:none!important;
+}
+.dropdown.open .dd-panel{
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+  transform:translateY(0) scale(1)!important;
+  animation:none!important;
+}
+
+/* سیرج سلکت هم همین‌طور */
+.siraj-select-panel{
+  opacity:0!important;
+  visibility:hidden!important;
+  transform:translateY(-10px) scale(.92)!important;
+  transform-origin:top right!important;
+  transition:
+    opacity .35s cubic-bezier(.4,0,.2,1),
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    visibility .35s!important;
+  animation:none!important;
+}
+.siraj-select.open .siraj-select-panel{
+  opacity:1!important;
+  visibility:visible!important;
+  transform:translateY(0) scale(1)!important;
+  animation:none!important;
+}
