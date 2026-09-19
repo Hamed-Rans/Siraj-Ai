@@ -1,4 +1,4 @@
-/* Siraj v2.0 — planner-v2.js (v3.0 Final) */
+/* Siraj v2.0 — planner-v2.js (v3.1 Final) */
 (function(){
   'use strict';
 
@@ -33,7 +33,7 @@
     };
 
     var LEVEL_LABELS = {beginner:'مبتدی', intermediate:'متوسط', advanced:'پیشرفته'};
-    var VIEW_LABELS  = {chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'انجمن', tools:'دستیار'};
+    var VIEW_LABELS  = {chat:'گفتگو', planner:'برنامه‌ریز', blog:'مقالات', videos:'محفل', tools:'دستیار'};
 
     if(typeof window._plannerNavState === 'undefined'){
       window._plannerNavState = { daily:false, weekly:false, monthly:false, yearly:false };
@@ -134,6 +134,7 @@
     }
 
     function toFa(n){var fa=['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];return String(n).replace(/\d/g,function(d){return fa[+d];});}
+    function toFaPl(n){return toFa(n);}
     function formatMinutes(mins){mins=Math.max(0,Math.round(mins));if(mins<60)return toFa(mins)+' دقیقه';var h=Math.floor(mins/60),m=mins%60;if(m===0)return toFa(h)+' ساعت';return toFa(h)+' ساعت و '+toFa(m)+' دقیقه';}
     function formatTimer(mins){mins=Math.max(0,Math.round(mins));var h=Math.floor(mins/60),m=mins%60;return toFa(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'));}
     function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -818,12 +819,13 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NOTIFICATION SYSTEM v3.0
+       NOTIFICATION SYSTEM v3.1
        ═══════════════════════════════════════════════════════════════ */
     var NOTIF_KEY      = 'siraj-notif-history';
     var NOTIF_SEEN_KEY = 'siraj-notif-seen';
     var NOTIF_PRE_KEY  = 'siraj_notif_pre_';
     var NOTIF_END_KEY  = 'siraj_notif_end_';
+    var _notifTab      = 'all';
 
     function timeAgoShort(ts){
       var d = Date.now() - ts;
@@ -938,10 +940,11 @@
       }catch(e){ console.warn('[NotifCheck]', e); }
     }
 
+    /* ★ نوتیف سیستمی فقط وقتی تب مخفی یا غیرفعاله */
     function fireNotification(n){
       addNotifToHistory(n);
       showNotifLivePopup(n);
-      if('Notification' in window && Notification.permission === 'granted'){
+      if(document.hidden && 'Notification' in window && Notification.permission === 'granted'){
         try{
           var title = n.type === 'pre' ? '⏰ یادآور کار' : '🔔 پایان زمان کار';
           var body  = n.type === 'pre'
@@ -1095,17 +1098,36 @@
       el.querySelector('#ncpKeep').onclick = close;
     }
 
+    /* ★ رندر پنل با تب‌های خوانده/نخوانده */
     function renderNotifPanel(){
       var list = document.getElementById('notifList');
       if(!list) return;
-      var history = loadNotifHistory().slice().reverse();
+      var all = loadNotifHistory();
+      var seen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
+      var unreadList = all.filter(function(n){ return (n.ts||0) > seen; });
+      var readList = all.filter(function(n){ return (n.ts||0) <= seen; });
+      var history;
+      if(_notifTab === 'unread') history = unreadList.slice().reverse();
+      else if(_notifTab === 'read') history = readList.slice().reverse();
+      else history = all.slice().reverse();
+
+      var tabsEl = document.getElementById('notifTabs');
+      if(tabsEl){
+        tabsEl.innerHTML =
+          '<button class="notif-tab'+(_notifTab==='all'?' active':'')+'" onclick="window.__setNotifTab(\'all\')">همه <span class="notif-tab-count">'+toFaPl(all.length)+'</span></button>'
+          +'<button class="notif-tab'+(_notifTab==='unread'?' active':'')+'" onclick="window.__setNotifTab(\'unread\')">نخوانده <span class="notif-tab-count">'+toFaPl(unreadList.length)+'</span></button>'
+          +'<button class="notif-tab'+(_notifTab==='read'?' active':'')+'" onclick="window.__setNotifTab(\'read\')">خوانده <span class="notif-tab-count">'+toFaPl(readList.length)+'</span></button>';
+      }
+
       if(history.length === 0){
-        list.innerHTML = '<div class="notif-empty"><span class="emoji">🔔</span>هنوز اعلانی نداری</div>';
+        var emptyMsg = _notifTab === 'unread' ? 'اعلان نخوانده نداری' : _notifTab === 'read' ? 'اعلان خوانده‌شده نداری' : 'هنوز اعلانی نداری';
+        list.innerHTML = '<div class="notif-empty"><span class="emoji">🔔</span>'+emptyMsg+'</div>';
         return;
       }
-      var seen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
+
       list.innerHTML = history.map(function(n){
-        var unread = (n.ts||0) > seen ? ' unread' : '';
+        var isUnread = (n.ts||0) > seen;
+        var unread = isUnread ? ' unread' : '';
         var typeCls = n.type === 'pre' ? ' notif-pre' : n.type === 'end' ? ' notif-end' : n.type === 'dev' ? ' notif-dev' : '';
         var icon = n.emoji || (n.type === 'pre' ? '⏰' : n.type === 'end' ? '🔔' : '📢');
         var title = n.type === 'pre' ? 'یادآور کار' : n.type === 'end' ? 'پایان زمان کار' : (n.title || 'اعلان از سراج');
@@ -1118,17 +1140,17 @@
         if(!n.answered && n.type !== 'dev'){
           if(n.type === 'pre'){
             actions = '<div class="notif-item-actions">'
-              +'<button class="notif-btn yes" onclick="window.__notifDone(\''+n.id+'\')">✓ انجام دادم</button>'
-              +'<button class="notif-btn reschedule" onclick="window.__notifResched(\''+n.id+'\')">⏰ انتقال</button>'
+              +'<button class="notif-btn yes" onclick="event.stopPropagation();window.__notifDone(\''+n.id+'\')">✓ انجام دادم</button>'
+              +'<button class="notif-btn reschedule" onclick="event.stopPropagation();window.__notifResched(\''+n.id+'\')">⏰ انتقال</button>'
               +'</div>';
           } else if(n.type === 'end'){
             actions = '<div class="notif-item-actions">'
-              +'<button class="notif-btn yes" onclick="window.__notifDone(\''+n.id+'\')">✓ انجام دادم</button>'
-              +'<button class="notif-btn no" onclick="window.__notifNo(\''+n.id+'\')">✗ نه</button>'
+              +'<button class="notif-btn yes" onclick="event.stopPropagation();window.__notifDone(\''+n.id+'\')">✓ انجام دادم</button>'
+              +'<button class="notif-btn no" onclick="event.stopPropagation();window.__notifNo(\''+n.id+'\')">✗ نه</button>'
               +'</div>';
           }
         }
-        return '<div class="notif-item'+unread+typeCls+'">'
+        return '<div class="notif-item'+unread+typeCls+'" onclick="window.__markOneNotifRead(\''+n.id+'\')">'
           +'<div class="notif-item-head">'
           +'<span class="notif-item-icon">'+icon+'</span>'
           +'<span class="notif-item-title">'+title+'</span>'
@@ -1139,6 +1161,29 @@
           +'</div>';
       }).join('');
     }
+
+    /* ★ تغییر تب فعال */
+    window.__setNotifTab = function(t){
+      _notifTab = t;
+      renderNotifPanel();
+    };
+
+    /* ★ علامت‌گذاری یک نوتیف به‌عنوان خوانده‌شده (با کلیک روش) */
+    window.__markOneNotifRead = function(id){
+      var list = loadNotifHistory();
+      var n = list.find(function(x){ return x.id === id; });
+      if(!n) return;
+      if(!n.readAt){
+        n.readAt = Date.now();
+        saveNotifHistory(list);
+        var currentSeen = parseInt(localStorage.getItem(NOTIF_SEEN_KEY)||'0');
+        if(n.ts > currentSeen){
+          localStorage.setItem(NOTIF_SEEN_KEY, String(Math.min(n.ts, Date.now())));
+        }
+        updateNotifBadge();
+        renderNotifPanel();
+      }
+    };
 
     function __notifOutsideClose(e){
       var p = document.getElementById('notifPanel');
@@ -1172,6 +1217,7 @@
         +'<div class="notif-header-title">🔔 اعلان‌ها</div>'
         +'<button class="notif-clear-btn" id="notifClearBtn">پاک کردن</button>'
         +'</div>'
+        +'<div class="notif-tabs" id="notifTabs"></div>'
         +'<div class="notif-list" id="notifList"></div>';
       document.body.appendChild(panel);
       requestAnimationFrame(function(){ panel.classList.add('open'); });
@@ -1216,7 +1262,7 @@
       renderNotifPanel();
     };
 
-    /* ★ ارسال نوتیف تست توسط کاربر */
+    /* ★ ارسال نوتیف تست */
     window.__sendTestNotification = function(){
       try{
         if('Notification' in window && Notification.permission === 'default'){
@@ -1263,7 +1309,7 @@
       });
     };
 
-    /* ★ اتصال نوتیف سازنده به پنل اعلان‌ها (از script.js صدا زده می‌شه) */
+    /* ★ اتصال نوتیف سازنده به پنل اعلان‌ها */
     window.__pushDevNotificationToPanel = function(n){
       try{
         addNotifToHistory(n);
@@ -2404,7 +2450,7 @@
           box.querySelector('#stayBtn').onclick=function(){
             el.classList.remove('open');setTimeout(function(){el.remove();},320);
           };
-          /* ★ فیکس باگ تاریخ: از window.plannerDate استفاده می‌کنه */
+          /* ★ فیکس باگ تاریخ تنبیه */
           box.querySelector('#acceptPunish').onclick=function(){
             try{
               var baseDate = window.plannerDate || new Date();
@@ -2673,7 +2719,7 @@
     };
 
     /* ═══════════════════════════════════════════════════════════════
-       BLOG + COMMUNITY — حذف شده (script.js مدیریت می‌کنه)
+       BLOG + COMMUNITY — مدیریت توسط script.js
        ═══════════════════════════════════════════════════════════════ */
 
     function linkifyContacts(){
@@ -2712,7 +2758,7 @@
     setTimeout(linkifyContacts,800);
     setTimeout(linkifyContacts,1800);
 
-    /* هدر اکشن‌ها با دکمه اعلان */
+    /* هدر اکشن‌ها — دکمه اعلان و قفل */
     function injectMainTopActions(){
       if(_injectingHeaderActions) return;
       _injectingHeaderActions=true;
@@ -2726,9 +2772,10 @@
           var w=document.createElement('div');
           w.id='sirajHeaderActions';
           w.className='header-left-actions';
+          /* ★ آیکون نوتیف و قفل با SVG خوشگل‌تر */
           w.innerHTML='<div class="main-top-avatar" title="'+esc(name)+'"><img src="'+src+'" alt="" draggable="false"></div>'
-            +'<button type="button" class="main-top-icon-btn notif-bell" id="notifBtn" title="اعلان‌ها"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>'
-            +'<button type="button" class="main-top-icon-btn" id="lockHeaderBtn" title="قفل کردن سایت"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>';
+            +'<button type="button" class="main-top-icon-btn notif-bell" id="notifBtn" title="اعلان‌ها"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><circle cx="19" cy="5" r="2.5" fill="currentColor" stroke="none" opacity="0.9"/></svg></button>'
+            +'<button type="button" class="main-top-icon-btn" id="lockHeaderBtn" title="قفل کردن سایت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg></button>';
           h.appendChild(w);
           w.querySelector('.main-top-avatar').onclick=function(){
             if(typeof window.openSettings==='function') window.openSettings();
@@ -3092,6 +3139,6 @@
       }catch(e){}
     },50);
 
-    console.log('[Siraj v3.0] planner loaded ✓');
+    console.log('[Siraj v3.1] planner loaded ✓');
   }
 })();
