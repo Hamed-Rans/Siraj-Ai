@@ -3026,7 +3026,20 @@
         if(dv&&dv!=='chat'&&typeof window.switchView==='function') window.switchView(dv);
       }catch(e){}
     },50);
+/* FIX 2: Header buttons re-inject */
+setTimeout(injectMainTopActions, 100);
+setTimeout(injectMainTopActions, 800);
+setTimeout(injectMainTopActions, 2000);
 
+/* FIX 4: Planner re-render */
+setTimeout(function () {
+    try {
+        var vp = document.getElementById('view-planner');
+        if (vp) {
+            if (typeof window.renderPlanner === 'function') window.renderPlanner();
+        }
+    } catch (e) { console.warn('[Planner re-render]', e); }
+}, 100);
     console.log('[Siraj v2.6] planner loaded ✓');
   }
 })();
