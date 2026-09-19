@@ -2837,3 +2837,383 @@
 .settings-subtab.active{background:linear-gradient(135deg,var(--accent-light),var(--accent-dark));color:#fff;border-color:var(--accent);box-shadow:0 6px 16px -6px var(--accent)}
 .settings-subcontent{display:none;animation:siraj-fade-in .3s both}
 .settings-subcontent.active{display:block}
+/* ═══════════════════════════════════════════════════════════════
+   SIRAJ v3.1 — Fixes: Cards, Nav overlap, Notif, Hover, Tabs
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ① کارت‌های خالی مقالات/انجمن — هماهنگ با تم ساده و شیشه‌ای */
+.page-empty-card{
+  background:var(--panel-bg)!important;
+  border:1px solid var(--border-strong)!important;
+  box-shadow:0 20px 60px -25px rgba(0,0,0,.6)!important;
+}
+.page-empty-card.new-style{
+  background:var(--panel-bg)!important;
+}
+[data-element-style="glass"] .page-empty-card{
+  background:rgba(18,22,30,.55)!important;
+  backdrop-filter:blur(34px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(200%)!important;
+  border-color:rgba(255,255,255,.14)!important;
+  box-shadow:0 20px 60px -25px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.09)!important;
+}
+[data-theme^="light"][data-element-style="glass"] .page-empty-card{
+  background:rgba(255,255,255,.72)!important;
+  border-color:rgba(0,0,0,.1)!important;
+}
+/* حذف گرادیان زرد/آبی بالای کارت‌ها */
+.page-empty-card::before{opacity:.35!important;}
+
+/* ② site-credit — بدون کادر، فقط فضا اشغال کنه */
+.site-credit{
+  position:fixed!important;
+  bottom:8px!important;
+  left:14px!important;
+  right:auto!important;
+  z-index:99998!important;
+  background:transparent!important;
+  border:none!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  padding:4px 6px!important;
+  pointer-events:none!important;
+  opacity:.5!important;
+  transition:opacity .3s ease!important;
+}
+.site-credit:hover{opacity:.8!important;}
+.site-credit img{filter:grayscale(1) brightness(1.4) drop-shadow(0 0 6px rgba(0,0,0,.6))!important;}
+.site-version{
+  background:rgba(0,0,0,.5)!important;
+  border:none!important;
+  padding:2px 7px!important;
+  border-radius:6px!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.6)!important;
+}
+[data-theme^="light"] .site-credit span,
+[data-theme^="light"] .site-credit img{
+  text-shadow:0 1px 2px rgba(255,255,255,.8)!important;
+}
+[data-theme^="light"] .site-version{
+  background:rgba(255,255,255,.75)!important;
+  color:#333!important;
+}
+
+/* ③ نوار بالا/چپ/راست — صفحات زیر نوار قرار نگیرن */
+[data-nav-position="top"] .main-chat,
+[data-nav-position="top"] .view-planner,
+[data-nav-position="top"] .blog-view,
+[data-nav-position="top"] .videos-view,
+[data-nav-position="top"] .tools-view{
+  padding-top:0!important;
+}
+[data-nav-position="top"] .top-row{
+  padding-top:calc(var(--nav-height) + 8px)!important;
+}
+[data-nav-position="top"] .nav-row{
+  position:fixed!important;
+  top:8px!important;
+  left:0!important;
+  right:0!important;
+  height:auto!important;
+  padding:0!important;
+  z-index:9999!important;
+  background:transparent!important;
+  pointer-events:none!important;
+}
+[data-nav-position="top"] .nav-row > *{pointer-events:auto!important;}
+
+[data-nav-position="left"] .top-row{padding-left:96px!important;}
+[data-nav-position="right"] .top-row{padding-right:96px!important;}
+[data-nav-position="left"] .app-container{padding-left:0!important;}
+[data-nav-position="right"] .app-container{padding-right:0!important;}
+[data-nav-position="left"] .nav-row{
+  z-index:9999!important;
+}
+[data-nav-position="right"] .nav-row{
+  z-index:9999!important;
+}
+
+/* ④ حذف نوار بالای نوتیف پاپ‌آپ */
+.task-notif-popup::before{display:none!important;}
+
+/* ⑤ تنظیمات — حذف قاب‌های اضافی */
+.settings-content .setting-group{
+  border:none!important;
+  background:transparent!important;
+  padding:0 0 14px!important;
+  margin-bottom:14px!important;
+  border-bottom:1px dashed var(--border)!important;
+}
+.settings-content .setting-group:last-child{
+  border-bottom:none!important;
+  margin-bottom:0!important;
+}
+/* استثنا: کارت‌های داخل حریم خصوصی و رفتار قابشون بمونه */
+.settings-content[data-cat="privacy"] .setting-group,
+.settings-content[data-cat="behavior"] .setting-group{
+  border:1px solid var(--border)!important;
+  background:rgba(255,255,255,.02)!important;
+  padding:14px!important;
+  border-radius:14px!important;
+  margin-bottom:12px!important;
+}
+
+/* ⑥ زیرتب‌های تنظیمات — وسط چین */
+.settings-subtabs{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+  padding:10px 0 14px!important;
+  border-bottom:1px dashed var(--border)!important;
+  margin-bottom:16px!important;
+}
+.settings-subtab{
+  min-width:80px!important;
+  text-align:center!important;
+  justify-content:center!important;
+  padding:8px 16px!important;
+}
+
+/* ⑦ آیکون اعلان و قفل — فاصله کمتر + آیکون جدید */
+.header-left-actions{
+  gap:8px!important;
+}
+.main-top-icon-btn{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+}
+.main-top-icon-btn.notif-bell{
+  margin-right:0!important;
+}
+/* آیکون اعلان */
+.main-top-icon-btn.notif-bell svg{
+  stroke-width:1.9!important;
+}
+
+/* ⑧ هدر اکشن‌ها — انیمیشن روی هاور */
+.main-top-avatar,
+.main-top-icon-btn{
+  transition:transform .3s cubic-bezier(.34,1.4,.64,1),
+             box-shadow .3s ease,
+             color .25s,
+             border-color .25s!important;
+}
+.main-top-avatar:hover{
+  transform:scale(1.08)!important;
+}
+.main-top-icon-btn:hover{
+  transform:scale(1.08)!important;
+}
+
+/* ⑨ هاور کارت‌ها — نوار خطی بالا با انیمیشن */
+.daily-card,
+.panel-card,
+.tool-card,
+.month-goals,
+.month-calendar,
+.year-overview,
+.planner-hero-card,
+.task-item,
+.ll-item,
+.blog-post,
+.contact-row,
+.page-empty-card,
+.planner-stats-card{
+  position:relative!important;
+  overflow:hidden!important;
+}
+.daily-card::after,
+.panel-card::after,
+.tool-card::after,
+.month-goals::after,
+.month-calendar::after,
+.year-overview::after,
+.planner-hero-card::after,
+.task-item::after,
+.ll-item::after,
+.blog-post::after,
+.contact-row::after,
+.planner-stats-card::after{
+  content:''!important;
+  position:absolute!important;
+  top:0!important;
+  right:50%!important;
+  left:50%!important;
+  height:2px!important;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-light) 30%,
+    var(--accent) 50%,
+    var(--accent-light) 70%,
+    transparent 100%)!important;
+  opacity:0!important;
+  transition:
+    right .45s cubic-bezier(.22,1,.36,1),
+    left .45s cubic-bezier(.22,1,.36,1),
+    opacity .3s ease!important;
+  pointer-events:none!important;
+  z-index:5!important;
+  border-radius:0 0 2px 2px!important;
+}
+.daily-card:hover::after,
+.panel-card:hover::after,
+.tool-card:hover::after,
+.month-goals:hover::after,
+.month-calendar:hover::after,
+.year-overview:hover::after,
+.planner-hero-card:hover::after,
+.task-item:hover::after,
+.ll-item:hover::after,
+.blog-post:hover::after,
+.contact-row:hover::after,
+.planner-stats-card:hover::after{
+  right:0!important;
+  left:0!important;
+  opacity:1!important;
+}
+
+/* ⑩ تب‌های خوانده/نخوانده اعلان */
+.notif-tabs{
+  display:flex!important;
+  gap:6px!important;
+  padding:10px 14px!important;
+  border-bottom:1px solid var(--border)!important;
+  background:rgba(255,255,255,.02)!important;
+  flex-shrink:0!important;
+}
+.notif-tab{
+  flex:1!important;
+  padding:8px 12px!important;
+  border-radius:10px!important;
+  border:1px solid var(--border)!important;
+  background:transparent!important;
+  color:var(--text-muted)!important;
+  font-family:var(--font-text)!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  cursor:pointer!important;
+  transition:all .28s cubic-bezier(.34,1.4,.64,1)!important;
+  position:relative!important;
+}
+.notif-tab:hover{
+  border-color:var(--accent)!important;
+  color:var(--accent)!important;
+  transform:translateY(-1px)!important;
+}
+.notif-tab.active{
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  color:#fff!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 6px 16px -6px var(--accent)!important;
+}
+.notif-tab .notif-tab-count{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:16px!important;
+  height:16px!important;
+  padding:0 5px!important;
+  border-radius:8px!important;
+  background:rgba(255,255,255,.2)!important;
+  font-size:9px!important;
+  font-weight:900!important;
+  margin-right:4px!important;
+}
+.notif-tab.active .notif-tab-count{
+  background:rgba(255,255,255,.35)!important;
+}
+
+/* ⑪ انیمیشن ورود بخش درباره ما */
+.settings-content[data-cat="about"] .about-bio-card,
+.settings-content[data-cat="about"] .about-hero,
+.settings-content[data-cat="about"] .about-section-title,
+.settings-content[data-cat="about"] .about-contacts,
+.settings-content[data-cat="about"] .contact-row{
+  animation:siraj-fade-in .45s cubic-bezier(.22,1,.36,1) both;
+}
+.settings-content[data-cat="about"] .about-hero{animation-delay:0s;}
+.settings-content[data-cat="about"] .about-bio-card{animation-delay:.08s;}
+.settings-content[data-cat="about"] .about-section-title{animation-delay:.16s;}
+.settings-content[data-cat="about"] .contact-row:nth-child(1){animation-delay:.24s;}
+.settings-content[data-cat="about"] .contact-row:nth-child(2){animation-delay:.30s;}
+.settings-content[data-cat="about"] .contact-row:nth-child(3){animation-delay:.36s;}
+.settings-content[data-cat="about"] .contact-row:nth-child(4){animation-delay:.42s;}
+
+/* ⑫ فیکس ظاهر contact-row */
+.contact-row{
+  background:var(--panel-bg)!important;
+  border:1px solid var(--border)!important;
+  padding:12px 14px!important;
+}
+.contact-row .contact-label{
+  color:var(--text-muted)!important;
+  font-size:10px!important;
+}
+.contact-row .contact-value{
+  color:var(--text-main)!important;
+  font-size:13px!important;
+  font-weight:800!important;
+}
+.contact-row .contact-icon{
+  width:42px!important;
+  height:42px!important;
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+}
+
+/* ⑬ ابعاد nav icon‌ها در هدر */
+.main-top-icon-btn svg{
+  width:18px!important;
+  height:18px!important;
+  stroke-width:2!important;
+}
+
+/* ⑭ جلوگیری از تداخل نوار چپ/راست با محتوا */
+[data-nav-position="left"] .chat-view-inner,
+[data-nav-position="right"] .chat-view-inner{
+  padding-left:0!important;
+  padding-right:0!important;
+}
+[data-nav-position="left"] .planner-pane,
+[data-nav-position="right"] .planner-pane{
+  padding-left:0!important;
+  padding-right:0!important;
+}
+
+/* ⑮ انیمیشن body pages عمودی در حالت چپ/راست */
+[data-nav-position="left"] .view.view-in-from-left,
+[data-nav-position="right"] .view.view-in-from-left{
+  animation:viewInFromTopSmooth .35s cubic-bezier(.22,1,.36,1) both!important;
+}
+[data-nav-position="left"] .view.view-in-from-right,
+[data-nav-position="right"] .view.view-in-from-right{
+  animation:viewInFromBottomSmooth .35s cubic-bezier(.22,1,.36,1) both!important;
+}
+[data-nav-position="left"] .view.leaving.view-out-left,
+[data-nav-position="right"] .view.leaving.view-out-left{
+  animation:viewOutToTopSmooth .2s cubic-bezier(.4,0,.7,.5) forwards!important;
+}
+[data-nav-position="left"] .view.leaving.view-out-right,
+[data-nav-position="right"] .view.leaving.view-out-right{
+  animation:viewOutToBottomSmooth .2s cubic-bezier(.4,0,.7,.5) forwards!important;
+}
+@keyframes viewInFromTopSmooth{
+  0%{opacity:0;transform:translateY(-22px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes viewInFromBottomSmooth{
+  0%{opacity:0;transform:translateY(22px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes viewOutToTopSmooth{
+  0%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(-16px)}
+}
+@keyframes viewOutToBottomSmooth{
+  0%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(16px)}
+}
