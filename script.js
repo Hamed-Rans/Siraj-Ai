@@ -3,8 +3,8 @@
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
     devNotifUrl:"",
-    promptsUrl:"", /* ★ آدرس prompts.json توی گیتهاب — بعداً پر کن */
-    adminPassword:"", /* ★ رمز ادمین رو این‌جا بذار — مثلاً "siraj-hamed-2025" */
+    promptsUrl:"https://raw.githubusercontent.com/Hamed-Rans/Siraj-Ai/refs/heads/main/prompts.json", /* ★ آدرس prompts.json توی گیتهاب — بعداً پر کن */
+    adminPassword:"Ransari0185", /* ★ رمز ادمین رو این‌جا بذار — مثلاً "siraj-hamed-2025" */
     models:[
         {
             id:'hakim',
@@ -13,7 +13,7 @@ const APP_CONFIG={
             desc:'استاد نحو، صرف و اعراب',
             color:'#8b5cf6',
             baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/hakim',
-            apiModel:'gemini-2.5-flash',
+            apiModel:'gemini-3.6-flash',
             systemExtra:''
         },
         {
@@ -23,7 +23,7 @@ const APP_CONFIG={
             desc:'هنرمند ادبیات و ترجمه',
             color:'#F59E0B',
             baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/adib',
-            apiModel:'gemini-2.5-flash',
+            apiModel:'gemini-3.6-flash',
             systemExtra:''
         },
         {
@@ -33,7 +33,7 @@ const APP_CONFIG={
             desc:'همراه و مشاور تو',
             color:'#10B981',
             baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions/siraj-yar',
-            apiModel:'gemini-2.5-flash',
+            apiModel:'gemini-3.6-flash',
             systemExtra:''
         }
     ],
@@ -1747,7 +1747,11 @@ function renderSettingsControls(){
         <button class="settings-tab-btn${settingsCat==='models'?' active':''}" data-cat="models" onclick="switchSettingsCat('models')"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg>مدل‌ها</button>
         <button class="settings-tab-btn${settingsCat==='privacy'?' active':''}" data-cat="privacy" onclick="switchSettingsCat('privacy')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>حریم خصوصی</button>
         <button class="settings-tab-btn${settingsCat==='about'?' active':''}" data-cat="about" onclick="switchSettingsCat('about')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>درباره ما</button>`;
-
+         /* ★ حذف تب مدل‌ها برای کاربرای عادی */
+if(!isAdmin()){
+  var modelsTabBtn = tabs.querySelector('[data-cat="models"]');
+  if(modelsTabBtn) modelsTabBtn.remove();
+}
     setTimeout(function(){
         var tw = document.getElementById('settingsTabs');
         if(tw && !tw.querySelector('[data-cat="profile"]')){
