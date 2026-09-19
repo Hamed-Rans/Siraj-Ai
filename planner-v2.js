@@ -528,10 +528,9 @@
       var goals=pl.months[monthKey].goals||[];
       var goal=goals.length?(goals.find(function(g){return !g.done;})||goals[0]):null;
       var p=dateParts(d);
-      var backBtn = isToday
+           var backBtn = isToday
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امروز</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امروز</span></button>';
-      return '<div class="planner-hero-card">'
         +backBtn
         +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
@@ -550,7 +549,7 @@
       var days=myWeekDays();
       var p=dateParts(d);
       var ic=isCurrentWeek();
-      var backBtn = ic
+            var backBtn = ic
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این هفته</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این هفته</span></button>';
       return '<div class="planner-hero-card">'
@@ -575,7 +574,7 @@
       var goals=pl.months[monthKey].goals||[];
       var dg=goals.filter(function(g){return g.done;}).length;
       var ic=isCurrentMonth();
-      var backBtn = ic
+            var backBtn = ic
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این ماه</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این ماه</span></button>';
       return '<div class="planner-hero-card">'
@@ -600,7 +599,7 @@
       var goals=pl.years[y].goals||[];
       var done=goals.filter(function(g){return g.done;}).length;
       var ic=isCurrentYear();
-      var backBtn = ic
+            var backBtn = ic
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امسال</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امسال</span></button>';
       return '<div class="planner-hero-card">'
@@ -1399,10 +1398,12 @@
     };
 
     function closeLibrary(){
-      var el=document.getElementById('learnLibrary');if(!el) return;
-      el.classList.remove('open');
-      setTimeout(function(){el.remove();},320);
-    }
+  var el=document.getElementById('learnLibrary');if(!el) return;
+  if(el.dataset.closing==='1') return;
+  el.dataset.closing='1';
+  el.classList.remove('open');
+  setTimeout(function(){if(el.parentNode)el.remove();},550);
+}
 
     function renderLibList(){
       var listEl=document.getElementById('libList');if(!listEl) return;
@@ -2413,30 +2414,31 @@
       }catch(e){return { valid: reason.length >= 25 };}
     }
     function closeStudy(){
-      try{stopAudio();}catch(e){}
-      var o=document.getElementById('studyOverlay');
-      var chat=document.getElementById('studyChatPanel');
-      var tools=document.getElementById('studyToolsPanel');
-      if(chat) chat.remove();
-      if(tools) tools.remove();
-      if(_studyDragHandlers){
-        try{
-          document.removeEventListener('mousemove',_studyDragHandlers.move);
-          document.removeEventListener('mouseup',_studyDragHandlers.up);
-          document.removeEventListener('touchmove',_studyDragHandlers.move);
-          document.removeEventListener('touchend',_studyDragHandlers.up);
-        }catch(e){}
-        _studyDragHandlers=null;
-      }
-      if(!o) return;
-      o.style.transition='opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.4,0,.2,1), visibility .45s';
-      o.classList.remove('open');
-      setTimeout(function(){if(o.parentNode)o.remove();},620);
-      setTimeout(function(){
-        if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
-        refreshBody('left');
-      },380);
-    }
+  try{stopAudio();}catch(e){}
+  var o=document.getElementById('studyOverlay');
+  var chat=document.getElementById('studyChatPanel');
+  var tools=document.getElementById('studyToolsPanel');
+  if(chat) chat.remove();
+  if(tools) tools.remove();
+  if(_studyDragHandlers){
+    try{
+      document.removeEventListener('mousemove',_studyDragHandlers.move);
+      document.removeEventListener('mouseup',_studyDragHandlers.up);
+      document.removeEventListener('touchmove',_studyDragHandlers.move);
+      document.removeEventListener('touchend',_studyDragHandlers.up);
+    }catch(e){}
+    _studyDragHandlers=null;
+  }
+  if(!o) return;
+  if(o.dataset.closing==='1') return;
+  o.dataset.closing='1';
+  o.classList.remove('open');
+  setTimeout(function(){if(o.parentNode)o.remove();},700);
+  setTimeout(function(){
+    if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
+    refreshBody('left');
+  },400);
+}
     function blockKey(e){
       if(!studyRunning) return;
       var k=e.key||'';var c=e.ctrlKey||e.metaKey;
