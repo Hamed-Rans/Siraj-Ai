@@ -2010,15 +2010,19 @@ function openSettings() {
 }
 function closeSettings() {
     const m = document.getElementById('settingsModal');
-    if (!m) return;
+    if (!m || !m.classList.contains('open')) return;
+    /* ★ حذف فوری backdrop-filter برای جلوگیری از لگ انیمیشن بستن */
+    m.style.backdropFilter = 'none';
+    m.style.webkitBackdropFilter = 'none';
     m.classList.remove('open');
     setTimeout(() => {
         if (!m.classList.contains('open')) {
             m.style.visibility = 'hidden';
             m.style.pointerEvents = 'none';
         }
-    }, 320);
-    setTimeout(() => {
+        /* ★ برگرداندن backdrop-filter برای دفعه بعد */
+        m.style.backdropFilter = '';
+        m.style.webkitBackdropFilter = '';
         document.querySelectorAll('.bottom-nav-btn').forEach(b => { b.style.pointerEvents = 'auto'; b.style.position = 'relative'; b.style.zIndex = '2'; });
         const s = document.getElementById('navSlider');
         if (s) s.style.pointerEvents = 'none';
