@@ -1,39 +1,50 @@
-/* Siraj v2.0 — script.js (v3.3 Final) */
+/* Siraj v2.0 — script.js (v3.5 Final) */
 
 const APP_CONFIG={
     baseURL:"https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
     devNotifUrl:"",
+    /* ★ سه مدل اصلی — URL و apiModel رو از تنظیمات ویرایش کن */
     models:[
         {
             id:'hakim',
             name:'حکیم',
             emoji:'🧠',
-            desc:'تحلیل عمیق نحو و بلاغت',
+            desc:'استاد نحو، صرف و اعراب',
             color:'#8b5cf6',
             baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions',
             apiModel:'gemini-3.6-flash',
-            systemExtra:`\n\n🧠 حالت حکیم — تحلیل‌گر عمیق:\n- تمرکز اصلی روی نحو، صرف، بلاغت، اعراب دقیق\n- پاسخ‌های ساختارمند با تجزیه و ترکیب\n- ذکر شواهد قرآنی و شعری در تحلیل\n- لحن آکادمیک ولی صمیمی\n- مناسب برای: اعراب، تجزیه و ترکیب، تحلیل بیت عمیق، قواعد پیشرفته`
+            systemExtra:''
         },
         {
             id:'adib',
             name:'ادیب',
             emoji:'✍️',
-            desc:'ترجمه و ادبیات',
+            desc:'هنرمند ادبیات و ترجمه',
             color:'#F59E0B',
             baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions',
             apiModel:'gemini-3.6-flash',
-            systemExtra:`\n\n✍️ حالت ادیب — ادبیات و ترجمه:\n- تمرکز روی ترجمه‌ی روان، سبک‌شناسی، زیبایی‌شناسی متن\n- تحلیل بلاغی و بدیعی با رویکرد ادبی\n- لحن هنری و شاعرانه در توضیح\n- استفاده از تعبیرات ادبی زیبا\n- مناسب برای: ترجمه، تحلیل ادبی، نقد شعر، متن‌های ادبی، سبک‌شناسی`
+            systemExtra:''
         },
         {
-            id:'rahnama',
-            name:'راهنما',
+            id:'siraj-yar',
+            name:'سراج‌یار',
             emoji:'🎯',
-            desc:'مشاوره و برنامه‌ریزی',
+            desc:'همراه و مشاور تو',
             color:'#10B981',
             baseURL:'https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions',
             apiModel:'gemini-3.6-flash',
-            systemExtra:`\n\n🎯 حالت راهنما — مشاور و برنامه‌ریز:\n- تمرکز روی مشاوره، انگیزه‌دهی، برنامه‌ریزی\n- راهنمایی تحصیلی و مطالعه مؤثر\n- ساخت برنامه روزانه/هفتگی/ماهانه\n- تکنیک‌های مقابله با تنبلی و بی‌انگیزگی\n- لحن گرم، دوستانه، مثل یه رفیق دلسوز\n- مناسب برای: برنامه‌ریزی، مشاوره تحصیلی، انگیزه، مدیریت زمان`
+            systemExtra:''
         }
+    ],
+    patternPresets:[
+        {c1:'#2AA5B8',c2:'#F5A623',n:'کلاسیک'},
+        {c1:'#D4AF37',c2:'#B8860B',n:'زرین'},
+        {c1:'#EF4444',c2:'#F59E0B',n:'آتشین'},
+        {c1:'#8b5cf6',c2:'#ec4899',n:'جادویی'},
+        {c1:'#10B981',c2:'#06B6D4',n:'طبیعی'},
+        {c1:'#6366F1',c2:'#3B82F6',n:'نیلی'},
+        {c1:'#F472B6',c2:'#FBBF24',n:'پاستل'},
+        {c1:'#F8FAFC',c2:'#CBD5E1',n:'مونو'}
     ],
     defaultSettings:{
         themeMode:'dark',themeColor:'navy',bubbleShape:'modern',fontSize:'15px',
@@ -54,7 +65,7 @@ const APP_CONFIG={
         notifPreMinutes:10,
         studyDefaultMinutes:25,
         studyStrictMode:true,
-        appVersion:'3.3'
+        appVersion:'3.5'
     },
     themeColors:['navy','crimson','gold','purple','emerald','indigo'],
     colorNames:{navy:'شبانه',crimson:'آتشین',gold:'زرین',purple:'جادویی',emerald:'طبیعی',indigo:'نیلی'},
@@ -159,10 +170,10 @@ const PATTERN_TEMPLATES={
     tazhib:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g transform='translate(120 120)' fill='none' stroke='${c1}' stroke-width='1.5'><circle r='92'/><circle r='70'/><circle r='44'/></g><g transform='translate(120 120)' fill='none' stroke='${c2}' stroke-width='1.5'><circle r='80'/><circle r='58'/><circle r='32'/></g></svg>`,
     eslimi:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5' stroke-linecap='round'><path d='M10 10 Q60 40 80 90 Q95 130 60 170 Q30 200 60 230'/></g><g fill='none' stroke='${c2}' stroke-width='1.5' stroke-linecap='round'><path d='M230 230 Q180 200 160 150 Q145 110 180 70 Q210 40 180 10'/></g></svg>`,
     boteh:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5' stroke-linecap='round'><path d='M135 30 Q95 50 80 95 Q65 145 95 185 Q125 215 165 200 Q200 180 200 140 Q200 105 170 88 Q140 72 145 50 Q148 35 135 30 Z'/><circle cx='130' cy='120' r='10'/></g><g fill='none' stroke='${c2}' stroke-width='1.5' stroke-linecap='round'><path d='M105 30 Q145 50 160 95 Q175 145 145 185 Q115 215 75 200 Q40 180 40 140 Q40 105 70 88 Q100 72 95 50 Q92 35 105 30 Z'/><circle cx='110' cy='120' r='10'/></g></svg>`,
-    persepolis:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.8' stroke-linecap='round'><path d='M40 200 L40 120 M60 200 L60 100 M120 200 L120 100 M180 200 L180 100 M200 200 L200 120'/><path d='M30 200 L210 200'/><path d='M50 100 L120 50 L190 100'/><path d='M85 100 L85 70 L105 70 L105 100'/><path d='M135 100 L135 70 L155 70 L155 100'/></g><g fill='none' stroke='${c2}' stroke-width='1.8'><circle cx='120' cy='35' r='10'/></g></svg>`,
-    hafezieh:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.8'><path d='M60 200 L60 140 Q60 110 90 110 Q120 110 120 80 Q120 50 150 50 Q180 50 180 80 L180 200'/><circle cx='90' cy='80' r='16'/><path d='M120 200 L120 110'/><path d='M90 200 L90 140'/></g><g fill='none' stroke='${c2}' stroke-width='1.8'><path d='M40 200 L200 200'/></g></svg>`,
-    esfahan:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.8'><circle cx='120' cy='120' r='80'/><path d='M120 40 Q160 80 160 120 Q160 160 120 200 Q80 160 80 120 Q80 80 120 40'/><path d='M40 120 Q80 80 120 80 Q160 80 200 120 Q160 160 120 160 Q80 160 40 120'/></g><g fill='none' stroke='${c2}' stroke-width='1.5'><circle cx='120' cy='120' r='30'/></g></svg>`,
-    yazd:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.8'><path d='M120 30 L120 210'/><circle cx='120' cy='60' r='20'/><circle cx='120' cy='120' r='28'/><circle cx='120' cy='180' r='24'/><path d='M80 60 L160 60 M76 120 L164 120 M78 180 L162 180'/></g><g fill='none' stroke='${c2}' stroke-width='1.5'><circle cx='120' cy='120' r='8'/></g></svg>`
+    persepolis:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5' stroke-linecap='round'><path d='M120 60 L120 200'/><path d='M100 200 L100 140 L140 140 L140 200'/><path d='M90 200 L150 200'/></g><g fill='none' stroke='${c2}' stroke-width='1.3'><path d='M100 60 Q120 40 140 60'/><circle cx='120' cy='35' r='6'/></g><g fill='none' stroke='${c1}' stroke-width='1' opacity='.6'><path d='M60 200 L60 120'/><path d='M180 200 L180 120'/><path d='M50 120 Q60 100 70 120'/><path d='M170 120 Q180 100 190 120'/></g></svg>`,
+    hafezieh:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5'><path d='M80 200 L80 130 Q80 90 120 70 Q160 90 160 130 L160 200'/><path d='M95 130 Q120 100 145 130'/></g><g fill='none' stroke='${c2}' stroke-width='1.3'><path d='M95 200 L95 130'/><path d='M145 200 L145 130'/><circle cx='120' cy='60' r='6'/></g><g fill='none' stroke='${c1}' stroke-width='1' opacity='.5'><path d='M50 200 Q50 150 70 130'/><path d='M190 200 Q190 150 170 130'/></g></svg>`,
+    esfahan:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5'><circle cx='120' cy='120' r='60'/><circle cx='120' cy='120' r='30'/></g><g fill='none' stroke='${c2}' stroke-width='1.2'><path d='M120 60 Q140 90 140 120'/><path d='M120 180 Q100 150 100 120'/><path d='M60 120 Q90 100 120 100'/><path d='M180 120 Q150 140 120 140'/></g><circle cx='120' cy='120' r='4' fill='${c1}'/></svg>`,
+    yazd:(c1,c2)=>`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><g fill='none' stroke='${c1}' stroke-width='1.5'><path d='M120 60 L120 200'/><circle cx='120' cy='80' r='12'/><circle cx='120' cy='130' r='18'/><circle cx='120' cy='180' r='14'/></g><g fill='none' stroke='${c2}' stroke-width='1.3'><path d='M100 80 L140 80'/><path d='M94 130 L146 130'/><path d='M100 180 L140 180'/></g></svg>`
 };
 
 const STORAGE_KEY='siraj-settings';
@@ -220,12 +231,13 @@ window._settingsSub='general';
 function loadSettings(){try{const l=JSON.parse(localStorage.getItem(STORAGE_KEY))||{};const s=Object.assign({},APP_CONFIG.defaultSettings,l);
     const pi=localStorage.getItem(PROFILE_IMG_KEY);
     if(pi&&!s.profileImage)s.profileImage=pi;
-    return s;}catch(e){return{...APP_CONFIG.defaultSettings};}}
+    if(!s.models) s.models=JSON.parse(JSON.stringify(APP_CONFIG.models));
+    return s;}catch(e){return{...APP_CONFIG.defaultSettings,models:JSON.parse(JSON.stringify(APP_CONFIG.models))};}}
 
-/* ★ پیدا کردن مدل انتخاب شده */
 function getCurrentModelConfig(){
     var id = settings.selectedModel || 'hakim';
-    var m = APP_CONFIG.models.find(function(x){ return x.id === id; });
+    var m = (settings.models && settings.models.find(function(x){ return x.id === id; }))
+            || APP_CONFIG.models.find(function(x){ return x.id === id; });
     return m || APP_CONFIG.models[0];
 }
 
@@ -527,13 +539,12 @@ function applySettingsToUI(s){
     document.documentElement.style.setProperty('--nav-shadow',computeNavShadow(t.navShadowLevel||0));
     applyBodyBackground(t);
     renderDropdown('dialectDD',APP_CONFIG.dialects,t.dialect,'dialect');
-    /* ★ مدل */
     renderModelsDropdown();
     const tb=document.getElementById('thinkBtn');if(tb)tb.classList.toggle('active',t.thinking);
     const qb=document.getElementById('quickBtn');if(qb)qb.classList.toggle('active',t.quick);
     applyPattern(document.getElementById('patternLayer'),t.pattern,t.patternColor1,t.patternColor2,t.patternPerCorner,t.patternSize,t.patternPosition,t.patternOpacity);
     var vb=document.getElementById('versionBadge');
-    if(vb) vb.textContent='v'+(t.appVersion||'3.3');
+    if(vb) vb.textContent='v'+(t.appVersion||'3.5');
     resetInactivityTimer();
     setTimeout(()=>{if(typeof window.updateNavSlider==='function')window.updateNavSlider(false);},100);
 }
@@ -554,28 +565,28 @@ function renderDropdown(id,items,value,key){
 function toggleDropdown(id,e){e.stopPropagation();const el=document.getElementById(id);const wasOpen=el.classList.contains('open');document.querySelectorAll('.dropdown.open').forEach(d=>d.classList.remove('open'));if(!wasOpen)el.classList.add('open');}
 function selectDropdown(id,value,key,e){e.stopPropagation();settings[key]=value;saveSettings();applySettingsToUI();document.querySelectorAll('.dropdown.open').forEach(d=>d.classList.remove('open'));renderDropdown(id,APP_CONFIG.dialects,value,key);}
 
-/* ★ رندر مدل‌ها در input bar */
+/* ★ رندر مدل‌ها */
 function renderModelsDropdown(){
     var el = document.getElementById('modelDD');
     if(!el) return;
     var cur = getCurrentModelConfig();
-    var modelEmojiMap = {
+    var icons = {
         hakim: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>',
         adib: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/></svg>',
-        rahnama: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>'
+        'siraj-yar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>'
     };
     el.innerHTML =
-        '<div class="dd-trigger model-dd-trigger" onclick="toggleDropdown(\'modelDD\', event)" title="'+escapeHtml(cur.desc)+'">'
-        + (modelEmojiMap[cur.id]||'') 
+        '<div class="dd-trigger model-dd-trigger" onclick="toggleDropdown(\'modelDD\', event)" title="'+escapeHtml(cur.desc)+'" style="border-color:'+cur.color+'55;color:'+cur.color+'">'
+        + (icons[cur.id]||'') 
         + '<span>'+escapeHtml(cur.name)+'</span>'
         + '<span class="dd-arrow"></span>'
         +'</div>'
         +'<div class="dd-panel model-dd-panel">'
         + APP_CONFIG.models.map(function(m){
-            return '<div class="dd-item model-dd-item'+(m.id===cur.id?' active':'')+'" data-model="'+m.id+'" onclick="selectModel(\''+m.id+'\', event)" style="flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px">'
+            return '<div class="dd-item model-dd-item'+(m.id===cur.id?' active':'')+'" data-model="'+m.id+'" onclick="selectModel(\''+m.id+'\', event)" style="flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;border-radius:12px">'
               +'<div style="display:flex;align-items:center;gap:8px;font-weight:800;color:'+m.color+'">'
-              + (modelEmojiMap[m.id]||'')
-              + '<span style="color:var(--text-main)">'+escapeHtml(m.name)+'</span>'
+              + (icons[m.id]||'')
+              + '<span>'+escapeHtml(m.name)+'</span>'
               +'</div>'
               +'<div style="font-size:10px;color:var(--text-muted);margin-right:22px">'+escapeHtml(m.desc)+'</div>'
               +'</div>';
@@ -653,7 +664,6 @@ function updateNavSlider(animate){
 }
 
 function switchView(view){
-    /* ★ تضمین اعمال attributeها قبل از switch */
     applySettingsToUI();
     currentView=view;
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -700,7 +710,7 @@ function renderPanelForChat(){
             <div class="panel-card">
                 <div class="card-title"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9"/></svg><span>گفتگوهای قبلی</span></div>
                 <div class="history-search">
-                    <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--text-muted);fill:none;stroke-width:2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
                     <input type="text" id="historySearchInput" placeholder="جستجو در گفتگوها..." oninput="filterHistoryList(this.value)">
                 </div>
                 <div id="historyList"></div>
@@ -765,7 +775,7 @@ function renderPanelForVideos(){
     document.getElementById('panelSubText').textContent='ارتباط با مدرسین و کاربران';
     document.getElementById('panelContent').innerHTML=`
         <div class="panel-card" style="border-color:var(--accent);background:var(--accent-soft)">
-            <div class="card-title" style="border-bottom-color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>دیوان</span></div>
+            <div class="card-title" style="border-bottom-color:var(--accent)"><svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h9l5 5v11.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg><span>دیوان</span></div>
             <div class="empty-state" style="padding:16px"><span class="emoji">🚧</span>به‌زودی</div>
         </div>`;
 }
@@ -841,7 +851,7 @@ function renderCommunity(){
     if(!v) return;
     v.innerHTML='<div class="planner-hero">'
       +'<div class="planner-hero-icon">'
-      +'<svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+      +'<svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h9l5 5v11.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/><path d="M8 12h8"/><path d="M8 16h6"/></svg>'
       +'</div>'
       +'<div class="planner-hero-text">'
       +'<div class="planner-hero-title">دیوان سراج</div>'
@@ -849,7 +859,7 @@ function renderCommunity(){
       +'</div>'
       +'</div>'
       +'<div class="page-empty-card new-style">'
-      +'<div class="page-empty-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>'
+      +'<div class="page-empty-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h9l5 5v11.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/><path d="M8 12h8"/><path d="M8 16h6"/></svg></div>'
       +'<div class="page-empty-title">به‌زودی در دسترس</div>'
       +'<div class="page-empty-desc">اینجا می‌تونید سؤال بپرسید، تجربیاتتون رو با مدرسین و سایر علاقه‌مندان به اشتراک بگذارید و از هم یاد بگیرید. جایی برای هم‌اندیشی و رشد با هم 🌿</div>'
       +'<div class="page-empty-soon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>در حال آماده‌سازی</div>'
@@ -975,7 +985,6 @@ function loadChat(id){
         c.messages.forEach(function(m, idx){
             if(m.role === 'user') renderUserMsg(m.content, m.fileData, m.fileType, true);
             else renderBotMsg(m.content, true);
-            /* ★ انیمیشن ورود هر پیام با تاخیر */
             var lastWrap = box.lastElementChild;
             if(lastWrap){
                 lastWrap.classList.add('chat-loading');
@@ -1042,9 +1051,17 @@ function getSystemPrompt(){
     }catch(e){}
     if(settings.quick)extra+='\n\n⚡ حالت پاسخ سریع: پاسخ‌ها را کوتاه، مختصر و مستقیم بده.';
     if(settings.thinking)extra+='\n\n🧠 حالت تفکر عمیق: با دقت و عمق بیشتر تحلیل کن.';
-    /* ★ اضافه کردن پرامپت مدل */
+    /* ★ اضافه کردن systemExtra مدل انتخابی */
     var modelCfg = getCurrentModelConfig();
-    var modelExtra = modelCfg && modelCfg.systemExtra ? modelCfg.systemExtra : '';
+    var modelExtra = '';
+    try{
+        if(settings.models && Array.isArray(settings.models)){
+            var custom = settings.models.find(function(x){return x.id===modelCfg.id;});
+            if(custom && custom.systemExtra) modelExtra = custom.systemExtra;
+        }
+    }catch(e){}
+    if(!modelExtra && modelCfg.systemExtra) modelExtra = modelCfg.systemExtra;
+
     return `شما «سراج» هستید — دستیار هوشمند، خوش‌برخورد و صمیمی زبان و ادبیات عربی.
 
 🎯 تخصص: نحو، صرف، بلاغت، ترجمه، اعراب، تحلیل بیت، متون دینی به عربی، برنامه‌ریزی درسی، مشاوره تحصیلی، انگیزه‌دهی، ساخت تمرین و آزمون.
@@ -1189,7 +1206,6 @@ async function send(){
     }
     const t0=Date.now();
     try{
-        /* ★ استفاده از URL و مدل مخصوص مدل انتخاب شده */
         const modelCfg = getCurrentModelConfig();
         const url = (modelCfg && modelCfg.baseURL && modelCfg.baseURL.trim()) ? modelCfg.baseURL.trim() : ((APP_CONFIG.baseURL&&APP_CONFIG.baseURL.trim())?APP_CONFIG.baseURL:'/api/chat');
         const apiModel = (modelCfg && modelCfg.apiModel) ? modelCfg.apiModel : (settings.model || 'gemini-3.6-flash');
@@ -1321,7 +1337,6 @@ function checkLock(){
         return;
     }
     const ls=document.getElementById('lockScreen');
-    /* ★ آماده‌سازی کادرهای PIN به اندازه رمز */
     renderLockPinBoxes(Math.max(4, settings.password.length));
     ls.classList.add('open');
     setTimeout(function(){
@@ -1330,7 +1345,7 @@ function checkLock(){
         /* ★ کلیک روی هر جای صفحه قفل → focus روی input */
         if(ls && !ls.dataset.clickBound){
             ls.dataset.clickBound = '1';
-            ls.addEventListener('click', function(e){
+            ls.addEventListener('click', function(){
                 var inp2 = document.getElementById('lockInput');
                 if(inp2) inp2.focus();
             });
@@ -1343,7 +1358,6 @@ function tryUnlock(){
     const val=inp.value;
     if(!val){err.textContent='رمز را وارد کنید';return;}
     if(val===settings.password){
-        /* ★ انیمیشن موفقیت + محو شدن تدریجی */
         var row = document.getElementById('lockPinRow');
         var boxes = row ? row.querySelectorAll('.lock-pin-box') : [];
         boxes.forEach(function(b){ b.classList.add('success'); });
@@ -1358,7 +1372,6 @@ function tryUnlock(){
         sessionStorage.setItem(LOCK_SESSION_KEY,'1');
         setTimeout(function(){
             document.getElementById('lockScreen').classList.remove('open');
-            /* ★ انیمیشن ورود سایت */
             var app = document.getElementById('appContainer');
             if(app){
                 app.classList.add('locked-entering');
@@ -1395,7 +1408,6 @@ function lockNow(){
     const err=document.getElementById('lockError');
     if(inp){inp.value='';setTimeout(()=>inp.focus(),350);}
     if(err)err.textContent='';
-    /* ★ کلیک روی هر جای صفحه قفل → focus */
     if(ls && !ls.dataset.clickBound){
         ls.dataset.clickBound = '1';
         ls.addEventListener('click', function(){
@@ -1441,6 +1453,7 @@ function openSettings(){
         settingsCat='appearance';
         window._settingsSub='general';
         settingsDraft=JSON.parse(JSON.stringify(settings));
+        if(!settingsDraft.models) settingsDraft.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
         renderSettingsControls();
         updatePreview();
         const m=document.getElementById('settingsModal');
@@ -1467,18 +1480,6 @@ function applySettings(){
     if(!settingsDraft)return;
     const oldPass=settings.password,oldEnabled=settings.passwordEnabled;
     settings=JSON.parse(JSON.stringify(settingsDraft));
-    /* ★ اگه URL یا apiModel مدل‌ها تغییر کرده، در APP_CONFIG ذخیره کن */
-    try{
-        if(settings.models && Array.isArray(settings.models)){
-            settings.models.forEach(function(m){
-                var orig = APP_CONFIG.models.find(function(x){return x.id===m.id;});
-                if(orig){
-                    if(m.baseURL) orig.baseURL = m.baseURL;
-                    if(m.apiModel) orig.apiModel = m.apiModel;
-                }
-            });
-        }
-    }catch(e){}
     saveSettings();applySettingsToUI();
     try{localStorage.setItem(PROFILE_IMG_KEY,settings.profileImage||'');}catch(e){}
     if(settings.passwordEnabled&&(!oldEnabled||oldPass!==settings.password)){
@@ -1525,7 +1526,7 @@ function updateDraft(key,value){
     if(['patternSize','patternOpacity','patternPerCorner','navShadowLevel','bgImageOpacity','autoLockMinutes','notifPreMinutes','studyDefaultMinutes'].includes(key))value=parseInt(value,10);
     if(key==='bgPreset'){settingsDraft.bgImage='';settingsDraft.bgPreset=value;}
     else settingsDraft[key]=value;
-    document.querySelectorAll('#settingsContentWrap .row-btn, #settingsContentWrap .color-opt, #settingsContentWrap .pattern-opt, #settingsContentWrap .bg-opt').forEach(b=>{
+    document.querySelectorAll('#settingsContentWrap .row-btn, #settingsContentWrap .color-opt, #settingsContentWrap .pattern-opt, #settingsContentWrap .bg-opt, #settingsContentWrap .pattern-preset').forEach(b=>{
         if(b.dataset.key===key)b.classList.toggle('active',String(b.dataset.value)===String(value));
     });
     if(['patternSize','patternOpacity','patternPerCorner','navShadowLevel','bgImageOpacity','autoLockMinutes','notifPreMinutes','studyDefaultMinutes'].includes(key)){
@@ -1546,7 +1547,6 @@ function updateDraft(key,value){
     previewRaf=requestAnimationFrame(()=>{updatePreview();previewRaf=null;});
 }
 
-/* ★ آپدیت model config در settings */
 window.updateModelConfig = function(modelId, field, value){
     if(!settingsDraft) return;
     if(!settingsDraft.models) settingsDraft.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
@@ -1725,26 +1725,42 @@ function renderSettingsControls(){
         <button class="settings-tab-btn${settingsCat==='privacy'?' active':''}" data-cat="privacy" onclick="switchSettingsCat('privacy')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>حریم خصوصی</button>
         <button class="settings-tab-btn${settingsCat==='about'?' active':''}" data-cat="about" onclick="switchSettingsCat('about')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>درباره ما</button>`;
 
+    /* ★ بعد از رندر، تب profile رو برگردون */
+    setTimeout(function(){
+        var tw = document.getElementById('settingsTabs');
+        if(tw && !tw.querySelector('[data-cat="profile"]')){
+            var btn=document.createElement('button');
+            btn.className='settings-tab-btn';
+            btn.setAttribute('data-cat','profile');
+            btn.setAttribute('onclick',"switchSettingsCat('profile')");
+            btn.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>مشخصات من';
+            var aboutBtn=tw.querySelector('[data-cat="about"]');
+            tw.insertBefore(btn,aboutBtn||null);
+        }
+    }, 20);
+
     var subState = window._settingsSub || 'general';
 
-    /* ★ ساخت بخش مدل‌ها */
+    /* بخش مدل‌ها */
     var modelsDraft = settingsDraft.models || JSON.parse(JSON.stringify(APP_CONFIG.models));
     var modelsHTML = '<div class="setting-group">'
         +'<label style="font-size:13px;font-weight:800;color:var(--accent)">🧠 مدل‌های هوش مصنوعی سراج</label>'
-        +'<div style="font-size:11px;color:var(--text-muted);line-height:1.9;padding:6px 0 10px">هر مدل به یه پروکسی و کلید API خودش وصل می‌شه. URL و نام مدل رو این‌جا تنظیم کن.</div>'
+        +'<div style="font-size:11px;color:var(--text-muted);line-height:1.9;padding:6px 0 10px">هر مدل به یه پروکسی و کلید API خودش وصل می‌شه. این‌ها رو این‌جا تنظیم کن.</div>'
         + modelsDraft.map(function(m){
-            return '<div style="padding:12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.02);margin-bottom:10px">'
-              +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-              +'<span style="font-size:20px">'+m.emoji+'</span>'
+            return '<div style="padding:14px;border-radius:16px;border:1px solid '+m.color+'40;background:'+m.color+'10;margin-bottom:12px">'
+              +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+              +'<div style="width:36px;height:36px;border-radius:12px;background:'+m.color+'30;display:flex;align-items:center;justify-content:center;font-size:18px">'+m.emoji+'</div>'
               +'<div>'
-              +'<div style="font-size:13px;font-weight:800;color:'+m.color+'">'+escapeHtml(m.name)+'</div>'
-              +'<div style="font-size:10.5px;color:var(--text-muted);margin-top:2px">'+escapeHtml(m.desc)+'</div>'
+              +'<div style="font-size:14px;font-weight:800;color:'+m.color+'">'+escapeHtml(m.name)+'</div>'
+              +'<div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+escapeHtml(m.desc)+'</div>'
               +'</div>'
               +'</div>'
               +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">URL پروکسی</label>'
               +'<input type="text" value="'+escapeHtml(m.baseURL||'')+'" oninput="window.updateModelConfig(\''+m.id+'\',\'baseURL\',this.value)" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px">'
               +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">نام مدل API</label>'
-              +'<input type="text" value="'+escapeHtml(m.apiModel||'')+'" oninput="window.updateModelConfig(\''+m.id+'\',\'apiModel\',this.value)" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr">'
+              +'<input type="text" value="'+escapeHtml(m.apiModel||'')+'" oninput="window.updateModelConfig(\''+m.id+'\',\'apiModel\',this.value)" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;direction:ltr;margin-bottom:8px">'
+              +'<label style="font-size:10.5px;color:var(--text-muted);font-weight:700;display:block;margin-bottom:4px">شخصیت و پرامپت اضافی</label>'
+              +'<textarea oninput="window.updateModelConfig(\''+m.id+'\',\'systemExtra\',this.value)" placeholder="اینجا شخصیت مدل رو بنویس..." style="width:100%;min-height:100px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:11px;outline:none;resize:vertical;line-height:1.8">'+escapeHtml(m.systemExtra||'')+'</textarea>'
               +'</div>';
         }).join('')
         +'</div>';
@@ -1801,13 +1817,20 @@ function renderSettingsControls(){
                 </div>
                 <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>استایل المان‌ها</label>
                     <div class="row-btns">${APP_CONFIG.elementStyles.map(el=>`<button class="row-btn${s.elementStyle===el.id?' active':''}" data-key="elementStyle" data-value="${el.id}" onclick="updateDraft('elementStyle','${el.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${el.icon}</svg><span class="rb-label">${el.name}</span></button>`).join('')}</div>
-                    <div style="font-size:10.5px;color:var(--text-muted);line-height:1.8;padding:4px 0">حالت شیشه‌ای، پشت المان‌ها رو با افکت بلور نشون می‌ده.</div>
                 </div>
             </div>
 
             <div class="settings-subcontent${subState==='pattern'?' active':''}" data-sub="pattern">
                 <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>انتخاب طرح</label>
                     <div class="pattern-grid">${APP_CONFIG.patterns.map(p=>`<div class="pattern-opt${s.pattern===p.id?' active':''}" data-key="pattern" data-value="${p.id}" onclick="updateDraft('pattern','${p.id}')"><div class="pattern-thumb th-${p.id}"></div><div class="pattern-name">${p.name}</div></div>`).join('')}</div>
+                </div>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>رنگ‌های آماده طرح</label>
+                    <div class="pattern-preset-colors">
+                        ${APP_CONFIG.patternPresets.map(function(p){
+                            var isActive = s.patternColor1===p.c1 && s.patternColor2===p.c2;
+                            return '<div class="pattern-preset'+(isActive?' active':'')+'" title="'+p.n+'" onclick="updateDraft(\'patternColor1\',\''+p.c1+'\');updateDraft(\'patternColor2\',\''+p.c2+'\')" style="background:linear-gradient(135deg,'+p.c1+' 0%,'+p.c1+' 50%,'+p.c2+' 50%,'+p.c2+' 100%)"></div>';
+                        }).join('')}
+                    </div>
                 </div>
                 <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>موقعیت</label>
                     <div class="row-btns">
@@ -1826,7 +1849,7 @@ function renderSettingsControls(){
                 <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" opacity=".5"/></svg>شفافیت</label>
                     <div class="slider-row"><input type="range" min="10" max="100" step="5" value="${s.patternOpacity}" oninput="updateDraft('patternOpacity',this.value)"><span class="slider-val">${s.patternOpacity}%</span></div>
                 </div>
-                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ‌های طرح</label>
+                <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".5"/></svg>رنگ‌های دلخواه</label>
                     <div class="color-picker-row">
                         <div class="color-picker-wrap"><label>رنگ ۱</label><input type="color" value="${s.patternColor1}" oninput="updateDraft('patternColor1',this.value)"></div>
                         <div class="color-picker-wrap"><label>رنگ ۲</label><input type="color" value="${s.patternColor2}" oninput="updateDraft('patternColor2',this.value)"></div>
@@ -1856,11 +1879,11 @@ function renderSettingsControls(){
             <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>موقعیت نوار</label>
                 <div class="row-btns">${APP_CONFIG.navPositions.map(p=>`<button class="row-btn${s.navPosition===p.id?' active':''}" data-key="navPosition" data-value="${p.id}" onclick="updateDraft('navPosition','${p.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${p.icon}</svg><span class="rb-label">${p.name}</span></button>`).join('')}</div>
             </div>
-            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>شدت سایه نوار</label>
-                <div class="slider-row"><input type="range" min="0" max="100" step="5" value="${s.navShadowLevel||0}" oninput="updateDraft('navShadowLevel',this.value)"><span class="slider-val">${s.navShadowLevel||0}%</span></div>
-            </div>
             <div class="setting-group"><label><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>استایل پس‌زمینه نوار</label>
                 <div class="row-btns">${APP_CONFIG.navStyles.map(st=>`<button class="row-btn${s.navStyle===st.id?' active':''}" data-key="navStyle" data-value="${st.id}" onclick="updateDraft('navStyle','${st.id}')"><svg class="rb-icon" viewBox="0 0 24 24">${st.icon}</svg><span class="rb-label">${st.name}</span></button>`).join('')}</div>
+            </div>
+            <div class="setting-group"><label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>شدت سایه نوار</label>
+                <div class="slider-row"><input type="range" min="0" max="100" step="5" value="${s.navShadowLevel||0}" oninput="updateDraft('navShadowLevel',this.value)"><span class="slider-val">${s.navShadowLevel||0}%</span></div>
             </div>
         </div>
 
@@ -1871,7 +1894,6 @@ function renderSettingsControls(){
                     <button class="row-btn${s.notifEnabled!==false?' active':''}" onclick="updateDraft('notifEnabled',true)"><span class="rb-label">فعال ✓</span></button>
                     <button class="row-btn${s.notifEnabled===false?' active':''}" onclick="updateDraft('notifEnabled',false)"><span class="rb-label">خاموش ✗</span></button>
                 </div>
-                <div style="font-size:11px;color:var(--text-muted);line-height:1.8;margin-top:6px">یادآور پیش‌کار قبل از شروع هر تسک + یادآور پایان تسک</div>
             </div>
             <div class="setting-group">
                 <label><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>فاصله یادآور پیش‌کار</label>
@@ -1989,7 +2011,7 @@ function renderSettingsControls(){
                 </div>
             </div>
             <div class="siraj-version-badge" style="text-align:center;padding:14px 0;font-size:12px;color:var(--text-muted)">
-                نسخه <span style="color:var(--accent);font-weight:900">${s.appVersion||'3.3'}</span>
+                نسخه <span style="color:var(--accent);font-weight:900">${s.appVersion||'3.5'}</span>
             </div>
         </div>`;
     setTimeout(()=>{
