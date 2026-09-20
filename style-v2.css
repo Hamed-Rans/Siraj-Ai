@@ -5142,3 +5142,10 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
   font-family:var(--font-heading)!important;
   font-weight:600!important;
 }
+/* انیمیشن صفحات بدون blur (سبک‌تر) */
+@keyframes viewOutRightStrong{0%{opacity:1;transform:translateX(0) scale(1)}100%{opacity:0;transform:translateX(80px) scale(.96)}}
+@keyframes viewOutLeftStrong{0%{opacity:1;transform:translateX(0) scale(1)}100%{opacity:0;transform:translateX(-80px) scale(.96)}}
+@keyframes viewInFromLeftStrong{0%{opacity:0;transform:translateX(-80px) scale(.96)}100%{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes viewInFromRightStrong{0%{opacity:0;transform:translateX(80px) scale(.96)}100%{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes viewInFromTopStrong{0%{opacity:0;transform:translateY(-60px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes viewInFromBottomStrong{0%{opacity:0;transform:translateY(60px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
