@@ -676,6 +676,42 @@ function applySettingsToUI(s) {
     applyPattern(document.getElementById('patternLayer'), t.pattern, t.patternColor1, t.patternColor2, t.patternPerCorner, t.patternSize, t.patternPosition, t.patternOpacity);
     var vb = document.getElementById('versionBadge');
     if (vb) vb.textContent = 'v' + (t.appVersion || '2.5');
+       /* ★★ مدیریت کیبورد موبایل — input bar بالای کیبورد */
+    if (window.visualViewport) {
+        var _kbUpdate = function () {
+            var vv = window.visualViewport;
+            var kbHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+            var isMobile = window.innerWidth <= 768;
+            if (isMobile && kbHeight > 100) {
+                document.documentElement.style.setProperty('--kb-height', kbHeight + 'px');
+                document.body.classList.add('kb-open');
+            } else {
+                document.documentElement.style.setProperty('--kb-height', '0px');
+                document.body.classList.remove('kb-open');
+            }
+        };
+        window.visualViewport.addEventListener('resize', _kbUpdate);
+        window.visualViewport.addEventListener('scroll', _kbUpdate);
+
+        /* ★ وقتی input فوکوس می‌گیره، اسکرول کن */
+        document.addEventListener('focusin', function (e) {
+            if (e.target && e.target.classList && e.target.classList.contains('bar-input')) {
+                setTimeout(function () {
+                    if (typeof _kbUpdate === 'function') _kbUpdate();
+                    var box = document.getElementById('box');
+                    if (box) box.scrollTop = box.scrollHeight;
+                }, 300);
+            }
+        });
+        document.addEventListener('focusout', function (e) {
+            if (e.target && e.target.classList && e.target.classList.contains('bar-input')) {
+                setTimeout(_kbUpdate, 200);
+            }
+        });
+    }
+
+    resetInactivityTimer();
+});
     resetInactivityTimer();
     setTimeout(() => { if (typeof window.updateNavSlider === 'function') window.updateNavSlider(false); }, 100);
 }
