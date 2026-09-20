@@ -2959,6 +2959,7 @@
             cur=copy(tg);
           }
         }
+      }
 
         slider.style.width=Math.max(0,cur.r-cur.l)+'px';
         slider.style.height=Math.max(0,cur.b-cur.t)+'px';
@@ -3028,7 +3029,7 @@
       }
     })();
 
-        /* ★ انیمیشن سوییچ view */
+            /* ★ انیمیشن سوییچ view */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function') return false;
@@ -3092,7 +3093,6 @@
         if(a){var n=a.id.replace('view-','');if(VIEW_ORDER.indexOf(n)!==-1) _currentMainView=n;}
       },1000);
     })();
-
     function applyPinRotation(){
       var row=document.getElementById('navRow');
       var svg=document.querySelector('.nav-collapse-tab svg');
