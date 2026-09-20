@@ -2794,14 +2794,6 @@ function renderSettingsControls() {
                 '</div>' +
             '</div>' +
         '</div>' +
-            '<div class="setting-group">' +
-                '<label>تست و مجوز اعلان</label>' +
-                '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">' +
-                    '<button class="btn-primary" style="flex:1;justify-content:center" onclick="if(window.__sendTestNotification)window.__sendTestNotification()">ارسال نوتیف تست</button>' +
-                    '<button class="btn-secondary" style="flex:1;justify-content:center" onclick="if(window.__requestNotifPermission)window.__requestNotifPermission()">درخواست مجوز</button>' +
-                '</div>' +
-            '</div>' +
-        '</div>' +
 
         (admin ? '<div class="settings-content' + (settingsCat === 'models' ? ' active' : '') + '" data-cat="models">' + modelsHTML + '</div>' : '') +
 
