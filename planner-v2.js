@@ -2855,68 +2855,83 @@
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
+        /* ═══════════════════════════════════════════════════════════════
        NAV SLIDER
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null, fill=null;
-      var S=null;
-      var raf=0, lastT=0, settleUntil=0;
+      var cur=null;                    // موقعیت فعلی پس‌زمینه {l,r,t,b}
+      var lastBtn=null;                // دکمه‌ای که پس‌زمینه روشه (یا داره می‌ره روش)
+      var fromBtn=null, rel=null;      // دکمه‌ی مبدأ + فاصله‌ی پس‌زمینه از اون
+      var t0=0, animating=false, flying=false;
+      var raf=0, settleUntil=0;
+      var DUR=460;
 
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
+      function ease(p){ return p<.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2; }
+      function copy(o){ return {l:o.l,r:o.r,t:o.t,b:o.b}; }
 
-      function readTarget(btn){
-        var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
-        var padY=(pos==='left'||pos==='right')?2:4;
+      function box(btn){
         var l=btn.offsetLeft, t=btn.offsetTop;
-        return {
-          l:l, r:l+btn.offsetWidth,
-          t:t-padY, b:t+btn.offsetHeight+padY,
-          chat:btn.classList.contains('nav-btn-chat')
-        };
+        return {l:l, r:l+btn.offsetWidth, t:t, b:t+btn.offsetHeight};
+      }
+      function padY(){
+        var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
+        return (pos==='left'||pos==='right')?2:4;
+      }
+      function target(btn){
+        var bx=box(btn), py=padY();
+        return { l:bx.l, r:bx.r, t:bx.t-py, b:bx.b+py, chat:btn.classList.contains('nav-btn-chat') };
       }
 
       function frame(now){
         raf=0;
         if(!nav||!slider) return;
         var btn=nav.querySelector('.bottom-nav-btn.active');
-        if(!btn){ imp(slider,'opacity','0'); lastT=0; return; }
-        var row=document.getElementById('navRow');
-        var collapsed=!!(row&&row.classList.contains('collapsed'));
-        var tg=readTarget(btn);
-        var dt=lastT?Math.min(64,now-lastT):16; lastT=now;
+        if(!btn){ imp(slider,'opacity','0'); return; }
+        var tg=target(btn);
 
-        if(!S){
-          S={l:tg.l,r:tg.r,t:tg.t,b:tg.b};
+        if(!cur){
+          cur=copy(tg); lastBtn=btn;
         }else{
-          var fast=1-Math.exp(-dt/85), slow=1-Math.exp(-dt/170);
-          var right=(tg.l+tg.r)>(S.l+S.r);
-          S.r+=(tg.r-S.r)*(right?fast:slow);
-          S.l+=(tg.l-S.l)*(right?slow:fast);
-          var down=(tg.t+tg.b)>(S.t+S.b);
-          S.b+=(tg.b-S.b)*(down?fast:slow);
-          S.t+=(tg.t-S.t)*(down?slow:fast);
+          if(btn!==lastBtn){
+            /* شروع حرکت: مبدأ = موقعیت فعلی نسبت به دکمه‌ی قبلی (نه مختصات ثابت) */
+            var ob=box(lastBtn);
+            rel={ l:cur.l-ob.l, r:cur.r-ob.r, t:cur.t-ob.t, b:cur.b-ob.b };
+            fromBtn=lastBtn; lastBtn=btn; t0=now; animating=true;
+          }
+          if(animating){
+            var p=Math.min(1,(now-t0)/DUR), e=ease(p);
+            var fb=box(fromBtn);
+            var fl=fb.l+rel.l, fr=fb.r+rel.r, ft=fb.t+rel.t, fbt=fb.b+rel.b;
+            cur.l=fl+(tg.l-fl)*e;
+            cur.r=fr+(tg.r-fr)*e;
+            cur.t=ft+(tg.t-ft)*e;
+            cur.b=fbt+(tg.b-fbt)*e;
+            if(p>=1) animating=false;
+          }else{
+            cur=copy(tg);
+          }
         }
 
-        slider.style.width=Math.max(0,S.r-S.l)+'px';
-        slider.style.height=Math.max(0,S.b-S.t)+'px';
-        imp(slider,'transform','translate3d('+S.l+'px,'+S.t+'px,0)');
-
-        var dist=Math.abs(tg.l-S.l)+Math.abs(tg.r-S.r)+Math.abs(tg.t-S.t)+Math.abs(tg.b-S.b);
-        var shouldHide=(tg.chat||collapsed);
-        if(shouldHide && dist<12){
-          imp(slider,'opacity','0');
-        } else {
-          imp(slider,'opacity','1');
+        /* وسط حرکت سایه‌ی سبک، بعد از رسیدن سایه‌ی اصلی */
+        if(animating!==flying){
+          flying=animating;
+          if(flying) imp(fill,'box-shadow','0 2px 8px -4px var(--accent)');
+          else fill.style.removeProperty('box-shadow');
         }
 
-        var moving=dist>.4;
-        if(moving||now<settleUntil){ raf=requestAnimationFrame(frame); }
-        else{ lastT=0; }
+        slider.style.width=Math.max(0,cur.r-cur.l)+'px';
+        slider.style.height=Math.max(0,cur.b-cur.t)+'px';
+        imp(slider,'transform','translate3d('+cur.l+'px,'+cur.t+'px,0)');
+        /* روی دکمه‌ی هوش مصنوعی: اول کامل می‌رسه، بعد محو می‌شه */
+        imp(slider,'opacity',(tg.chat&&!animating)?'0':'1');
+
+        if(animating||now<settleUntil){ raf=requestAnimationFrame(frame); }
       }
 
       function kick(snap){
-        if(snap) S=null;
+        if(snap){ cur=null; animating=false; lastBtn=null; fromBtn=null; rel=null; }
         settleUntil=performance.now()+900;
         if(!raf) raf=requestAnimationFrame(frame);
       }
@@ -2933,6 +2948,8 @@
         slider.appendChild(fill);
         imp(slider,'transition','opacity .28s ease');
         imp(slider,'opacity','0');
+        imp(slider,'will-change','transform,width,height');
+        imp(fill,'transition','box-shadow .3s ease,border-radius .3s ease');
         nav.insertBefore(slider,nav.firstChild);
 
         nav.addEventListener('click',function(e){
@@ -3070,19 +3087,11 @@
       }
     },800);
 
-    function updateNavHiddenState(){
+        function updateNavHiddenState(){
       var row=document.getElementById('navRow');
       if(!row) return;
       var collapsed=row.classList.contains('collapsed');
-      function updateNavHiddenState(){
-  var row=document.getElementById('navRow');
-  if(!row) return;
-  var collapsed=row.classList.contains('collapsed');
-  var nav=document.getElementById('bottomNav');
-  if(!nav) return;
-  if(collapsed) nav.classList.add('nav-collapsed');
-  else nav.classList.remove('nav-collapsed');
-}
+      var nav=document.getElementById('bottomNav');
       if(!nav) return;
       if(collapsed) nav.classList.add('nav-collapsed');
       else nav.classList.remove('nav-collapsed');
