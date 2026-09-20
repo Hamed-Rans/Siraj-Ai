@@ -711,11 +711,8 @@ function applySettingsToUI(s) {
     }
 
     resetInactivityTimer();
-});
-    resetInactivityTimer();
     setTimeout(() => { if (typeof window.updateNavSlider === 'function') window.updateNavSlider(false); }, 100);
-}
-
+    });
 /* ═══════════════════════════════════════════════════════════════
    DROPDOWNS
    ═══════════════════════════════════════════════════════════════ */
