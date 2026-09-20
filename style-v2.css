@@ -5445,3 +5445,21 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
   width:18px!important;
   height:18px!important;
 }
+/* ═══ R12: پشتیبانی از SVG در titles پاپ‌آپ‌ها ═══ */
+.siraj-popup-title{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+}
+.siraj-popup-title svg{
+  width:16px!important;
+  height:16px!important;
+  color:var(--accent)!important;
+  flex-shrink:0;
+}
+
+/* همین‌طور برای cal-popup-wide (پاپ‌آپ تقویم) */
+.cal-popup-wide .siraj-popup-title{
+  gap:8px!important;
+}
