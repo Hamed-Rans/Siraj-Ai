@@ -3709,3 +3709,88 @@ body{
   text-overflow:ellipsis!important;
   box-sizing:border-box!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   NAV v3 — موقعیت‌ها + جمع‌شدن نیمه‌بیرون + انیمیشن کادر صفحات
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  --nav-ease:cubic-bezier(.22,1,.36,1);
+  --nav-edge-y:18px;          /* فاصله‌ی نوار تا لبه‌ی صفحه در حالت پایین/بالا */
+  --nav-edge-x:14px;          /* فاصله‌ی نوار تا لبه‌ی صفحه در حالت چپ/راست */
+  --nav-reserve-open:100px;   /* فضای کادر صفحات وقتی نوار بازه (چپ/راست) */
+  --nav-reserve-closed:44px;  /* فضای کادر صفحات وقتی نوار جمع شده */
+}
+@media (max-width:900px){
+  :root{
+    --nav-height:64px;
+    --nav-collapsed:20px;
+    --nav-edge-y:4px;
+    --nav-reserve-open:112px;
+    --nav-reserve-closed:56px;
+  }
+}
+
+/* انیمیشن جمع/باز شدن کادر صفحات */
+.nav-row{transition:height .5s var(--nav-ease),padding .5s var(--nav-ease)!important}
+.app-container{transition:padding .5s var(--nav-ease)}
+.nav-row .bottom-nav{
+  transition:transform .5s var(--nav-ease),opacity .35s ease,box-shadow .4s var(--nav-ease),background .3s ease,border-color .3s ease!important;
+  will-change:transform;
+}
+
+/* بالا: توی جریان صفحه، مثل پایین ولی برعکس */
+html[data-nav-position="top"] .app-container{flex-direction:column-reverse!important}
+html[data-nav-position="top"] .nav-row{
+  position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+  height:var(--nav-height)!important;padding:6px 0 0!important;
+  align-items:flex-start!important;transform:none!important;z-index:100!important;
+}
+html[data-nav-position="top"] .nav-row.collapsed{height:var(--nav-collapsed)!important}
+
+/* چپ/راست */
+html:is([data-nav-position="left"],[data-nav-position="right"]) .nav-row{
+  position:fixed!important;top:50%!important;bottom:auto!important;
+  width:auto!important;height:auto!important;padding:0!important;
+  transform:translateY(-50%)!important;z-index:100!important;
+}
+html[data-nav-position="left"] .nav-row{left:var(--nav-edge-x)!important;right:auto!important}
+html[data-nav-position="right"] .nav-row{right:var(--nav-edge-x)!important;left:auto!important}
+html[data-nav-position="left"] .app-container{padding-left:var(--nav-reserve-open)!important}
+html[data-nav-position="right"] .app-container{padding-right:var(--nav-reserve-open)!important}
+html[data-nav-position="left"] .app-container:has(.nav-row.collapsed){padding-left:var(--nav-reserve-closed)!important}
+html[data-nav-position="right"] .app-container:has(.nav-row.collapsed){padding-right:var(--nav-reserve-closed)!important}
+html:is([data-nav-position="left"],[data-nav-position="right"]) .top-row{padding-left:0!important;padding-right:0!important}
+
+/* نوار جمع‌شده: نصفش بیرون از لبه‌ی صفحه */
+html[data-nav-position="bottom"] .nav-row.collapsed .bottom-nav{transform:translateY(calc(50% + var(--nav-edge-y)))!important}
+html[data-nav-position="top"] .nav-row.collapsed .bottom-nav{transform:translateY(calc(-50% - var(--nav-edge-y)))!important}
+html[data-nav-position="left"] .nav-row.collapsed .bottom-nav{transform:translateX(calc(-50% - var(--nav-edge-x)))!important}
+html[data-nav-position="right"] .nav-row.collapsed .bottom-nav{transform:translateX(calc(50% + var(--nav-edge-x)))!important}
+.nav-row.collapsed .bottom-nav{opacity:.92}
+/* هاور: با انیمیشن بیرون میاد */
+html .nav-row.collapsed .bottom-nav:hover{transform:none!important;opacity:1}
+/* ناحیه‌ی نامرئی هاور، تا وقتی نوار بالا میاد هاور از دست نره */
+.nav-row.collapsed .bottom-nav::after{content:''!important;display:block!important;position:absolute!important}
+html[data-nav-position="bottom"] .nav-row.collapsed .bottom-nav::after{left:0;right:0;top:100%;height:44px}
+html[data-nav-position="top"] .nav-row.collapsed .bottom-nav::after{left:0;right:0;bottom:100%;height:44px}
+html[data-nav-position="left"] .nav-row.collapsed .bottom-nav::after{top:0;bottom:0;right:100%;width:44px}
+html[data-nav-position="right"] .nav-row.collapsed .bottom-nav::after{top:0;bottom:0;left:100%;width:44px}
+
+/* دکمه‌های نوار عمودی: متن زیر آیکون، با انیمیشن ارتفاع */
+html:is([data-nav-position="left"],[data-nav-position="right"]) .nav-collapse-tab{margin:0 0 4px!important}
+html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn:not(.nav-btn-chat){
+  height:44px!important;min-height:0!important;max-height:none!important;
+  padding:0 4px!important;gap:0!important;
+  transition:height .45s var(--nav-ease),background .3s ease,color .25s ease,transform .25s var(--nav-ease)!important;
+}
+html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.active:not(.nav-btn-chat){
+  height:56px!important;min-height:0!important;padding:0 4px!important;gap:0!important;
+}
+html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn:not(.nav-btn-chat)::after{
+  content:attr(title)!important;display:block!important;
+  max-width:100%!important;max-height:0!important;opacity:0!important;
+  margin:0!important;line-height:1.1!important;font-size:9.5px!important;
+  transition:max-height .45s var(--nav-ease),margin-top .45s var(--nav-ease),opacity .3s ease!important;
+}
+html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.active:not(.nav-btn-chat)::after{
+  max-height:12px!important;margin-top:4px!important;opacity:1!important;
+}
