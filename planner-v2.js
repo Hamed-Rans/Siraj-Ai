@@ -2840,12 +2840,15 @@
     /* ═══════════════════════════════════════════════════════════════
        ★ NAV SLIDER — بازنویسی کامل بدون کش‌آمدن و بدون باقی‌موندن
        ═══════════════════════════════════════════════════════════════ */
-        (function(){
+            (function(){
       var nav=null, slider=null, fill=null;
-      var S=null;                       // موقعیت فعلی پس‌زمینه {l,r,t,b}
-      var raf=0, lastT=0, settleUntil=0;
+      var cur=null, from=null, t0=0, animating=false, lastBtn=null;
+      var raf=0, settleUntil=0;
+      var DUR=520;
 
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
+      function ease(p){ return 1-Math.pow(1-p,4); }
+      function copy(o){ return {l:o.l,r:o.r,t:o.t,b:o.b}; }
 
       function readTarget(btn){
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
@@ -2858,47 +2861,42 @@
         };
       }
 
-        function frame(now){
+      function frame(now){
         raf=0;
         if(!nav||!slider) return;
         var btn=nav.querySelector('.bottom-nav-btn.active');
-        if(!btn){ imp(slider,'opacity','0'); lastT=0; return; }
-        var row=document.getElementById('navRow');
-        var collapsed=!!(row&&row.classList.contains('collapsed'));
+        if(!btn){ imp(slider,'opacity','0'); return; }
         var tg=readTarget(btn);
-        var dt=lastT?Math.min(64,now-lastT):16; lastT=now;
 
-        if(!S){
-          S={l:tg.l,r:tg.r,t:tg.t,b:tg.b};
+        if(!cur){
+          cur=copy(tg); lastBtn=btn;
         }else{
-          var fast=1-Math.exp(-dt/85), slow=1-Math.exp(-dt/170);
-          var right=(tg.l+tg.r)>(S.l+S.r);
-          S.r+=(tg.r-S.r)*(right?fast:slow);
-          S.l+=(tg.l-S.l)*(right?slow:fast);
-          var down=(tg.t+tg.b)>(S.t+S.b);
-          S.b+=(tg.b-S.b)*(down?fast:slow);
-          S.t+=(tg.t-S.t)*(down?slow:fast);
+          if(btn!==lastBtn){
+            lastBtn=btn; from=copy(cur); t0=now; animating=true;
+          }
+          if(animating){
+            var p=Math.min(1,(now-t0)/DUR), e=ease(p);
+            cur.l=from.l+(tg.l-from.l)*e;
+            cur.r=from.r+(tg.r-from.r)*e;
+            cur.t=from.t+(tg.t-from.t)*e;
+            cur.b=from.b+(tg.b-from.b)*e;
+            if(p>=1) animating=false;
+          }else{
+            cur=copy(tg);
+          }
         }
 
-        slider.style.width=Math.max(0,S.r-S.l)+'px';
-        slider.style.height=Math.max(0,S.b-S.t)+'px';
-        imp(slider,'transform','translate3d('+S.l+'px,'+S.t+'px,0)');
+        slider.style.width=Math.max(0,cur.r-cur.l)+'px';
+        slider.style.height=Math.max(0,cur.b-cur.t)+'px';
+        imp(slider,'transform','translate3d('+cur.l+'px,'+cur.t+'px,0)');
+        /* روی دکمه‌ی گفتگو: اول کامل می‌رسه، بعد محو می‌شه */
+        imp(slider,'opacity',(tg.chat&&!animating)?'0':'1');
 
-        var dist=Math.abs(tg.l-S.l)+Math.abs(tg.r-S.r)+Math.abs(tg.t-S.t)+Math.abs(tg.b-S.b);
-        var shouldHide=(tg.chat||collapsed);
-        if(shouldHide && dist<12){
-          imp(slider,'opacity','0');
-        } else {
-          imp(slider,'opacity','1');
-        }
-
-        var moving=dist>.4;
-        if(moving||now<settleUntil){ raf=requestAnimationFrame(frame); }
-        else{ lastT=0; }
+        if(animating||now<settleUntil){ raf=requestAnimationFrame(frame); }
       }
 
       function kick(snap){
-        if(snap) S=null;
+        if(snap){ cur=null; animating=false; lastBtn=null; }
         settleUntil=performance.now()+900;
         if(!raf) raf=requestAnimationFrame(frame);
       }
