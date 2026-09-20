@@ -331,8 +331,6 @@ body{
 [data-nav-position="left"] .view.view-in-from-right,[data-nav-position="right"] .view.view-in-from-right{animation:viewInFromBottomSmooth .35s var(--ease-smooth) both!important}
 [data-nav-position="left"] .view.leaving.view-out-left,[data-nav-position="right"] .view.leaving.view-out-left{animation:viewOutToTopSmooth .2s cubic-bezier(.4,0,.7,.5) forwards!important}
 [data-nav-position="left"] .view.leaving.view-out-right,[data-nav-position="right"] .view.leaving.view-out-right{animation:viewOutToBottomSmooth .2s cubic-bezier(.4,0,.7,.5) forwards!important}
-[data-element-style]{will-change:backdrop-filter,background!important}
-.view, .view *{transform:translateZ(0)}
 
 /* ═══════════════════════════════════════════════════════════════
    ۸) SIDE PANEL
