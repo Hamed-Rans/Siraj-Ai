@@ -6367,3 +6367,47 @@ body.kb-open #box{
     padding-bottom:8px!important;
   }
 }
+/* ═══════════════════════════════════════════════════════════════
+   STUDY BUTTONS — رنگ دکمه‌ها هم‌رنگ سایه‌هاشون
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ دکمه توقف (زرد/نارنجی) ═══ */
+.study-btn.pause-mode{
+  background:linear-gradient(160deg,#F59E0B 0%,#D97706 100%)!important;
+  color:#fff!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 24px -8px #F59E0B!important;
+}
+.study-btn.pause-mode:hover:not(:disabled){
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.25),
+    0 2px 4px rgba(0,0,0,.3),
+    0 12px 32px -8px #F59E0B!important;
+}
+
+/* ═══ دکمه پایان و ثبت (سبز) ═══ */
+.study-btn.finish-mode{
+  background:linear-gradient(160deg,#10B981 0%,#059669 100%)!important;
+  color:#fff!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 24px -8px #10B981!important;
+}
+.study-btn.finish-mode:hover:not(:disabled){
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.25),
+    0 2px 4px rgba(0,0,0,.3),
+    0 12px 32px -8px #10B981!important;
+}
+
+/* ═══ دکمه ادامه (وقتی paused) ═══ */
+.study-btn.resume-mode{
+  background:linear-gradient(160deg,#10B981 0%,#059669 100%)!important;
+  color:#fff!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 8px 24px -8px #10B981!important;
+}
