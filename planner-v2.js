@@ -55,6 +55,7 @@
       library: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>',
       checkCircle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>',
       flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+            bookUpload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M12 7v6"/><path d="m9 10 3-3 3 3"/></svg>',
       lamp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21h6"/><path d="M12 21v-5"/><path d="M6 16h12l-2-8H8z"/><path d="M12 8V5"/><path d="M9 5h6"/><circle cx="12" cy="12.5" r="1.2" fill="currentColor" stroke="none" opacity=".55"/></svg>',
       calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
       bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
@@ -2161,6 +2162,7 @@
         +'<div class="study-actions-row top">'
         +'<button class="study-btn" id="studyToolsBtn">🛠️ دستیار</button>'
         +'<button class="study-btn" id="studyChatBtn">🤖 هوش مصنوعی سراج</button>'
+        +'<button class="study-btn" id="studyLibraryBtn">📚 کتابخانه</button>'
         +'</div>'
         +'<div class="study-actions-row bottom">'
         +'<button class="study-btn pause-mode" id="studyPauseBtn"><span id="studyPauseLabel">توقف</span></button>'
@@ -2217,9 +2219,10 @@
         });
       }
       el.querySelector('#studyStartBtn').onclick=startStudy;
-      el.querySelector('#studyCancelBtn').onclick=function(){stopAudio();closeStudy();};
+      el.querySelector('#studyCancelBtn').onclick=function(e){         e.preventDefault();         e.stopPropagation();         stopAudio();         closeStudy();       };
       el.querySelector('#studyChatBtn').onclick=toggleStudyChat;
       el.querySelector('#studyToolsBtn').onclick=toggleStudyTools;
+      el.querySelector('#studyLibraryBtn').onclick=toggleStudyLibrary;
       el.querySelector('#studyPauseBtn').onclick=toggleStudyPause;
       el.querySelector('#studyFinishBtn').onclick=finishAndRecord;
     }
@@ -2490,13 +2493,15 @@
         return { valid: reason.length >= 30 };
       }catch(e){return { valid: reason.length >= 25 };}
     }
-    function closeStudy(){
+       function closeStudy(){
       try{stopAudio();}catch(e){}
       var o=document.getElementById('studyOverlay');
       var chat=document.getElementById('studyChatPanel');
       var tools=document.getElementById('studyToolsPanel');
+      var lib=document.getElementById('studyLibraryPanel');
       if(chat) chat.remove();
       if(tools) tools.remove();
+      if(lib) lib.remove();
       if(_studyDragHandlers){
         try{
           document.removeEventListener('mousemove',_studyDragHandlers.move);
@@ -2507,14 +2512,24 @@
         _studyDragHandlers=null;
       }
       if(!o) return;
-      if(o.dataset.closing==='1') return;
-      o.dataset.closing='1';
+      /* ★ ریست کامل state */
+      if(studyTimer){ clearInterval(studyTimer); studyTimer=null; }
+      studyRunning=false;
+      studyPaused=false;
+      studySeconds=0;
+      studyTotalMinutes=0;
+      window.__studyTask='';
+      window.__studyTaskSourceId=null;
+      window.__studyTaskSourceDay=null;
+      try{ unlockSite(); }catch(e){}
+      /* ★ انیمیشن بستن */
+      o.style.transition='opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.4,0,.2,1), visibility .45s';
       o.classList.remove('open');
-      setTimeout(function(){if(o.parentNode)o.remove();},700);
+      setTimeout(function(){if(o.parentNode)o.remove();},620);
       setTimeout(function(){
         if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
         refreshBody('left');
-      },400);
+      },380);
     }
     function blockKey(e){
       if(!studyRunning) return;
@@ -2662,6 +2677,110 @@
       }catch(err){
         var t2=document.getElementById(tid);if(t2) t2.textContent='خطا: '+err.message;
       }
+    };
+
+        /* ═══════════════════════════════════════════════════════════════
+       STUDY LIBRARY — کتابخانه شخصی در حالت مطالعه
+       ═══════════════════════════════════════════════════════════════ */
+    var STUDY_BOOKS_KEY = 'siraj-study-books';
+    function loadStudyBooks(){
+      try{ return JSON.parse(localStorage.getItem(STUDY_BOOKS_KEY) || '[]'); }catch(e){ return []; }
+    }
+    function saveStudyBooks(arr){
+      try{ localStorage.setItem(STUDY_BOOKS_KEY, JSON.stringify(arr)); }catch(e){}
+    }
+
+    function toggleStudyLibrary(){
+      var ex=document.getElementById('studyLibraryPanel');
+      if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
+
+      var p=document.createElement('div');
+      p.id='studyLibraryPanel';
+      p.className='study-tools-panel';
+      p.innerHTML=
+        '<div class="study-chat-header">'
+        +'<div class="study-chat-header-title">📚 کتابخانه من</div>'
+        +'<button class="study-chat-close" id="studyLibCloseBtn">✕</button>'
+        +'</div>'
+        +'<div class="study-lib-upload-row">'
+        +'<label class="study-lib-upload-btn">'
+        +'<input type="file" id="studyLibFileInput" accept=".pdf,.epub,.txt,.doc,.docx,.jpg,.png" multiple style="display:none">'
+        +'📁 آپلود کتاب'
+        +'</label>'
+        +'</div>'
+        +'<div class="study-lib-list" id="studyLibList"></div>';
+
+      document.body.appendChild(p);
+      p.querySelector('#studyLibCloseBtn').onclick=function(){
+        p.classList.remove('open');
+        setTimeout(function(){p.remove();},320);
+      };
+      p.querySelector('#studyLibFileInput').onchange=handleStudyBookUpload;
+
+      renderStudyLibraryList();
+      requestAnimationFrame(function(){ p.classList.add('open'); });
+    }
+
+    function handleStudyBookUpload(e){
+      var files=e.target.files;
+      if(!files||!files.length) return;
+      var books=loadStudyBooks();
+      var remaining=files.length;
+
+      Array.prototype.forEach.call(files,function(f){
+        if(f.size>10*1024*1024){
+          if(window.toast) window.toast('فایل «'+f.name+'» بیش از ۱۰ مگابایته','error');
+          remaining--; if(remaining===0) renderStudyLibraryList();
+          return;
+        }
+        var r=new FileReader();
+        r.onload=function(ev){
+          books.push({
+            id:'book_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+            name:f.name,
+            size:f.size,
+            type:f.type,
+            data:ev.target.result,
+            ts:Date.now()
+          });
+          remaining--;
+          if(remaining===0){
+            saveStudyBooks(books);
+            renderStudyLibraryList();
+            if(window.toast) window.toast(files.length+' کتاب اضافه شد ✓','success');
+          }
+        };
+        r.readAsDataURL(f);
+      });
+      e.target.value='';
+    }
+
+    function renderStudyLibraryList(){
+      var list=document.getElementById('studyLibList');
+      if(!list) return;
+      var books=loadStudyBooks();
+      if(books.length===0){
+        list.innerHTML='<div class="study-lib-empty"><span style="font-size:32px;opacity:.5">📚</span><br>هنوز کتابی آپلود نکردی</div>';
+        return;
+      }
+      list.innerHTML=books.map(function(b){
+        var size=(b.size/(1024*1024)).toFixed(2)+' MB';
+        return '<div class="study-lib-item">'
+          +'<div class="study-lib-icon">📄</div>'
+          +'<div class="study-lib-info">'
+          +'<div class="study-lib-name">'+esc(b.name)+'</div>'
+          +'<div class="study-lib-meta">'+size+'</div>'
+          +'</div>'
+          +'<button class="study-lib-del" onclick="window.__delStudyBook(\''+b.id+'\')">✕</button>'
+          +'</div>';
+      }).join('');
+    }
+
+    window.__delStudyBook=function(id){
+      var books=loadStudyBooks().filter(function(b){return b.id!==id;});
+      saveStudyBooks(books);
+      renderStudyLibraryList();
+      if(window.toast) window.toast('حذف شد','info');
     };
 
     /* ═══════════════════════════════════════════════════════════════
