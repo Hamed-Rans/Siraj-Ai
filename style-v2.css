@@ -4329,3 +4329,231 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
   margin:0!important;
   padding:0!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH N — رفع باگ‌های تم روشن + hover + کلیک تنظیمات
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   N1: کارت روزانه — حذف هاله آبی hover (فقط خط بالایی بمونه)
+   ═══════════════════════════════════════════════════════════════ */
+.daily-card:hover,
+.daily-cards:hover .daily-card{
+  transform:none!important;
+  background:var(--bubble-bot-bg)!important;
+  border-color:var(--border)!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.25),
+    0 4px 14px -8px rgba(0,0,0,.35)!important;
+}
+.daily-card::after{
+  /* خط بالایی از PATCH J2 باقی می‌مونه */
+  display:block!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   N2: تم روشن — input کار جدید تیره نشه
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="light"] .task-add-form input[type=text],
+[data-theme^="light"][data-header-style="glass"] .task-add-form input[type=text],
+[data-theme^="light"][data-element-style="glass"] .task-add-form input[type=text]{
+  background:#FFFFFF!important;
+  border-color:rgba(0,0,0,.12)!important;
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .task-add-form input[type=text]::placeholder{
+  color:var(--text-muted)!important;
+  opacity:.7!important;
+}
+[data-theme^="light"] .task-add-form input[type=text]:hover,
+[data-theme^="light"] .task-add-form input[type=text]:focus{
+  border-color:var(--accent)!important;
+}
+
+/* ═══ light — select های اولویت و ساعت ═══ */
+[data-theme^="light"] .siraj-select-trigger{
+  background:#FFFFFF!important;
+  border-color:rgba(0,0,0,.12)!important;
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .siraj-select-panel{
+  background:#FFFFFF!important;
+  border-color:rgba(0,0,0,.12)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   N3: تم روشن — پیش‌نمایش نوار در تنظیمات، روشن بشه
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="light"] .pv-nav-preview{
+  background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(238,242,250,.9))!important;
+  border-color:rgba(0,0,0,.1)!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.1),
+    0 4px 14px -6px rgba(0,0,0,.15)!important;
+}
+[data-theme^="light"] .pv-nav-preview-item{
+  background:rgba(0,0,0,.06)!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .pv-nav-preview-item.active{
+  background:var(--accent)!important;
+  color:#fff!important;
+}
+[data-theme^="light"] .pv-nav-preview-item.fab{
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark))!important;
+  color:#fff!important;
+  box-shadow:0 0 0 2px #fff,0 0 0 3px var(--accent)!important;
+}
+[data-theme^="light"] .pv-nav-preview-item.collapse{
+  background:transparent!important;
+  color:var(--text-muted)!important;
+}
+
+/* ═══ light — input preview هم روشن ═══ */
+[data-theme^="light"] .pv-input-bar{
+  background:#FFFFFF!important;
+  border-color:rgba(0,0,0,.12)!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .preview-zone[data-input-style="glass"] .pv-input-bar{
+  background:rgba(255,255,255,.9)!important;
+  border-color:rgba(0,0,0,.1)!important;
+}
+[data-theme^="light"] .preview-zone[data-header-style="glass"] .pv-header{
+  background:linear-gradient(135deg,rgba(255,255,255,.7),rgba(255,255,255,.4))!important;
+  border-color:rgba(0,0,0,.1)!important;
+}
+[data-theme^="light"] .preview-zone[data-header-style="solid"] .pv-header{
+  background:#fff!important;
+  border-color:rgba(0,0,0,.12)!important;
+}
+[data-theme^="light"] .pv-header-text{
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .pv-msg.bot{
+  background:var(--bubble-bot-bg)!important;
+  color:var(--text-main)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   N4: تم روشن — حالت مطالعه (study overlay) روشن بشه
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="light"] .study-overlay{
+  background:linear-gradient(160deg,#FFFFFF 0%,#F2F5FB 100%)!important;
+}
+[data-theme^="light"] .study-title{
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .study-sub{
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .study-timer{
+  color:var(--accent)!important;
+  text-shadow:0 0 30px var(--accent-soft)!important;
+}
+[data-theme^="light"] .study-empty-box,
+[data-theme^="light"] .stp-wrap,
+[data-theme^="light"] .study-music-section,
+[data-theme^="light"] .study-task,
+[data-theme^="light"] .study-volume-row{
+  background:#FFFFFF!important;
+  border-color:rgba(0,0,0,.1)!important;
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .stp-num{
+  color:var(--accent)!important;
+}
+[data-theme^="light"] .stp-hint{
+  background:#FFFFFF!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .study-sound-btn{
+  background:rgba(0,0,0,.03)!important;
+  border-color:rgba(0,0,0,.1)!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .study-sound-btn.on{
+  background:linear-gradient(160deg,var(--accent-light),var(--accent-dark))!important;
+  color:#fff!important;
+  border-color:transparent!important;
+}
+[data-theme^="light"] .study-sound-btn.on.off-btn{
+  background:rgba(239,68,68,.12)!important;
+  color:#EF4444!important;
+  border-color:rgba(239,68,68,.35)!important;
+}
+[data-theme^="light"] .study-mode-badge{
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  border-color:var(--accent)!important;
+}
+[data-theme^="light"] .study-btn.secondary{
+  background:#F5F7FB!important;
+  color:var(--text-muted)!important;
+  border-color:rgba(0,0,0,.1)!important;
+}
+[data-theme^="light"] .study-btn.secondary:hover{
+  background:rgba(239,68,68,.08)!important;
+  color:#EF4444!important;
+  border-color:#EF4444!important;
+}
+
+/* ═══ study chat/tools panels در light ═══ */
+[data-theme^="light"] .study-chat-panel,
+[data-theme^="light"] .study-tools-panel{
+  background:#FFFFFF!important;
+  border-color:rgba(0,0,0,.1)!important;
+}
+[data-theme^="light"] .study-chat-header{
+  background:var(--bubble-bot-bg)!important;
+  border-color:rgba(0,0,0,.08)!important;
+}
+[data-theme^="light"] .study-chat-messages{
+  background:#F7F9FC!important;
+}
+[data-theme^="light"] .sc-bot{
+  background:var(--bubble-bot-bg)!important;
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .study-chat-input-row{
+  background:#FFFFFF!important;
+  border-color:rgba(0,0,0,.08)!important;
+}
+[data-theme^="light"] .study-chat-input{
+  background:#F5F7FB!important;
+  border-color:rgba(0,0,0,.1)!important;
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .study-tool-card{
+  background:#FFFFFF!important;
+  border-color:rgba(0,0,0,.1)!important;
+}
+[data-theme^="light"] .study-tools-grid{
+  background:#F5F7FB!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   N5: بعد از بستن تنظیمات، مطمئن شو پنل مخفی و کلیک‌پذیر بشه
+   ═══════════════════════════════════════════════════════════════ */
+.modal-overlay:not(.open){
+  pointer-events:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  display:none!important;
+}
+.modal-overlay.open{
+  display:flex!important;
+  pointer-events:auto!important;
+  visibility:visible!important;
+}
+/* رفع تداخل contain با pointer-events */
+.settings-content-wrap{
+  contain:none!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
