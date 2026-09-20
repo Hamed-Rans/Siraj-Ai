@@ -5478,3 +5478,108 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
     opacity .3s ease,
     margin .45s cubic-bezier(.3,.5,.2,1)!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH S — رفع اندازه آیکون‌های SVG در badge کارت روزانه
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   S1: badge کارت روزانه — کنترل کامل
+   ═══════════════════════════════════════════════════════════════ */
+.daily-card-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  padding:5px 10px!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  color:var(--accent)!important;
+  background:var(--accent-soft)!important;
+  border-radius:10px!important;
+  line-height:1!important;
+  max-width:100%;
+  overflow:hidden;
+}
+
+.daily-card-badge .badge-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:13px!important;
+  height:13px!important;
+  min-width:13px!important;
+  min-height:13px!important;
+  max-width:13px!important;
+  max-height:13px!important;
+  flex-shrink:0!important;
+  margin:0!important;
+  padding:0!important;
+  color:var(--accent)!important;
+  line-height:0!important;
+  vertical-align:middle!important;
+}
+
+.daily-card-badge .badge-icon svg{
+  width:13px!important;
+  height:13px!important;
+  min-width:13px!important;
+  min-height:13px!important;
+  max-width:13px!important;
+  max-height:13px!important;
+  display:block!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  margin:0!important;
+  padding:0!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   S2: safeguard — همه SVG های بدون اندازه‌گیری داخل card
+   ═══════════════════════════════════════════════════════════════ */
+.daily-card svg:not([width]):not([height]){
+  max-width:100%!important;
+  max-height:100%!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   S3: title-icon (کنار عنوان «در جریان» و «انجام شده») هم کنترل کامل
+   ═══════════════════════════════════════════════════════════════ */
+.tasks-list-title .title-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:14px!important;
+  height:14px!important;
+  min-width:14px!important;
+  max-width:14px!important;
+  min-height:14px!important;
+  max-height:14px!important;
+  flex-shrink:0!important;
+  margin:0 6px 0 0!important;
+  color:var(--accent)!important;
+  line-height:0!important;
+}
+
+.tasks-list-title .title-icon svg{
+  width:14px!important;
+  height:14px!important;
+  max-width:14px!important;
+  max-height:14px!important;
+  display:block!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   S4: safeguard کلی — هر SVG بدون اندازه، پیش‌فرض کوچک بشه
+   ═══════════════════════════════════════════════════════════════ */
+.badge-icon > svg,
+.title-icon > svg,
+.guide-icon > svg,
+.panel-btn-icon > svg{
+  display:block!important;
+}
