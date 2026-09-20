@@ -1207,6 +1207,14 @@
         +'<div class="notif-tabs" id="notifTabs"></div>'
         +'<div class="notif-list" id="notifList"></div>';
       document.body.appendChild(panel);
+            /* ★ موقعیت پنل نسبت به دکمه نوتیف */
+      var notifBtn = document.getElementById('notifBtn');
+      if (notifBtn) {
+        var rect = notifBtn.getBoundingClientRect();
+        panel.style.left = rect.left + 'px';
+        panel.style.top = (rect.bottom + 10) + 'px';
+        panel.style.transformOrigin = 'top left';
+      }
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
           panel.classList.add('open');
