@@ -1,11 +1,11 @@
-/* Siraj v2.6 — script.js (Complete, Bug-Free) */
+/* Siraj v2.5 — script.js (Complete with all patches) */
 
 /* ═══════════════════════════════════════════════════════════════
    APP CONFIG
    ═══════════════════════════════════════════════════════════════ */
 const APP_CONFIG = {
     baseURL: "https://siraj-proxy.hamedansarifar.workers.dev/openai/chat/completions",
-    devNotifUrl: "https://raw.githubusercontent.com/Hamed-Rans/Siraj-Ai/refs/heads/main/notifications.json",
+    devNotifUrl: "",
     promptsUrl: "https://raw.githubusercontent.com/Hamed-Rans/Siraj-Ai/refs/heads/main/prompts.json",
     adminPassword: "Ransari0185",
     models: [
@@ -83,7 +83,7 @@ const APP_CONFIG = {
         emerald: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>',
         indigo: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/><circle cx="19" cy="5" r="1" fill="currentColor"/>'
     },
-        patterns: [
+    patterns: [
         { id: 'boteh', name: 'بته جقه' },
         { id: 'circles', name: 'دایره‌های متقارن' },
         { id: 'waves', name: 'موج' },
@@ -253,6 +253,7 @@ let inactivityTimer = null;
 let plannerTab = 'daily';
 let currentPanelTab = 'history';
 window._settingsSub = 'general';
+window._appearanceSubHidden = false;
 
 /* ═══════════════════════════════════════════════════════════════
    ADMIN ACTIONS
@@ -320,7 +321,6 @@ function loadSettings() {
         const pi = localStorage.getItem(PROFILE_IMG_KEY);
         if (pi && !s.profileImage) s.profileImage = pi;
         if (!s.models) s.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
-        /* ★ اجبار نسخه به 2.5 */
         if (s.appVersion !== '2.5') s.appVersion = '2.5';
         return s;
     } catch (e) {
@@ -623,7 +623,6 @@ function applyBodyBackground(t) {
     const root = document.documentElement;
     const body = document.body;
     const v = getBgValue(t);
-    /* body همیشه شفاف بمونه */
     body.style.background = '';
     body.style.backgroundImage = '';
     body.style.backgroundSize = '';
@@ -631,7 +630,6 @@ function applyBodyBackground(t) {
     body.style.backgroundAttachment = '';
     body.style.backgroundRepeat = '';
     body.style.backgroundColor = '';
-    /* ★ پس‌زمینه در CSS variable ذخیره میشه و body::before نمایشش میده */
     if (v === 'none') {
         root.style.setProperty('--siraj-bg', 'var(--primary-gradient)');
         root.style.setProperty('--siraj-bg-size', 'cover');
@@ -650,6 +648,7 @@ function applyBodyBackground(t) {
         }
     }
 }
+
 /* ═══════════════════════════════════════════════════════════════
    APPLY SETTINGS
    ═══════════════════════════════════════════════════════════════ */
@@ -676,7 +675,7 @@ function applySettingsToUI(s) {
     const qb = document.getElementById('quickBtn'); if (qb) qb.classList.toggle('active', t.quick);
     applyPattern(document.getElementById('patternLayer'), t.pattern, t.patternColor1, t.patternColor2, t.patternPerCorner, t.patternSize, t.patternPosition, t.patternOpacity);
     var vb = document.getElementById('versionBadge');
-    if (vb) vb.textContent = 'v' + (t.appVersion || '2.6');
+    if (vb) vb.textContent = 'v' + (t.appVersion || '2.5');
     resetInactivityTimer();
     setTimeout(() => { if (typeof window.updateNavSlider === 'function') window.updateNavSlider(false); }, 100);
 }
@@ -727,9 +726,6 @@ var MODEL_ICONS = {
     'siraj-yar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>'
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   SI_ICONS — آیکون‌های SVG اختصاصی سراج (جای ایموجی)
-   ═══════════════════════════════════════════════════════════════ */
 var SI_ICONS = {
     target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
     bookOpen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
@@ -881,7 +877,6 @@ function toggleWelcome() {
     const hasMessages = box.querySelector('.msg-wrap') !== null;
     w.classList.toggle('hidden', hasMessages);
 }
-
 /* ═══════════════════════════════════════════════════════════════
    PANELS FOR EACH VIEW
    ═══════════════════════════════════════════════════════════════ */
@@ -994,7 +989,7 @@ function renderPanelForTools() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   PLANNER
+   PLANNER / BLOG / COMMUNITY / TOOLS
    ═══════════════════════════════════════════════════════════════ */
 function renderPlanner() {
     const view = document.getElementById('view-planner');
@@ -1025,9 +1020,6 @@ function switchPlannerTab(tab) {
     }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   BLOG / COMMUNITY / TOOLS
-   ═══════════════════════════════════════════════════════════════ */
 function renderBlog() {
     const v = document.getElementById('view-blog');
     if (!v) return;
@@ -1043,7 +1035,7 @@ function renderBlog() {
         '<div class="page-empty-card new-style">' +
         '<div class="page-empty-icon gold"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg></div>' +
         '<div class="page-empty-title gold">به‌زودی در دسترس</div>' +
-                '<div class="page-empty-desc">' +
+        '<div class="page-empty-desc">' +
             'قراره اینجا فضایی باشه برای نوشتن، خواندن و به اشتراک‌گذاری.<br><br>' +
             '📝 <b>بنویس:</b> می‌تونی تحلیل‌ها، یادداشت‌ها، نکته‌های ادبی و هر چیزی که یاد گرفتی رو به‌صورت مقاله منتشر کنی.<br><br>' +
             '📖 <b>بخوان:</b> نوشته‌های دیگران رو بخون، ازشون ایده بگیر و با سبک‌های مختلف آشنا شو.<br><br>' +
@@ -1068,7 +1060,7 @@ function renderCommunity() {
         '<div class="page-empty-card new-style">' +
         '<div class="page-empty-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h9l5 5v11.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/></svg></div>' +
         '<div class="page-empty-title">به‌زودی در دسترس</div>' +
-                '<div class="page-empty-desc">' +
+        '<div class="page-empty-desc">' +
             'دیوان، فضایی برای <b>هم‌اندیشی</b> و <b>ارتباط</b> بین کاربران سراجه.<br><br>' +
             '💬 <b>بپرس:</b> هر سؤالی درباره عربی، ادبیات، نحو، ترجمه یا هر چیز دیگه داری رو مطرح کن.<br><br>' +
             '🤝 <b>همراه شو:</b> با مدرسین و دیگر زبان‌آموزها آشنا شو و از تجربه‌شون استفاده کن.<br><br>' +
@@ -1366,14 +1358,12 @@ function getSystemPrompt() {
     const dialect = dm[settings.dialect] || 'العربية الفصحى';
     let extra = '';
 
-    /* ═══ پروفایل کاربر ═══ */
     try {
         var prof = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
         if (prof.name) extra += '\n\n👤 اسم کاربر: ' + prof.name;
         if (prof.bio) extra += '\n📝 درباره‌ی خودش: ' + prof.bio;
     } catch (e) {}
 
-    /* ═══ سطح کاربر ═══ */
     var userLevel = 'beginner';
     try { userLevel = getUserLevel(); } catch (e) {}
     var lvlLabels = { beginner: 'مبتدی', intermediate: 'متوسط', advanced: 'پیشرفته' };
@@ -1388,11 +1378,9 @@ function getSystemPrompt() {
     }
     extra += '\n⚠️ نکته: سطح کاربر از قبل انتخاب شده و قطعیه. نیاز به پرسیدن مجدد نداری.';
 
-    /* ═══ حالت پاسخ سریع / تفکر عمیق ═══ */
     if (settings.quick) extra += '\n\n⚡ حالت پاسخ سریع: پاسخ‌ها را کوتاه، مختصر و مستقیم بده.';
     if (settings.thinking) extra += '\n\n🧠 حالت تفکر عمیق: با دقت و عمق بیشتر تحلیل کن.';
 
-    /* ═══ مدل فعلی ═══ */
     var modelCfg = getCurrentModelConfig();
     var modelExtra = '';
     try {
@@ -1403,7 +1391,6 @@ function getSystemPrompt() {
     } catch (e) {}
     if (!modelExtra && modelCfg.systemExtra) modelExtra = modelCfg.systemExtra;
 
-    /* ═══ هویت مدل ═══ */
     var modelIdentity = '';
     if (modelCfg.id === 'hakim') {
         modelIdentity = '\n\n🆔 **هویت فعلی تو: «سراجِ حکیم»** — استاد نحو، صرف و اعراب.\n' +
@@ -1419,7 +1406,6 @@ function getSystemPrompt() {
             'تخصصت: برنامه‌ریزی درسی، مشاوره تحصیلی، انگیزه‌دهی، مدیریت زمان، هم‌فکری درباره هر موضوعی.';
     }
 
-    /* ═══ اطلاعات سازنده (متنوع) ═══ */
     var creatorInfo = '\n\n👨‍🎓 **درباره سازنده‌ات (حامد انصاری‌فر):**\n' +
         'اگه کاربر درباره سازنده‌ات پرسید، باید این اطلاعات رو با لحن دوستانه و صمیمی بگی، ولی **هر بار با یه لحن و چیدمان متفاوت** (نه تکراری، خلاقانه و خودمونی):\n' +
         '• اسم کامل: حامد انصاری‌فر\n' +
@@ -1441,7 +1427,6 @@ function getSystemPrompt() {
         '• «نکن این‌کارا رو! 😅 من یه هوش مصنوعی‌ام، نه دفترچه تلفن. برو از خودش بپرس اگه این‌قدر کنجکاوی»\n' +
         'از قالب بالا الهام بگیر ولی **خودت هم جمله‌های خلاقانه جدید بساز** — هیچ‌وقت ثابت نباش.';
 
-    /* ═══ زبان و لحن پاسخ ═══ */
     if (settings.aiLevel) {
         if (settings.aiLevel === 'beginner') extra += '\n🗣️ لحن پاسخ: ساده و خودی.';
         else if (settings.aiLevel === 'advanced') extra += '\n🗣️ لحن پاسخ: تخصصی و عمیق.';
@@ -1468,6 +1453,7 @@ function getSystemPrompt() {
         modelExtra +
         extra;
 }
+
 function buildMessagesForWorker(chatId, currentText, currentFileData, currentFileType) {
     const history = loadHistory()[chatId];
     const messages = [{ role: 'system', content: getSystemPrompt() }];
@@ -1972,10 +1958,8 @@ function checkLock() {
     }
     const ls = document.getElementById('lockScreen');
     if (!ls) return;
-    /* ★ مخفی کردن پی‌های قدیمی، استفاده از نمایش جدید */
     const pinRow = document.getElementById('lockPinRow');
     if (pinRow) pinRow.style.display = 'none';
-    /* ★ اضافه کردن ردیف نمایش کاراکترها */
     injectLockTypedRow();
     ls.classList.add('open');
     setTimeout(function () {
@@ -2022,7 +2006,6 @@ function syncLockTypedRow(val, mode) {
         return;
     }
 
-    /* ★ اگه خالیه، کرسر چشمک‌زن نشون بده */
     if (chars.length === 0) {
         row.innerHTML = '<div class="lock-cursor"></div>';
         return;
@@ -2030,7 +2013,6 @@ function syncLockTypedRow(val, mode) {
     var cursor = row.querySelector('.lock-cursor');
     if (cursor) cursor.remove();
 
-    /* کم شد؟ حذف با انیمیشن */
     if (chars.length < existing.length) {
         for (var i = existing.length - 1; i >= chars.length; i--) {
             (function (el) {
@@ -2048,7 +2030,6 @@ function syncLockTypedRow(val, mode) {
         return;
     }
 
-    /* اضافه شد؟ char جدید با انیمیشن + ماسک بعد از ۲ ثانیه */
     for (var k = 0; k < chars.length; k++) {
         if (existing[k]) {
             if (existing[k].dataset.raw !== chars[k]) {
@@ -2062,7 +2043,6 @@ function syncLockTypedRow(val, mode) {
             el.dataset.raw = chars[k];
             el.textContent = chars[k];
             row.appendChild(el);
-            /* ★ بعد از ۲ ثانیه → ● با انیمیشن */
             (function (e) {
                 setTimeout(function () {
                     if (e.parentNode && !e.classList.contains('erasing')) {
@@ -2080,6 +2060,8 @@ function syncLockTypedRow(val, mode) {
         }
     }
 }
+window.syncLockTypedRow = syncLockTypedRow;
+
 function tryUnlock() {
     const inp = document.getElementById('lockInput');
     const err = document.getElementById('lockError');
@@ -2088,12 +2070,9 @@ function tryUnlock() {
     if (!val) { err.textContent = 'رمز را وارد کنید'; return; }
     if (val === settings.password) {
         sessionStorage.setItem(LOCK_SESSION_KEY, '1');
-        /* ★ نمایش موفقیت با انیمیشن تیک */
         syncLockTypedRow(val, 'success');
-        /* ★ مخفی کردن input */
         inp.style.opacity = '0';
         inp.style.pointerEvents = 'none';
-        /* ★ نمایش پیام موفقیت */
         var box = document.querySelector('.lock-box');
         if (box && !box.querySelector('.lock-success-check')) {
             var chk = document.createElement('div');
@@ -2101,7 +2080,6 @@ function tryUnlock() {
             chk.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>خوش آمدی!</span>';
             box.appendChild(chk);
         }
-        /* ★ پنهان کردن دکمه */
         var btn = document.querySelector('.lock-btn');
         if (btn) btn.style.opacity = '0';
         setTimeout(function () {
@@ -2115,7 +2093,6 @@ function tryUnlock() {
             err.textContent = '';
             var hb = document.getElementById('headerLockBtn');
             if (hb) hb.classList.remove('locked');
-            /* ★ پاکسازی */
             setTimeout(function () {
                 var row = document.getElementById('lockTypedRow');
                 if (row) row.innerHTML = '';
@@ -2131,7 +2108,6 @@ function tryUnlock() {
         }, 900);
     } else {
         err.textContent = 'رمز اشتباه است';
-        /* ★ انیمیشن خطا روی کاراکترها */
         syncLockTypedRow(val, 'error');
         const box = document.querySelector('.lock-box');
         if (box) {
@@ -2139,7 +2115,6 @@ function tryUnlock() {
             void box.offsetWidth;
             box.style.animation = 'pinShake .5s ease';
         }
-        /* ★ پاک کردن پس از انیمیشن خطا */
         setTimeout(function () {
             var row = document.getElementById('lockTypedRow');
             if (row) row.innerHTML = '';
@@ -2148,6 +2123,7 @@ function tryUnlock() {
         }, 700);
     }
 }
+
 function lockNow() {
     if (!settings.passwordEnabled || !settings.password) {
         toast('اول از تنظیمات، رمز قفل رو تنظیم کن', 'error');
@@ -2158,7 +2134,6 @@ function lockNow() {
     if (!ls) return;
     const pinRow = document.getElementById('lockPinRow');
     if (pinRow) pinRow.style.display = 'none';
-    /* ★ فعال‌سازی نمایش دونه‌دونه */
     injectLockTypedRow();
     ls.classList.add('open');
     const inp = document.getElementById('lockInput');
@@ -2166,7 +2141,6 @@ function lockNow() {
     if (inp) { inp.value = ''; setTimeout(() => inp.focus(), 350); }
     if (err) err.textContent = '';
     syncLockTypedRow('');
-    /* پاک کردن success/check قبلی */
     var oldChk = document.querySelector('.lock-success-check');
     if (oldChk) oldChk.remove();
     if (ls && !ls.dataset.clickBound) {
@@ -2177,6 +2151,7 @@ function lockNow() {
         });
     }
 }
+
 /* ═══════════════════════════════════════════════════════════════
    BACKUP
    ═══════════════════════════════════════════════════════════════ */
@@ -2218,7 +2193,6 @@ function importBackup(ev) {
    ═══════════════════════════════════════════════════════════════ */
 function openSettings() {
     try {
-        /* ★ پاک کردن انتخاب متن قبلی */
         if (window.getSelection) {
             var sel = window.getSelection();
             if (sel && sel.removeAllRanges) sel.removeAllRanges();
@@ -2242,41 +2216,30 @@ function openSettings() {
         toast('خطا: ' + err.message, 'error');
     }
 }
+
 function closeSettings() {
     const m = document.getElementById('settingsModal');
-    if (!m) return;
-    /* ★ حذف backdrop-filter فوری */
+    if (!m || !m.classList.contains('open')) return;
     m.style.backdropFilter = 'none';
     m.style.webkitBackdropFilter = 'none';
-    m.classList.remove('open');
     m.classList.add('closing');
+    m.classList.remove('open');
     setTimeout(function () {
         m.classList.remove('closing');
-        m.classList.remove('open');
-        /* ★ مخفی کردن کامل */
-        m.style.setProperty('visibility', 'hidden', 'important');
-        m.style.setProperty('pointer-events', 'none', 'important');
-        m.style.setProperty('display', 'none', 'important');
-        /* ★ پاکسازی */
-        setTimeout(function () {
-            m.style.display = '';
-            m.style.visibility = '';
-            m.style.pointerEvents = '';
-            m.style.backdropFilter = '';
-            m.style.webkitBackdropFilter = '';
-        }, 60);
-        /* ★ بازگرداندن pointer-events به نوار */
+        m.style.backdropFilter = '';
+        m.style.webkitBackdropFilter = '';
         document.querySelectorAll('.bottom-nav-btn').forEach(function (b) {
             b.style.pointerEvents = 'auto';
             b.style.position = 'relative';
             b.style.zIndex = '2';
         });
-        var s = document.getElementById('navSlider');
+        const s = document.getElementById('navSlider');
         if (s) s.style.pointerEvents = 'none';
         if (typeof window.updateNavSlider === 'function') window.updateNavSlider(true);
-    }, 460);
+    }, 500);
     settingsDraft = null;
 }
+
 function applySettings() {
     if (!settingsDraft) return;
     const oldPass = settings.password, oldEnabled = settings.passwordEnabled;
@@ -2293,13 +2256,12 @@ function applySettings() {
     toast('تنظیمات با موفقیت اعمال شد ✓', 'success');
     closeSettings();
 }
+
 function switchSettingsCat(cat) {
-    /* ★ پاک کردن انتخاب متن */
     if (window.getSelection) {
         var sel = window.getSelection();
         if (sel && sel.removeAllRanges) sel.removeAllRanges();
     }
-    /* ★ اگه روی «ظاهر» کلیک شد و از قبل بازه → فقط toggle کن، بدون رندر */
     if (cat === 'appearance' && settingsCat === 'appearance') {
         window._appearanceSubHidden = !window._appearanceSubHidden;
         var sub = document.querySelector('.settings-submenu');
@@ -2407,8 +2369,8 @@ function updatePreview() {
         }
     }
     if (!pl) return;
-    /* ★ مقیاس نسبت به اندازه واقعی */  
-    const scale = pz.offsetWidth / 900;     const pvSize = Math.max(20, settingsDraft.patternSize * scale);
+    const scale = pz.offsetWidth / 900;
+    const pvSize = Math.max(20, settingsDraft.patternSize * scale);
     pl.style.position = 'absolute';
     pl.style.inset = '0';
     pl.style.zIndex = '1';
@@ -2595,9 +2557,8 @@ function renderSettingsControls() {
     var modelsDraft = settingsDraft.models || JSON.parse(JSON.stringify(APP_CONFIG.models));
 
     var subState = window._settingsSub || 'general';
-    var isAppearanceOpen = (settingsCat === 'appearance'); 
+    var isAppearanceOpen = (settingsCat === 'appearance');
 
-    /* ═══ تب‌ها + زیرمنوی ظاهر ═══ */
     var tabsHTML = '';
     tabsHTML +=
         '<button class="settings-tab-btn' + (isAppearanceOpen ? ' active' : '') + ' settings-tab-parent' + (isAppearanceOpen ? ' has-sub' : '') + '" data-cat="appearance" onclick="switchSettingsCat(\'appearance\')">' +
@@ -2606,7 +2567,7 @@ function renderSettingsControls() {
             '<svg class="settings-tab-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
         '</button>';
 
-            if (isAppearanceOpen) {
+    if (isAppearanceOpen) {
         var subs = [
             { id: 'general', label: 'تم و رنگ' },
             { id: 'background', label: 'پس‌زمینه' },
@@ -2632,7 +2593,6 @@ function renderSettingsControls() {
     tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'about' ? ' active' : '') + '" data-cat="about" onclick="switchSettingsCat(\'about\')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>درباره ما</button>';
     tabs.innerHTML = tabsHTML;
 
-    /* ═══ محتوای هر زیردسته ═══ */
     var appearanceContent = {
         general:
             '<div class="setting-group"><label>حالت نمایش</label>' +
@@ -2662,7 +2622,7 @@ function renderSettingsControls() {
                     '<button class="row-btn' + (s.animation === a.id ? ' active' : '') + '" onclick="updateDraft(\'animation\',\'' + a.id + '\')"><span class="rb-label">' + a.name + '</span></button>'
                 ).join('') + '</div>' +
             '</div>',
-               background:
+        background:
             '<div class="setting-group"><label>پیش‌فرض‌های آماده</label>' +
                 '<div class="row-btns" style="grid-template-columns:repeat(3,1fr)">' +
                     APP_CONFIG.bgPresets.map(function(bp){
@@ -2702,11 +2662,11 @@ function renderSettingsControls() {
         pattern:
             '<div class="setting-group"><label>انتخاب طرح</label>' +
                 '<div class="pattern-grid">' + APP_CONFIG.patterns.map(pat =>
-    '<div class="pattern-opt' + (s.pattern === pat.id ? ' active' : '') + '" onclick="updateDraft(\'pattern\',\'' + pat.id + '\')">' +
-        '<div class="pattern-thumb" style="' + getPatternThumbStyle(pat.id, s.patternColor1, s.patternColor2) + '"></div>' +
-        '<div class="pattern-name">' + pat.name + '</div>' +
-    '</div>'
-).join('') + '</div>' +
+                    '<div class="pattern-opt' + (s.pattern === pat.id ? ' active' : '') + '" onclick="updateDraft(\'pattern\',\'' + pat.id + '\')">' +
+                        '<div class="pattern-thumb" style="' + getPatternThumbStyle(pat.id, s.patternColor1, s.patternColor2) + '"></div>' +
+                        '<div class="pattern-name">' + pat.name + '</div>' +
+                    '</div>'
+                ).join('') + '</div>' +
             '</div>' +
             '<div class="setting-group"><label>رنگ‌های آماده طرح</label>' +
                 '<div class="pattern-preset-colors">' +
@@ -2748,7 +2708,6 @@ function renderSettingsControls() {
             '</div>'
     };
 
-    /* ═══ محتوای مدل‌ها (فقط ادمین) ═══ */
     var modelsHTML = '';
     if (admin) {
         modelsHTML = '<div class="setting-group">' +
@@ -2793,7 +2752,6 @@ function renderSettingsControls() {
         '</div>';
     }
 
-    /* ═══ محتوای پروفایل ═══ */
     var p = getProfile();
     var src = p.avatar || 'siraj-logo.png';
     var lvl = getUserLevel();
@@ -2819,7 +2777,6 @@ function renderSettingsControls() {
             '<div class="default-view-options">' + vh + '</div>' +
         '</div>';
 
-    /* ═══ ساخت wrap ═══ */
     wrap.innerHTML =
         '<div class="settings-content' + (settingsCat === 'appearance' ? ' active' : '') + '" data-cat="appearance">' +
             (appearanceContent[subState] || appearanceContent.general) +
@@ -2847,7 +2804,7 @@ function renderSettingsControls() {
             '</div>' +
         '</div>' +
 
-                '<div class="settings-content' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior">' +
+        '<div class="settings-content' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior">' +
             '<div class="setting-group">' +
                 '<label>مدل پیش‌فرض</label>' +
                 '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
@@ -2948,7 +2905,7 @@ function renderSettingsControls() {
                 'من هم مثل سراج هنوز اول راهم؛ هنوز چیزهای زیادی هست که باید یاد بگیریم، تجربه کنیم و بسازیم.<br><br>' +
                 'این تازه شروع ماجراست.<br><br>' +
                 'به دنیای سراج خوش اومدید. 🌱' +
-                    '</div>' +
+            '</div>' +
             '<div class="about-section-title">' +
                 '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>' +
                 'راه های ارتباطی' +
@@ -2972,7 +2929,7 @@ function renderSettingsControls() {
                 '</div>' +
             '</div>' +
             '<div class="siraj-version-badge" style="text-align:center;padding:14px 0;font-size:12px;color:var(--text-muted)">' +
-                'نسخه <span style="color:var(--accent);font-weight:900">' + (s.appVersion || '2.6') + '</span>' +
+                'نسخه <span style="color:var(--accent);font-weight:900">' + (s.appVersion || '2.5') + '</span>' +
             '</div>' +
         '</div>';
 
@@ -3042,30 +2999,6 @@ function renderSettingsControls() {
         }
     }, 30);
 }
-/* ═══════════════════════════════════════════════════════════════
-   SETTINGS ACCORDION — باز/بسته کردن زیر‌دسته‌های ظاهر
-   ═══════════════════════════════════════════════════════════════ */
-window.toggleSettingsSub = function (sub) {
-    var content = document.querySelector('.settings-content[data-cat="appearance"]');
-    if (!content) return;
-    var items = content.querySelectorAll('.settings-acc-item');
-    var target = null;
-    items.forEach(function (it) {
-        if (it.getAttribute('data-sub') === sub) target = it;
-    });
-    if (!target) return;
-
-    var wasActive = target.classList.contains('active');
-
-    items.forEach(function (it) { it.classList.remove('active'); });
-
-    if (!wasActive) {
-        target.classList.add('active');
-        window._settingsSub = sub;
-    } else {
-        window._settingsSub = '';
-    }
-};
 
 /* ═══════════════════════════════════════════════════════════════
    CLICKABLE
@@ -3085,7 +3018,6 @@ document.addEventListener('visibilitychange', () => {
         setTimeout(() => {
             ensureClickable();
             if (typeof window.updateNavSlider === 'function') window.updateNavSlider(false);
-            /* ★ بازمحاسبه پس‌زمینه برای رفع جابجایی */
             const root = document.documentElement;
             const cur = root.style.getPropertyValue('--siraj-bg');
             if (cur) {
@@ -3191,7 +3123,7 @@ function showDevNotifPopup(emoji, title, body) {
         '<div class="task-notif-task"><b>' + escapeHtml(title) + '</b></div>' +
         (body ? '<div style="font-size:12px;color:var(--text-muted);line-height:1.8;margin-bottom:12px">' + escapeHtml(body) + '</div>' : '') +
         '<div class="task-notif-actions"><button class="yes-btn" id="devNotifOk">متوجه شدم</button></div>';
-        document.body.appendChild(el);
+    document.body.appendChild(el);
     requestAnimationFrame(function () {
         requestAnimationFrame(function () {
             el.classList.add('show');
@@ -3266,17 +3198,14 @@ window.addEventListener('load', () => {
         if (savedImg && !settings.profileImage) settings.profileImage = savedImg;
     } catch (e) {}
 
-        if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js?v=2.5.1', { updateViaCache: 'none' }).then(function (reg) {
-            /* ★ هر بار چک کنه نسخه جدید هست یا نه */
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js?v=2.5.5', { updateViaCache: 'none' }).then(function (reg) {
             reg.update().catch(function () {});
-            /* ★ اگه نسخه جدید پیدا شد، کش قدیمی رو پاک کن */
             reg.addEventListener('updatefound', function () {
                 var nw = reg.installing;
                 if (!nw) return;
                 nw.addEventListener('statechange', function () {
                     if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                        /* ★ SW جدید آماده — کش قدیمی پاک بشه */
                         if ('caches' in window) {
                             caches.keys().then(function (names) {
                                 return Promise.all(names.map(function (n) {
@@ -3319,4 +3248,25 @@ window.addEventListener('load', () => {
 
     resetInactivityTimer();
 });
-window.syncLockTypedRow = syncLockTypedRow;
+
+/* ═══════════════════════════════════════════════════════════════
+   FORCE UPDATE (کش‌شکن دستی از کنسول)
+   ═══════════════════════════════════════════════════════════════ */
+window.__forceUpdate = function () {
+    if (!confirm('کش پاک بشه و صفحه رفرش بشه؟')) return;
+    if ('caches' in window) {
+        caches.keys().then(function (names) {
+            return Promise.all(names.map(function (n) { return caches.delete(n); }));
+        }).then(function () {
+            if ('serviceWorker' in navigator) {
+                return navigator.serviceWorker.getRegistrations().then(function (regs) {
+                    return Promise.all(regs.map(function (r) { return r.unregister(); }));
+                });
+            }
+        }).then(function () {
+            location.reload(true);
+        });
+    } else {
+        location.reload(true);
+    }
+};
