@@ -3028,7 +3028,7 @@
       }
     })();
 
-    /* ★ انیمیشن سوییچ view */
+        /* ★ انیمیشن سوییچ view */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function') return false;
@@ -3047,7 +3047,6 @@
           var newEl=document.getElementById('view-'+view);
           var oldIdx=VIEW_ORDER.indexOf(oldName);
           var newIdx=VIEW_ORDER.indexOf(view);
-          if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){
           if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){
             orig.apply(this,arguments);
             if(typeof window.__navActivate==='function') window.__navActivate(view);
@@ -3069,12 +3068,6 @@
           oldEl.style.pointerEvents='none';
           window.switchView.__t1=setTimeout(function(){
             orig.apply(window,origArgs);
-            _currentMainView=view;
-            newEl.classList.add(inClass);
-            setTimeout(injectMainTopActions,10);
-            if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,60);
-                     window.switchView.__t1=setTimeout(function(){
-            orig.apply(window,origArgs);
             if(typeof window.__navActivate==='function') window.__navActivate(view);
             _currentMainView=view;
             newEl.classList.add(inClass);
@@ -3086,6 +3079,7 @@
               newEl.classList.remove(inClass);
             },240);
           },170);
+        };
         window.switchView.__hooked=true;
         return true;
       }
