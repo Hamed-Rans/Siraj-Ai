@@ -1,4 +1,4 @@
-/* Siraj v2.6 — planner-v2.js */
+/* Siraj v2.6 — planner-v2.js (Complete with all patches) */
 (function(){
   'use strict';
 
@@ -44,6 +44,19 @@
     if(typeof window.plannerDate === 'undefined'){
       window.plannerDate = new Date();
     }
+
+    /* ═══ SI_ICONS — آیکون‌های SVG اختصاصی سراج ═══ */
+    var SI_ICONS = {
+      target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+      bookOpen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+      books: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h6M9 11h4"/></svg>',
+      pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/></svg>',
+      graduation: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>',
+      library: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>',
+      checkCircle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>',
+      flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>'
+    };
+    window.SI_ICONS = SI_ICONS;
 
     var DAILY_POEMS = [
       {text:'وَمَا نَيْلُ الْمَطَالِبِ بِالتَّمَنِّي ۞ وَلَكِنْ تُؤْخَذُ الدُّنْيَا غِلَابَا', by:'أحمد شوقي', meaning:'به آرزو کردن به هدف نمی‌رسی، بلکه دنیا با غلبه و تلاش به دست میاد.'},
@@ -457,7 +470,7 @@
         body.style.animation='bodyFadeIn .3s ease';
         return;
       }
-            pane.dataset.animating='1';
+      pane.dataset.animating='1';
       pane.style.pointerEvents='none';
       var html='';
       if(tab==='daily') html=viewDaily();
@@ -467,24 +480,23 @@
       pane.innerHTML=html;
       bindPaneEvents(tab);
       if(tab==='weekly') setTimeout(setupWeekSummaryClicks,50);
-      /* ★ انیمیشن ورود نرم برای همه تب‌ها */
       var hero=pane.querySelector('.planner-hero-card');
-      var body=pane.querySelector('.planner-body-content');
+      var bodyEl=pane.querySelector('.planner-body-content');
       if(hero){ hero.style.opacity='0'; hero.style.transform='translateY(-10px)'; }
-      if(body){ body.style.opacity='0'; body.style.transform='translateY(20px)'; }
+      if(bodyEl){ bodyEl.style.opacity='0'; bodyEl.style.transform='translateY(20px)'; }
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
           if(hero){
             hero.style.transition='opacity .4s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.34,1.2,.64,1)';
             hero.style.opacity='1'; hero.style.transform='translateY(0)';
           }
-          if(body){
-            body.style.transition='opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.34,1.2,.64,1)';
-            body.style.opacity='1'; body.style.transform='translateY(0)';
+          if(bodyEl){
+            bodyEl.style.transition='opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.34,1.2,.64,1)';
+            bodyEl.style.opacity='1'; bodyEl.style.transform='translateY(0)';
           }
           setTimeout(function(){
             if(hero){hero.style.transition='';hero.style.opacity='';hero.style.transform='';}
-            if(body){body.style.transition='';body.style.opacity='';body.style.transform='';}
+            if(bodyEl){bodyEl.style.transition='';bodyEl.style.opacity='';bodyEl.style.transform='';}
           },620);
         });
       });
@@ -538,8 +550,8 @@
       }
     }
 
-    /* ═══ HERO — دکمه برگشت الان بیرون از phc-day است ═══ */
-     function heroDaily(){
+    /* ═══ HERO FUNCTIONS ═══ */
+    function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
       var key=window.dateKey(d);
@@ -566,7 +578,7 @@
         +'<button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-     function heroWeekly(){
+    function heroWeekly(){
       var d=new Date(window.plannerDate||new Date());
       var days=myWeekDays();
       var p=dateParts(d);
@@ -587,7 +599,7 @@
         +'<button class="phc-nav-btn" onclick="window.__navWeek(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-     function heroMonthly(){
+    function heroMonthly(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
       var p=dateParts(d);
@@ -612,7 +624,7 @@
         +'<button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-     function heroYearly(){
+    function heroYearly(){
       var d=new Date(window.plannerDate||new Date());
       var y=d.getFullYear();
       var pl=window.loadPlannerNew();
@@ -636,6 +648,7 @@
         +'<button class="phc-nav-btn" onclick="window.__navYear(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
+
     function weekStatsHTML(){
       var pl=window.loadPlannerNew();var days=myWeekDays();
       var sm=0,dw=0,dwo=0;
@@ -673,8 +686,9 @@
       var s=getStreakDays();
       if(s<2) return '';
       var msg=s>=30?'فوق‌العاده‌ای! 🏆':s>=14?'عالی پیش می‌ری! ✨':s>=7?'ادامه بده! 💪':'خوب شروع کردی! 🌱';
-      return '<div class="daily-streak"><span class="ds-fire">'+(window.SI_ICONS?window.SI_ICONS.flame:'🔥')+'</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
+      return '<div class="daily-streak"><span class="ds-fire">'+SI_ICONS.flame+'</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
     }
+
     function dailyWordHTML(){
       var d=new Date(window.plannerDate||new Date());
       var dk=window.dateKey(d);
@@ -682,12 +696,13 @@
       if(state!==null) return '';
       var it=getTodayItem(dk);
       if(!it) return '';
-            var badgeIcon = it.type === 'بیت' ? (window.SI_ICONS?window.SI_ICONS.bookOpen:'')
-                    : (it.type === 'کلمه' ? (window.SI_ICONS?window.SI_ICONS.books:'')
-                    : (window.SI_ICONS?window.SI_ICONS.pencil:''));
+      var badgeIcon = it.type === 'بیت' ? SI_ICONS.bookOpen
+                    : it.type === 'کلمه' ? SI_ICONS.books
+                    : SI_ICONS.pencil;
+      var badgeText = it.badge.replace(/^[^\s]+\s/,'');
       var html='<div class="daily-cards"><div class="daily-card">';
       html+='<div class="daily-card-head">'
-        +'<span class="daily-card-badge"><span class="badge-icon">'+badgeIcon+'</span>'+esc(it.badge.replace(/^[^\s]+\s/,''))+'</span>'
+        +'<span class="daily-card-badge"><span class="badge-icon">'+badgeIcon+'</span>'+esc(badgeText)+'</span>'
         +'<div class="daily-card-actions">'
         +'<button class="daily-action-btn learn-yes" onclick="window.__dailyLearn(\'learned\')">✓ یاد گرفتم</button>'
         +'<button class="daily-action-btn learn-no" onclick="window.__dailyLearn(\'practice\')">✗ یاد نگرفتم</button>'
@@ -814,7 +829,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       NOTIFICATION SYSTEM — بدون تغییر
+       NOTIFICATION SYSTEM
        ═══════════════════════════════════════════════════════════════ */
     var NOTIF_KEY      = 'siraj-notif-history';
     var NOTIF_SEEN_KEY = 'siraj-notif-seen';
@@ -967,7 +982,7 @@
         +'<div class="task-notif-head"><div class="task-notif-icon">'+icon+'</div><div class="task-notif-title">'+title+'</div></div>'
         +'<div class="task-notif-task">'+text+'</div>'
         +'<div class="task-notif-actions">'+actions+'</div>';
-            document.body.appendChild(el);
+      document.body.appendChild(el);
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
           el.classList.add('show');
@@ -1209,12 +1224,11 @@
         +'<div class="notif-tabs" id="notifTabs"></div>'
         +'<div class="notif-list" id="notifList"></div>';
       document.body.appendChild(panel);
-                  /* ★ موقعیت پنل — زیر دکمه نوتیف، بدون همپوشانی */
+      /* ★ موقعیت پنل نسبت به دکمه نوتیف */
       var notifBtn = document.getElementById('notifBtn');
       if (notifBtn) {
         var rect = notifBtn.getBoundingClientRect();
         var panelLeft = rect.left;
-        /* ★ اگه از راست مرز بیرون می‌زنه، اصلاح کن */
         var panelW = Math.min(380, window.innerWidth - 32);
         if (panelLeft + panelW > window.innerWidth - 8) {
           panelLeft = window.innerWidth - panelW - 8;
@@ -1364,14 +1378,14 @@
       var po=[{value:'high',label:'بالا',dot:'red'},{value:'med',label:'متوسط',dot:'yellow'},{value:'low',label:'پایین',dot:'green'}];
       window.__pendingTime='';window.__pendingPri='med';
 
-            return streakHTML()+punishmentHTML()+dailyWordHTML()+weekStatsHTML()
+      return streakHTML()+punishmentHTML+dailyWordHTML()+weekStatsHTML()
         +'<div class="task-add-form">'
         +'<input type="text" id="pNewTitle" placeholder="عنوان کار جدید..." onkeydown="if(event.key===\'Enter\')window.__dAddTask()">'
         +'<div class="task-form-selects">'+makeSelect('pNewTime','',ho)+makeSelect('pNewPri','med',po,'اولویت‌بندی')+'</div>'
         +'<button class="task-add-btn" onclick="window.__dAddTask()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>افزودن</button>'
         +'</div>'
-        +'<div class="tasks-list-title"><span class="title-icon">'+(window.SI_ICONS?window.SI_ICONS.target:'')+'</span>در جریان:</div>'+activeHTML
-        +'<div class="tasks-list-title done-title"><span class="title-icon">'+(window.SI_ICONS?window.SI_ICONS.checkCircle:'')+'</span>انجام شده ('+toFa(done.length)+'):</div>'+doneHTML;
+        +'<div class="tasks-list-title"><span class="title-icon">'+SI_ICONS.target+'</span>در جریان:</div>'+activeHTML
+        +'<div class="tasks-list-title done-title"><span class="title-icon">'+SI_ICONS.checkCircle+'</span>انجام شده ('+toFa(done.length)+'):</div>'+doneHTML;
     }
     function viewDaily(){return heroDaily()+'<div class="planner-body-content">'+dailyContentHTML()+'</div>';}
 
@@ -1410,7 +1424,9 @@
         +'<button class="lib-study-btn" id="libStudyBtn">🎓 ورود به حالت مطالعه</button>'
         +'</div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){el.classList.add('open');});
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){el.classList.add('open');});
+      });
       el.querySelector('#libClose').onclick=closeLibrary;
       el.addEventListener('click',function(e){if(e.target===el) closeLibrary();});
       el.querySelector('#libStudyBtn').onclick=function(){
@@ -1437,12 +1453,12 @@
     };
 
     function closeLibrary(){
-  var el=document.getElementById('learnLibrary');if(!el) return;
-  if(el.dataset.closing==='1') return;
-  el.dataset.closing='1';
-  el.classList.remove('open');
-  setTimeout(function(){if(el.parentNode)el.remove();},550);
-}
+      var el=document.getElementById('learnLibrary');if(!el) return;
+      if(el.dataset.closing==='1') return;
+      el.dataset.closing='1';
+      el.classList.remove('open');
+      setTimeout(function(){if(el.parentNode)el.remove();},550);
+    }
 
     function renderLibList(){
       var listEl=document.getElementById('libList');if(!listEl) return;
@@ -2017,7 +2033,7 @@
       window.savePlanner(pl);inp.value='';refreshBody('left');
     };
 
-        window.renderPanelForPlanner=function(){
+    window.renderPanelForPlanner=function(){
       var p=getProfile();
       var te=document.getElementById('panelTitleText');
       var se=document.getElementById('panelSubText');
@@ -2037,20 +2053,19 @@
       var learned=getAllLearned();
       var practice=getAllPractice();
       var lc=learned.length,pc=practice.length;
-      var SI = window.SI_ICONS || {};
 
       var pc2=document.getElementById('panelContent');if(!pc2) return;
       pc2.innerHTML=th
         +'<button onclick="window.__openStudy()" class="panel-study-btn" style="margin-top:14px">'
-        +'<span class="panel-btn-icon">'+(SI.graduation||'')+'</span>'
+        +'<span class="panel-btn-icon">'+SI_ICONS.graduation+'</span>'
         +'<div style="text-align:right;flex:1"><div>حالت مطالعه</div><div style="font-size:11px;opacity:.85;font-weight:600;margin-top:3px">با تایمر و تمرکز</div></div>'
         +'</button>'
         +'<button onclick="window.__openLibrary()" class="panel-library-btn">'
-        +'<span class="panel-btn-icon">'+(SI.library||'')+'</span>'
+        +'<span class="panel-btn-icon">'+SI_ICONS.library+'</span>'
         +'<div style="text-align:right;flex:1"><div>کتابخانه یادگیری</div><div style="font-size:11px;opacity:.85;font-weight:600;margin-top:3px">یادگرفته‌ها و تمرین‌ها'+(lc+pc>0?' · '+toFa(lc+pc)+' آیتم':'')+'</div></div>'
         +'</button>'
         +'<div class="panel-card guide-card" style="margin-top:10px">'
-        +'<div class="card-title"><span class="title-icon">'+(SI.bookOpen||'')+'</span>راهنما</div>'
+        +'<div class="card-title"><span class="title-icon">'+SI_ICONS.bookOpen+'</span>راهنما</div>'
         +'<div class="guide-list">'
         +'<div class="guide-item"><span>✨</span>روی حالت مطالعه بزن</div>'
         +'<div class="guide-item"><span>📚</span>یه کار انتخاب کن</div>'
@@ -2454,31 +2469,31 @@
       }catch(e){return { valid: reason.length >= 25 };}
     }
     function closeStudy(){
-  try{stopAudio();}catch(e){}
-  var o=document.getElementById('studyOverlay');
-  var chat=document.getElementById('studyChatPanel');
-  var tools=document.getElementById('studyToolsPanel');
-  if(chat) chat.remove();
-  if(tools) tools.remove();
-  if(_studyDragHandlers){
-    try{
-      document.removeEventListener('mousemove',_studyDragHandlers.move);
-      document.removeEventListener('mouseup',_studyDragHandlers.up);
-      document.removeEventListener('touchmove',_studyDragHandlers.move);
-      document.removeEventListener('touchend',_studyDragHandlers.up);
-    }catch(e){}
-    _studyDragHandlers=null;
-  }
-  if(!o) return;
-  if(o.dataset.closing==='1') return;
-  o.dataset.closing='1';
-  o.classList.remove('open');
-  setTimeout(function(){if(o.parentNode)o.remove();},700);
-  setTimeout(function(){
-    if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
-    refreshBody('left');
-  },400);
-}
+      try{stopAudio();}catch(e){}
+      var o=document.getElementById('studyOverlay');
+      var chat=document.getElementById('studyChatPanel');
+      var tools=document.getElementById('studyToolsPanel');
+      if(chat) chat.remove();
+      if(tools) tools.remove();
+      if(_studyDragHandlers){
+        try{
+          document.removeEventListener('mousemove',_studyDragHandlers.move);
+          document.removeEventListener('mouseup',_studyDragHandlers.up);
+          document.removeEventListener('touchmove',_studyDragHandlers.move);
+          document.removeEventListener('touchend',_studyDragHandlers.up);
+        }catch(e){}
+        _studyDragHandlers=null;
+      }
+      if(!o) return;
+      if(o.dataset.closing==='1') return;
+      o.dataset.closing='1';
+      o.classList.remove('open');
+      setTimeout(function(){if(o.parentNode)o.remove();},700);
+      setTimeout(function(){
+        if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
+        refreshBody('left');
+      },400);
+    }
     function blockKey(e){
       if(!studyRunning) return;
       var k=e.key||'';var c=e.ctrlKey||e.metaKey;
@@ -2841,17 +2856,14 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       ★ NAV SLIDER — بازنویسی کامل بدون کش‌آمدن و بدون باقی‌موندن
+       NAV SLIDER
        ═══════════════════════════════════════════════════════════════ */
-            (function(){
+    (function(){
       var nav=null, slider=null, fill=null;
-      var cur=null, from=null, t0=0, animating=false, lastBtn=null;
-      var raf=0, settleUntil=0;
-      var DUR=520;
+      var S=null;
+      var raf=0, lastT=0, settleUntil=0;
 
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
-      function ease(p){ return 1-Math.pow(1-p,4); }
-      function copy(o){ return {l:o.l,r:o.r,t:o.t,b:o.b}; }
 
       function readTarget(btn){
         var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
@@ -2868,38 +2880,43 @@
         raf=0;
         if(!nav||!slider) return;
         var btn=nav.querySelector('.bottom-nav-btn.active');
-        if(!btn){ imp(slider,'opacity','0'); return; }
+        if(!btn){ imp(slider,'opacity','0'); lastT=0; return; }
+        var row=document.getElementById('navRow');
+        var collapsed=!!(row&&row.classList.contains('collapsed'));
         var tg=readTarget(btn);
+        var dt=lastT?Math.min(64,now-lastT):16; lastT=now;
 
-        if(!cur){
-          cur=copy(tg); lastBtn=btn;
+        if(!S){
+          S={l:tg.l,r:tg.r,t:tg.t,b:tg.b};
         }else{
-          if(btn!==lastBtn){
-            lastBtn=btn; from=copy(cur); t0=now; animating=true;
-          }
-          if(animating){
-            var p=Math.min(1,(now-t0)/DUR), e=ease(p);
-            cur.l=from.l+(tg.l-from.l)*e;
-            cur.r=from.r+(tg.r-from.r)*e;
-            cur.t=from.t+(tg.t-from.t)*e;
-            cur.b=from.b+(tg.b-from.b)*e;
-            if(p>=1) animating=false;
-          }else{
-            cur=copy(tg);
-          }
+          var fast=1-Math.exp(-dt/85), slow=1-Math.exp(-dt/170);
+          var right=(tg.l+tg.r)>(S.l+S.r);
+          S.r+=(tg.r-S.r)*(right?fast:slow);
+          S.l+=(tg.l-S.l)*(right?slow:fast);
+          var down=(tg.t+tg.b)>(S.t+S.b);
+          S.b+=(tg.b-S.b)*(down?fast:slow);
+          S.t+=(tg.t-S.t)*(down?slow:fast);
         }
 
-        slider.style.width=Math.max(0,cur.r-cur.l)+'px';
-        slider.style.height=Math.max(0,cur.b-cur.t)+'px';
-        imp(slider,'transform','translate3d('+cur.l+'px,'+cur.t+'px,0)');
-        /* روی دکمه‌ی گفتگو: اول کامل می‌رسه، بعد محو می‌شه */
-        imp(slider,'opacity',(tg.chat&&!animating)?'0':'1');
+        slider.style.width=Math.max(0,S.r-S.l)+'px';
+        slider.style.height=Math.max(0,S.b-S.t)+'px';
+        imp(slider,'transform','translate3d('+S.l+'px,'+S.t+'px,0)');
 
-        if(animating||now<settleUntil){ raf=requestAnimationFrame(frame); }
+        var dist=Math.abs(tg.l-S.l)+Math.abs(tg.r-S.r)+Math.abs(tg.t-S.t)+Math.abs(tg.b-S.b);
+        var shouldHide=(tg.chat||collapsed);
+        if(shouldHide && dist<12){
+          imp(slider,'opacity','0');
+        } else {
+          imp(slider,'opacity','1');
+        }
+
+        var moving=dist>.4;
+        if(moving||now<settleUntil){ raf=requestAnimationFrame(frame); }
+        else{ lastT=0; }
       }
 
       function kick(snap){
-        if(snap){ cur=null; animating=false; lastBtn=null; }
+        if(snap) S=null;
         settleUntil=performance.now()+900;
         if(!raf) raf=requestAnimationFrame(frame);
       }
@@ -2941,7 +2958,8 @@
         setTimeout(function(){ clearInterval(t); },8000);
       }
     })();
-    /* ★ انیمیشن سوییچ view — RTL درست */
+
+    /* ★ انیمیشن سوییچ view */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function') return false;
@@ -3056,7 +3074,15 @@
       var row=document.getElementById('navRow');
       if(!row) return;
       var collapsed=row.classList.contains('collapsed');
-      var nav=document.getElementById('bottomNav');
+      function updateNavHiddenState(){
+  var row=document.getElementById('navRow');
+  if(!row) return;
+  var collapsed=row.classList.contains('collapsed');
+  var nav=document.getElementById('bottomNav');
+  if(!nav) return;
+  if(collapsed) nav.classList.add('nav-collapsed');
+  else nav.classList.remove('nav-collapsed');
+}
       if(!nav) return;
       if(collapsed) nav.classList.add('nav-collapsed');
       else nav.classList.remove('nav-collapsed');
@@ -3074,20 +3100,20 @@
         if(dv&&dv!=='chat'&&typeof window.switchView==='function') window.switchView(dv);
       }catch(e){}
     },50);
-/* FIX 2: Header buttons re-inject */
-setTimeout(injectMainTopActions, 100);
-setTimeout(injectMainTopActions, 800);
-setTimeout(injectMainTopActions, 2000);
 
-/* FIX 4: Planner re-render */
-setTimeout(function () {
-    try {
+    setTimeout(injectMainTopActions, 100);
+    setTimeout(injectMainTopActions, 800);
+    setTimeout(injectMainTopActions, 2000);
+
+    setTimeout(function () {
+      try {
         var vp = document.getElementById('view-planner');
         if (vp) {
-            if (typeof window.renderPlanner === 'function') window.renderPlanner();
+          if (typeof window.renderPlanner === 'function') window.renderPlanner();
         }
-    } catch (e) { console.warn('[Planner re-render]', e); }
-}, 100);
-    console.log('[Siraj v2.6] planner loaded ✓');
+      } catch (e) { console.warn('[Planner re-render]', e); }
+    }, 100);
+
+    console.log('[Siraj v2.5] planner loaded ✓');
   }
 })();
