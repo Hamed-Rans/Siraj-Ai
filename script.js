@@ -2137,6 +2137,11 @@ function importBackup(ev) {
    ═══════════════════════════════════════════════════════════════ */
 function openSettings() {
     try {
+        /* ★ پاک کردن انتخاب متن قبلی */
+        if (window.getSelection) {
+            var sel = window.getSelection();
+            if (sel && sel.removeAllRanges) sel.removeAllRanges();
+        }
         settingsCat = 'appearance';
         window._settingsSub = 'general';
         window._appearanceSubHidden = false;
@@ -2197,6 +2202,11 @@ function applySettings() {
     closeSettings();
 }
 function switchSettingsCat(cat) {
+    /* ★ پاک کردن انتخاب متن */
+    if (window.getSelection) {
+        var sel = window.getSelection();
+        if (sel && sel.removeAllRanges) sel.removeAllRanges();
+    }
     /* ★ اگه روی «ظاهر» کلیک شد و از قبل بازه → فقط toggle کن، بدون رندر */
     if (cat === 'appearance' && settingsCat === 'appearance') {
         window._appearanceSubHidden = !window._appearanceSubHidden;
