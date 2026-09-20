@@ -5463,3 +5463,18 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
 .cal-popup-wide .siraj-popup-title{
   gap:8px!important;
 }
+
+.bottom-nav-btn:not(.nav-btn-chat){
+  transition:
+    max-width .45s cubic-bezier(.3,.5,.2,1),
+    padding .45s cubic-bezier(.3,.5,.2,1),
+    background .3s ease,color .3s ease,border-color .3s ease,
+    box-shadow .4s ease,transform .25s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.bottom-nav-btn::after{
+  transition:
+    max-width .45s cubic-bezier(.3,.5,.2,1),
+    max-height .45s cubic-bezier(.3,.5,.2,1),
+    opacity .3s ease,
+    margin .45s cubic-bezier(.3,.5,.2,1)!important;
+}
