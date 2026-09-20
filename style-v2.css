@@ -3895,3 +3895,183 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
 .bottom-nav-btn[data-view="videos"] svg{
   stroke-width:1.75!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH J — انیمیشن روان viewها بدون لگ
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ GPU layer برای همه viewها ═══ */
+.view{
+  will-change:auto;
+  backface-visibility:hidden;
+  transform:translateZ(0);
+}
+.view.active{
+  will-change:transform,opacity;
+}
+
+/* ═══ ورود از چپ ═══ */
+.view.active.view-in-from-left{
+  animation:viewSlideInLeft .48s cubic-bezier(.2,.9,.3,1) both!important;
+}
+/* ═══ ورود از راست ═══ */
+.view.active.view-in-from-right{
+  animation:viewSlideInRight .48s cubic-bezier(.2,.9,.3,1) both!important;
+}
+/* ═══ خروج به چپ ═══ */
+.view.leaving.view-out-left{
+  animation:viewSlideOutLeft .26s cubic-bezier(.4,0,.7,.3) forwards!important;
+}
+/* ═══ خروج به راست ═══ */
+.view.leaving.view-out-right{
+  animation:viewSlideOutRight .26s cubic-bezier(.4,0,.7,.3) forwards!important;
+}
+
+@keyframes viewSlideInLeft{
+  from{opacity:0;transform:translate3d(-52px,0,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes viewSlideInRight{
+  from{opacity:0;transform:translate3d(52px,0,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes viewSlideOutLeft{
+  from{opacity:1;transform:translate3d(0,0,0)}
+  to{opacity:0;transform:translate3d(-38px,0,0)}
+}
+@keyframes viewSlideOutRight{
+  from{opacity:1;transform:translate3d(0,0,0)}
+  to{opacity:0;transform:translate3d(38px,0,0)}
+}
+
+/* ═══ حالت نوار چپ/راست — انیمیشن عمودی ═══ */
+[data-nav-position="left"] .view.active.view-in-from-left,
+[data-nav-position="right"] .view.active.view-in-from-left{
+  animation:viewSlideInTop .48s cubic-bezier(.2,.9,.3,1) both!important;
+}
+[data-nav-position="left"] .view.active.view-in-from-right,
+[data-nav-position="right"] .view.active.view-in-from-right{
+  animation:viewSlideInBottom .48s cubic-bezier(.2,.9,.3,1) both!important;
+}
+[data-nav-position="left"] .view.leaving.view-out-left,
+[data-nav-position="right"] .view.leaving.view-out-left{
+  animation:viewSlideOutTop .26s cubic-bezier(.4,0,.7,.3) forwards!important;
+}
+[data-nav-position="left"] .view.leaving.view-out-right,
+[data-nav-position="right"] .view.leaving.view-out-right{
+  animation:viewSlideOutBottom .26s cubic-bezier(.4,0,.7,.3) forwards!important;
+}
+@keyframes viewSlideInTop{
+  from{opacity:0;transform:translate3d(0,-48px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes viewSlideInBottom{
+  from{opacity:0;transform:translate3d(0,48px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes viewSlideOutTop{
+  from{opacity:1;transform:translate3d(0,0,0)}
+  to{opacity:0;transform:translate3d(0,-32px,0)}
+}
+@keyframes viewSlideOutBottom{
+  from{opacity:1;transform:translate3d(0,0,0)}
+  to{opacity:0;transform:translate3d(0,32px,0)}
+}
+
+/* ═══ غیرفعال کردن کامل blur در transition (بهبود GPU) ═══ */
+.view.active.view-in-from-left,
+.view.active.view-in-from-right,
+.view.leaving.view-out-left,
+.view.leaving.view-out-right{
+  filter:none!important;
+  animation-fill-mode:both!important;
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH J2 — کارت‌های روزانه: خط hover مثل بقیه کارت‌ها، بدون حرکت
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ فعال‌سازی خط hover روی کارت روزانه ═══ */
+.daily-card{
+  position:relative!important;
+  overflow:hidden!important;
+  transform:none!important;
+  transition:
+    border-color .28s cubic-bezier(.4,0,.2,1),
+    background .3s cubic-bezier(.4,0,.2,1),
+    box-shadow .32s cubic-bezier(.22,1,.36,1)!important;
+}
+.daily-card::after{
+  content:''!important;
+  display:block!important;
+  position:absolute!important;
+  top:0!important;
+  right:50%!important;
+  left:50%!important;
+  height:2px!important;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-light) 30%,
+    var(--accent) 50%,
+    var(--accent-light) 70%,
+    transparent 100%)!important;
+  opacity:0!important;
+  transition:
+    right .45s cubic-bezier(.22,1,.36,1),
+    left .45s cubic-bezier(.22,1,.36,1),
+    opacity .3s cubic-bezier(.4,0,.2,1)!important;
+  pointer-events:none!important;
+  z-index:5!important;
+  border-radius:0 0 2px 2px!important;
+}
+.daily-card:hover::after{
+  right:0!important;
+  left:0!important;
+  opacity:1!important;
+}
+
+/* ═══ حذف کامل حرکت و glow اضافی روی hover ═══ */
+.daily-card:hover,
+.daily-cards:hover .daily-card{
+  transform:none!important;
+  background:var(--bubble-bot-bg)!important;
+  border-color:var(--accent)!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.25),
+    0 4px 14px -8px rgba(0,0,0,.35)!important;
+}
+
+/* ═══ کارت‌های week-stats و planner-stats هم همین رفتار ═══ */
+.planner-stats-card:hover{
+  transform:none!important;
+}
+.planner-stats-card::after{
+  content:''!important;
+  display:block!important;
+  position:absolute!important;
+  top:0!important;
+  right:50%!important;
+  left:50%!important;
+  height:2px!important;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-light) 30%,
+    var(--accent) 50%,
+    var(--accent-light) 70%,
+    transparent 100%)!important;
+  opacity:0!important;
+  transition:
+    right .45s cubic-bezier(.22,1,.36,1),
+    left .45s cubic-bezier(.22,1,.36,1),
+    opacity .3s cubic-bezier(.4,0,.2,1)!important;
+  pointer-events:none!important;
+  z-index:5!important;
+}
+.planner-stats-card:hover::after{
+  right:0!important;
+  left:0!important;
+  opacity:1!important;
+}
+
+/* ═══ غیرفعال کردن خط hover کارت‌های قدیمی (duplicate از style.css) ═══ */
+.daily-card::before{
+  display:none!important;
+}
