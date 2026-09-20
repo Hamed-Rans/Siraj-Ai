@@ -2886,17 +2886,28 @@
         /* ═══════════════════════════════════════════════════════════════
        NAV SLIDER
        ═══════════════════════════════════════════════════════════════ */
-    (function(){
+        (function(){
       var nav=null, slider=null, fill=null;
-      var cur=null;                    // موقعیت فعلی پس‌زمینه {l,r,t,b}
-      var lastBtn=null;                // دکمه‌ای که پس‌زمینه روشه (یا داره می‌ره روش)
-      var fromBtn=null, rel=null;      // دکمه‌ی مبدأ + فاصله‌ی پس‌زمینه از اون
-      var t0=0, animating=false, flying=false;
+      var cur=null;
+      var lastBtn=null;
+      var fromBtn=null, rel=null;
+      var t0=0, animating=false;
       var raf=0, settleUntil=0;
-      var DUR=460;
+      var DUR=480;
 
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
-      function ease(p){ return p<.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2; }
+      /* منحنی نرم: شروع ملایم، بدون جهش، فرود آرام (cubic-bezier .3,.5,.2,1) */
+      var ease=(function(x1,y1,x2,y2){
+        function A(a,b){return 1-3*b+3*a} function B(a,b){return 3*b-6*a} function C(a){return 3*a}
+        function calc(t,a,b){return ((A(a,b)*t+B(a,b))*t+C(a))*t}
+        function slope(t,a,b){return 3*A(a,b)*t*t+2*B(a,b)*t+C(a)}
+        return function(x){
+          if(x<=0) return 0; if(x>=1) return 1;
+          var t=x;
+          for(var i=0;i<8;i++){ var s=slope(t,x1,x2); if(Math.abs(s)<1e-6) break; t-=(calc(t,x1,x2)-x)/s; }
+          return calc(t,y1,y2);
+        };
+      })(.3,.5,.2,1);
       function copy(o){ return {l:o.l,r:o.r,t:o.t,b:o.b}; }
 
       function box(btn){
@@ -2911,11 +2922,19 @@
         var bx=box(btn), py=padY();
         return { l:bx.l, r:bx.r, t:bx.t-py, b:bx.b+py, chat:btn.classList.contains('nav-btn-chat') };
       }
+      /* اگه لحظه‌ای دو دکمه active بودن، جدیدترین رو بردار (جلوگیری از لرزش) */
+      function activeBtn(){
+        var list=nav.querySelectorAll('.bottom-nav-btn.active');
+        if(!list.length) return null;
+        if(list.length===1) return list[0];
+        for(var i=0;i<list.length;i++){ if(list[i]!==lastBtn) return list[i]; }
+        return list[0];
+      }
 
       function frame(now){
         raf=0;
         if(!nav||!slider) return;
-        var btn=nav.querySelector('.bottom-nav-btn.active');
+        var btn=activeBtn();
         if(!btn){ imp(slider,'opacity','0'); return; }
         var tg=target(btn);
 
@@ -2923,7 +2942,6 @@
           cur=copy(tg); lastBtn=btn;
         }else{
           if(btn!==lastBtn){
-            /* شروع حرکت: مبدأ = موقعیت فعلی نسبت به دکمه‌ی قبلی (نه مختصات ثابت) */
             var ob=box(lastBtn);
             rel={ l:cur.l-ob.l, r:cur.r-ob.r, t:cur.t-ob.t, b:cur.b-ob.b };
             fromBtn=lastBtn; lastBtn=btn; t0=now; animating=true;
@@ -2940,13 +2958,6 @@
           }else{
             cur=copy(tg);
           }
-        }
-
-        /* وسط حرکت سایه‌ی سبک، بعد از رسیدن سایه‌ی اصلی */
-        if(animating!==flying){
-          flying=animating;
-          if(flying) imp(fill,'box-shadow','0 2px 8px -4px var(--accent)');
-          else fill.style.removeProperty('box-shadow');
         }
 
         slider.style.width=Math.max(0,cur.r-cur.l)+'px';
@@ -2974,10 +2985,8 @@
         fill=document.createElement('div');
         fill.className='nav-slider-fill';
         slider.appendChild(fill);
-        imp(slider,'transition','opacity .28s ease');
+        imp(slider,'transition','opacity .25s ease');
         imp(slider,'opacity','0');
-        imp(slider,'will-change','transform,width,height');
-        imp(fill,'transition','box-shadow .3s ease,border-radius .3s ease');
         nav.insertBefore(slider,nav.firstChild);
 
         nav.addEventListener('click',function(e){
