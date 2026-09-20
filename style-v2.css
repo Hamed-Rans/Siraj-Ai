@@ -4189,3 +4189,60 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
 .settings-content[data-cat="behavior"]{
   padding-bottom:40px!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH L — رفع هایلایت انتخاب متن در تنظیمات
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   L1: استایل انتخاب متن — ملایم و نامرئی در تنظیمات
+   ═══════════════════════════════════════════════════════════════ */
+::selection{
+  background:rgba(59,130,246,.28)!important;
+  color:inherit!important;
+}
+::-moz-selection{
+  background:rgba(59,130,246,.28)!important;
+  color:inherit!important;
+}
+
+/* توی تنظیمات — انتخاب متن نامرئی */
+.settings-modal ::selection,
+.settings-modal ::-moz-selection{
+  background:transparent!important;
+  color:inherit!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   L2: غیرفعال کردن انتخاب متن روی عناصر کنترلی
+   ═══════════════════════════════════════════════════════════════ */
+.settings-modal button,
+.settings-modal .settings-tab-btn,
+.settings-modal .settings-submenu-btn,
+.settings-modal .row-btn,
+.settings-modal label,
+.settings-modal .color-opt,
+.settings-modal .pattern-opt,
+.settings-modal .slider-val,
+.settings-modal .admin-badge,
+.settings-modal .profile-access-note,
+.settings-modal .group-subtitle,
+.settings-modal .level-opt,
+.settings-modal .default-view-opt,
+.settings-modal .settings-subtab{
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   L3: حذف outline پیش‌فرض مرورگر (با outline سفارشی جایگزین)
+   ═══════════════════════════════════════════════════════════════ */
+.settings-modal button:focus,
+.settings-modal button:focus-visible,
+.settings-modal label:focus{
+  outline:none!important;
+}
+.settings-modal button:focus-visible{
+  outline:2px solid var(--accent)!important;
+  outline-offset:2px!important;
+  border-radius:12px!important;
+}
