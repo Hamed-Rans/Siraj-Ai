@@ -4246,3 +4246,73 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
   outline-offset:2px!important;
   border-radius:12px!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH M — رفع کامل سرریز محتوای تب‌های غیرفعال تنظیمات
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   M1: wrapper تنظیمات — محدوده سخت
+   ═══════════════════════════════════════════════════════════════ */
+.settings-content-wrap{
+  position:relative!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  contain:layout paint!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   M2: صفحات تنظیمات — کاملاً مخفی وقتی غیرفعالن
+   ═══════════════════════════════════════════════════════════════ */
+.settings-content{
+  position:absolute!important;
+  inset:0!important;
+  overflow-y:auto!important;
+  padding:20px 22px 40px!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  z-index:0!important;
+  transform:translateY(8px)!important;
+  transition:
+    opacity .3s cubic-bezier(.4,0,.2,1),
+    transform .35s cubic-bezier(.22,1,.36,1),
+    visibility .3s!important;
+}
+.settings-content.active{
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+  z-index:5!important;
+  transform:translateY(0)!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   M3: محتوای تب‌های غیرفعال — قطع سرریز
+   ═══════════════════════════════════════════════════════════════ */
+.settings-content:not(.active){
+  display:none!important;
+  contain:strict!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   M4: رفع سرریز دکمه‌های تست اعلان (تب رفتار)
+   ═══════════════════════════════════════════════════════════════ */
+.settings-content[data-cat="behavior"]{
+  overflow-x:hidden!important;
+}
+.settings-content[data-cat="behavior"] .setting-group{
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   M5: کلیپ سخت روی settings-left برای اطمینان
+   ═══════════════════════════════════════════════════════════════ */
+.settings-left{
+  overflow:hidden!important;
+  position:relative!important;
+}
+.settings-body{
+  overflow:hidden!important;
+  position:relative!important;
+}
