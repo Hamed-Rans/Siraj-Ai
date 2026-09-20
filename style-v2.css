@@ -4075,3 +4075,117 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
 .daily-card::before{
   display:none!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH K — رفع باگ هاله تنظیمات + دکمه دیوان
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   K1: تنظیمات — رفع هاله آبی (اسکرول‌بار روشن) پشت پنل
+   ═══════════════════════════════════════════════════════════════ */
+
+/* اسکرول‌بار پنل تنظیمات — نازک و کم‌رنگ */
+.settings-content::-webkit-scrollbar,
+.settings-content-wrap::-webkit-scrollbar,
+.settings-preview::-webkit-scrollbar,
+.settings-tabs::-webkit-scrollbar,
+.settings-body::-webkit-scrollbar,
+.settings-left::-webkit-scrollbar{
+  width:5px!important;
+  height:5px!important;
+}
+.settings-content::-webkit-scrollbar-track,
+.settings-content-wrap::-webkit-scrollbar-track,
+.settings-preview::-webkit-scrollbar-track,
+.settings-tabs::-webkit-scrollbar-track{
+  background:transparent!important;
+}
+.settings-content::-webkit-scrollbar-thumb,
+.settings-content-wrap::-webkit-scrollbar-thumb,
+.settings-preview::-webkit-scrollbar-thumb,
+.settings-tabs::-webkit-scrollbar-thumb{
+  background:rgba(120,150,200,.22)!important;
+  border-radius:10px!important;
+  transition:background .25s!important;
+}
+.settings-content::-webkit-scrollbar-thumb:hover,
+.settings-content-wrap::-webkit-scrollbar-thumb:hover,
+.settings-preview::-webkit-scrollbar-thumb:hover,
+.settings-tabs::-webkit-scrollbar-thumb:hover{
+  background:rgba(120,150,200,.38)!important;
+}
+/* حذف کامل fallback رنگی */
+.settings-content{
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(120,150,200,.22) transparent!important;
+}
+.settings-preview{
+  scrollbar-width:thin!important;
+  scrollbar-color:rgba(120,150,200,.22) transparent!important;
+}
+/* حذف halos احتمالی از element های قدیمی */
+.settings-modal::before,
+.settings-modal::after,
+.settings-body::before,
+.settings-body::after,
+.settings-left::before,
+.settings-left::after,
+.settings-content-wrap::before,
+.settings-content-wrap::after{
+  display:none!important;
+  content:none!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   K2: دیوان / مقالات — فضای کافی زیر دکمه، بدون بریدگی
+   ═══════════════════════════════════════════════════════════════ */
+.page-empty-card{
+  padding-bottom:56px!important;
+  margin-bottom:50px!important;
+}
+.page-empty-soon{
+  animation:soonPulseSoft 3s ease-in-out infinite!important;
+  margin-bottom:4px;
+}
+@keyframes soonPulseSoft{
+  0%,100%{
+    box-shadow:
+      0 1px 2px -1px rgba(0,0,0,.3),
+      0 8px 24px -10px var(--accent),
+      0 0 0 0 var(--accent-soft);
+  }
+  50%{
+    box-shadow:
+      0 1px 2px -1px rgba(0,0,0,.3),
+      0 8px 24px -10px var(--accent),
+      0 0 0 8px transparent;
+  }
+}
+
+/* دیوان/مقالات — فضای پایین view */
+.blog-view.active,
+.videos-view.active{
+  padding-bottom:30px!important;
+  overflow-y:auto!important;
+}
+
+/* موبایل */
+@media (max-width:900px){
+  .page-empty-card{
+    padding-bottom:44px!important;
+    margin-bottom:36px!important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   K3: پنل تنظیمات — فضای داخلی بهتر
+   ═══════════════════════════════════════════════════════════════ */
+.settings-content{
+  padding:20px 22px 40px!important;
+}
+[data-cat="behavior"] .settings-content,
+.settings-content[data-cat="behavior"]{
+  padding-bottom:40px!important;
+}
