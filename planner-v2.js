@@ -1474,12 +1474,15 @@
       renderLibList();
     };
 
-    function closeLibrary(){
+      function closeLibrary(){
       var el=document.getElementById('learnLibrary');if(!el) return;
       if(el.dataset.closing==='1') return;
       el.dataset.closing='1';
+      el.classList.add('closing');
       el.classList.remove('open');
-      setTimeout(function(){if(el.parentNode)el.remove();},550);
+      setTimeout(function(){
+        if(el.parentNode) el.remove();
+      },560);
     }
 
     function renderLibList(){
