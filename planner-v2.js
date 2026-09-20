@@ -539,7 +539,7 @@
     }
 
     /* ═══ HERO — دکمه برگشت الان بیرون از phc-day است ═══ */
-            function heroDaily(){
+     function heroDaily(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
       var key=window.dateKey(d);
@@ -553,12 +553,12 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امروز</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امروز</span></button>';
       return '<div class="planner-hero-card">'
-        +backBtn
         +'<button class="phc-nav-btn" onclick="window.__navDay(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
         +'<div class="phc-day">'
         +'<span data-anim-key="weekday">'+esc(p.weekday||'')+'</span>'
         +'<span class="phc-today" style="'+(isToday?'':'display:none')+'">امروز</span>'
+        +backBtn
         +'</div>'
         +'<div class="phc-date"><span data-anim-key="dayNum">'+esc(p.dayNum||'')+'</span> <span data-anim-key="monthName">'+esc(p.monthName||'')+'</span> <span data-anim-key="yearNum">'+esc(p.yearNum||'')+'</span></div>'
         +(goal?'<div class="phc-goal"><span>🎯</span><span>هدف ماه: '+esc(goal.text)+'</span></div>':'<div class="phc-goal empty">🎯 هنوز هدف ماهانه‌ای ثبت نکردی</div>')
@@ -566,7 +566,7 @@
         +'<button class="phc-nav-btn" onclick="window.__navDay(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-            function heroWeekly(){
+     function heroWeekly(){
       var d=new Date(window.plannerDate||new Date());
       var days=myWeekDays();
       var p=dateParts(d);
@@ -575,19 +575,19 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این هفته</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این هفته</span></button>';
       return '<div class="planner-hero-card">'
-        +backBtn
         +'<button class="phc-nav-btn" onclick="window.__navWeek(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
         +'<div class="phc-day">'
         +'<span data-anim-key="monthName2">'+esc(p.monthName||'')+'</span>'
         +'<span data-anim-key="yearNum2">'+esc(p.yearNum||'')+'</span>'
+        +backBtn
         +'</div>'
         +'<div class="phc-date"><span data-anim-key="weekOrdinal">هفته '+weekOrd(weekOfMonth())+' ماه</span> — <span data-anim-key="weekRange">از '+esc(days[0].date||'')+' تا '+esc(days[6].date||'')+'</span></div>'
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navWeek(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-                function heroMonthly(){
+     function heroMonthly(){
       var pl=window.loadPlannerNew();
       var d=new Date(window.plannerDate||new Date());
       var p=dateParts(d);
@@ -600,19 +600,19 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این ماه</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد این ماه</span></button>';
       return '<div class="planner-hero-card">'
-        +backBtn
         +'<button class="phc-nav-btn" onclick="window.__navMonth(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
         +'<div class="phc-day">'
         +'<span data-anim-key="monthName3">'+esc(p.monthName||'')+'</span>'
         +'<span data-anim-key="yearNum3">'+esc(p.yearNum||'')+'</span>'
+        +backBtn
         +'</div>'
         +'<div class="phc-date" data-anim-key="monthStat">'+toFa(dg)+' از '+toFa(goals.length)+' هدف این ماه انجام شده</div>'
         +'</div>'
         +'<button class="phc-nav-btn" onclick="window.__navMonth(1)"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>'
         +'</div>';
     }
-           function heroYearly(){
+     function heroYearly(){
       var d=new Date(window.plannerDate||new Date());
       var y=d.getFullYear();
       var pl=window.loadPlannerNew();
@@ -625,11 +625,11 @@
         ? '<button class="phc-back-inline hidden" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امسال</span></button>'
         : '<button class="phc-back-inline appearing" onclick="window.__goToday()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><span>برگرد امسال</span></button>';
       return '<div class="planner-hero-card">'
-        +backBtn
         +'<button class="phc-nav-btn" onclick="window.__navYear(-1)"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>'
         +'<div class="phc-center">'
         +'<div class="phc-day">'
         +'<span data-anim-key="yearNum4">'+esc(d.toLocaleDateString('fa-IR',{year:'numeric'})||'')+'</span>'
+        +backBtn
         +'</div>'
         +'<div class="phc-date">'+toFa(done)+' از '+toFa(goals.length)+' هدف سالانه انجام شده</div>'
         +'</div>'
@@ -1207,13 +1207,20 @@
         +'<div class="notif-tabs" id="notifTabs"></div>'
         +'<div class="notif-list" id="notifList"></div>';
       document.body.appendChild(panel);
-            /* ★ موقعیت پنل نسبت به دکمه نوتیف */
+                  /* ★ موقعیت پنل — زیر دکمه نوتیف، بدون همپوشانی */
       var notifBtn = document.getElementById('notifBtn');
       if (notifBtn) {
         var rect = notifBtn.getBoundingClientRect();
-        panel.style.left = rect.left + 'px';
-        panel.style.top = (rect.bottom + 10) + 'px';
-        panel.style.transformOrigin = 'top left';
+        var panelLeft = rect.left;
+        /* ★ اگه از راست مرز بیرون می‌زنه، اصلاح کن */
+        var panelW = Math.min(380, window.innerWidth - 32);
+        if (panelLeft + panelW > window.innerWidth - 8) {
+          panelLeft = window.innerWidth - panelW - 8;
+        }
+        if (panelLeft < 8) panelLeft = 8;
+        panel.style.setProperty('left', panelLeft + 'px', 'important');
+        panel.style.setProperty('top', (rect.bottom + 12) + 'px', 'important');
+        panel.style.setProperty('transform-origin', 'top left', 'important');
       }
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
