@@ -55,6 +55,15 @@
       library: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>',
       checkCircle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>',
       flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>'
+            ,
+      calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+      bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+      award: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>',
+      chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M7 16v-5M12 16v-9M17 16v-3"/></svg>',
+      sparkle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 14.09 8.26 19.5 9l-4 3.5L16.5 18 12 15.5 7.5 18 8.5 12.5 4.5 9l5.41-.74z"/></svg>',
+      clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+      star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>',
+      wave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11.5V6a1.5 1.5 0 0 1 3 0v5"/><path d="M10 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M13 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M16 11V8a1.5 1.5 0 0 1 3 0v6a7 7 0 0 1-7 7h-1a7 7 0 0 1-7-7v-3a1.5 1.5 0 0 1 3 0"/></svg>'
     };
     window.SI_ICONS = SI_ICONS;
 
@@ -265,17 +274,21 @@
       var old=document.getElementById('sirajPopup'); if(old) old.remove();
       var el=document.createElement('div');el.id='sirajPopup';el.className='siraj-popup-overlay';
       el.innerHTML='<div class="siraj-popup"><span class="siraj-popup-emoji">'+emoji+'</span><div class="siraj-popup-title">'+title+'</div><div class="siraj-popup-text">'+text+'</div><button class="siraj-popup-btn" id="sirajPopupOk">متوجه شدم</button></div>';
-      document.body.appendChild(el);
-      requestAnimationFrame(function(){el.classList.add('open');});
-      el.querySelector('#sirajPopupOk').onclick=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+            document.body.appendChild(el);
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ el.classList.add('open'); });
+      });
+      el.querySelector('#sirajPopupOk').onclick=function(){el.classList.remove('open');setTimeout(function(){el.remove();},380);};
     }
     function showConfirm(emoji,title,text,onYes,yesText,noText){
       var old=document.getElementById('sirajConfirmPopup'); if(old) old.remove();
       var el=document.createElement('div');el.id='sirajConfirmPopup';el.className='siraj-popup-overlay';
       el.innerHTML='<div class="siraj-popup"><span class="siraj-popup-emoji">'+emoji+'</span><div class="siraj-popup-title">'+title+'</div><div class="siraj-popup-text">'+text+'</div><div class="siraj-popup-actions"><button class="siraj-popup-btn secondary" id="sirajConfirmNo">'+(noText||'نه')+'</button><button class="siraj-popup-btn" id="sirajConfirmYes">'+(yesText||'بله')+'</button></div></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){el.classList.add('open');});
-      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ el.classList.add('open'); });
+      });
+      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},380);};
       el.querySelector('#sirajConfirmYes').onclick=function(){close();if(onYes)onYes();};
       el.querySelector('#sirajConfirmNo').onclick=close;
     }
@@ -284,7 +297,10 @@
       var el=document.createElement('div');el.id='sirajTriplePopup';el.className='siraj-popup-overlay';
       el.innerHTML='<div class="siraj-popup"><span class="siraj-popup-emoji">'+emoji+'</span><div class="siraj-popup-title">'+title+'</div><div class="siraj-popup-text">'+text+'</div><div class="siraj-popup-actions-3"><button class="siraj-popup-btn secondary" id="sirajTriple1">'+opt1.text+'</button><button class="siraj-popup-btn secondary" id="sirajTriple2">'+opt2.text+'</button><button class="siraj-popup-btn" id="sirajTriple3">'+opt3.text+'</button></div></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){el.classList.add('open');});
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ el.classList.add('open'); });
+      });
+      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},380);};
       var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
       el.querySelector('#sirajTriple1').onclick=function(){close();if(opt1.onClick)opt1.onClick();};
       el.querySelector('#sirajTriple2').onclick=function(){close();if(opt2.onClick)opt2.onClick();};
@@ -741,8 +757,10 @@
           +'<button class="siraj-popup-btn" id="dLearnKeep">📚 بذار مرور کنم</button>'
           +'</div></div>';
         document.body.appendChild(el);
-        requestAnimationFrame(function(){el.classList.add('open');});
-        var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){ el.classList.add('open'); });
+        });
+        var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},380);};
         el.querySelector('#dLearnDelete').onclick=function(){
           close();setItemState(dk,null);
           if(window.toast) window.toast('از یادگرفته‌ها حذف شد','info');
@@ -765,8 +783,10 @@
           +'<div class="siraj-popup-text">هنوز '+remain.text+' تا آخر امروز مونده — هنوز می‌تونی یادش بگیری 🌱<br><br>توی «کتابخانه یادگیری» هست برات.</div>'
           +'<button class="siraj-popup-btn" id="dPracOk">باشه</button></div>';
         document.body.appendChild(el2);
-        requestAnimationFrame(function(){el2.classList.add('open');});
-        el2.querySelector('#dPracOk').onclick=function(){el2.classList.remove('open');setTimeout(function(){el2.remove();},320);};
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){ el2.classList.add('open'); });
+        });
+        el2.querySelector('#dPracOk').onclick=function(){el2.classList.remove('open');setTimeout(function(){el2.remove();},380);};
         refreshBody('left');
         if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
       }
@@ -1100,8 +1120,10 @@
         +'<button class="siraj-popup-btn" id="ncpKeep">✋ بعداً</button>'
         +'</div></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){ el.classList.add('open'); });
-      var close = function(){ el.classList.remove('open'); setTimeout(function(){ el.remove(); }, 320); };
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ el.classList.add('open'); });
+      });
+      var close = function(){ el.classList.remove('open'); setTimeout(function(){ el.remove(); }, 380); };
       el.querySelector('#ncpDel').onclick = function(){ close(); deleteTask(n.taskId, n.dayKey); };
       el.querySelector('#ncpResch').onclick = function(){ close(); smartReschedule(n.taskId, n.dayKey); };
       el.querySelector('#ncpKeep').onclick = close;
@@ -1801,8 +1823,8 @@
         }
         if(isF) dc+=' friday';
         var ic='';
-        if(rems.length) ic+='<span class="cal-day-icon icon-evt">🔔'+(rems.length>1?'<b>'+toFa(rems.length)+'</b>':'')+'</span>';
-        if(evt) ic+='<span class="cal-day-icon icon-occ">⭐</span>';
+        if(rems.length) ic+='<span class="cal-day-icon icon-evt">'+SI_ICONS.bell+(rems.length>1?'<b>'+toFa(rems.length)+'</b>':'')+'</span>';
+        if(evt) ic+='<span class="cal-day-icon icon-occ">'+SI_ICONS.star+'</span>';
         var si='';
         if(total>0){
           if(dC===total) si='<span class="cal-day-status st-done">✓</span>';
@@ -1815,7 +1837,7 @@
           +'</div>');
       }
       var gh='';
-      if(goals.length===0) gh='<div class="mg-empty-compact">🎯 هنوز هدفی نداری</div>';
+      if(goals.length===0) gh='<div class="mg-empty-compact"><span class="title-icon">'+SI_ICONS.target+'</span>هنوز هدفی نداری</div>';
       else gh='<div class="month-goals-list">'+goals.map(function(g,i){
         return '<div class="month-goal'+(g.done?' done':'')+'">'
           +'<label class="mg-check-wrap"><input type="checkbox" '+(g.done?'checked':'')+' onchange="window.__toggleMonthGoalLocal(\''+mk+'\','+i+',this)"><span class="mg-check"></span></label>'
@@ -1826,7 +1848,7 @@
       var dg=goals.filter(function(g){return g.done;}).length;
       return '<div class="monthly-layout">'
         +'<div class="monthly-side"><div class="month-goals compact">'
-        +'<div class="month-goals-title"><span>🎯</span><span>اهداف این ماه</span>'+(goals.length>0?'<span class="mg-counter">'+toFa(dg)+'/'+toFa(goals.length)+'</span>':'')+'</div>'
+                +'<div class="month-goals-title"><span class="title-icon">'+SI_ICONS.target+'</span><span>اهداف این ماه</span>'+(goals.length>0?'<span class="mg-counter">'+toFa(dg)+'/'+toFa(goals.length)+'</span>':'')+'</div>'
         +gh
         +'<div class="month-goal-add compact"><input type="text" id="newGoalInput" placeholder="هدف جدید..." onkeydown="if(event.key===\'Enter\')addMonthGoal(\''+mk+'\')"><button onclick="addMonthGoal(\''+mk+'\')">+</button></div>'
         +'</div></div>'
@@ -1866,15 +1888,15 @@
       }).join(''):'';
       var old=document.getElementById('calDayPopup');if(old) old.remove();
       var el=document.createElement('div');el.id='calDayPopup';el.className='siraj-popup-overlay';
-      el.innerHTML='<div class="siraj-popup cal-popup-wide">'
-        +'<div class="siraj-popup-title">📅 '+toFa(day)+' '+d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'})+'</div>'
+       el.innerHTML='<div class="siraj-popup cal-popup-wide">'
+        +'<div class="siraj-popup-title">'+SI_ICONS.calendar+' '+toFa(day)+' '+d.toLocaleDateString('fa-IR',{month:'long',year:'numeric'})+'</div>'
         +(ne?'<div class="cal-national-badge">🇮🇷 '+esc(ne)+'</div>':'')
         +'<div class="cal-popup-section">'
-        +'<div class="cal-popup-label">🎯 کارها</div>'
+        +'<div class="cal-popup-label">'+SI_ICONS.target+' کارها</div>'
         +(tasks.length===0?'<div class="cal-popup-empty">کاری ثبت نشده</div>':'<div class="cal-popup-text">'+toFa(dC)+' از '+toFa(tasks.length)+' انجام شده</div>'+tl)
         +'</div>'
         +'<div class="cal-popup-section">'
-        +'<div class="cal-popup-label">🔔 یادآورها</div>'
+        +'<div class="cal-popup-label">'+SI_ICONS.bell+' یادآورها</div>'
         +'<div class="cal-rem-list">'+(rl||'<div class="cal-popup-empty">یادآوری نداری</div>')+'</div>'
         +'<div class="cal-rem-add"><input type="text" id="newRemText" placeholder="یادآور جدید..." onkeydown="if(event.key===\'Enter\')window.__addReminder(\''+k+'\')"><input type="text" id="newRemTime" placeholder="ساعت" maxlength="5"><button onclick="window.__addReminder(\''+k+'\')">افزودن</button></div>'
         +'</div>'
@@ -1882,9 +1904,11 @@
         +'<button class="siraj-popup-btn secondary" id="calPopupClose">بستن</button>'
         +'<button class="siraj-popup-btn" id="calPopupGo">برو به این روز</button>'
         +'</div></div>';
-      document.body.appendChild(el);
-      requestAnimationFrame(function(){el.classList.add('open');});
-      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+           document.body.appendChild(el);
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ el.classList.add('open'); });
+      });
+      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},380);};
       el.querySelector('#calPopupClose').onclick=close;
       el.querySelector('#calPopupGo').onclick=function(){close();selectMonthDay(day);};
     };
@@ -1924,7 +1948,7 @@
       if(!pl.years[y]) pl.years[y]={goals:[]};
       var goals=pl.years[y].goals||[];
       var gh='';
-      if(goals.length===0) gh='<div class="mg-empty-compact">🏆 هنوز هدفی نداری</div>';
+      if(goals.length===0) gh='<div class="mg-empty-compact"><span class="title-icon">'+SI_ICONS.award+'</span>هنوز هدفی نداری</div>';
       else gh='<div class="month-goals-list">'+goals.map(function(g,i){
         return '<div class="month-goal'+(g.done?' done':'')+'">'
           +'<label class="mg-check-wrap"><input type="checkbox" '+(g.done?'checked':'')+' onchange="window.__toggleYearGoalLocal('+y+','+i+',this)"><span class="mg-check"></span></label>'
@@ -1953,12 +1977,12 @@
       }).join('');
       return '<div class="monthly-layout">'
         +'<div class="monthly-side"><div class="month-goals year-goals compact">'
-        +'<div class="month-goals-title"><span>🏅</span><span>اهداف سالانه</span>'+(goals.length>0?'<span class="mg-counter">'+toFa(dg)+'/'+toFa(goals.length)+'</span>':'')+'</div>'
+        +'<div class="month-goals-title"><span class="title-icon">'+SI_ICONS.award+'</span><span>اهداف سالانه</span>'+(goals.length>0?'<span class="mg-counter">'+toFa(dg)+'/'+toFa(goals.length)+'</span>':'')+'</div>'
         +gh
         +'<div class="month-goal-add compact"><input type="text" id="newYearGoalInput" placeholder="هدف جدید..." onkeydown="if(event.key===\'Enter\')addYearGoal('+y+')"><button onclick="addYearGoal('+y+')">+</button></div>'
         +'</div></div>'
         +'<div class="monthly-main"><div class="year-overview">'
-        +'<div class="year-overview-title">📊 نگاه کلی به ماه‌ها</div>'
+        +'<div class="year-overview-title"><span class="title-icon">'+SI_ICONS.chart+'</span>نگاه کلی به ماه‌ها</div>'
         +'<div class="year-months-grid">'+mc+'</div>'
         +'</div></div></div>';
     }
@@ -2038,7 +2062,7 @@
       var te=document.getElementById('panelTitleText');
       var se=document.getElementById('panelSubText');
       if(te) te.textContent='برنامه‌ریزی';
-      if(se) se.textContent=p.name?('سلام '+p.name+'، خوشومدی 👋'):'سلام، خوشومدی 👋';
+      if(se) se.textContent=p.name?('سلام '+p.name+'، خوشومدی'):'سلام، خوشومدی';
       var tab=getTab();
       var tabs=[
         {id:'daily',label:'روزانه',icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>'},
@@ -2067,10 +2091,10 @@
         +'<div class="panel-card guide-card" style="margin-top:10px">'
         +'<div class="card-title"><span class="title-icon">'+SI_ICONS.bookOpen+'</span>راهنما</div>'
         +'<div class="guide-list">'
-        +'<div class="guide-item"><span>✨</span>روی حالت مطالعه بزن</div>'
-        +'<div class="guide-item"><span>📚</span>یه کار انتخاب کن</div>'
-        +'<div class="guide-item"><span>⏱️</span>زمان تنظیم کن</div>'
-        +'<div class="guide-item"><span>🎓</span>کتابخانه یادگیری رو ببین</div>'
+        +'<div class="guide-item"><span class="guide-icon">'+SI_ICONS.sparkle+'</span>روی حالت مطالعه بزن</div>'
+        +'<div class="guide-item"><span class="guide-icon">'+SI_ICONS.books+'</span>یه کار انتخاب کن</div>'
+        +'<div class="guide-item"><span class="guide-icon">'+SI_ICONS.clock+'</span>زمان تنظیم کن</div>'
+        +'<div class="guide-item"><span class="guide-icon">'+SI_ICONS.graduation+'</span>کتابخانه یادگیری رو ببین</div>'
         +'</div></div>';
     };
 
@@ -2353,8 +2377,10 @@
         +'<button class="siraj-popup-btn" id="earlyLeave" style="background:linear-gradient(135deg,#EF4444,#DC2626)">بله، خارج می‌شم</button>'
         +'</div></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){el.classList.add('open');});
-      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ el.classList.add('open'); });
+      });
+      var close=function(){el.classList.remove('open');setTimeout(function(){el.remove();},380);};
       el.querySelector('#earlyStay').onclick=function(){close();if(window.toast) window.toast('ادامه بده! 💪','success');};
       el.querySelector('#earlyLeave').onclick=function(){close();showExitReasonPopup();};
     }
@@ -2373,10 +2399,12 @@
         +'<button class="btn-exit" id="exitReasonSubmit">بررسی دلیل</button>'
         +'</div></div>';
       document.body.appendChild(el);
-      requestAnimationFrame(function(){el.classList.add('open');});
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ el.classList.add('open'); });
+      });
       setTimeout(function(){var t=document.getElementById('exitReasonText');if(t) t.focus();},300);
       var errEl=el.querySelector('#exitReasonError');
-      el.querySelector('#exitReasonCancel').onclick=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+      el.querySelector('#exitReasonCancel').onclick=function(){el.classList.remove('open');setTimeout(function(){el.remove();},380);};
       el.querySelector('#exitReasonSubmit').onclick=async function(){
         var reason=(document.getElementById('exitReasonText')||{}).value||'';
         reason=reason.trim();
@@ -2403,7 +2431,7 @@
             +'<button class="btn-continue secondary" id="stayBtn">✋ نه، ادامه می‌دم</button>'
             +'<button class="btn-exit" id="acceptPunish">قبول می‌کنم و خارج می‌شم</button>'
             +'</div>';
-          box.querySelector('#stayBtn').onclick=function(){el.classList.remove('open');setTimeout(function(){el.remove();},320);};
+          box.querySelector('#stayBtn').onclick=function(){el.classList.remove('open');setTimeout(function(){el.remove();},380);};
           box.querySelector('#acceptPunish').onclick=function(){
             try{
               var baseDate = window.plannerDate || new Date();
