@@ -673,9 +673,8 @@
       var s=getStreakDays();
       if(s<2) return '';
       var msg=s>=30?'فوق‌العاده‌ای! 🏆':s>=14?'عالی پیش می‌ری! ✨':s>=7?'ادامه بده! 💪':'خوب شروع کردی! 🌱';
-      return '<div class="daily-streak"><span class="ds-fire">🔥</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
+      return '<div class="daily-streak"><span class="ds-fire">'+(window.SI_ICONS?window.SI_ICONS.flame:'🔥')+'</span><span class="ds-num">'+toFa(s)+'</span><span class="ds-text">روز پشت‌سرهم فعالی — '+msg+'</span></div>';
     }
-
     function dailyWordHTML(){
       var d=new Date(window.plannerDate||new Date());
       var dk=window.dateKey(d);
@@ -683,9 +682,12 @@
       if(state!==null) return '';
       var it=getTodayItem(dk);
       if(!it) return '';
+            var badgeIcon = it.type === 'بیت' ? (window.SI_ICONS?window.SI_ICONS.bookOpen:'')
+                    : (it.type === 'کلمه' ? (window.SI_ICONS?window.SI_ICONS.books:'')
+                    : (window.SI_ICONS?window.SI_ICONS.pencil:''));
       var html='<div class="daily-cards"><div class="daily-card">';
       html+='<div class="daily-card-head">'
-        +'<span class="daily-card-badge">'+esc(it.badge)+'</span>'
+        +'<span class="daily-card-badge"><span class="badge-icon">'+badgeIcon+'</span>'+esc(it.badge.replace(/^[^\s]+\s/,''))+'</span>'
         +'<div class="daily-card-actions">'
         +'<button class="daily-action-btn learn-yes" onclick="window.__dailyLearn(\'learned\')">✓ یاد گرفتم</button>'
         +'<button class="daily-action-btn learn-no" onclick="window.__dailyLearn(\'practice\')">✗ یاد نگرفتم</button>'
@@ -1362,14 +1364,14 @@
       var po=[{value:'high',label:'بالا',dot:'red'},{value:'med',label:'متوسط',dot:'yellow'},{value:'low',label:'پایین',dot:'green'}];
       window.__pendingTime='';window.__pendingPri='med';
 
-      return streakHTML()+punishmentHTML+dailyWordHTML()+weekStatsHTML()
+            return streakHTML()+punishmentHTML()+dailyWordHTML()+weekStatsHTML()
         +'<div class="task-add-form">'
         +'<input type="text" id="pNewTitle" placeholder="عنوان کار جدید..." onkeydown="if(event.key===\'Enter\')window.__dAddTask()">'
         +'<div class="task-form-selects">'+makeSelect('pNewTime','',ho)+makeSelect('pNewPri','med',po,'اولویت‌بندی')+'</div>'
         +'<button class="task-add-btn" onclick="window.__dAddTask()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>افزودن</button>'
         +'</div>'
-        +'<div class="tasks-list-title">🎯 در جریان:</div>'+activeHTML
-        +'<div class="tasks-list-title done-title">✅ انجام شده ('+toFa(done.length)+'):</div>'+doneHTML;
+        +'<div class="tasks-list-title"><span class="title-icon">'+(window.SI_ICONS?window.SI_ICONS.target:'')+'</span>در جریان:</div>'+activeHTML
+        +'<div class="tasks-list-title done-title"><span class="title-icon">'+(window.SI_ICONS?window.SI_ICONS.checkCircle:'')+'</span>انجام شده ('+toFa(done.length)+'):</div>'+doneHTML;
     }
     function viewDaily(){return heroDaily()+'<div class="planner-body-content">'+dailyContentHTML()+'</div>';}
 
@@ -2015,7 +2017,7 @@
       window.savePlanner(pl);inp.value='';refreshBody('left');
     };
 
-    window.renderPanelForPlanner=function(){
+        window.renderPanelForPlanner=function(){
       var p=getProfile();
       var te=document.getElementById('panelTitleText');
       var se=document.getElementById('panelSubText');
@@ -2035,19 +2037,20 @@
       var learned=getAllLearned();
       var practice=getAllPractice();
       var lc=learned.length,pc=practice.length;
+      var SI = window.SI_ICONS || {};
 
       var pc2=document.getElementById('panelContent');if(!pc2) return;
       pc2.innerHTML=th
         +'<button onclick="window.__openStudy()" class="panel-study-btn" style="margin-top:14px">'
-        +'<svg viewBox="0 0 24 24" style="width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/><path d="M9 22h6"/></svg>'
+        +'<span class="panel-btn-icon">'+(SI.graduation||'')+'</span>'
         +'<div style="text-align:right;flex:1"><div>حالت مطالعه</div><div style="font-size:11px;opacity:.85;font-weight:600;margin-top:3px">با تایمر و تمرکز</div></div>'
         +'</button>'
         +'<button onclick="window.__openLibrary()" class="panel-library-btn">'
-        +'<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'
+        +'<span class="panel-btn-icon">'+(SI.library||'')+'</span>'
         +'<div style="text-align:right;flex:1"><div>کتابخانه یادگیری</div><div style="font-size:11px;opacity:.85;font-weight:600;margin-top:3px">یادگرفته‌ها و تمرین‌ها'+(lc+pc>0?' · '+toFa(lc+pc)+' آیتم':'')+'</div></div>'
         +'</button>'
         +'<div class="panel-card guide-card" style="margin-top:10px">'
-        +'<div class="card-title">📖 راهنما</div>'
+        +'<div class="card-title"><span class="title-icon">'+(SI.bookOpen||'')+'</span>راهنما</div>'
         +'<div class="guide-list">'
         +'<div class="guide-item"><span>✨</span>روی حالت مطالعه بزن</div>'
         +'<div class="guide-item"><span>📚</span>یه کار انتخاب کن</div>'
