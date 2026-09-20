@@ -1922,7 +1922,6 @@ function syncLockTypedRow(val, mode) {
     var chars = String(val || '').split('');
     var existing = row.querySelectorAll('.lock-typed-char');
 
-    /* اگر حالت success/error داده شده، همه رو با انیمیشن ست کن */
     if (mode === 'success' || mode === 'error') {
         existing.forEach(function (c) {
             c.classList.remove('success', 'error');
@@ -1930,6 +1929,14 @@ function syncLockTypedRow(val, mode) {
         });
         return;
     }
+
+    /* ★ اگه خالیه، کرسر چشمک‌زن نشون بده */
+    if (chars.length === 0) {
+        row.innerHTML = '<div class="lock-cursor"></div>';
+        return;
+    }
+    var cursor = row.querySelector('.lock-cursor');
+    if (cursor) cursor.remove();
 
     /* کم شد؟ حذف با انیمیشن */
     if (chars.length < existing.length) {
@@ -1939,22 +1946,45 @@ function syncLockTypedRow(val, mode) {
                 setTimeout(function () { if (el.parentNode) el.remove(); }, 280);
             })(existing[i]);
         }
-        /* آپدیت بقیی */
         for (var j = 0; j < chars.length && j < existing.length; j++) {
-            if (existing[j].textContent !== chars[j]) existing[j].textContent = chars[j];
+            if (existing[j].dataset.raw !== chars[j]) {
+                existing[j].dataset.raw = chars[j];
+                existing[j].textContent = chars[j];
+                existing[j].classList.remove('masked');
+            }
         }
         return;
     }
 
-    /* اضافه شد؟ چار جدید با انیمیشن */
+    /* اضافه شد؟ char جدید با انیمیشن + ماسک بعد از ۲ ثانیه */
     for (var k = 0; k < chars.length; k++) {
         if (existing[k]) {
-            if (existing[k].textContent !== chars[k]) existing[k].textContent = chars[k];
+            if (existing[k].dataset.raw !== chars[k]) {
+                existing[k].dataset.raw = chars[k];
+                existing[k].textContent = chars[k];
+                existing[k].classList.remove('masked');
+            }
         } else {
             var el = document.createElement('div');
             el.className = 'lock-typed-char';
+            el.dataset.raw = chars[k];
             el.textContent = chars[k];
             row.appendChild(el);
+            /* ★ بعد از ۲ ثانیه → ● با انیمیشن */
+            (function (e) {
+                setTimeout(function () {
+                    if (e.parentNode && !e.classList.contains('erasing')) {
+                        e.classList.add('masking');
+                        setTimeout(function () {
+                            if (e.parentNode) {
+                                e.textContent = '●';
+                                e.classList.remove('masking');
+                                e.classList.add('masked');
+                            }
+                        }, 240);
+                    }
+                }, 2000);
+            })(el);
         }
     }
 }
