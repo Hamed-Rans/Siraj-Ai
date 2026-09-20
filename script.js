@@ -894,6 +894,10 @@ function renderPanelForChat() {
                 '<span class="tab-label">برنامه امروز</span>' +
             '</button>' +
         '</div>' +
+                '<button class="row-btn active" onclick="newChat()" style="flex-direction:row;min-height:44px;width:100%;margin-bottom:12px">' +
+            '<svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>' +
+            '<span class="rb-label">گفتگوی تازه</span>' +
+        '</button>' +
         '<div class="panel-pane' + (currentPanelTab === 'daily' ? ' active' : '') + '" data-pane="daily">' + renderDailyPanel() + '</div>' +
         '<div class="panel-pane' + (currentPanelTab === 'history' ? ' active' : '') + '" data-pane="history">' +
             '<div class="panel-card">' +
@@ -907,10 +911,6 @@ function renderPanelForChat() {
                 '</div>' +
                 '<div id="historyList"></div>' +
             '</div>' +
-            '<button class="row-btn active" onclick="newChat()" style="flex-direction:row;min-height:44px">' +
-                '<svg class="rb-icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>' +
-                '<span class="rb-label">گفتگوی تازه</span>' +
-            '</button>' +
         '</div>';
     renderHistory();
 }
@@ -3183,12 +3183,18 @@ window.addEventListener('appinstalled', function () {
 window.addEventListener('load', () => {
     var splashStart = Date.now();
     var splashMinTime = 1200;
-    var tryHideSplash = function () {
+        var tryHideSplash = function () {
         var elapsed = Date.now() - splashStart;
         var wait = Math.max(0, splashMinTime - elapsed);
         setTimeout(function () {
             var sl = document.getElementById('splashLoader');
             if (sl) sl.classList.add('hidden');
+            /* ★ انیمیشن ورود اپ */
+            var app = document.getElementById('appContainer');
+            if (app) {
+                app.classList.add('app-entering');
+                setTimeout(function () { app.classList.remove('app-entering'); }, 1000);
+            }
         }, wait);
     };
     tryHideSplash();
