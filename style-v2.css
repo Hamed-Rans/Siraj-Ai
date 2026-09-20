@@ -5583,3 +5583,294 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
 .panel-btn-icon > svg{
   display:block!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH T — Study button, library anim, settings close, icon sizes, gold hover
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   T1: دکمه «حالت مطالعه» — هم‌ساختار با کتابخانه + آیکون مینیمال
+   ═══════════════════════════════════════════════════════════════ */
+.panel-study-btn{
+  display:flex!important;
+  align-items:center!important;
+  gap:14px!important;
+  width:100%!important;
+  padding:16px 18px!important;
+  border-radius:18px!important;
+  border:none!important;
+  background:linear-gradient(160deg, #6BA8FF 0%, #4A7BD8 100%)!important;
+  color:#fff!important;
+  font-family:var(--font-heading,'Morabba','Estedad',sans-serif)!important;
+  font-size:14px!important;
+  font-weight:700!important;
+  letter-spacing:-.1px;
+  cursor:pointer!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 1px 2px rgba(0,0,0,.25),
+    0 6px 18px -8px rgba(74,123,216,.6)!important;
+  transition:transform .3s cubic-bezier(.34,1.4,.64,1),box-shadow .3s!important;
+}
+.panel-study-btn:hover{
+  transform:translateY(-3px)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    0 2px 4px rgba(0,0,0,.3),
+    0 10px 26px -8px rgba(74,123,216,.7)!important;
+}
+.panel-study-btn .panel-btn-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:28px!important;
+  height:28px!important;
+  min-width:28px!important;
+  max-width:28px!important;
+  min-height:28px!important;
+  max-height:28px!important;
+  flex-shrink:0!important;
+  color:#fff!important;
+}
+.panel-study-btn .panel-btn-icon svg{
+  width:28px!important;
+  height:28px!important;
+  max-width:28px!important;
+  max-height:28px!important;
+  display:block!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  filter:drop-shadow(0 0 6px rgba(255,255,255,.4));
+}
+
+/* ═══ هم‌راستاسازی دکمه کتابخانه ═══ */
+.panel-library-btn{
+  display:flex!important;
+  align-items:center!important;
+  gap:14px!important;
+  width:100%!important;
+  padding:16px 18px!important;
+  border-radius:18px!important;
+  border:none!important;
+  margin-top:10px!important;
+  font-family:var(--font-heading,'Morabba','Estedad',sans-serif)!important;
+  font-size:14px!important;
+  font-weight:700!important;
+  letter-spacing:-.1px;
+}
+.panel-library-btn .panel-btn-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:28px!important;
+  height:28px!important;
+  min-width:28px!important;
+  max-width:28px!important;
+  min-height:28px!important;
+  max-height:28px!important;
+  flex-shrink:0!important;
+  color:#fff!important;
+}
+.panel-library-btn .panel-btn-icon svg{
+  width:28px!important;
+  height:28px!important;
+  max-width:28px!important;
+  max-height:28px!important;
+  display:block!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:1.8!important;
+  filter:drop-shadow(0 0 6px rgba(255,255,255,.3));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   T2: پاپ‌آپ کتابخانه — انیمیشن باز/بسته هم‌شکل با مودال تنظیمات
+   ═══════════════════════════════════════════════════════════════ */
+.learn-library-overlay{
+  animation:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  transition:
+    opacity .48s cubic-bezier(.22,1,.36,1),
+    visibility .48s cubic-bezier(.22,1,.36,1)!important;
+}
+.learn-library-overlay.open{
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+.learn-library-box{
+  animation:none!important;
+  opacity:0!important;
+  transform:scale(.94) translateY(20px)!important;
+  filter:blur(4px)!important;
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    opacity .42s cubic-bezier(.22,1,.36,1),
+    filter .42s cubic-bezier(.22,1,.36,1)!important;
+}
+.learn-library-overlay.open .learn-library-box{
+  opacity:1!important;
+  transform:scale(1) translateY(0)!important;
+  filter:blur(0)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   T3: مودال تنظیمات — بازگرداندن انیمیشن بستن
+   ═══════════════════════════════════════════════════════════════ */
+.modal-overlay{
+  display:flex!important;
+  transition:
+    opacity .48s cubic-bezier(.22,1,.36,1),
+    visibility .48s cubic-bezier(.22,1,.36,1)!important;
+}
+.modal-overlay:not(.open):not(.closing){
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+.modal-overlay.open{
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+.modal-overlay.closing{
+  opacity:0!important;
+  visibility:visible!important;
+  pointer-events:none!important;
+  display:flex!important;
+}
+
+/* ═══ انیمیشن خروج مودال تنظیمات ═══ */
+.modal-overlay.closing .settings-modal{
+  animation:settingsModalExitAnim .48s cubic-bezier(.4,0,.6,1) both!important;
+}
+@keyframes settingsModalExitAnim{
+  0%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}
+  40%{opacity:1;filter:blur(0)}
+  100%{opacity:0;transform:scale(.94) translateY(20px);filter:blur(4px)}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   T4: کاهش اندازه آیکون‌ها در عنوان‌های پلنر
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ کلیه title-icon ها ═══ */
+.title-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:14px!important;
+  height:14px!important;
+  min-width:14px!important;
+  max-width:14px!important;
+  min-height:14px!important;
+  max-height:14px!important;
+  flex-shrink:0!important;
+  margin:0 6px 0 0!important;
+  line-height:0!important;
+  vertical-align:middle!important;
+}
+.title-icon svg{
+  width:14px!important;
+  height:14px!important;
+  max-width:14px!important;
+  max-height:14px!important;
+  display:block!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+
+/* ═══ mg-empty-compact (هنوز هدفی نداری) ═══ */
+.mg-empty-compact{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  font-size:11px!important;
+  color:var(--text-muted)!important;
+  padding:14px 8px!important;
+  text-align:center;
+}
+.mg-empty-compact .title-icon{
+  margin:0!important;
+  color:var(--accent);
+}
+
+/* ═══ month-goals-title ═══ */
+.month-goals-title{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+}
+.month-goals-title .title-icon,
+.year-overview-title .title-icon{
+  margin:0 2px 0 0!important;
+}
+
+/* ═══ year-overview-title ═══ */
+.year-overview-title{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+}
+
+/* ═══ tasks-list-title ═══ */
+.tasks-list-title .title-icon{
+  margin:0 4px 0 0!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   T5: خط hover طلایی برای اهداف سالانه
+   ═══════════════════════════════════════════════════════════════ */
+.year-goals::after,
+.year-goals::before{
+  content:''!important;
+  display:block!important;
+  position:absolute!important;
+  top:0!important;
+  right:50%!important;
+  left:50%!important;
+  height:2px!important;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    #E3B341 25%,
+    #D4AF37 50%,
+    #E3B341 75%,
+    transparent 100%)!important;
+  opacity:0!important;
+  transition:
+    right .45s cubic-bezier(.22,1,.36,1),
+    left .45s cubic-bezier(.22,1,.36,1),
+    opacity .3s cubic-bezier(.4,0,.2,1)!important;
+  pointer-events:none!important;
+  z-index:5!important;
+  border-radius:0 0 2px 2px!important;
+}
+.year-goals:hover::after,
+.year-goals:hover::before{
+  right:0!important;
+  left:0!important;
+  opacity:1!important;
+}
+
+/* ═══ حذف رنگ آبی گرادیانت قدیمی از سالانه ═══ */
+.year-goals.month-goals::after{
+  background:linear-gradient(90deg,
+    transparent 0%,
+    #E3B341 25%,
+    #D4AF37 50%,
+    #E3B341 75%,
+    transparent 100%)!important;
+}
