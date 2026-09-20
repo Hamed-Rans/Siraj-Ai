@@ -2467,13 +2467,17 @@ function clearBgImage() {
 function handleProfileUpload(ev) {
     const f = ev.target.files ? ev.target.files[0] : null;
     if (!f) return;
-    if (f.size > 1.5 * 1024 * 1024) { toast('حجم عکس زیاد است', 'error'); return; }
+    if (f.size > 1.5 * 1024 * 1024) { toast('حجم عکس زیاد است (حداکثر ۱.۵ مگابایت)', 'error'); return; }
     const r = new FileReader();
     r.onload = e => {
         if (!settingsDraft) return;
         settingsDraft.profileImage = e.target.result;
+        /* ★ آپدیت فوری preview */
+        var preview = document.getElementById('profileAvatarPreview');
+        if (preview) {
+            preview.innerHTML = '<img src="' + e.target.result + '" alt="">';
+        }
         toast('عکس انتخاب شد ✓', 'success');
-        renderSettingsControls();
     };
     r.readAsDataURL(f);
     ev.target.value = '';
@@ -2762,7 +2766,13 @@ function renderSettingsControls() {
     var profileHTML =
         '<div class="setting-group profile-section">' +
             '<label style="font-size:13px;font-weight:800;color:var(--accent)">👤 مشخصات شخصی</label>' +
-            '<div class="about-avatar" style="margin:14px auto"><img src="' + src + '" alt=""></div>' +
+        '<div style="position:relative;width:fit-content;margin:14px auto">' +
+                '<div class="about-avatar" id="profileAvatarPreview" style="margin:0;cursor:pointer"><img src="' + src + '" alt=""></div>' +
+                '<label class="profile-upload-badge" for="profileUploadInput" title="تغییر عکس پروفایل">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+                    '<input type="file" id="profileUploadInput" accept="image/*" onchange="handleProfileUpload(event)" style="display:none">' +
+                '</label>' +
+            '</div>' +
             '<div class="profile-access-note">ℹ️ دستیار هوشمند سراج به این اطلاعات دسترسی داره.</div>' +
             '<input type="text" id="profileName" placeholder="اسمت چیه؟" value="' + (p.name ? escapeHtml(p.name) : '') + '" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;margin-bottom:8px;margin-top:8px">' +
             '<textarea id="profileBio" placeholder="یه توضیح کوتاه..." style="width:100%;min-height:90px;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--primary);color:var(--text-main);font-family:var(--font-text);font-size:12.5px;outline:none;resize:vertical;line-height:1.8;margin-bottom:8px">' + (p.bio ? escapeHtml(p.bio) : '') + '</textarea>' +
