@@ -678,7 +678,7 @@ function applySettingsToUI(s) {
     if (vb) vb.textContent = 'v' + (t.appVersion || '2.5');
     resetInactivityTimer();
     setTimeout(() => { if (typeof window.updateNavSlider === 'function') window.updateNavSlider(false); }, 100);
-    });
+    }
 /* ═══════════════════════════════════════════════════════════════
    DROPDOWNS
    ═══════════════════════════════════════════════════════════════ */
