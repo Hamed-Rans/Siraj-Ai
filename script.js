@@ -1355,6 +1355,31 @@ function getSystemPrompt() {
         if (prof.name) extra += '\n\n👤 اسم کاربر: ' + prof.name;
         if (prof.bio) extra += '\n📝 درباره‌ی خودش: ' + prof.bio + '\nاسمش رو تو جواب‌هات صدا بزن.';
     } catch (e) {}
+       /* ★ سطح کاربر */
+    var userLevel = 'beginner';
+    try { userLevel = getUserLevel(); } catch (e) {}
+    var lvlLabels = { beginner: 'مبتدی', intermediate: 'متوسط', advanced: 'پیشرفته' };
+    var lvlLabel = lvlLabels[userLevel] || 'مبتدی';
+    extra += '\n\n🎓 سطح کاربر: ' + lvlLabel;
+    if (userLevel === 'beginner') {
+        extra += '\n📝 کاربر در سطح مبتدیه — از اصطلاحات ساده استفاده کن، هر اصطلاح تخصصی رو توضیح بده، مثال‌های ساده بزن.';
+    } else if (userLevel === 'intermediate') {
+        extra += '\n📝 کاربر در سطح متوسطه — می‌تونی از اصطلاحات تخصصی نحو و بلاغت استفاده کنی، ولی وقتی اصطلاح جدیدی آوردی یه توضیح کوتاه بده.';
+    } else if (userLevel === 'advanced') {
+        extra += '\n📝 کاربر در سطح پیشرفته‌ست — می‌تونی عمیق، تخصصی و با اصطلاحات دقیق علمی بحث کنی.';
+    }
+    /* ★ سطح پاسخ‌دهی (از تب رفتار) */
+    if (settings.aiLevel) {
+        if (settings.aiLevel === 'beginner') extra += '\n🗣️ لحن پاسخ: ساده و خودی.';
+        else if (settings.aiLevel === 'advanced') extra += '\n🗣️ لحن پاسخ: تخصصی و عمیق.';
+        else extra += '\n🗣️ لحن پاسخ: متوسط.';
+    }
+    /* ★ زبان پاسخ */
+    if (settings.aiLang) {
+        if (settings.aiLang === 'ar') extra += '\n🌐 زبان پاسخ: عربی.';
+        else if (settings.aiLang === 'en') extra += '\n🌐 زبان پاسخ: English.';
+        else extra += '\n🌐 زبان پاسخ: فارسی.';
+    }
     if (settings.quick) extra += '\n\n⚡ حالت پاسخ سریع: پاسخ‌ها را کوتاه، مختصر و مستقیم بده.';
     if (settings.thinking) extra += '\n\n🧠 حالت تفکر عمیق: با دقت و عمق بیشتر تحلیل کن.';
     var modelCfg = getCurrentModelConfig();
@@ -2383,6 +2408,16 @@ function getFontCSS(id) {
     return map[id] || "'Vazirmatn',sans-serif";
 }
 
+function getPatternThumbStyle(patternId, c1, c2) {
+    if (patternId === 'none') {
+        return 'background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 120 120\'%3E%3Cg fill=\'none\' stroke=\'%238A9AB5\' stroke-width=\'2\' opacity=\'.5\'%3E%3Ccircle cx=\'60\' cy=\'60\' r=\'45\'/%3E%3Cpath d=\'M25 25 L95 95\'/%3E%3C/g%3E%3C/svg%3E");';
+    }
+    var tpl = PATTERN_TEMPLATES[patternId];
+    if (!tpl) return '';
+    var svg = tpl(c1 || '#2AA5B8', c2 || '#F5A623');
+    return 'background-image:url("data:image/svg+xml,' + encodeURIComponent(svg) + '");background-repeat:no-repeat;background-position:center;background-size:72%;';
+}
+
 function fontRow(f) {
     const s = settingsDraft || settings;
     return '<button class="row-btn' + (s.fontFamily === f.id ? ' active' : '') + '" data-key="fontFamily" data-value="' + f.id + '" onclick="updateDraft(\'fontFamily\',\'' + f.id + '\')" style="font-family:' + getFontCSS(f.id) + '"><svg class="rb-icon" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg><span class="rb-label">' + f.name + '</span></button>';
@@ -2611,8 +2646,11 @@ function renderSettingsControls() {
         pattern:
             '<div class="setting-group"><label>انتخاب طرح</label>' +
                 '<div class="pattern-grid">' + APP_CONFIG.patterns.map(pat =>
-                    '<div class="pattern-opt' + (s.pattern === pat.id ? ' active' : '') + '" onclick="updateDraft(\'pattern\',\'' + pat.id + '\')"><div class="pattern-thumb th-' + pat.id + '"></div><div class="pattern-name">' + pat.name + '</div></div>'
-                ).join('') + '</div>' +
+    '<div class="pattern-opt' + (s.pattern === pat.id ? ' active' : '') + '" onclick="updateDraft(\'pattern\',\'' + pat.id + '\')">' +
+        '<div class="pattern-thumb" style="' + getPatternThumbStyle(pat.id, s.patternColor1, s.patternColor2) + '"></div>' +
+        '<div class="pattern-name">' + pat.name + '</div>' +
+    '</div>'
+).join('') + '</div>' +
             '</div>' +
             '<div class="setting-group"><label>رنگ‌های آماده طرح</label>' +
                 '<div class="pattern-preset-colors">' +
