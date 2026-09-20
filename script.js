@@ -2156,9 +2156,20 @@ function applySettings() {
     closeSettings();
 }
 function switchSettingsCat(cat) {
+    /* ★ اگه روی «ظاهر» کلیک شد و از قبل بازه → فقط toggle کن، بدون رندر */
     if (cat === 'appearance' && settingsCat === 'appearance') {
         window._appearanceSubHidden = !window._appearanceSubHidden;
-        renderSettingsControls();
+        var sub = document.querySelector('.settings-submenu');
+        var tab = document.querySelector('.settings-tab-btn[data-cat="appearance"]');
+        if (sub) {
+            if (window._appearanceSubHidden) {
+                sub.classList.remove('open');
+                if (tab) tab.classList.remove('active');
+            } else {
+                sub.classList.add('open');
+                if (tab) tab.classList.add('active');
+            }
+        }
         return;
     }
     if (cat === settingsCat) return;
@@ -2431,7 +2442,7 @@ function renderSettingsControls() {
     var modelsDraft = settingsDraft.models || JSON.parse(JSON.stringify(APP_CONFIG.models));
 
     var subState = window._settingsSub || 'general';
-    var isAppearanceOpen = (settingsCat === 'appearance');     var showSubMenu = isAppearanceOpen && !window._appearanceSubHidden;
+    var isAppearanceOpen = (settingsCat === 'appearance'); 
 
     /* ═══ تب‌ها + زیرمنوی ظاهر ═══ */
     var tabsHTML = '';
@@ -2442,7 +2453,7 @@ function renderSettingsControls() {
             '<svg class="settings-tab-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
         '</button>';
 
-        if (showSubMenu) {
+            if (isAppearanceOpen) {
         var subs = [
             { id: 'general', label: 'تم و رنگ' },
             { id: 'background', label: 'پس‌زمینه' },
@@ -2450,7 +2461,8 @@ function renderSettingsControls() {
             { id: 'pattern', label: 'طرح' },
             { id: 'font', label: 'فونت' }
         ];
-        tabsHTML += '<div class="settings-submenu">';
+        var subOpen = !window._appearanceSubHidden;
+        tabsHTML += '<div class="settings-submenu' + (subOpen ? ' open' : '') + '">';
         tabsHTML += subs.map(function (sub) {
             return '<button class="settings-submenu-btn' + (subState === sub.id ? ' active' : '') + '" onclick="event.stopPropagation();window._settingsSub=\'' + sub.id + '\';renderSettingsControls();">' + sub.label + '</button>';
         }).join('');
