@@ -4316,3 +4316,16 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
   overflow:hidden!important;
   position:relative!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH N — مخفی کردن هر setting-group که مستقیم توی settings-content-wrap باشه
+   (بند-کمکی: رفع باگ orphan setting-group ناشی از HTML ناقص در JS)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.settings-content-wrap > .setting-group{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  height:0!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+}
