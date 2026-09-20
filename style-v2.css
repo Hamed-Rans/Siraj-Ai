@@ -3271,3 +3271,215 @@ body::before{
     0 0 0 3px var(--accent),
     0 6px 16px -6px rgba(0,0,0,.5)!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH G — Final Fix (قفل، تنظیمات، input bar، حلقه‌ها، فضاهای خالی)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   G1: زیرمنوی ظاهر — انیمیشن باز/بسته + چرخش فلش
+   ═══════════════════════════════════════════════════════════════ */
+.settings-submenu{
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  margin:0 0 0 14px;
+  padding:0;
+  border-right:2px solid var(--accent-soft);
+  transition:
+    max-height .45s cubic-bezier(.22,1,.36,1),
+    opacity .35s cubic-bezier(.4,0,.2,1),
+    margin .4s cubic-bezier(.22,1,.36,1),
+    padding .4s cubic-bezier(.22,1,.36,1)!important;
+  animation:none!important;
+}
+.settings-submenu.open{
+  max-height:280px;
+  opacity:1;
+  margin:2px 0 6px 14px;
+  padding:4px 0;
+}
+.settings-tab-arrow{
+  width:14px!important;
+  height:14px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.2!important;
+  flex-shrink:0;
+  transition:transform .42s cubic-bezier(.34,1.4,.64,1),opacity .3s!important;
+  opacity:.6;
+}
+.settings-tab-btn.active .settings-tab-arrow{
+  transform:rotate(180deg)!important;
+  opacity:1;
+}
+.settings-tab-btn:not(.active) .settings-tab-arrow{
+  transform:rotate(0deg)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   G2: صفحه قفل — حذف input visible، فقط دونه‌دونه نمایش داده بشه
+   ═══════════════════════════════════════════════════════════════ */
+.lock-input{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  top:50%!important;
+  left:50%!important;
+  transform:translate(-50%,-50%)!important;
+  border:0!important;
+  padding:0!important;
+  z-index:-1!important;
+  overflow:hidden!important;
+}
+.lock-typed-row{
+  min-height:52px!important;
+  margin:24px 0 8px!important;
+}
+.lock-typed-char{
+  width:36px!important;
+  height:48px!important;
+  font-size:22px!important;
+  border-radius:12px!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   G3: input bar — «جمع شدن» به‌جای کوچک شدن سایز
+   ═══════════════════════════════════════════════════════════════ */
+.input-bar-shell:focus-within,
+.input-bar-shell:has(.bar-input:focus){
+  transform:translateY(-14px)!important;
+  box-shadow:0 22px 55px -18px var(--accent)!important;
+}
+.input-bar-shell{
+  transition:
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .4s ease!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   G4: حلقه‌های چرخان — هم‌سرعت
+   ═══════════════════════════════════════════════════════════════ */
+.input-bar-shell::before{
+  animation:spinNeon1 3.2s linear infinite!important;
+}
+.input-bar-shell::after{
+  animation:spinNeon2 3.2s linear infinite!important;
+}
+@keyframes spinNeon1{to{--spin1:360deg}}
+@keyframes spinNeon2{to{--spin2:360deg}}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   G5: لوگوی site-credit بزرگ‌تر
+   ═══════════════════════════════════════════════════════════════ */
+.site-credit img{
+  width:22px!important;
+  height:22px!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   G6: فضای خالی پایین سایت — تو همه موقعیت‌های نوار
+   ═══════════════════════════════════════════════════════════════ */
+.app-container{
+  padding-bottom:8px!important;
+}
+.main-chat{
+  margin-bottom:0!important;
+}
+body{
+  padding-bottom:0!important;
+  overflow:hidden!important;
+}
+[data-nav-position="bottom"] .app-container{
+  padding-bottom:10px!important;
+}
+[data-nav-position="top"] .app-container{
+  padding-top:10px!important;
+  padding-bottom:10px!important;
+}
+[data-nav-position="left"] .app-container{
+  padding-bottom:10px!important;
+  padding-left:100px!important;
+}
+[data-nav-position="right"] .app-container{
+  padding-bottom:10px!important;
+  padding-right:100px!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   G7: دکمه‌های تفکر / پاسخ سریع — انیمیشن نرم
+   ═══════════════════════════════════════════════════════════════ */
+.bar-btn{
+  transition:
+    background .32s cubic-bezier(.4,0,.2,1),
+    color .3s cubic-bezier(.4,0,.2,1),
+    border-color .32s cubic-bezier(.4,0,.2,1),
+    transform .32s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .38s cubic-bezier(.22,1,.36,1),
+    padding .38s cubic-bezier(.34,1.2,.64,1),
+    min-width .38s cubic-bezier(.34,1.2,.64,1)!important;
+  will-change:transform,background!important;
+}
+#thinkBtn.active,
+#quickBtn.active{
+  background:linear-gradient(160deg,var(--accent-light) 0%,var(--accent-dark) 100%)!important;
+  color:#fff!important;
+  border-color:transparent!important;
+  box-shadow:
+    0 4px 14px -6px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.18)!important;
+  transform:scale(1.04)!important;
+}
+#thinkBtn.active svg,
+#quickBtn.active svg{
+  transform:scale(1.1);
+  transition:transform .32s cubic-bezier(.34,1.4,.64,1);
+}
+#thinkBtn:not(.active),
+#quickBtn:not(.active){
+  background:rgba(255,255,255,.04)!important;
+}
+#thinkBtn:not(.active):hover,
+#quickBtn:not(.active):hover{
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  border-color:var(--accent)!important;
+  transform:translateY(-1px)!important;
+}
+#thinkBtn svg,
+#quickBtn svg{
+  transition:transform .32s cubic-bezier(.34,1.4,.64,1)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   G8: تنظیمات رفتار — رفع overflow دکمه‌های تست اعلان
+   ═══════════════════════════════════════════════════════════════ */
+[data-cat="behavior"] .setting-group > div[style*="display:flex"]{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px!important;
+  flex-wrap:nowrap!important;
+  width:100%!important;
+  overflow:hidden!important;
+}
+[data-cat="behavior"] .setting-group > div[style*="display:flex"] button{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  padding:11px 10px!important;
+  font-size:11.5px!important;
+  box-sizing:border-box!important;
+  justify-content:center!important;
+}
