@@ -2879,13 +2879,16 @@
 
         /* ═══════════════════════════════════════════════════════════════
        NAV SLIDER
-       ═══════════════════════════════════════════════════════════════ */
-        (function(){
+       ═    (function(){
+      /* true = پس‌زمینه و لیبل دکمه بعد از عوض‌شدن صفحه شروع می‌شن (بدون گیر وسط حرکت)
+         false = هم‌زمان با کلیک شروع می‌شن */
+      var SYNC_WITH_SWAP=true;
+
       var nav=null, slider=null, fill=null;
       var cur=null;
       var lastBtn=null;
       var fromBtn=null, rel=null;
-      var t0=0, animating=false;
+      var animating=false, animT=0, lastNow=0;
       var raf=0, settleUntil=0;
       var DUR=480;
 
@@ -2916,7 +2919,6 @@
         var bx=box(btn), py=padY();
         return { l:bx.l, r:bx.r, t:bx.t-py, b:bx.b+py, chat:btn.classList.contains('nav-btn-chat') };
       }
-      /* اگه لحظه‌ای دو دکمه active بودن، جدیدترین رو بردار (جلوگیری از لرزش) */
       function activeBtn(){
         var list=nav.querySelectorAll('.bottom-nav-btn.active');
         if(!list.length) return null;
@@ -2928,6 +2930,7 @@
       function frame(now){
         raf=0;
         if(!nav||!slider) return;
+        var dt=lastNow?(now-lastNow):16; lastNow=now;
         var btn=activeBtn();
         if(!btn){ imp(slider,'opacity','0'); return; }
         var tg=target(btn);
@@ -2938,10 +2941,13 @@
           if(btn!==lastBtn){
             var ob=box(lastBtn);
             rel={ l:cur.l-ob.l, r:cur.r-ob.r, t:cur.t-ob.t, b:cur.b-ob.b };
-            fromBtn=lastBtn; lastBtn=btn; t0=now; animating=true;
+            fromBtn=lastBtn; lastBtn=btn; animT=0; animating=true; dt=0;
           }
           if(animating){
-            var p=Math.min(1,(now-t0)/DUR), e=ease(p);
+            /* ساعت انیمیشن: اگه مرورگر وسط کار گیر کرد، انیمیشن نمی‌پره، از همون‌جا ادامه می‌ده */
+            if(dt>60 && window.console) console.warn('[nav] hitch '+Math.round(dt)+'ms (at '+Math.round(animT)+'ms of '+DUR+')');
+            animT+=Math.min(dt,32);
+            var p=Math.min(1,animT/DUR), e=ease(p);
             var fb=box(fromBtn);
             var fl=fb.l+rel.l, fr=fb.r+rel.r, ft=fb.t+rel.t, fbt=fb.b+rel.b;
             cur.l=fl+(tg.l-fl)*e;
@@ -2961,6 +2967,7 @@
         imp(slider,'opacity',(tg.chat&&!animating)?'0':'1');
 
         if(animating||now<settleUntil){ raf=requestAnimationFrame(frame); }
+        else{ lastNow=0; }
       }
 
       function kick(snap){
@@ -2969,6 +2976,19 @@
         if(!raf) raf=requestAnimationFrame(frame);
       }
       window.__moveNavSlider=function(){ kick(false); };
+
+      /* فعال‌کردن دکمه‌ی یک صفحه (هوک عوض‌کردن صفحه بعد از تعویض صدا می‌زنه) */
+      window.__navActivate=function(view){
+        if(!nav) return;
+        var tgt=null;
+        nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){
+          if(b.dataset&&b.dataset.view===view) tgt=b;
+        });
+        if(!tgt) return;
+        nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+        tgt.classList.add('active');
+        kick(false);
+      };
 
       function initNavSlider(){
         nav=document.getElementById('bottomNav'); if(!nav) return false;
@@ -2984,6 +3004,7 @@
         nav.insertBefore(slider,nav.firstChild);
 
         nav.addEventListener('click',function(e){
+          if(SYNC_WITH_SWAP) return;
           var btn=e.target.closest('.bottom-nav-btn[data-view]');
           if(!btn) return;
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
@@ -3027,7 +3048,9 @@
           var oldIdx=VIEW_ORDER.indexOf(oldName);
           var newIdx=VIEW_ORDER.indexOf(view);
           if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){
+          if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){
             orig.apply(this,arguments);
+            if(typeof window.__navActivate==='function') window.__navActivate(view);
             _currentMainView=view;
             if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,60);
             return;
@@ -3050,13 +3073,19 @@
             newEl.classList.add(inClass);
             setTimeout(injectMainTopActions,10);
             if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,60);
+                     window.switchView.__t1=setTimeout(function(){
+            orig.apply(window,origArgs);
+            if(typeof window.__navActivate==='function') window.__navActivate(view);
+            _currentMainView=view;
+            newEl.classList.add(inClass);
+            setTimeout(injectMainTopActions,10);
+            if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,60);
             window.switchView.__t2=setTimeout(function(){
               oldEl.classList.remove('leaving',outClass);
               oldEl.style.pointerEvents='';
               newEl.classList.remove(inClass);
             },240);
           },170);
-        };
         window.switchView.__hooked=true;
         return true;
       }
