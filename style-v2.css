@@ -3483,3 +3483,229 @@ body{
   box-sizing:border-box!important;
   justify-content:center!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH H — Final Polish
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H1: صفحه قفل — کرسر چشمک‌زن + انیمیشن ماسک شدن کاراکترها
+   ═══════════════════════════════════════════════════════════════ */
+.lock-cursor{
+  width:3px;
+  height:32px;
+  border-radius:2px;
+  background:var(--accent);
+  box-shadow:0 0 12px var(--accent);
+  animation:lockCursorBlink 1.05s ease-in-out infinite;
+  align-self:center;
+}
+@keyframes lockCursorBlink{
+  0%,45%{opacity:1;transform:scaleY(1)}
+  55%,100%{opacity:.15;transform:scaleY(.85)}
+}
+.lock-typed-char.masking{
+  animation:lockCharMask .24s cubic-bezier(.4,0,.6,1) forwards;
+}
+@keyframes lockCharMask{
+  0%{transform:scale(1) rotate(0)}
+  50%{transform:scale(.6) rotate(-180deg);opacity:.5}
+  100%{transform:scale(1) rotate(-360deg);opacity:1}
+}
+.lock-typed-char.masked{
+  background:linear-gradient(160deg,rgba(59,130,246,.55),rgba(37,99,235,.85))!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.35),
+    0 4px 12px -6px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.18)!important;
+  font-size:18px!important;
+  color:rgba(255,255,255,.85)!important;
+  letter-spacing:0!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H2: پنل نوتیف — همیشه زیر دکمه نوتیف، بدون همپوشانی
+   ═══════════════════════════════════════════════════════════════ */
+.notif-panel{
+  top:auto!important;
+  left:auto!important;
+  transform-origin:top left!important;
+}
+@media (max-width:900px){
+  .notif-panel{
+    top:auto!important;
+    left:auto!important;
+    right:auto!important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H3: دکمه برگرد به امروز — داخل phc-day کنار badge
+   ═══════════════════════════════════════════════════════════════ */
+.phc-day{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  flex-wrap:nowrap!important;
+}
+.phc-back-inline{
+  position:static!important;
+  left:auto!important;
+  top:auto!important;
+  transform:none!important;
+  margin:0!important;
+  height:22px!important;
+  padding:2px 10px!important;
+  font-size:10px!important;
+  opacity:.95;
+}
+.phc-back-inline:hover{
+  transform:scale(1.06)!important;
+}
+.phc-back-inline:active{
+  transform:scale(.96)!important;
+}
+.phc-back-inline.hidden{
+  display:none!important;
+}
+.phc-back-inline.appearing{
+  animation:backBtnInlineIn .5s cubic-bezier(.34,1.4,.64,1) both!important;
+}
+@keyframes backBtnInlineIn{
+  0%{opacity:0;transform:scale(.4) translateX(8px);max-width:0;padding:2px 0}
+  60%{opacity:1;transform:scale(1.08) translateX(0);max-width:120px;padding:2px 10px}
+  100%{opacity:1;transform:scale(1) translateX(0);max-width:120px;padding:2px 10px}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H4: کارت «بیت امروز» — حذف حرکت hover و خط بالایی
+   ═══════════════════════════════════════════════════════════════ */
+.daily-card{
+  transform:none!important;
+}
+.daily-card:hover{
+  transform:none!important;
+  background:var(--panel-bg)!important;
+  border-color:var(--border-strong)!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.25),
+    0 4px 14px -8px rgba(0,0,0,.35)!important;
+}
+.daily-card::after{
+  display:none!important;
+}
+.daily-cards:hover .daily-card,
+.daily-card:hover{
+  transform:none!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H5: هدر سراج — «سراج» با گرادیانت تم رنگی
+   ═══════════════════════════════════════════════════════════════ */
+.brand-text h1 .accent-word{
+  background:linear-gradient(135deg,var(--accent-light) 0%,var(--accent) 45%,var(--accent-dark) 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  color:transparent!important;
+  filter:none!important;
+}
+[data-theme="dark-gold"] .brand-text h1 .accent-word{
+  background:linear-gradient(135deg,#F4D03F 0%,#D4AF37 45%,#B8860B 100%)!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H6: input bar — بالا آمدن + جمع شدن نرم
+   ═══════════════════════════════════════════════════════════════ */
+.input-bar-shell{
+  transition:
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .42s cubic-bezier(.22,1,.36,1)!important;
+  transform-origin:center bottom!important;
+}
+.input-bar-shell:focus-within,
+.input-bar-shell:has(.bar-input:focus){
+  transform:translateY(-14px) scale(.97)!important;
+  box-shadow:
+    0 22px 55px -18px rgba(0,0,0,.7),
+    0 0 0 1px var(--accent-soft)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H7: حلقه‌های چرخان — هم‌سرعت، ۱۸۰ درجه اختلاف (هرگز به هم نمی‌رسن)
+   ═══════════════════════════════════════════════════════════════ */
+.input-bar-shell::before{
+  animation:spinNeon1 3.4s linear infinite!important;
+}
+.input-bar-shell::after{
+  animation:spinNeon2 3.4s linear infinite!important;
+  animation-delay:-1.7s!important;
+}
+@keyframes spinNeon1{to{--spin1:360deg}}
+@keyframes spinNeon2{to{--spin2:360deg}}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H8: کتابخانه یادگیری — انیمیشن ورود/خروج
+   ═══════════════════════════════════════════════════════════════ */
+.learn-library-overlay{
+  animation:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  transition:
+    opacity .42s cubic-bezier(.22,1,.36,1),
+    visibility .42s cubic-bezier(.22,1,.36,1)!important;
+}
+.learn-library-overlay.open{
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+.learn-library-box{
+  animation:none!important;
+  transform:scale(.9) translateY(30px)!important;
+  opacity:0!important;
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    opacity .42s cubic-bezier(.22,1,.36,1)!important;
+}
+.learn-library-overlay.open .learn-library-box{
+  transform:scale(1) translateY(0)!important;
+  opacity:1!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   H9: تنظیمات رفتار — دکمه‌ها کنار هم، بدون overflow
+   ═══════════════════════════════════════════════════════════════ */
+[data-cat="behavior"] .setting-group > div[style*="display:flex"]{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+[data-cat="behavior"] .setting-group > div[style*="display:flex"] > button,
+[data-cat="behavior"] .setting-group > div[style*="display:flex"] > .btn-primary,
+[data-cat="behavior"] .setting-group > div[style*="display:flex"] > .btn-secondary{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  padding:11px 8px!important;
+  font-size:11px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  box-sizing:border-box!important;
+}
