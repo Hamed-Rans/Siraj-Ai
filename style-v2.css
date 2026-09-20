@@ -4557,3 +4557,588 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
   overflow:hidden!important;
   position:relative!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH P — بازطراحی ظاهر (بالغ و گرم)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P1: تم شب — رنگ‌های گرم‌تر با تینت آبی ظریف
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"]{
+  --primary:#0D1117;
+  --panel-bg:#161B22;
+  --bubble-bot-bg:#1C2128;
+  --bubble-bot-border:rgba(48,54,61,.8);
+  --text-main:#E6EDF3;
+  --text-muted:#8B949E;
+  --border:rgba(240,246,252,.08);
+  --border-strong:rgba(240,246,252,.14);
+}
+[data-theme="dark-navy"]{
+  --primary:#0D1117;
+  --panel-bg:#161B22;
+  --bubble-bot-bg:#1C2128;
+  --accent:#58A6FF;
+  --accent-light:#79C0FF;
+  --accent-dark:#388BFD;
+  --accent-soft:rgba(88,166,255,.12);
+  --primary-gradient:linear-gradient(160deg,#0D1117 0%,#161B22 100%);
+}
+[data-theme="dark-crimson"]{
+  --primary:#14090C;
+  --panel-bg:#1E1114;
+  --bubble-bot-bg:#25171A;
+  --accent:#F85149;
+  --accent-light:#FF7B72;
+  --accent-dark:#DA3633;
+  --accent-soft:rgba(248,81,73,.12);
+}
+[data-theme="dark-gold"]{
+  --primary:#110E08;
+  --panel-bg:#1C1810;
+  --bubble-bot-bg:#231E14;
+  --accent:#D29922;
+  --accent-light:#E3B341;
+  --accent-dark:#BB8009;
+  --accent-soft:rgba(210,153,34,.12);
+}
+[data-theme="dark-purple"]{
+  --primary:#0D0B14;
+  --panel-bg:#17141F;
+  --bubble-bot-bg:#1E1A28;
+  --accent:#A371F7;
+  --accent-light:#C297FF;
+  --accent-dark:#8957E5;
+  --accent-soft:rgba(163,113,247,.12);
+}
+[data-theme="dark-emerald"]{
+  --primary:#0A120E;
+  --panel-bg:#0F1C16;
+  --bubble-bot-bg:#14261C;
+  --accent:#3FB950;
+  --accent-light:#56D364;
+  --accent-dark:#2EA043;
+  --accent-soft:rgba(63,185,80,.12);
+}
+[data-theme="dark-indigo"]{
+  --primary:#0D0E16;
+  --panel-bg:#151721;
+  --bubble-bot-bg:#1C1E2A;
+  --accent:#7C8FFF;
+  --accent-light:#99A8FF;
+  --accent-dark:#5A6EFF;
+  --accent-soft:rgba(124,143,255,.12);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P2: تم روز — رنگ‌های muted و بالغ
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="light"]{
+  --primary:#FAFBFC;
+  --panel-bg:#FFFFFF;
+  --bubble-bot-bg:#F6F8FA;
+  --bubble-bot-border:rgba(208,215,222,.7);
+  --text-main:#1F2328;
+  --text-muted:#59636E;
+  --border:rgba(31,35,40,.09);
+  --border-strong:rgba(31,35,40,.15);
+}
+[data-theme="light-navy"]{
+  --primary:#F6F8FA;
+  --panel-bg:#FFFFFF;
+  --bubble-bot-bg:#F0F3F6;
+  --accent:#0969DA;
+  --accent-light:#218BFF;
+  --accent-dark:#0550AE;
+  --accent-soft:rgba(9,105,218,.08);
+  --primary-gradient:linear-gradient(160deg,#FAFBFC 0%,#F0F3F6 100%);
+}
+[data-theme="light-crimson"]{
+  --primary:#FDF6F6;
+  --panel-bg:#FFFFFF;
+  --bubble-bot-bg:#FAEFEF;
+  --accent:#CF222E;
+  --accent-light:#F85149;
+  --accent-dark:#A40E26;
+  --accent-soft:rgba(207,34,46,.08);
+}
+[data-theme="light-gold"]{
+  --primary:#FCF9F0;
+  --panel-bg:#FFFFFF;
+  --bubble-bot-bg:#F7F1DC;
+  --accent:#9A6700;
+  --accent-light:#BF8700;
+  --accent-dark:#7D4E00;
+  --accent-soft:rgba(154,103,0,.08);
+}
+[data-theme="light-purple"]{
+  --primary:#FAF7FD;
+  --panel-bg:#FFFFFF;
+  --bubble-bot-bg:#F3ECFA;
+  --accent:#8250DF;
+  --accent-light:#A475F9;
+  --accent-dark:#6639BA;
+  --accent-soft:rgba(130,80,223,.08);
+}
+[data-theme="light-emerald"]{
+  --primary:#F3FAF6;
+  --panel-bg:#FFFFFF;
+  --bubble-bot-bg:#E7F4EC;
+  --accent:#1A7F37;
+  --accent-light:#2DA44E;
+  --accent-dark:#116329;
+  --accent-soft:rgba(26,127,55,.08);
+}
+[data-theme="light-indigo"]{
+  --primary:#F6F7FC;
+  --panel-bg:#FFFFFF;
+  --bubble-bot-bg:#EEF0FA;
+  --accent:#4F46E5;
+  --accent-light:#6366F1;
+  --accent-dark:#4338CA;
+  --accent-soft:rgba(79,70,229,.08);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P3: سایه‌های چندلایه (عمق واقعی) — تم شب
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .main-chat,
+[data-theme^="dark"] .side-panel{
+  box-shadow:
+    0 0 0 1px rgba(240,246,252,.04),
+    0 1px 3px rgba(0,0,0,.4),
+    0 8px 24px -8px rgba(0,0,0,.6),
+    0 16px 48px -12px rgba(0,0,0,.4)!important;
+}
+[data-theme^="dark"] .bottom-nav{
+  box-shadow:
+    0 0 0 1px rgba(240,246,252,.06),
+    0 4px 12px rgba(0,0,0,.4),
+    0 12px 32px -8px rgba(0,0,0,.6)!important;
+}
+[data-theme^="dark"] .daily-card,
+[data-theme^="dark"] .panel-card,
+[data-theme^="dark"] .tool-card,
+[data-theme^="dark"] .month-calendar,
+[data-theme^="dark"] .month-goals,
+[data-theme^="dark"] .year-overview,
+[data-theme^="dark"] .planner-hero-card,
+[data-theme^="dark"] .week-grid-wrap,
+[data-theme^="dark"] .week-summary,
+[data-theme^="dark"] .settings-content-wrap .setting-group{
+  box-shadow:
+    0 0 0 1px rgba(240,246,252,.03),
+    0 1px 2px rgba(0,0,0,.3),
+    0 4px 12px -4px rgba(0,0,0,.4)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P4: سایه‌های نرم — تم روز (بدون هیچ رنگی)
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="light"] .main-chat,
+[data-theme^="light"] .side-panel{
+  box-shadow:
+    0 0 0 1px rgba(31,35,40,.04),
+    0 1px 2px rgba(31,35,40,.04),
+    0 8px 24px -8px rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .bottom-nav{
+  box-shadow:
+    0 0 0 1px rgba(31,35,40,.06),
+    0 4px 12px rgba(31,35,40,.08),
+    0 12px 32px -8px rgba(31,35,40,.12)!important;
+}
+[data-theme^="light"] .daily-card,
+[data-theme^="light"] .panel-card,
+[data-theme^="light"] .tool-card,
+[data-theme^="light"] .month-calendar,
+[data-theme^="light"] .month-goals,
+[data-theme^="light"] .year-overview,
+[data-theme^="light"] .planner-hero-card,
+[data-theme^="light"] .week-grid-wrap,
+[data-theme^="light"] .week-summary,
+[data-theme^="light"] .settings-content-wrap .setting-group{
+  box-shadow:
+    0 0 0 1px rgba(31,35,40,.03),
+    0 1px 2px rgba(31,35,40,.04),
+    0 4px 12px -4px rgba(31,35,40,.06)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P5: حباب‌های گفتگو — تم شب گرم‌تر
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .me .msg{
+  background:linear-gradient(160deg,var(--accent) 0%,var(--accent-dark) 100%)!important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.3),
+    0 4px 12px -4px rgba(0,0,0,.4)!important;
+}
+[data-theme^="dark"] .bot .msg{
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.2),
+    0 3px 10px -4px rgba(0,0,0,.3)!important;
+}
+[data-theme^="light"] .me .msg{
+  background:linear-gradient(160deg,var(--accent) 0%,var(--accent-dark) 100%)!important;
+  box-shadow:
+    0 1px 2px rgba(31,35,40,.08),
+    0 4px 12px -4px rgba(31,35,40,.12)!important;
+}
+[data-theme^="light"] .bot .msg{
+  box-shadow:
+    0 1px 2px rgba(31,35,40,.04),
+    0 3px 10px -4px rgba(31,35,40,.06)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P6: هدر — عمق بیشتر بدون رنگ اضافی
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .chat-header,
+[data-theme^="dark"] .planner-hero,
+[data-theme^="dark"] .page-title-bar{
+  border-bottom:1px solid rgba(240,246,252,.06)!important;
+  background:linear-gradient(180deg,rgba(22,27,34,.6) 0%,rgba(13,17,23,.4) 100%)!important;
+}
+[data-theme^="light"] .chat-header,
+[data-theme^="light"] .planner-hero,
+[data-theme^="light"] .page-title-bar{
+  border-bottom:1px solid rgba(31,35,40,.06)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P7: gradient های کارتونی حذف / جایگزین با gradients ظریف
+   ═══════════════════════════════════════════════════════════════ */
+
+/* --- تم شب — حذف gradient کارتونی از دکمه‌ها --- */
+[data-theme^="dark"] .send-btn,
+[data-theme^="dark"] .task-add-btn,
+[data-theme^="dark"] .btn-primary,
+[data-theme^="dark"] .pv-apply-btn,
+[data-theme^="dark"] .lock-btn,
+[data-theme^="dark"] .study-btn,
+[data-theme^="dark"] .main-top-icon-btn{
+  background:linear-gradient(180deg,var(--accent-light) 0%,var(--accent) 100%)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.15),
+    0 1px 2px rgba(0,0,0,.3),
+    0 4px 12px -4px rgba(0,0,0,.4)!important;
+}
+[data-theme^="dark"] .send-btn:hover,
+[data-theme^="dark"] .task-add-btn:hover,
+[data-theme^="dark"] .btn-primary:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 2px 4px rgba(0,0,0,.35),
+    0 6px 16px -4px rgba(0,0,0,.5)!important;
+}
+
+/* --- تم روز — gradient بسیار ظریف --- */
+[data-theme^="light"] .send-btn,
+[data-theme^="light"] .task-add-btn,
+[data-theme^="light"] .btn-primary,
+[data-theme^="light"] .pv-apply-btn,
+[data-theme^="light"] .lock-btn,
+[data-theme^="light"] .study-btn,
+[data-theme^="light"] .main-top-icon-btn{
+  background:var(--accent)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 2px rgba(31,35,40,.08),
+    0 2px 6px -2px rgba(31,35,40,.12)!important;
+}
+[data-theme^="light"] .send-btn:hover,
+[data-theme^="light"] .task-add-btn:hover,
+[data-theme^="light"] .btn-primary:hover{
+  background:var(--accent-dark)!important;
+}
+
+/* --- nav slider --- */
+[data-theme^="dark"] .nav-slider-fill{
+  background:linear-gradient(180deg,var(--accent-light) 0%,var(--accent) 100%)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.15),
+    0 2px 6px -2px rgba(0,0,0,.5)!important;
+}
+[data-theme^="light"] .nav-slider-fill{
+  background:var(--accent)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 2px 6px -2px rgba(31,35,40,.2)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P8: borders نازک‌تر و ملایم‌تر (هر دو تم)
+   ═══════════════════════════════════════════════════════════════ */
+.daily-card,
+.panel-card,
+.tool-card,
+.month-calendar,
+.month-goals,
+.year-overview,
+.planner-hero-card,
+.week-grid-wrap,
+.week-summary,
+.settings-content-wrap .setting-group,
+.task-item,
+.history-item,
+.ll-item,
+.contact-row,
+.planner-stats-card{
+  border-width:1px!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P9: typography — افزایش letter-spacing منفی + وزن بهتر
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .brand-text h1,
+[data-theme^="light"] .brand-text h1{
+  letter-spacing:-.4px;
+}
+.planner-hero-title{
+  letter-spacing:-.4px!important;
+}
+.welcome-title{
+  letter-spacing:-.6px!important;
+}
+.phc-day{
+  letter-spacing:-.5px!important;
+}
+
+/* متن‌های بزرگ — رنگ ملایم‌تر در تم شب */
+[data-theme^="dark"] .welcome-tagline{
+  color:#C9D1D9!important;
+  opacity:.9;
+}
+[data-theme^="dark"] .welcome-sub{
+  color:#8B949E!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P10: welcome card — ظاهر بالغ‌تر
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .welcome-card{
+  background:linear-gradient(160deg,rgba(22,27,34,.85),rgba(13,17,23,.7))!important;
+  border:1px solid rgba(240,246,252,.08)!important;
+  box-shadow:
+    0 0 0 1px rgba(240,246,252,.03),
+    0 24px 60px -20px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+[data-theme^="light"] .welcome-card{
+  background:linear-gradient(160deg,#FFFFFF 0%,#FAFBFC 100%)!important;
+  border:1px solid rgba(31,35,40,.08)!important;
+  box-shadow:
+    0 1px 3px rgba(31,35,40,.04),
+    0 24px 60px -20px rgba(31,35,40,.12)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P11: لوگو glow — ملایم‌تر، بالغ‌تر
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .brand-mark,
+[data-theme^="dark"] .brand-logo-wrap,
+[data-theme^="dark"] .welcome-logo{
+  animation:none!important;
+  filter:none!important;
+}
+[data-theme^="dark"] .brand-logo-wrap img,
+[data-theme^="dark"] .brand-mark img,
+[data-theme^="dark"] .welcome-logo img{
+  filter:drop-shadow(0 0 20px rgba(88,166,255,.25))!important;
+}
+[data-theme^="light"] .brand-logo-wrap img,
+[data-theme^="light"] .brand-mark img,
+[data-theme^="light"] .welcome-logo img{
+  filter:none!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P12: پس‌زمینه اپ — gradient ظریف در تم شب
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] body::before{
+  background:
+    radial-gradient(ellipse at 20% 0%,rgba(88,166,255,.06),transparent 50%),
+    radial-gradient(ellipse at 80% 100%,rgba(163,113,247,.04),transparent 50%),
+    var(--siraj-bg,var(--primary-gradient))!important;
+}
+[data-theme^="light"] body::before{
+  background:
+    radial-gradient(ellipse at 20% 0%,rgba(9,105,218,.03),transparent 50%),
+    radial-gradient(ellipse at 80% 100%,rgba(130,80,223,.02),transparent 50%),
+    var(--siraj-bg,var(--primary-gradient))!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P13: input bar — بالغ‌تر
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .input-bar{
+  background:#161B22!important;
+  border:1px solid rgba(240,246,252,.1)!important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.3),
+    0 4px 14px -6px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+[data-theme^="dark"] .input-bar-shell:focus-within .input-bar{
+  border-color:rgba(88,166,255,.4)!important;
+  box-shadow:
+    0 0 0 3px rgba(88,166,255,.1),
+    0 4px 14px -6px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+[data-theme^="light"] .input-bar{
+  background:#FFFFFF!important;
+  border:1px solid rgba(31,35,40,.1)!important;
+  box-shadow:
+    0 1px 2px rgba(31,35,40,.04),
+    0 4px 14px -6px rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .input-bar-shell:focus-within .input-bar{
+  border-color:rgba(9,105,218,.5)!important;
+  box-shadow:
+    0 0 0 3px rgba(9,105,218,.08),
+    0 4px 14px -6px rgba(31,35,40,.1)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P14: حذف درخشش حلقه‌های چرخان در تم شب (خیلی زننده بودن)
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .input-bar-shell::before{
+  background:conic-gradient(from var(--spin1),
+    transparent 0deg,transparent 300deg,
+    rgba(88,166,255,.15) 330deg,
+    var(--accent-light) 350deg,
+    #ffffff 358deg,
+    var(--accent) 360deg)!important;
+}
+[data-theme^="dark"] .input-bar-shell::after{
+  background:conic-gradient(from var(--spin2),
+    transparent 0deg,transparent 300deg,
+    rgba(163,113,247,.15) 330deg,
+    #A371F7 350deg,
+    #C297FF 358deg,
+    #a78bfa 360deg)!important;
+  filter:blur(1.5px)!important;
+}
+[data-theme^="light"] .input-bar-shell::before{
+  background:conic-gradient(from var(--spin1),
+    transparent 0deg,transparent 300deg,
+    rgba(9,105,218,.2) 330deg,
+    var(--accent) 350deg,
+    var(--accent-dark) 360deg)!important;
+}
+[data-theme^="light"] .input-bar-shell::after{
+  background:conic-gradient(from var(--spin2),
+    transparent 0deg,transparent 300deg,
+    rgba(130,80,223,.2) 330deg,
+    #8250DF 350deg,
+    #A475F9 360deg)!important;
+  filter:blur(1.5px)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P15: select dropdowns — بالغ‌تر
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme^="dark"] .siraj-select-trigger,
+[data-theme^="dark"] .siraj-select-panel,
+[data-theme^="dark"] .dd-panel{
+  background:#161B22!important;
+  border-color:rgba(240,246,252,.1)!important;
+}
+[data-theme^="light"] .siraj-select-trigger,
+[data-theme^="light"] .siraj-select-panel,
+[data-theme^="light"] .dd-panel{
+  background:#FFFFFF!important;
+  border-color:rgba(31,35,40,.1)!important;
+  box-shadow:
+    0 1px 3px rgba(31,35,40,.05),
+    0 8px 24px -8px rgba(31,35,40,.1)!important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   P16: بازگرداندن border-right task-item (رنگی بمونه)
+   ═══════════════════════════════════════════════════════════════ */
+.task-item{
+  border-right-width:2px!important;
+}
+.task-item.pri-high{border-right-color:#F85149!important}
+.task-item.pri-med{border-right-color:#D29922!important}
+.task-item.pri-low{border-right-color:#3FB950!important}
+/* ═══════════════════════════════════════════════════════════════════════════
+   PATCH Q1 — فونت Morabba برای عناوین
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --font-heading:'Morabba','Estedad','Vazirmatn',sans-serif;
+}
+
+/* ═══ عناوین اصلی ═══ */
+.planner-hero-title,
+.welcome-title,
+.brand-text h1,
+.panel-title-text,
+.about-name,
+.page-empty-title,
+.study-title,
+.learn-library-title,
+.settings-modal .modal-header h3,
+.notif-header-title,
+.phc-day,
+.study-mode-badge,
+.siraj-popup-title,
+.exit-reason-title,
+.task-notif-title,
+.lock-title{
+  font-family:var(--font-heading)!important;
+  font-weight:700!important;
+  letter-spacing:-.3px!important;
+}
+
+/* ═══ تنظیمات — عنوان دسته‌ها ═══ */
+.settings-tab-btn,
+.settings-submenu-btn,
+.settings-acc-title,
+.settings-subtab,
+.card-title{
+  font-family:var(--font-heading)!important;
+  font-weight:600!important;
+  letter-spacing:-.15px!important;
+}
+
+/* ═══ زیرعنوان‌های پلنر ═══ */
+.planner-hero-sub,
+.phc-date,
+.phc-goal,
+.tasks-list-title,
+.month-goals-title,
+.year-overview-title{
+  font-family:var(--font-heading)!important;
+  font-weight:600!important;
+  letter-spacing:0!important;
+}
+
+/* ═══ دکمه‌های بزرگ ═══ */
+.panel-study-btn,
+.panel-library-btn,
+.study-btn,
+.task-add-btn,
+.btn-primary,
+.btn-secondary{
+  font-family:var(--font-heading)!important;
+  font-weight:600!important;
+}
