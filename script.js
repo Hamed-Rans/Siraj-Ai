@@ -2098,6 +2098,7 @@ function openSettings() {
     try {
         settingsCat = 'appearance';
         window._settingsSub = 'general';
+        window._appearanceSubHidden = false;
         settingsDraft = JSON.parse(JSON.stringify(settings));
         if (!settingsDraft.models) settingsDraft.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
         renderSettingsControls();
@@ -2155,14 +2156,14 @@ function applySettings() {
     closeSettings();
 }
 function switchSettingsCat(cat) {
-    /* ★ اگه روی «ظاهر» کلیک شد و از قبل بازه → ببندش */
-    if (cat === 'appearance' && settingsCat === 'appearance' && window._settingsSub) {
-        window._settingsSub = '';
+    if (cat === 'appearance' && settingsCat === 'appearance') {
+        window._appearanceSubHidden = !window._appearanceSubHidden;
         renderSettingsControls();
         return;
     }
     if (cat === settingsCat) return;
     settingsCat = cat;
+    window._appearanceSubHidden = false;
     if (cat === 'appearance') window._settingsSub = 'general';
     renderSettingsControls();
     if (cat === 'privacy') { renderSessionsList(); }
@@ -2430,7 +2431,7 @@ function renderSettingsControls() {
     var modelsDraft = settingsDraft.models || JSON.parse(JSON.stringify(APP_CONFIG.models));
 
     var subState = window._settingsSub || 'general';
-    var isAppearanceOpen = (settingsCat === 'appearance');
+    var isAppearanceOpen = (settingsCat === 'appearance');     var showSubMenu = isAppearanceOpen && !window._appearanceSubHidden;
 
     /* ═══ تب‌ها + زیرمنوی ظاهر ═══ */
     var tabsHTML = '';
@@ -2441,7 +2442,7 @@ function renderSettingsControls() {
             '<svg class="settings-tab-arrow" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>' +
         '</button>';
 
-        if (isAppearanceOpen) {
+        if (showSubMenu) {
         var subs = [
             { id: 'general', label: 'تم و رنگ' },
             { id: 'background', label: 'پس‌زمینه' },
