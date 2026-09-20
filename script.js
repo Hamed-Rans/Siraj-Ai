@@ -2163,23 +2163,34 @@ function openSettings() {
 }
 function closeSettings() {
     const m = document.getElementById('settingsModal');
-    if (!m || !m.classList.contains('open')) return;
-    /* ★ حذف فوری backdrop-filter برای جلوگیری از لگ */
+    if (!m) return;
+    /* ★ حذف backdrop-filter فوری */
     m.style.backdropFilter = 'none';
     m.style.webkitBackdropFilter = 'none';
-    /* ★ اضافه کردن کلاس closing برای انیمیشن خروج هم‌شکل با ورود */
-    m.classList.add('closing');
     m.classList.remove('open');
-    setTimeout(() => {
+    m.classList.add('closing');
+    setTimeout(function () {
         m.classList.remove('closing');
-        m.style.backdropFilter = '';
-        m.style.webkitBackdropFilter = '';
-        if (!m.classList.contains('open')) {
-            m.style.visibility = 'hidden';
-            m.style.pointerEvents = 'none';
-        }
-        document.querySelectorAll('.bottom-nav-btn').forEach(b => { b.style.pointerEvents = 'auto'; b.style.position = 'relative'; b.style.zIndex = '2'; });
-        const s = document.getElementById('navSlider');
+        m.classList.remove('open');
+        /* ★ مخفی کردن کامل */
+        m.style.setProperty('visibility', 'hidden', 'important');
+        m.style.setProperty('pointer-events', 'none', 'important');
+        m.style.setProperty('display', 'none', 'important');
+        /* ★ پاکسازی */
+        setTimeout(function () {
+            m.style.display = '';
+            m.style.visibility = '';
+            m.style.pointerEvents = '';
+            m.style.backdropFilter = '';
+            m.style.webkitBackdropFilter = '';
+        }, 60);
+        /* ★ بازگرداندن pointer-events به نوار */
+        document.querySelectorAll('.bottom-nav-btn').forEach(function (b) {
+            b.style.pointerEvents = 'auto';
+            b.style.position = 'relative';
+            b.style.zIndex = '2';
+        });
+        var s = document.getElementById('navSlider');
         if (s) s.style.pointerEvents = 'none';
         if (typeof window.updateNavSlider === 'function') window.updateNavSlider(true);
     }, 460);
@@ -3161,8 +3172,28 @@ window.addEventListener('load', () => {
         if (savedImg && !settings.profileImage) settings.profileImage = savedImg;
     } catch (e) {}
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(function (err) { console.warn('[SW]', err); });
+        if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js?v=2.5.1', { updateViaCache: 'none' }).then(function (reg) {
+            /* ★ هر بار چک کنه نسخه جدید هست یا نه */
+            reg.update().catch(function () {});
+            /* ★ اگه نسخه جدید پیدا شد، کش قدیمی رو پاک کن */
+            reg.addEventListener('updatefound', function () {
+                var nw = reg.installing;
+                if (!nw) return;
+                nw.addEventListener('statechange', function () {
+                    if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                        /* ★ SW جدید آماده — کش قدیمی پاک بشه */
+                        if ('caches' in window) {
+                            caches.keys().then(function (names) {
+                                return Promise.all(names.map(function (n) {
+                                    return caches.delete(n);
+                                }));
+                            });
+                        }
+                    }
+                });
+            });
+        }).catch(function (err) { console.warn('[SW]', err); });
     }
 
     initNavState();
