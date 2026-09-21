@@ -3029,14 +3029,16 @@
       }
 
       /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
-       function place(btn,animate){
+        function place(btn,animate){
         if(!btn||!slider) return;
         var isChat=btn.classList.contains('nav-btn-chat');
         var pw=slider.offsetWidth, ph=slider.offsetHeight;
         var x=btn.offsetLeft+(btn.offsetWidth-pw)/2;
         var y=btn.offsetTop+(btn.offsetHeight-ph)/2;
-        /* ★ تست: مقصد رو توی console نشون بده */
-        console.log('PLACE:', 'x='+x.toFixed(0), 'y='+y.toFixed(0), 'btnW='+btn.offsetWidth, 'btnL='+btn.offsetLeft);
+        /* ★ اگه همون مقصد قبلیه، دوباره اجرا نکن (رفع پرش) */
+        if(slider.dataset.tx==String(x) && slider.dataset.ty==String(y)) return;
+        slider.dataset.tx=String(x);
+        slider.dataset.ty=String(y);
         if(animate){
           imp(slider,'transition','transform .55s '+EASE+',opacity .24s ease'+(isChat?' .3s':''));
         }else{
