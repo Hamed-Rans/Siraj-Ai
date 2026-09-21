@@ -1994,6 +1994,8 @@ function injectLockTypedRow() {
 function syncLockTypedRow(val, mode) {
     var row = document.getElementById('lockTypedRow');
     if (!row) return;
+       /* ★ پاک کردن کلاس‌های قبلی */
+    row.classList.remove('lock-row-success','lock-row-error');
     var chars = String(val || '').split('');
     var existing = row.querySelectorAll('.lock-typed-char');
 
