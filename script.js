@@ -2054,7 +2054,7 @@ function syncLockTypedRow(val, mode) {
                             }
                         }, 240);
                     }
-                }, 2000);
+                }, 1000);
             })(el);
         }
     }
@@ -2072,17 +2072,10 @@ function tryUnlock() {
         syncLockTypedRow(val, 'success');
         inp.style.opacity = '0';
         inp.style.pointerEvents = 'none';
-        var box = document.querySelector('.lock-box');
-        if (box && !box.querySelector('.lock-success-check')) {
-            var chk = document.createElement('div');
-            chk.className = 'lock-success-check';
-            chk.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>خوش آمدی!</span>';
-            box.appendChild(chk);
-        }
-        var btn = document.querySelector('.lock-btn');
-        if (btn) btn.style.opacity = '0';
+                var ls = document.getElementById('lockScreen');
+        if (ls) ls.classList.add('closing');
         setTimeout(function () {
-            document.getElementById('lockScreen').classList.remove('open');
+            if (ls) { ls.classList.remove('open'); ls.classList.remove('closing'); }
             const app = document.getElementById('appContainer');
             if (app) {
                 app.classList.add('locked-entering');
