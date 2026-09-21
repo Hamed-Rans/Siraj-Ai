@@ -1415,7 +1415,13 @@
     var _libCat='all';
     var _libState='learned';
 
-    window.__openLibrary=function(){
+      window.__openLibrary=function(){
+      /* ★ فقط در صفحه planner باز بشه */
+      var activeView = document.querySelector('.view.active');
+      if (!activeView || activeView.id !== 'view-planner') {
+        if (window.toast) window.toast('کتابخانه فقط در بخش برنامه‌ریز در دسترسه','info');
+        return;
+      }
       var old=document.getElementById('learnLibrary');if(old) old.remove();
       var learned=getAllLearned();
       var practice=getAllPractice();
@@ -2219,8 +2225,12 @@
         });
       }
       el.querySelector('#studyStartBtn').onclick=startStudy;
-      el.querySelector('#studyCancelBtn').onclick=function(e){         e.preventDefault();         e.stopPropagation();         stopAudio();         closeStudy();       };
-      el.querySelector('#studyChatBtn').onclick=toggleStudyChat;
+            el.querySelector('#studyCancelBtn').onclick=function(e){
+        if(e){ e.preventDefault(); e.stopPropagation(); }
+        try{ stopAudio(); }catch(err){}
+        try{ unlockSite(); }catch(err){}
+        closeStudy();
+      };
       el.querySelector('#studyToolsBtn').onclick=toggleStudyTools;
       el.querySelector('#studyLibraryBtn').onclick=toggleStudyLibrary;
       el.querySelector('#studyPauseBtn').onclick=toggleStudyPause;
@@ -2452,26 +2462,27 @@
         }
       };
     }
-    async function checkReasonWithAI(reason){
+        async function checkReasonWithAI(reason){
       try{
         var prompt = 'دلیل کاربر برای قطع جلسه مطالعه قبل از پایان تایمر:\n\n"'+reason+'"\n\n'
-          +'آیا این دلیل واقعی و موجهه برای قطع جلسه؟ '
-          +'دلایل موجه: بیماری ناگهانی، حادثه، وضعیت اورژانسی، کار بسیار ضروری، حال روحی خیلی بد، مشکل جسمی جدی، کار اداری/خانوادگی فوری.\n'
-          +'دلایل غیرموجه: بی‌حوصلگی، خستگی معمولی، حواس‌پرتی، وسوسه شبکه اجتماعی، بی‌انگیزگی، حوصله نداشتن، کار غیرضروری، دلایل ساختگی و کلیشه‌ای.\n\n'
-          +'فقط با یک کلمه جواب بده: "بله" (موجه) یا "خیر" (غیرموجه).';
+          +'آیا این دلیل واقعی و موجهه؟ به اکثر دلایل منطقی «بله» بگو. فقط دلایل واضح الکی رو رد کن.\n'
+          +'دلایل موجه: بیماری، حادثه، کار فوری، حال روحی بد، مشکل جسمی، مهمون ناخونده، کار اداری/خانوادگی، سردرد، خواب‌آلودگی شدید، گرسنگی، دستشویی، کار ضروری.\n'
+          +'دلایل غیرموجه (فقط اینا): «حوصله ندارم»، «حوصلش نیست»، «دوست ندارم»، «نمیخوام»، کلمات تک‌حرفی و بی‌معنی.\n\n'
+          +'قاعده: اگه دلیل بیشتر از ۱۰ کاراکتر بود و شامل کلمات کلیشه‌ای بالا نبود، «بله» بده.\n'
+          +'فقط با یک کلمه جواب بده: «بله» یا «خیر».';
         var res = await fetch(getBaseURL(),{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({
             model:getModel(),
             messages:[
-              {role:'system',content:'تو یه ارزیاب دقیق و سخت‌گیر هستی. فقط با «بله» یا «خیر» جواب بده.'},
+              {role:'system',content:'تو یه ارزیاب آسان‌گیر هستی. به اکثر دلایل «بله» بگو مگر واضحاً الکی باشه. فقط با «بله» یا «خیر» جواب بده.'},
               {role:'user',content:prompt}
             ],
-            temperature:0.15, stream:false, max_tokens:10
+            temperature:0.3, stream:false, max_tokens:10
           })
         });
-        if(!res.ok){return { valid: reason.length >= 25 };}
+        if(!res.ok){ return { valid: reason.length >= 10 }; }
         var data = await res.json();
         var ans = '';
         if(data.choices && data.choices[0]){
@@ -2481,17 +2492,18 @@
         }
         ans = String(ans||'').trim();
         var lower = ans.toLowerCase();
-        var hasNo = (ans.indexOf('خیر') > -1) || (ans.indexOf('نه ') > -1) || (ans === 'نه') || (lower.indexOf('no') > -1 && lower.indexOf('not') !== 0);
-        var hasYes = (ans.indexOf('بله') > -1) || (ans.indexOf('آری') > -1) || (lower.indexOf('yes') > -1) || (lower.indexOf('true') > -1);
+        var hasNo = (ans.indexOf('خیر') > -1) || (ans === 'نه') || (lower.indexOf('no') > -1);
+        var hasYes = (ans.indexOf('بله') > -1) || (ans.indexOf('آری') > -1) || (lower.indexOf('yes') > -1);
         if(hasNo && !hasYes) return { valid: false };
         if(hasYes && !hasNo) return { valid: true };
-        if(reason.length < 15) return { valid: false };
-        var vagueWords = ['حوصله','بی‌حوصله','خسته','حوصل','حالم نیست','دوست ندارم','نمی‌خوام','بسه','کافیه'];
-        for(var i=0;i<vagueWords.length;i++){
-          if(reason.indexOf(vagueWords[i]) > -1 && reason.length < 40){return { valid: false };}
+        /* ═══ fallback: اکثر دلایل منطقی موجه */
+        if(reason.length < 8) return { valid: false };
+        var vague = ['حوصله ندارم','حوصلش نیست','حوصله نمی‌کنم','دوست ندارم','نمیخوام','بسه','کافیه','خسته‌ام'];
+        for(var i=0;i<vague.length;i++){
+          if(reason.indexOf(vague[i]) > -1 && reason.length < 25) return { valid: false };
         }
-        return { valid: reason.length >= 30 };
-      }catch(e){return { valid: reason.length >= 25 };}
+        return { valid: true };  /* ★★ پیش‌فرض مثبت */
+      }catch(e){ return { valid: true }; }  /* ★★ خطا → موجه */
     }
        function closeStudy(){
       try{stopAudio();}catch(e){}
@@ -2540,10 +2552,13 @@
     }
     function blockContext(e){if(studyRunning) e.preventDefault();}
     function blockUnload(e){if(!studyRunning) return;e.preventDefault();e.returnValue='در حال مطالعه';return e.returnValue;}
-    function lockSite(){
+        function lockSite(){
       document.addEventListener('keydown',blockKey,true);
       document.addEventListener('contextmenu',blockContext,true);
       window.addEventListener('beforeunload',blockUnload);
+      /* ★ اضافه: pointer-events روی اورلی، نه روی دکمه‌ها */
+      var o = document.getElementById('studyOverlay');
+      if (o) o.style.pointerEvents = 'auto';
     }
     function unlockSite(){
       document.removeEventListener('keydown',blockKey,true);
