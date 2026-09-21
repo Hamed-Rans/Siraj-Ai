@@ -3029,49 +3029,68 @@
       }
 
       /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
-        function place(btn,animate){
+       function place(btn,animate){
         if(!btn||!slider) return;
-        var isChat=btn.classList.contains('nav-btn-chat');
+        var isChat = btn.classList.contains('nav-btn-chat');
         var wasChat = slider.dataset.wasChat === '1';
         slider.dataset.wasChat = isChat ? '1' : '0';
 
-        var pw=slider.offsetWidth, ph=slider.offsetHeight;
-        var x=Math.round(btn.offsetLeft+(btn.offsetWidth-pw)/2);
-        var y=Math.round(btn.offsetTop+(btn.offsetHeight-ph)/2);
+        var bw = btn.offsetWidth;
+        var bh = btn.offsetHeight;
+        var x = Math.round(btn.offsetLeft);
+        var y = Math.round(btn.offsetTop);
 
-        /* اگه همون مقصد و همون حالت قبلیه، دوباره اجرا نکن */
-        if(slider.dataset.tx==String(x) && slider.dataset.ty==String(y) && isChat===wasChat) return;
+        /* اگه همون مقصد + همون اندازه + همون حالت FAB بود، دوباره اجرا نکن */
+        var key = x+'_'+y+'_'+bw+'_'+bh+'_'+(isChat?'c':'n');
+        if(slider.dataset.key === key) return;
 
-        var prevX = parseFloat(slider.dataset.tx) || x;
-        var prevY = parseFloat(slider.dataset.ty) || y;
-        var dist = Math.sqrt(Math.pow(x-prevX, 2) + Math.pow(y-prevY, 2));
-        slider.dataset.tx=String(x);
-        slider.dataset.ty=String(y);
+        var prevX = parseFloat(slider.dataset.px);
+        var prevY = parseFloat(slider.dataset.py);
+        if(isNaN(prevX)) prevX = x;
+        if(isNaN(prevY)) prevY = y;
 
-        var dur = Math.min(0.9, 0.5 + dist * 0.00065);
+        slider.dataset.key = key;
+        slider.dataset.px = x;
+        slider.dataset.py = y;
 
-        if(animate){
-          if (isChat) {
-            /* ★ رفتن سمت FAB: اول نرم برسه، بعد با تأخیر محو بشه */
-            imp(slider,'transition',
-              'transform '+dur.toFixed(2)+'s '+EASE+
-              ',opacity .26s ease .3s');
-          } else if (wasChat) {
-            /* ★ برگشتن از FAB: اول سریع ظاهر بشه، بعد حرکت کنه */
-            imp(slider,'transition',
-              'opacity .22s ease .04s'+
-              ',transform '+dur.toFixed(2)+'s '+EASE+' .12s');
-          } else {
-            /* حالت عادی: همزمان نرم */
-            imp(slider,'transition',
-              'transform '+dur.toFixed(2)+'s '+EASE+
-              ',opacity .28s ease');
-          }
-        }else{
+        /* مدت زمان بر اساس فاصله */
+        var dx = x - prevX;
+        var dy = y - prevY;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        var dur = Math.min(0.9, 0.5 + dist * 0.0007);
+        var durStr = dur.toFixed(2)+'s';
+
+        if(!animate){
           imp(slider,'transition','none');
+        } else if(isChat){
+          /* ★ رفتن به FAB: حرکت کنه، قبل از رسیدن محو بشه (fade از نیمه‌راه) */
+          var fadeDelay = (dur * 0.5).toFixed(2)+'s';
+          var fadeDur = (dur * 0.45).toFixed(2)+'s';
+          imp(slider,'transition',
+            'transform '+durStr+' '+EASE+
+            ',width '+durStr+' '+EASE+
+            ',height '+durStr+' '+EASE+
+            ',opacity '+fadeDur+' ease '+fadeDelay);
+        } else if(wasChat){
+          /* ★ برگشت از FAB: سریع ظاهر بشه، بعد حرکت کنه */
+          imp(slider,'transition',
+            'opacity .16s ease 0s'+
+            ',transform '+durStr+' '+EASE+' .1s'+
+            ',width '+durStr+' '+EASE+' .1s'+
+            ',height '+durStr+' '+EASE+' .1s');
+        } else {
+          /* ★ حالت عادی */
+          imp(slider,'transition',
+            'transform '+durStr+' '+EASE+
+            ',width '+durStr+' '+EASE+
+            ',height '+durStr+' '+EASE+
+            ',opacity .26s ease');
         }
-        imp(slider,'transform','translate3d('+x+'px,'+y+'px,0)');
-        imp(slider,'opacity',isChat?'0':'1');
+
+        imp(slider,'width', bw+'px');
+        imp(slider,'height', bh+'px');
+        imp(slider,'transform', 'translate3d('+x+'px,'+y+'px,0)');
+        imp(slider,'opacity', isChat?'0':'1');
       }
       function sync(){
         if(!nav||!slider) return;
