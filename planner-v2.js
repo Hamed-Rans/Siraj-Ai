@@ -3029,12 +3029,14 @@
       }
 
       /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
-        function place(btn,animate){
+       function place(btn,animate){
         if(!btn||!slider) return;
         var isChat=btn.classList.contains('nav-btn-chat');
         var pw=slider.offsetWidth, ph=slider.offsetHeight;
         var x=btn.offsetLeft+(btn.offsetWidth-pw)/2;
         var y=btn.offsetTop+(btn.offsetHeight-ph)/2;
+        /* ★ تست: مقصد رو توی console نشون بده */
+        console.log('PLACE:', 'x='+x.toFixed(0), 'y='+y.toFixed(0), 'btnW='+btn.offsetWidth, 'btnL='+btn.offsetLeft);
         if(animate){
           imp(slider,'transition','transform .55s '+EASE+',opacity .24s ease'+(isChat?' .3s':''));
         }else{
@@ -3085,12 +3087,13 @@
         nav.insertBefore(slider,nav.firstChild);
 
         /* کلیک: هم‌زمان فعال بشه (حرکت روی GPU اجرا می‌شه و به سنگینی عوض‌شدن صفحه ربطی نداره) */
-        nav.addEventListener('click',function(e){
+         nav.addEventListener('click',function(e){
           var btn=e.target.closest('.bottom-nav-btn[data-view]');
           if(!btn) return;
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
           btn.classList.add('active');
-          sync();
+          /* ★ صبر کن تا layout با انیمیشن دکمه‌ها به‌روز بشه، بعد اسلایدر رو جابه‌جا کن */
+          setTimeout(sync, 20);
         },true);
 
         /* تغییر active از هرجای دیگه (مثلاً script.js) */
