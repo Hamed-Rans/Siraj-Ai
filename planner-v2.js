@@ -3030,18 +3030,19 @@
       }
 
       /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
-      function place(btn,animate){
+            function place(btn,animate){
         if(!btn||!slider) return;
         var isChat=btn.classList.contains('nav-btn-chat');
         var pw=slider.offsetWidth, ph=slider.offsetHeight;
         var x=btn.offsetLeft+(btn.offsetWidth-pw)/2;
         var y=btn.offsetTop+(btn.offsetHeight-ph)/2;
         if(animate){
-          /* رفتن روی دکمه‌ی هوش مصنوعی: اول برسه، بعد محو بشه */
           imp(slider,'transition','transform .48s '+EASE+',opacity .24s ease'+(isChat?' .3s':''));
         }else{
           imp(slider,'transition','none');
         }
+        /* ★ force style recalc — transition روی تغییر بعدی حتماً اعمال بشه */
+        if(animate) void getComputedStyle(slider).transform;
         imp(slider,'transform','translate3d('+x+'px,'+y+'px,0)');
         imp(slider,'opacity',isChat?'0':'1');
       }
