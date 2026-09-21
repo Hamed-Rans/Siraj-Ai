@@ -7149,3 +7149,149 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   .sw-update-btn{padding:8px 14px;font-size:11px}
   .sw-update-dismiss{width:22px;height:22px}
 }
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME — Library + Guide fixes
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ تم روشن — کتابخانه یادگیری ═══ */
+[data-theme^="light"] .learn-library-box{
+  background:#FFFFFF!important;
+  border-color:rgba(31,35,40,.1)!important;
+  box-shadow:
+    0 1px 3px rgba(31,35,40,.04),
+    0 24px 60px -20px rgba(31,35,40,.15)!important;
+}
+[data-theme^="light"] .learn-library-header{
+  background:linear-gradient(160deg,rgba(9,105,218,.06),transparent)!important;
+  border-color:rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .learn-library-title{
+  color:var(--accent)!important;
+}
+[data-theme^="light"] .learn-library-stats{
+  border-color:rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .ll-stat{
+  background:#F6F8FA!important;
+  border:1px solid rgba(31,35,40,.1)!important;
+  color:var(--text-main)!important;
+  box-shadow:none!important;
+}
+[data-theme^="light"] .ll-stat-num{
+  color:var(--accent)!important;
+}
+[data-theme^="light"] .ll-stat-lbl{
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .learn-library-filters{
+  border-color:rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .ll-filter{
+  background:#F6F8FA!important;
+  border-color:rgba(31,35,40,.1)!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .ll-filter.active{
+  background:var(--accent)!important;
+  color:#fff!important;
+  border-color:var(--accent)!important;
+}
+[data-theme^="light"] .ll-item{
+  background:#FFFFFF!important;
+  border-color:rgba(31,35,40,.1)!important;
+  box-shadow:0 1px 2px rgba(31,35,40,.04)!important;
+}
+[data-theme^="light"] .ll-item:hover{
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+}
+[data-theme^="light"] .ll-item-text{
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .ll-item-type{
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+}
+[data-theme^="light"] .ll-empty{
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .lib-study-btn{
+  background:linear-gradient(160deg,var(--accent-light),var(--accent-dark))!important;
+  color:#fff!important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.2),
+    0 8px 20px -8px var(--accent)!important;
+}
+[data-theme^="light"] .learn-library-close:hover{
+  background:rgba(239,68,68,.1)!important;
+  color:#EF4444!important;
+}
+
+/* ═══ تم روشن — کارت راهنما ═══ */
+[data-theme^="light"] .guide-card{
+  background:#FFFFFF!important;
+  border-color:rgba(31,35,40,.1)!important;
+}
+[data-theme^="light"] .guide-card .card-title{
+  color:var(--accent)!important;
+  border-bottom-color:rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .guide-card .card-title svg{
+  color:var(--accent)!important;
+  stroke:var(--accent)!important;
+}
+[data-theme^="light"] .guide-card .guide-item{
+  background:#F6F8FA!important;
+  border-color:rgba(31,35,40,.1)!important;
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .guide-card .guide-item span.guide-icon{
+  color:var(--accent)!important;
+}
+[data-theme^="light"] .guide-card .guide-item span.guide-icon svg{
+  stroke:var(--accent)!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   GUIDE CARD — فاصله از بالا و استایل بهتر
+   ═══════════════════════════════════════════════════════════════ */
+.guide-card{
+  margin-top:10px!important;
+}
+.guide-card .guide-list{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  padding:4px 0!important;
+}
+.guide-card .guide-item{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:10px!important;
+  padding:10px 12px!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid var(--border)!important;
+  font-size:11.5px!important;
+  color:var(--text-main)!important;
+  direction:rtl!important;
+  text-align:right!important;
+}
+.guide-card .guide-item .guide-icon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:16px!important;
+  height:16px!important;
+  min-width:16px!important;
+  color:var(--accent)!important;
+  flex-shrink:0!important;
+}
+.guide-card .guide-item .guide-icon svg{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:1.9!important;
+}
