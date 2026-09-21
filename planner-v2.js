@@ -3029,18 +3029,20 @@
       }
 
       /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
-       function place(btn,animate){
+      function place(btn,animate){
         if(!btn||!slider) return;
         var isChat = btn.classList.contains('nav-btn-chat');
         var wasChat = slider.dataset.wasChat === '1';
         slider.dataset.wasChat = isChat ? '1' : '0';
 
-        var bw = btn.offsetWidth;
-        var bh = btn.offsetHeight;
-        var x = Math.round(btn.offsetLeft);
-        var y = Math.round(btn.offsetTop);
+        /* ★ اندازه‌گیری دقیق با getBoundingClientRect */
+        var navRect = nav.getBoundingClientRect();
+        var btnRect = btn.getBoundingClientRect();
+        var bw = Math.round(btnRect.width);
+        var bh = Math.round(btnRect.height);
+        var x = Math.round(btnRect.left - navRect.left);
+        var y = Math.round(btnRect.top - navRect.top);
 
-        /* اگه همون مقصد + همون اندازه + همون حالت FAB بود، دوباره اجرا نکن */
         var key = x+'_'+y+'_'+bw+'_'+bh+'_'+(isChat?'c':'n');
         if(slider.dataset.key === key) return;
 
@@ -3053,37 +3055,43 @@
         slider.dataset.px = x;
         slider.dataset.py = y;
 
-        /* مدت زمان بر اساس فاصله */
         var dx = x - prevX;
         var dy = y - prevY;
         var dist = Math.sqrt(dx*dx + dy*dy);
-        var dur = Math.min(0.9, 0.5 + dist * 0.0007);
+
+        /* ★★ easing مناسب بر اساس فاصله ★★ */
+        var EASE_NEAR = 'cubic-bezier(0.16, 1, 0.3, 1)';   /* easeOutExpo — عالی برای فاصله کوتاه */
+        var EASE_FAR  = 'cubic-bezier(0.45, 0, 0.25, 1)';   /* easeInOut — عالی برای فاصله بلند */
+        var ease = dist > 180 ? EASE_FAR : EASE_NEAR;
+
+        /* ★★ مدت زمان متناسب با فاصله ★★ */
+        var dur = Math.min(1.0, 0.5 + dist * 0.00085);
         var durStr = dur.toFixed(2)+'s';
 
         if(!animate){
           imp(slider,'transition','none');
         } else if(isChat){
-          /* ★ رفتن به FAB: حرکت کنه، قبل از رسیدن محو بشه (fade از نیمه‌راه) */
-          var fadeDelay = (dur * 0.5).toFixed(2)+'s';
-          var fadeDur = (dur * 0.45).toFixed(2)+'s';
+          /* رفتن به FAB: حرکت کن، قبل رسیدن محو شو */
+          var fadeDelay = (dur * 0.55).toFixed(2)+'s';
+          var fadeDur = (dur * 0.4).toFixed(2)+'s';
           imp(slider,'transition',
-            'transform '+durStr+' '+EASE+
-            ',width '+durStr+' '+EASE+
-            ',height '+durStr+' '+EASE+
+            'transform '+durStr+' '+ease+
+            ',width '+durStr+' '+ease+
+            ',height '+durStr+' '+ease+
             ',opacity '+fadeDur+' ease '+fadeDelay);
         } else if(wasChat){
-          /* ★ برگشت از FAB: سریع ظاهر بشه، بعد حرکت کنه */
+          /* برگشت از FAB: سریع ظاهر شو، بعد حرکت کن */
           imp(slider,'transition',
-            'opacity .16s ease 0s'+
-            ',transform '+durStr+' '+EASE+' .1s'+
-            ',width '+durStr+' '+EASE+' .1s'+
-            ',height '+durStr+' '+EASE+' .1s');
+            'opacity .18s ease 0s'+
+            ',transform '+durStr+' '+ease+' .1s'+
+            ',width '+durStr+' '+ease+' .1s'+
+            ',height '+durStr+' '+ease+' .1s');
         } else {
-          /* ★ حالت عادی */
+          /* حالت عادی */
           imp(slider,'transition',
-            'transform '+durStr+' '+EASE+
-            ',width '+durStr+' '+EASE+
-            ',height '+durStr+' '+EASE+
+            'transform '+durStr+' '+ease+
+            ',width '+durStr+' '+ease+
+            ',height '+durStr+' '+ease+
             ',opacity .26s ease');
         }
 
