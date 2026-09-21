@@ -3011,158 +3011,162 @@
       }
     }
 
-        /* ═══════════════════════════════════════════════════════════════
-       NAV SLIDER
-       ═══════════════════════════════════════════════════════════════ */
-    (function(){
-      var nav=null, slider=null, fill=null, lastBtn=null;
-      var EASE='cubic-bezier(0.16, 1, 0.3, 1)';
-      function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
+     /* ═══════════════════════════════════════════════════════════════
+   NAV SLIDER — Smoothing with RAF (بدون پرش)
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  var nav=null, slider=null, fill=null;
+  var rafId = 0;
+  var smooth = null;       // موقعیت smoothed
+  var lastTarget = null;
+  var idleCount = 0;
 
-      /* اگه لحظه‌ای دو دکمه active بودن، جدیدترین رو بردار */
-      function activeBtn(){
-        var list=nav.querySelectorAll('.bottom-nav-btn.active');
-        if(!list.length) return null;
-        if(list.length===1) return list[0];
-        for(var i=0;i<list.length;i++){ if(list[i]!==lastBtn) return list[i]; }
-        return list[0];
+  function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
+
+  function activeBtn(){
+    if(!nav) return null;
+    var list = nav.querySelectorAll('.bottom-nav-btn.active');
+    if(!list.length) return null;
+    return list[list.length - 1];
+  }
+
+  function readTarget(btn){
+    if(!btn || !nav) return null;
+    var navRect = nav.getBoundingClientRect();
+    var btnRect = btn.getBoundingClientRect();
+    return {
+      x: btnRect.left - navRect.left,
+      y: btnRect.top - navRect.top,
+      w: btnRect.width,
+      h: btnRect.height,
+      chat: btn.classList.contains('nav-btn-chat')
+    };
+  }
+
+  function loop(){
+    rafId = 0;
+    if(!nav || !slider) return;
+
+    var btn = activeBtn();
+    if(!btn){
+      imp(slider,'opacity','0');
+      return;
+    }
+    var tgt = readTarget(btn);
+    if(!tgt) return;
+
+    /* اگه smooth نداشتیم (اولین بار) بساز */
+    if(!smooth){
+      smooth = {x: tgt.x, y: tgt.y, w: tgt.w, h: tgt.h};
+    }
+
+    /* ★ Lerp تطبیقی: موقع لگ اطراف حالت 0.22، موقع دور نزدیک 0.12 */
+    var dist = Math.sqrt(
+      Math.pow(tgt.x - smooth.x, 2) +
+      Math.pow(tgt.y - smooth.y, 2) +
+      Math.pow(tgt.w - smooth.w, 2) +
+      Math.pow(tgt.h - smooth.h, 2)
+    );
+    var lerp;
+    if (dist > 250)      lerp = 0.10;
+    else if (dist > 100) lerp = 0.14;
+    else if (dist > 20)  lerp = 0.20;
+    else                 lerp = 0.28;
+
+    smooth.x += (tgt.x - smooth.x) * lerp;
+    smooth.y += (tgt.y - smooth.y) * lerp;
+    smooth.w += (tgt.w - smooth.w) * lerp;
+    smooth.h += (tgt.h - smooth.h) * lerp;
+
+    /* ★ opacity خیلی نرم */
+    var curOp = parseFloat(slider.dataset.op);
+    if (isNaN(curOp)) curOp = tgt.chat ? 0 : 1;
+    var targetOp = tgt.chat ? 0 : 1;
+    var opLerp = 0.09;
+    curOp += (targetOp - curOp) * opLerp;
+    slider.dataset.op = String(curOp);
+
+    imp(slider, 'transform', 'translate3d(' + smooth.x.toFixed(2) + 'px,' + smooth.y.toFixed(2) + 'px,0)');
+    imp(slider, 'width',  smooth.w.toFixed(2) + 'px');
+    imp(slider, 'height', smooth.h.toFixed(2) + 'px');
+    imp(slider, 'opacity', curOp.toFixed(3));
+
+    /* idle چک: اگه ۲۵۰۰ میلی‌ثانیه بعد از رسیدن، idle حساب کن */
+    var settled = dist < 0.4 && Math.abs(curOp - targetOp) < 0.005;
+    if(settled){
+      idleCount++;
+      if(idleCount > 150){   /* ~2.5s */
+        rafId = 0;
+        return;
       }
+    } else {
+      idleCount = 0;
+    }
 
-      /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
-            function place(btn,animate){
-        if(!btn||!slider) return;
-        var isChat = btn.classList.contains('nav-btn-chat');
-        var wasChat = slider.dataset.wasChat === '1';
-        slider.dataset.wasChat = isChat ? '1' : '0';
+    rafId = requestAnimationFrame(loop);
+  }
 
-        var navRect = nav.getBoundingClientRect();
-        var btnRect = btn.getBoundingClientRect();
-        var bw = Math.round(btnRect.width);
-        var bh = Math.round(btnRect.height);
-        var x = Math.round(btnRect.left - navRect.left);
-        var y = Math.round(btnRect.top - navRect.top);
+  function kick(){
+    idleCount = 0;
+    if(!rafId) rafId = requestAnimationFrame(loop);
+  }
 
-        var key = x+'_'+y+'_'+bw+'_'+bh+'_'+(isChat?'c':'n');
-        if(slider.dataset.key === key) return;
+  window.__moveNavSlider = function(){ kick(); };
+  window.__navActivate = function(view){
+    if(!nav) return;
+    var tgt=null;
+    nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){
+      if(b.dataset && b.dataset.view===view) tgt=b;
+    });
+    if(!tgt) return;
+    nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+    tgt.classList.add('active');
+    kick();
+  };
 
-        var prevX = parseFloat(slider.dataset.px);
-        var prevY = parseFloat(slider.dataset.py);
-        if(isNaN(prevX)) prevX = x;
-        if(isNaN(prevY)) prevY = y;
+  function initNavSlider(){
+    nav = document.getElementById('bottomNav');
+    if(!nav) return false;
+    var old = document.getElementById('navSlider');
+    if(old) old.remove();
+    slider = document.createElement('div');
+    slider.id = 'navSlider';
+    slider.className = 'nav-slider';
+    fill = document.createElement('div');
+    fill.className = 'nav-slider-fill';
+    slider.appendChild(fill);
+    imp(slider, 'will-change', 'transform,opacity,width,height');
+    imp(slider, 'opacity', '0');
+    nav.insertBefore(slider, nav.firstChild);
 
-        slider.dataset.key = key;
-        slider.dataset.px = x;
-        slider.dataset.py = y;
+    nav.addEventListener('click', function(e){
+      var btn = e.target.closest('.bottom-nav-btn[data-view]');
+      if(!btn) return;
+      nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      kick();
+    }, true);
 
-        var dx = x - prevX;
-        var dy = y - prevY;
-        var dist = Math.sqrt(dx*dx + dy*dy);
+    new MutationObserver(kick).observe(nav, {attributes:true, attributeFilter:['class'], subtree:true});
 
-        /* ★ مدت زمان طولانی‌تر برای فواصل دور */
-        var dur = Math.min(1.1, 0.55 + dist * 0.0009);
-        var durStr = dur.toFixed(2)+'s';
-        var EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'; /* easeOutExpo */
+    function resnap(){
+      smooth = null;
+      kick();
+      setTimeout(kick, 300);
+      setTimeout(kick, 600);
+    }
+    new MutationObserver(resnap).observe(document.documentElement, {attributes:true, attributeFilter:['data-nav-position','data-nav-style']});
+    window.addEventListener('resize', resnap);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(resnap);
+    setTimeout(kick, 200);
+    return true;
+  }
 
-        if(!animate){
-          imp(slider,'transition','none');
-        } else if(isChat){
-          /* رفتن به FAB: قبل از رسیدن محو شو */
-          var fadeDelay = (dur * 0.55).toFixed(2)+'s';
-          var fadeDur = (dur * 0.4).toFixed(2)+'s';
-          imp(slider,'transition',
-            'transform '+durStr+' '+EASE+
-            ',width '+durStr+' '+EASE+
-            ',height '+durStr+' '+EASE+
-            ',opacity '+fadeDur+' ease '+fadeDelay);
-        } else if(wasChat){
-          /* برگشت از FAB: سریع ظاهر شو، بعد حرکت کن */
-          imp(slider,'transition',
-            'opacity .18s ease 0s'+
-            ',transform '+durStr+' '+EASE+' .1s'+
-            ',width '+durStr+' '+EASE+' .1s'+
-            ',height '+durStr+' '+EASE+' .1s');
-        } else {
-          /* حالت عادی */
-          imp(slider,'transition',
-            'transform '+durStr+' '+EASE+
-            ',width '+durStr+' '+EASE+
-            ',height '+durStr+' '+EASE+
-            ',opacity .26s ease');
-        }
-
-        imp(slider,'width', bw+'px');
-        imp(slider,'height', bh+'px');
-        imp(slider,'transform', 'translate3d('+x+'px,'+y+'px,0)');
-        imp(slider,'opacity', isChat?'0':'1');
-      }
-      function sync(){
-        if(!nav||!slider) return;
-        var btn=activeBtn();
-        if(!btn){ imp(slider,'opacity','0'); return; }
-        if(btn!==lastBtn){
-          var first=!lastBtn;
-          lastBtn=btn;
-          place(btn,!first);
-        }
-      }
-      function snap(){
-        if(!nav||!slider) return;
-        var btn=activeBtn(); if(!btn) return;
-        lastBtn=btn; place(btn,false);
-      }
-      window.__moveNavSlider=function(){ sync(); };
-      window.__navActivate=function(view){
-        if(!nav) return;
-        var tgt=null;
-        nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){
-          if(b.dataset&&b.dataset.view===view) tgt=b;
-        });
-        if(!tgt) return;
-        nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
-        tgt.classList.add('active');
-        sync();
-      };
-
-      function initNavSlider(){
-        nav=document.getElementById('bottomNav'); if(!nav) return false;
-        var old=document.getElementById('navSlider'); if(old) old.remove();
-        slider=document.createElement('div');
-        slider.id='navSlider';
-        slider.className='nav-slider';
-        fill=document.createElement('div');
-        fill.className='nav-slider-fill';
-        slider.appendChild(fill);
-        imp(slider,'will-change','transform,opacity');
-        imp(slider,'opacity','0');
-        nav.insertBefore(slider,nav.firstChild);
-
-        /* کلیک: هم‌زمان فعال بشه (حرکت روی GPU اجرا می‌شه و به سنگینی عوض‌شدن صفحه ربطی نداره) */
-          nav.addEventListener('click',function(e){
-          var btn=e.target.closest('.bottom-nav-btn[data-view]');
-          if(!btn) return;
-          nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
-          btn.classList.add('active');
-          /* ★ صبر کن تا layout با انیمیشن دکمه‌ها به‌روز بشه، بعد اسلایدر رو جابه‌جا کن */
-          setTimeout(sync, 20);
-        },true);
-
-        /* تغییر active از هرجای دیگه (مثلاً script.js) */
-        new MutationObserver(sync).observe(nav,{attributes:true,attributeFilter:['class'],subtree:true});
-
-        /* عوض‌شدن موقعیت نوار، تغییر اندازه، لود فونت: بدون حرکت جابه‌جا کن */
-        function resnap(){ snap(); setTimeout(snap,350); setTimeout(snap,800); }
-        new MutationObserver(resnap).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position','data-nav-style']});
-        window.addEventListener('resize',resnap);
-        if(document.fonts&&document.fonts.ready) document.fonts.ready.then(snap);
-        setTimeout(snap,150);
-        return true;
-      }
-
-      if(!initNavSlider()){
-        var t=setInterval(function(){ if(initNavSlider()) clearInterval(t); },200);
-        setTimeout(function(){ clearInterval(t); },8000);
-      }
-    })();
+  if(!initNavSlider()){
+    var t=setInterval(function(){ if(initNavSlider()) clearInterval(t); },200);
+    setTimeout(function(){ clearInterval(t); },8000);
+  }
+})();
 
     /* ★ انیمیشن سوییچ view */
     (function(){
