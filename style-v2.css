@@ -6793,3 +6793,62 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
 .planner-hero + .planner-pane{
   padding-top:6px!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   NAV BUTTON HOVER — انیمیشن نرم و روون
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ دکمه‌های غیرفعال نوار — هاور نرم ═══ */
+.bottom-nav-btn:not(.nav-btn-chat){
+  transition:
+    background .35s cubic-bezier(.22,1,.36,1),
+    color .3s cubic-bezier(.22,1,.36,1),
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .4s cubic-bezier(.22,1,.36,1)!important;
+  will-change:transform,background;
+}
+
+.bottom-nav-btn:not(.nav-btn-chat):not(.active):hover{
+  transform:translateY(-1.5px)!important;
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+}
+
+.bottom-nav-btn:not(.nav-btn-chat):not(.active):hover svg{
+  transform:scale(1.08)!important;
+  transition:transform .4s cubic-bezier(.34,1.4,.64,1)!important;
+}
+
+.bottom-nav-btn:not(.nav-btn-chat):not(.active) svg{
+  transition:transform .4s cubic-bezier(.34,1.4,.64,1)!important;
+}
+
+/* ═══ دکمه FAB — هاور نرم ═══ */
+.bottom-nav-btn.nav-btn-chat{
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .4s cubic-bezier(.22,1,.36,1),
+    filter .35s cubic-bezier(.22,1,.36,1)!important;
+}
+
+.bottom-nav-btn.nav-btn-chat:hover{
+  transform:scale(1.06) translateY(-1px)!important;
+  filter:brightness(1.08);
+}
+
+/* ═══ دکمه پین (کوچیک سمت چپ) ═══ */
+.nav-collapse-tab{
+  transition:
+    background .3s cubic-bezier(.22,1,.36,1),
+    color .28s cubic-bezier(.22,1,.36,1),
+    border-color .3s cubic-bezier(.22,1,.36,1),
+    transform .4s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .35s cubic-bezier(.22,1,.36,1)!important;
+}
+
+.nav-collapse-tab:hover{
+  transform:scale(1.05)!important;
+  background:var(--accent-soft)!important;
+  color:var(--accent)!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 4px 14px -8px var(--accent)!important;
+}
