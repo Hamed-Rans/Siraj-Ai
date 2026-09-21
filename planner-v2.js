@@ -3016,8 +3016,7 @@
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null, fill=null, lastBtn=null;
-      var EASE='cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-
+      var EASE='cubic-bezier(0.4, 0, 0.2, 1)';
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
 
       /* اگه لحظه‌ای دو دکمه active بودن، جدیدترین رو بردار */
