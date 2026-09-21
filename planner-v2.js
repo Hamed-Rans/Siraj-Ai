@@ -2418,7 +2418,7 @@
         if(!reason){errEl.textContent='دلیل خروج رو بنویس';return;}
         if(reason.length<8){errEl.textContent='دلیل خروج خیلی کوتاهه — واضح‌تر بنویس';return;}
         var box=el.querySelector('.exit-reason-box');
-        box.innerHTML='<div class="exit-reason-checking"><div class="spinner"></div><span>دارم بررسی می‌کنم...</span></div>';
+        box.innerHTML='<div class="exit-reason-checking"><div class="spinner"></div><span>حواسم بهت هست پسر خوب 👁️👁️🫵 دلیلت غیرموجه باشه تنبیه میشی</span></div>';
         var result=await checkReasonWithAI(reason);
         if(result.valid){
           box.innerHTML='<span class="exit-reason-emoji">✅</span>'
@@ -2462,27 +2462,41 @@
         }
       };
     }
-        async function checkReasonWithAI(reason){
+            async function checkReasonWithAI(reason){
       try{
-        var prompt = 'دلیل کاربر برای قطع جلسه مطالعه قبل از پایان تایمر:\n\n"'+reason+'"\n\n'
-          +'آیا این دلیل واقعی و موجهه؟ به اکثر دلایل منطقی «بله» بگو. فقط دلایل واضح الکی رو رد کن.\n'
-          +'دلایل موجه: بیماری، حادثه، کار فوری، حال روحی بد، مشکل جسمی، مهمون ناخونده، کار اداری/خانوادگی، سردرد، خواب‌آلودگی شدید، گرسنگی، دستشویی، کار ضروری.\n'
-          +'دلایل غیرموجه (فقط اینا): «حوصله ندارم»، «حوصلش نیست»، «دوست ندارم»، «نمیخوام»، کلمات تک‌حرفی و بی‌معنی.\n\n'
-          +'قاعده: اگه دلیل بیشتر از ۱۰ کاراکتر بود و شامل کلمات کلیشه‌ای بالا نبود، «بله» بده.\n'
+        var prompt = 'یه دانشجو توی حالت مطالعه بود و قبل از تموم شدن تایمر، دکمه «پایان» رو زده. دلیلش اینه:\n\n'
+          +'"'+reason+'"\n\n'
+          +'═══ معیار ارزیابی ═══\n'
+          +'✅ موجه (پاسخ: بله):\n'
+          +'• بیماری، سردرد شدید، دل درد، حالت تهوع\n'
+          +'• حادثه یا اتفاق ناگهانی\n'
+          +'• کار خیلی ضروری (کاری، اداری، خانوادگی)\n'
+          +'• مهمون ناخونده، تماس ضروری\n'
+          +'• مشکل جسمی یا روحی جدی\n'
+          +'• گرسنگی شدید، خواب‌آلودگی غیرقابل کنترل، دستشویی\n'
+          +'• هر دلیل منطقی که بیشتر از ۱۰ کاراکتر باشه\n\n'
+          +'❌ غیرموجه (پاسخ: خیر):\n'
+          +'• «حوصله ندارم»، «حوصلش نیست»، «دوست ندارم»، «نمیخوام»\n'
+          +'• «خسته‌ام» بدون توضیح بیشتر\n'
+          +'• «بسه»، «کافیه»، «ولش کن»\n'
+          +'• دلایل تک‌کلمه‌ای یا بی‌معنی\n\n'
+          +'═══ قاعده کلی ═══\n'
+          +'اگه دلیل شامل کلمات بالا نبود و بیشتر از ۸ کاراکتر داشت، «بله» بده. فقط دلایل واضح الکی رو رد کن.\n\n'
           +'فقط با یک کلمه جواب بده: «بله» یا «خیر».';
+
         var res = await fetch(getBaseURL(),{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({
             model:getModel(),
             messages:[
-              {role:'system',content:'تو یه ارزیاب آسان‌گیر هستی. به اکثر دلایل «بله» بگو مگر واضحاً الکی باشه. فقط با «بله» یا «خیر» جواب بده.'},
+              {role:'system',content:'تو یه ارزیاب منصف و آسان‌گیر هستی. به اکثر دلایل منطقی «بله» بگو. فقط دلایل واضح الکی رو رد کن. فقط با «بله» یا «خیر» جواب بده.'},
               {role:'user',content:prompt}
             ],
-            temperature:0.3, stream:false, max_tokens:10
+            temperature:0.2, stream:false, max_tokens:10
           })
         });
-        if(!res.ok){ return { valid: reason.length >= 10 }; }
+        if(!res.ok){ return { valid: reason.length >= 8 }; }
         var data = await res.json();
         var ans = '';
         if(data.choices && data.choices[0]){
@@ -2496,16 +2510,16 @@
         var hasYes = (ans.indexOf('بله') > -1) || (ans.indexOf('آری') > -1) || (lower.indexOf('yes') > -1);
         if(hasNo && !hasYes) return { valid: false };
         if(hasYes && !hasNo) return { valid: true };
-        /* ═══ fallback: اکثر دلایل منطقی موجه */
+        /* fallback منطقی */
         if(reason.length < 8) return { valid: false };
-        var vague = ['حوصله ندارم','حوصلش نیست','حوصله نمی‌کنم','دوست ندارم','نمیخوام','بسه','کافیه','خسته‌ام'];
+        var vague = ['حوصله ندارم','حوصلش نیست','حوصله نمی‌کنم','دوست ندارم','نمیخوام','بسه','کافیه'];
         for(var i=0;i<vague.length;i++){
-          if(reason.indexOf(vague[i]) > -1 && reason.length < 25) return { valid: false };
+          if(reason.indexOf(vague[i]) > -1 && reason.length < 22) return { valid: false };
         }
-        return { valid: true };  /* ★★ پیش‌فرض مثبت */
-      }catch(e){ return { valid: true }; }  /* ★★ خطا → موجه */
+        return { valid: true };
+      }catch(e){ return { valid: true }; }
     }
-       function closeStudy(){
+           function closeStudy(){
       try{stopAudio();}catch(e){}
       var o=document.getElementById('studyOverlay');
       var chat=document.getElementById('studyChatPanel');
@@ -2523,8 +2537,7 @@
         }catch(e){}
         _studyDragHandlers=null;
       }
-      if(!o) return;
-      /* ★ ریست کامل state */
+      /* ★ ریست کامل state قبل از بستن */
       if(studyTimer){ clearInterval(studyTimer); studyTimer=null; }
       studyRunning=false;
       studyPaused=false;
@@ -2534,14 +2547,20 @@
       window.__studyTaskSourceId=null;
       window.__studyTaskSourceDay=null;
       try{ unlockSite(); }catch(e){}
-      /* ★ انیمیشن بستن */
-      o.style.transition='opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.4,0,.2,1), visibility .45s';
+      /* ★ پاک کردن هر پاپ‌آپی که بازه */
+      var exitP=document.getElementById('exitReasonPopup');
+      if(exitP) exitP.remove();
+      var earlyP=document.getElementById('earlyExitPopup');
+      if(earlyP) earlyP.remove();
+      if(!o) return;
+      /* ★ بدون گارد dataset.closing */
       o.classList.remove('open');
-      setTimeout(function(){if(o.parentNode)o.remove();},620);
+      o.style.transition='opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.4,0,.2,1), visibility .45s';
+      setTimeout(function(){ if(o.parentNode) o.remove(); }, 620);
       setTimeout(function(){
         if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
         refreshBody('left');
-      },380);
+      }, 380);
     }
     function blockKey(e){
       if(!studyRunning) return;
