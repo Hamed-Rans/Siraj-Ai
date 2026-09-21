@@ -3087,7 +3087,7 @@
         nav.insertBefore(slider,nav.firstChild);
 
         /* کلیک: هم‌زمان فعال بشه (حرکت روی GPU اجرا می‌شه و به سنگینی عوض‌شدن صفحه ربطی نداره) */
-         nav.addEventListener('click',function(e){
+          nav.addEventListener('click',function(e){
           var btn=e.target.closest('.bottom-nav-btn[data-view]');
           if(!btn) return;
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
