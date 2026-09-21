@@ -3097,8 +3097,11 @@
       }
       window.__moveNavSlider=function(){ kick(false); };
 
-      /* فعال‌کردن دکمه‌ی یک صفحه (هوک عوض‌کردن صفحه بعد از تعویض صدا می‌زنه) */
-      window.__navActivate=function(view){
+            /* فعال‌کردن دکمه‌ی یک صفحه:
+         صبر می‌کنه تا فریم‌های سنگینِ تعویض صفحه تموم بشن (۲ فریم پشت‌سرهم سالم)، بعد شروع می‌کنه.
+         اینجوری انیمیشن نوار روی مرورگرِ آروم شروع می‌شه و اول کار نمی‌پره. */
+      var waitRaf=0, pendingView=null;
+      function doActivate(view){
         if(!nav) return;
         var tgt=null;
         nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){
@@ -3108,6 +3111,23 @@
         nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
         tgt.classList.add('active');
         kick(false);
+      }
+      window.__navActivate=function(view){
+        pendingView=view;
+        if(waitRaf) return;
+        var last=0, calm=0, start=performance.now();
+        function w(now){
+          var dt=last?(now-last):999; last=now;
+          calm=(dt<24)?calm+1:0;
+          if(calm>=2 || now-start>350){
+            waitRaf=0;
+            if(window.console && now-start>120) console.log('[nav] waited '+Math.round(now-start)+'ms for calm frames');
+            doActivate(pendingView);
+            return;
+          }
+          waitRaf=requestAnimationFrame(w);
+        }
+        waitRaf=requestAnimationFrame(w);
       };
 
       function initNavSlider(){
