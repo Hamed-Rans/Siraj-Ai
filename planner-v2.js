@@ -3016,7 +3016,7 @@
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null, fill=null, lastBtn=null;
-      var EASE='cubic-bezier(.3,.5,.2,1)';
+      var EASE='cubic-bezier(0.22, 1, 0.36, 1)';
 
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
 
@@ -3037,7 +3037,7 @@
         var x=btn.offsetLeft+(btn.offsetWidth-pw)/2;
         var y=btn.offsetTop+(btn.offsetHeight-ph)/2;
         if(animate){
-          imp(slider,'transition','transform .48s '+EASE+',opacity .24s ease'+(isChat?' .3s':''));
+          imp(slider,'transition','transform .62s '+EASE+',opacity .3s ease'+(isChat?' .35s':''));
         }else{
           imp(slider,'transition','none');
         }
