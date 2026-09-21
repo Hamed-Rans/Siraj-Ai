@@ -6728,3 +6728,20 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   }
   html:is([data-nav-position="bottom"],[data-nav-position="top"]) #bottomNav .bottom-nav-btn:not(.nav-btn-chat)::after{display:none!important}
 }
+/* ═══════════════════════════════════════════════════════════════
+   NAV GAP — کاهش فاصله بین دکمه‌های غیرفعال
+   ═══════════════════════════════════════════════════════════════ */
+.bottom-nav{
+  gap:2px!important;
+  padding:5px 10px!important;
+}
+[data-nav-position="bottom"] .bottom-nav,
+[data-nav-position="top"] .bottom-nav{
+  gap:2px!important;
+  padding:5px 10px!important;
+}
+[data-nav-position="left"] .bottom-nav,
+[data-nav-position="right"] .bottom-nav{
+  gap:2px!important;
+  padding:6px 4px!important;
+}
