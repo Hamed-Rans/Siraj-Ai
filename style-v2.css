@@ -6576,27 +6576,49 @@ body.kb-open #box{
     margin .48s cubic-bezier(.3,.5,.2,1)!important;
 }
 /* ═══════════════════════════════════════════════════════════════
-   FIX: اسکرول صفحه روزانه
+   FIX: اسکرول صفحه روزانه — نسخه اصلاح‌شده
    ═══════════════════════════════════════════════════════════════ */
-.planner-pane{
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  height:100%!important;
+
+/* ═══ view-planer = flex column، بدون scroll ═══ */
+#view-planner.active{
   display:flex!important;
   flex-direction:column!important;
-  -webkit-overflow-scrolling:touch;
-}
-.planner-body-content{
-  overflow:visible!important;
-  flex:1 1 auto!important;
-  padding-bottom:90px!important;
-}
-#view-planner.active{
-  overflow:hidden!important;
   height:100%!important;
+  overflow:hidden!important;
 }
-#view-planner .planner-hero{
-  flex-shrink:0!important;
+
+/* ═══ hero سرصفحه = ثابت ═══ */
+#view-planner > .planner-hero{
+  flex:0 0 auto!important;
+  position:relative!important;
+}
+
+/* ═══ planner-pane = پرکننده، این خودش اسکرول می‌شه ═══ */
+#view-planner .planner-pane{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch;
+  position:relative!important;
+}
+
+/* ═══ planner-hero-card داخل pane = sticky بمونه ═══ */
+#view-planner .planner-pane > .planner-hero-card{
+  position:sticky!important;
+  top:0!important;
+  z-index:15!important;
+  margin:0!important;
+  background:var(--panel-bg)!important;
+  backdrop-filter:blur(16px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(180%)!important;
+  border-bottom:1px solid var(--border)!important;
+}
+
+/* ═══ planner-body-content = بدون overflow (والد اسکرول می‌کنه) ═══ */
+#view-planner .planner-body-content{
+  overflow:visible!important;
+  padding-bottom:100px!important;
 }
 /* ═══════════════════════════════════════════════════════════════
    FIX: صفحه قفل — انیمیشن نرم + فاصله‌گذاری + موقعیت
