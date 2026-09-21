@@ -3016,7 +3016,7 @@
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null, fill=null, lastBtn=null;
-      var EASE='cubic-bezier(0.65, 0, 0.35, 1)';
+      var EASE='cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
 
@@ -3036,38 +3036,14 @@
         var pw=slider.offsetWidth, ph=slider.offsetHeight;
         var x=btn.offsetLeft+(btn.offsetWidth-pw)/2;
         var y=btn.offsetTop+(btn.offsetHeight-ph)/2;
-
-        /* ★ موقعیت فعلی رو از transform بخون */
-        var curX = 0, curY = 0;
-        try {
-          var tr = window.getComputedStyle(slider).transform;
-          if (tr && tr !== 'none') {
-            var m = tr.match(/matrix.*\((.+)\)/);
-            if (m) {
-              var v = m[1].split(', ');
-              curX = parseFloat(v[4]) || 0;
-              curY = parseFloat(v[5]) || 0;
-            }
-          }
-        } catch(e) {}
-
-        /* ★ مدت زمان متناسب با فاصله: بین 0.45s تا 0.85s */
-        var dx = x - curX;
-        var dy = y - curY;
-        var dist = Math.sqrt(dx*dx + dy*dy);
-        var dur = Math.min(0.85, Math.max(0.45, 0.36 + dist * 0.00055));
-
         if(animate){
-          imp(slider,'transition','transform '+dur.toFixed(2)+'s '+EASE+',opacity .3s ease'+(isChat?' .4s':''));
+          imp(slider,'transition','transform .55s '+EASE+',opacity .24s ease'+(isChat?' .3s':''));
         }else{
           imp(slider,'transition','none');
         }
-        /* ★ force style recalc */
-        if(animate) void getComputedStyle(slider).transform;
         imp(slider,'transform','translate3d('+x+'px,'+y+'px,0)');
         imp(slider,'opacity',isChat?'0':'1');
       }
-
       function sync(){
         if(!nav||!slider) return;
         var btn=activeBtn();
