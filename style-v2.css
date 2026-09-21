@@ -7295,3 +7295,18 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   fill:none!important;
   stroke-width:1.9!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   PANEL — خط hover فقط وقتی خود کارت hover شده
+   ═══════════════════════════════════════════════════════════════ */
+.side-panel .panel-card::after,
+.panel-content .panel-card::after{
+  opacity:0!important;
+  right:50%!important;
+  left:50%!important;
+}
+.side-panel .panel-card:hover::after,
+.panel-content .panel-card:hover::after{
+  opacity:1!important;
+  right:0!important;
+  left:0!important;
+}
