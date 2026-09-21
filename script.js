@@ -319,7 +319,7 @@ function loadSettings() {
         const l = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
         const s = Object.assign({}, APP_CONFIG.defaultSettings, l);
         const pi = localStorage.getItem(PROFILE_IMG_KEY);
-        if (pi && !s.profileImage) s.profileImage = pi;
+        if (pi) s.profileImage = pi;   /* ★ همیشه از localStorage بخون */
         if (!s.models) s.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
         if (s.appVersion !== '2.5') s.appVersion = '2.5';
         return s;
@@ -2242,10 +2242,16 @@ function closeSettings() {
 function applySettings() {
     if (!settingsDraft) return;
     const oldPass = settings.password, oldEnabled = settings.passwordEnabled;
+
+    /* ★ profileImage رو از localStorage بخون چون ممکنه کاربر بعد از باز کردن تنظیمات آپلود کرده باشه */
+    try {
+        var savedImg = localStorage.getItem(PROFILE_IMG_KEY);
+        if (savedImg) settingsDraft.profileImage = savedImg;
+    } catch(e) {}
+
     settings = JSON.parse(JSON.stringify(settingsDraft));
     saveSettings();
     applySettingsToUI();
-    /* ★ رفرش Dropdown مدل بعد از اعمال */
     if (typeof renderModelsDropdown === 'function') renderModelsDropdown();
     try { localStorage.setItem(PROFILE_IMG_KEY, settings.profileImage || ''); } catch (e) {}
     if (settings.passwordEnabled && (!oldEnabled || oldPass !== settings.password)) {
@@ -2477,33 +2483,22 @@ function handleProfileUpload(ev) {
     r.onload = e => {
         var dataUrl = e.target.result;
 
-        /* ★ آپدیت settings اصلی (نه فقط draft) */
-        settings.profileImage = dataUrl;
-        saveSettings();
+        /* ★ ذخیره توی localStorage مستقیم — منبع اصلی */
         try { localStorage.setItem(PROFILE_IMG_KEY, dataUrl); } catch(err) {}
 
-        /* ★ آپدیت draft هم اگه هست */
+        /* ★ آپدیت settings و settingsDraft هر دو */
+        settings.profileImage = dataUrl;
         if (settingsDraft) settingsDraft.profileImage = dataUrl;
+        saveSettings();
 
-        /* ★ آپدیت فوری preview */
+        /* ★ آپدیت همه آواتارهای فعال توی صفحه */
         var preview = document.getElementById('profileAvatarPreview');
-        if (preview) {
-            preview.innerHTML = '<img src="' + dataUrl + '" alt="">';
-        }
-
-        /* ★ آپدیت آواتار هدر */
-        var headerAvatar = document.querySelector('.main-top-avatar img');
-        if (headerAvatar) headerAvatar.src = dataUrl;
-
-        /* ★ آپدیت آواتار توی تنظیمات (about) */
+        if (preview) preview.innerHTML = '<img src="' + dataUrl + '" alt="">';
+        document.querySelectorAll('.main-top-avatar img').forEach(function(img){ img.src = dataUrl; });
         var aboutAv = document.querySelector('.about-avatar');
-        if (aboutAv) {
-            var hasImg = aboutAv.querySelector('img');
-            if (hasImg) hasImg.src = dataUrl;
-            else aboutAv.innerHTML = '<img src="' + dataUrl + '" alt="حامد">';
-        }
+        if (aboutAv) aboutAv.innerHTML = '<img src="' + dataUrl + '" alt="حامد">';
 
-        toast('✓ عکس پروفایل آپلود شد', 'success');
+        toast('✓ عکس پروفایل ذخیره شد', 'success');
     };
     r.readAsDataURL(f);
     ev.target.value = '';
