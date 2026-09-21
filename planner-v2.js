@@ -3016,7 +3016,7 @@
        ═══════════════════════════════════════════════════════════════ */
     (function(){
       var nav=null, slider=null, fill=null, lastBtn=null;
-      var EASE='cubic-bezier(0.4, 0, 0.2, 1)';
+      var EASE='cubic-bezier(0.16, 1, 0.3, 1)';
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
 
       /* اگه لحظه‌ای دو دکمه active بودن، جدیدترین رو بردار */
@@ -3040,7 +3040,7 @@
         slider.dataset.tx=String(x);
         slider.dataset.ty=String(y);
         if(animate){
-          imp(slider,'transition','transform .55s '+EASE+',opacity .24s ease'+(isChat?' .3s':''));
+          imp(slider,'transition','transform .65s '+EASE+',opacity .3s ease'+(isChat?' .35s':''));
         }else{
           imp(slider,'transition','none');
         }
