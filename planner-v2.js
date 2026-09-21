@@ -3067,16 +3067,22 @@
       Math.pow(tgt.w - smooth.w, 2) +
       Math.pow(tgt.h - smooth.h, 2)
     );
-    var lerp;
-    if (dist > 250)      lerp = 0.065;
-    else if (dist > 100) lerp = 0.085;
-    else if (dist > 20)  lerp = 0.12;
-    else                 lerp = 0.18;
+   var lerp;
+    if (dist > 250)      lerp = 0.09;
+    else if (dist > 100) lerp = 0.115;
+    else if (dist > 20)  lerp = 0.16;
+    else                 lerp = 0.24;
 
     smooth.x += (tgt.x - smooth.x) * lerp;
     smooth.y += (tgt.y - smooth.y) * lerp;
     smooth.w += (tgt.w - smooth.w) * lerp;
     smooth.h += (tgt.h - smooth.h) * lerp;
+
+    /* ★ Snap: وقتی نزدیک شد، یه‌جا بچسبون (رفع لگ آخر) */
+    if (Math.abs(tgt.x - smooth.x) < 0.7) smooth.x = tgt.x;
+    if (Math.abs(tgt.y - smooth.y) < 0.7) smooth.y = tgt.y;
+    if (Math.abs(tgt.w - smooth.w) < 0.7) smooth.w = tgt.w;
+    if (Math.abs(tgt.h - smooth.h) < 0.7) smooth.h = tgt.h;
 
     /* ★ opacity خیلی نرم */
     var curOp = parseFloat(slider.dataset.op);
