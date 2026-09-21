@@ -1371,10 +1371,12 @@
             var idx=allTasks.indexOf(tk);
             var pm={high:'بالا',med:'متوسط',low:'پایین'};
             var punishBadge = tk.isPunishment ? '<span class="punishment-badge">تنبیه</span>' : '';
-            return '<div class="task-item pri-'+(tk.priority||'med')+'" onclick="window.__taskClick(event, \''+key+'\', '+idx+')">'
+            return '<div class="task-item pri-'+(tk.priority||'med')+'" data-idx="'+idx+'">'
               +'<button class="task-check" onclick="event.stopPropagation();window.__dToggleTask('+idx+')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>'
-              +'<div class="task-info"><div class="task-title">'+punishBadge+esc(tk.title)+'</div>'
+              +'<div class="task-info"><div class="task-title" ondblclick="event.stopPropagation();window.__dEditTask('+idx+')" title="دابل کلیک برای ویرایش">'+punishBadge+esc(tk.title)+'</div>'
               +'<div class="task-meta">'+(tk.time?'<span>🕐 '+esc(tk.time)+'</span>':'')+'<span class="task-badge pri-'+(tk.priority||'med')+'">'+(pm[tk.priority]||'متوسط')+'</span></div></div>'
+              +'<button class="task-edit" onclick="event.stopPropagation();window.__dEditTask('+idx+')" title="ویرایش"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/></svg></button>'
+                           +'<button class="task-remind'+(tk.remindEnabled?' on':'')+'" onclick="event.stopPropagation();window.__dToggleRemind('+idx+')" title="'+(tk.remindEnabled?'خاموش کردن یادآور':'فعال کردن یادآور')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></button>'
               +'<button class="task-del" onclick="event.stopPropagation();window.__dDeleteTask('+idx+')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>'
               +'</div>';
           }).join('')+'</div>';
@@ -1626,13 +1628,146 @@
       window.__pendingTime='';window.__pendingPri='med';
       refreshBody('left');
     };
-    window.__dDeleteTask=function(i){
+       window.__dDeleteTask=function(i){
       var pl=window.loadPlannerNew();
       var key=window.dateKey(window.plannerDate||new Date());
       var dd=window.getDayData(pl,key);
       if(!dd.tasks[i]) return;
+      /* ★ ذخیره برای Undo */
+      var deleted = JSON.parse(JSON.stringify(dd.tasks[i]));
+      var deletedIdx = i;
+      window._lastDeleted = { task: deleted, idx: deletedIdx, dayKey: key };
+      /* ★ حذف */
       dd.tasks.splice(i,1);
       window.savePlanner(pl);
+      /* ★ Toast با دکمه Undo */
+      showUndoToast('کار حذف شد', function(){
+        var pl2 = window.loadPlannerNew();
+        var dd2 = window.getDayData(pl2, key);
+        dd2.tasks.splice(deletedIdx, 0, deleted);
+        window.savePlanner(pl2);
+        refreshBody('left');
+        if (window.toast) window.toast('✓ بازیابی شد','success');
+      });
+      refreshBody('left');
+    };
+
+    function showUndoToast(msg, onUndo){
+      var old = document.getElementById('undoToast');
+      if (old) old.remove();
+      var el = document.createElement('div');
+      el.id = 'undoToast';
+      el.className = 'undo-toast';
+      el.innerHTML = '<span>'+esc(msg)+'</span><button class="undo-btn">بازگرداندن</button>';
+      document.body.appendChild(el);
+      requestAnimationFrame(function(){ el.classList.add('show'); });
+      var closed = false;
+      function close(){ if(closed) return; closed=true; el.classList.remove('show'); setTimeout(function(){ el.remove(); }, 320); }
+      el.querySelector('.undo-btn').onclick = function(){ close(); onUndo(); };
+      setTimeout(close, 5000);
+    }
+        window.__dEditTask = function(i){
+      var pl = window.loadPlannerNew();
+      var key = window.dateKey(window.plannerDate||new Date());
+      var dd = window.getDayData(pl, key);
+      if (!dd.tasks[i]) return;
+      var task = dd.tasks[i];
+      var item = document.querySelector('.task-item[data-idx="'+i+'"]');
+      if (!item) return;
+      var titleEl = item.querySelector('.task-title');
+      if (!titleEl || titleEl.dataset.editing==='1') return;
+      titleEl.dataset.editing='1';
+      var currentText = task.title;
+      titleEl.innerHTML = '<input type="text" class="task-inline-edit" value="'+esc(currentText)+'" onkeydown="if(event.key===\'Enter\'){window.__saveTaskEdit('+i+',this.value)}else if(event.key===\'Escape\'){window.__refreshCurrentTab()}">';
+      var inp = titleEl.querySelector('input');
+      if (inp) { inp.focus(); inp.select(); }
+    };
+        window.__dToggleRemind = function(i){
+      var pl = window.loadPlannerNew();
+      var key = window.dateKey(window.plannerDate||new Date());
+      var dd = window.getDayData(pl, key);
+      if (!dd.tasks[i]) return;
+      dd.tasks[i].remindEnabled = !dd.tasks[i].remindEnabled;
+      window.savePlanner(pl);
+      if (window.toast) {
+        window.toast(dd.tasks[i].remindEnabled ? '🔔 یادآور فعال شد' : '🔕 یادآور خاموش شد', 'info');
+      }
+      refreshBody('left');
+    };
+        window.__dCopyTask = function(i){
+      var pl = window.loadPlannerNew();
+      var key = window.dateKey(window.plannerDate||new Date());
+      var dd = window.getDayData(pl, key);
+      if (!dd.tasks[i]) return;
+      var task = dd.tasks[i];
+
+      /* ★ پاپ‌آپ انتخاب روز */
+      var old = document.getElementById('copyTaskPopup');
+      if (old) old.remove();
+      var el = document.createElement('div');
+      el.id = 'copyTaskPopup';
+      el.className = 'siraj-popup-overlay';
+
+      /* ★ ساخت لیست ۷ روز آینده */
+      var days = [];
+      for (var d=1; d<=7; d++){
+        var dt = new Date(window.plannerDate||new Date());
+        dt.setDate(dt.getDate()+d);
+        var dk = window.dateKey(dt);
+        var dayName = window.getDayName(dt);
+        var dateStr = dt.toLocaleDateString('fa-IR',{month:'short',day:'numeric'});
+        days.push({key:dk, label:dayName+' — '+dateStr});
+      }
+
+      el.innerHTML = '<div class="siraj-popup">'
+        +'<span class="siraj-popup-emoji">📋</span>'
+        +'<div class="siraj-popup-title">کپی «'+esc(task.title.substring(0,30))+'» به:</div>'
+        +'<div class="copy-days-list">'
+        + days.map(function(d){
+            return '<button class="copy-day-btn" onclick="window.__doCopyTask('+i+',\''+d.key+'\')">'+esc(d.label)+'</button>';
+          }).join('')
+        +'</div>'
+        +'<button class="siraj-popup-btn secondary" onclick="document.getElementById(\'copyTaskPopup\').remove()">لغو</button>'
+        +'</div>';
+      document.body.appendChild(el);
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ el.classList.add('open'); });
+      });
+    };
+
+    window.__doCopyTask = function(i, targetKey){
+      var pl = window.loadPlannerNew();
+      var srcKey = window.dateKey(window.plannerDate||new Date());
+      var src = window.getDayData(pl, srcKey);
+      if (!src.tasks[i]) return;
+      var task = src.tasks[i];
+      /* ★ کپی به روز مقصد */
+      var dst = window.getDayData(pl, targetKey);
+      dst.tasks.push({
+        id: 'tk_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        title: task.title,
+        time: task.time || '',
+        priority: task.priority || 'med',
+        done: false,
+        createdAt: Date.now()
+      });
+      window.savePlanner(pl);
+      var p = document.getElementById('copyTaskPopup');
+      if (p) p.remove();
+      if (window.toast) window.toast('✓ به روز مقصد کپی شد','success');
+      refreshBody('left');
+    };
+
+    window.__saveTaskEdit = function(i, newTitle){
+      newTitle = (newTitle||'').trim();
+      if (!newTitle) return;
+      var pl = window.loadPlannerNew();
+      var key = window.dateKey(window.plannerDate||new Date());
+      var dd = window.getDayData(pl, key);
+      if (!dd.tasks[i]) return;
+      dd.tasks[i].title = newTitle;
+      window.savePlanner(pl);
+      if (window.toast) window.toast('✓ ویرایش شد','success');
       refreshBody('left');
     };
 
