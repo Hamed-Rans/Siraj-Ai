@@ -6761,4 +6761,35 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   transform:scaleX(0.82);
   transform-origin:center center;
 }
-,
+/* ═══════════════════════════════════════════════════════════════
+   FIX: تقویم پلنر — فاصله از هدر + z-index بالاتر
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ فاصله از هدر ═══ */
+#view-planner .planner-pane > .planner-hero-card{
+  margin-top:14px!important;
+}
+
+/* ═══ z-index بالاتر تقویم + پس‌زمینه محکم ═══ */
+#view-planner .planner-pane > .planner-hero-card{
+  z-index:25!important;
+  background:var(--panel-bg)!important;
+  isolation:isolate!important;
+}
+
+/* ═══ محتوای زیر تقویم — z-index پایین‌تر ═══ */
+#view-planner .planner-body-content{
+  position:relative!important;
+  z-index:1!important;
+}
+
+/* ═══ task-add-form هم z-index پایین‌تر ═══ */
+#view-planner .task-add-form{
+  position:relative!important;
+  z-index:1!important;
+}
+
+/* ═══ اضافه: padding بالای hero card اگه sticky نبود ═══ */
+.planner-hero + .planner-pane{
+  padding-top:6px!important;
+}
