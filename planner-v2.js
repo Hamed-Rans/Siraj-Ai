@@ -2359,18 +2359,27 @@
       if(strictMode && studyRunning && studySeconds>10){showEarlyExitPopup();return;}
       doFinishRecord();
     }
-    function doFinishRecord(){
+        function doFinishRecord(){
+      /* ★ اول state رو پاک کن، بعد پاپ‌آپ نشون بده */
+      studyRunning=false;
+      studyPaused=false;
+      if(studyTimer){ clearInterval(studyTimer); studyTimer=null; }
       var m=elapsedMinutes();
       var sd=window.__studyTaskSourceDay;
       var st=window.__studyTask;
-      markSourceTaskDone();
-      if(st) showPopup('🏆','جلسه تموم شد!','«'+st+'» با '+formatMinutes(m)+' ثبت شد.');
-      else showPopup('✨','خوب بود!',formatMinutes(m)+' ثبت شد.');
-      if(studyTimer) clearInterval(studyTimer);
-      studyTimer=null;studyRunning=false;
+      try{ markSourceTaskDone(); }catch(e){}
+      /* ★ اول overlay رو ببند، بعد پاپ‌آپ */
+      try{ clearStudyChat(); }catch(e){}
+      try{ stopAudio(); }catch(e){}
+      try{ unlockSite(); }catch(e){}
+      closeStudy();
+      /* ★ پاپ‌آپ موفقیت بعد از بستن overlay */
+      setTimeout(function(){
+        if(st) showPopup('🏆','جلسه تموم شد!','«'+st+'» با '+formatMinutes(m)+' ثبت شد.');
+        else showPopup('✨','خوب بود!',formatMinutes(m)+' ثبت شد.');
+      }, 200);
       window.__studyTask='';window.__studyTaskSourceId=null;window.__studyTaskSourceDay=null;
-      clearStudyChat();stopAudio();unlockSite();closeStudy();
-      if(sd) setTimeout(function(){maybeCelebrate(sd);},500);
+      if(sd) setTimeout(function(){maybeCelebrate(sd);},800);
     }
     function showEarlyExitPopup(){
       var old=document.getElementById('earlyExitPopup');if(old) old.remove();
@@ -2462,26 +2471,28 @@
         }
       };
     }
-            async function checkReasonWithAI(reason){
+               async function checkReasonWithAI(reason){
       try{
-        var prompt = 'یه دانشجو توی حالت مطالعه بود و قبل از تموم شدن تایمر، دکمه «پایان» رو زده. دلیلش اینه:\n\n'
-          +'"'+reason+'"\n\n'
-          +'═══ معیار ارزیابی ═══\n'
-          +'✅ موجه (پاسخ: بله):\n'
-          +'• بیماری، سردرد شدید، دل درد، حالت تهوع\n'
-          +'• حادثه یا اتفاق ناگهانی\n'
-          +'• کار خیلی ضروری (کاری، اداری، خانوادگی)\n'
-          +'• مهمون ناخونده، تماس ضروری\n'
+        var prompt = 'کاربر توی حالت مطالعه بود و قبل از تموم شدن تایمر، دکمه پایان رو زده. دلیلش:\n\n'
+          +'«'+reason+'»\n\n'
+          +'═══ وظیفه تو ═══\n'
+          +'بررسی کن آیا این یه دلیل «واقعی و موجه» هست یا نه.\n\n'
+          +'✅ فقط اینا موجه‌ان (پاسخ: بله):\n'
+          +'• بیماری ناگهانی (سردرد شدید، دل‌درد، حالت تهوع، تب)\n'
+          +'• حادثه، اتفاق غیرمنتظره\n'
+          +'• کار اداری/خانوادگی فوق‌ضروری\n'
+          +'• تماس یا مهمون ناخونده‌ی مهم\n'
           +'• مشکل جسمی یا روحی جدی\n'
-          +'• گرسنگی شدید، خواب‌آلودگی غیرقابل کنترل، دستشویی\n'
-          +'• هر دلیل منطقی که بیشتر از ۱۰ کاراکتر باشه\n\n'
-          +'❌ غیرموجه (پاسخ: خیر):\n'
-          +'• «حوصله ندارم»، «حوصلش نیست»، «دوست ندارم»، «نمیخوام»\n'
-          +'• «خسته‌ام» بدون توضیح بیشتر\n'
-          +'• «بسه»، «کافیه»، «ولش کن»\n'
-          +'• دلایل تک‌کلمه‌ای یا بی‌معنی\n\n'
-          +'═══ قاعده کلی ═══\n'
-          +'اگه دلیل شامل کلمات بالا نبود و بیشتر از ۸ کاراکتر داشت، «بله» بده. فقط دلایل واضح الکی رو رد کن.\n\n'
+          +'• دستشویی، گرسنگی شدید، خواب‌آلودگی غیرقابل کنترل\n\n'
+          +'❌ هر چیز دیگه غیرموجهه (پاسخ: خیر):\n'
+          +'• جملات بی‌ربط، نامفهوم، تایپی\n'
+          +'• «می‌خوام برم»، «باید برم»، «حوصله ندارم»، «خسته‌ام»\n'
+          +'• «ولش کن»، «بسه»، «کافیه»\n'
+          +'• دلیل کوتاه‌تر از ۱۵ کاراکتر\n'
+          +'• دلیل تکراری، ساختگی، الکی\n'
+          +'• جملاتی که کلماتشون به هم ربط ندارن\n\n'
+          +'═══ قاعده سخت‌گیرانه ═══\n'
+          +'فقط اگه دلیل واقعاً یکی از موارد موجه بالا بود، «بله» بده. هر شک و تردیدی داشتی → «خیر» بده.\n'
           +'فقط با یک کلمه جواب بده: «بله» یا «خیر».';
 
         var res = await fetch(getBaseURL(),{
@@ -2490,13 +2501,13 @@
           body:JSON.stringify({
             model:getModel(),
             messages:[
-              {role:'system',content:'تو یه ارزیاب منصف و آسان‌گیر هستی. به اکثر دلایل منطقی «بله» بگو. فقط دلایل واضح الکی رو رد کن. فقط با «بله» یا «خیر» جواب بده.'},
+              {role:'system',content:'تو یه ارزیاب سخت‌گیر و دقیق هستی. فقط دلایل واقعاً موجه رو قبول کن. جملات بی‌ربط و الکی رو رد کن. فقط با «بله» یا «خیر» جواب بده.'},
               {role:'user',content:prompt}
             ],
-            temperature:0.2, stream:false, max_tokens:10
+            temperature:0.1, stream:false, max_tokens:10
           })
         });
-        if(!res.ok){ return { valid: reason.length >= 8 }; }
+        if(!res.ok){ return { valid: false }; }  /* ★ خطای شبکه = غیرموجه */
         var data = await res.json();
         var ans = '';
         if(data.choices && data.choices[0]){
@@ -2510,24 +2521,30 @@
         var hasYes = (ans.indexOf('بله') > -1) || (ans.indexOf('آری') > -1) || (lower.indexOf('yes') > -1);
         if(hasNo && !hasYes) return { valid: false };
         if(hasYes && !hasNo) return { valid: true };
-        /* fallback منطقی */
-        if(reason.length < 8) return { valid: false };
-        var vague = ['حوصله ندارم','حوصلش نیست','حوصله نمی‌کنم','دوست ندارم','نمیخوام','بسه','کافیه'];
-        for(var i=0;i<vague.length;i++){
-          if(reason.indexOf(vague[i]) > -1 && reason.length < 22) return { valid: false };
-        }
-        return { valid: true };
-      }catch(e){ return { valid: true }; }
+        /* ★ پیش‌فرض = غیرموجه (سخت‌گیرانه) */
+        return { valid: false };
+      }catch(e){ return { valid: false }; }
     }
-           function closeStudy(){
+               function closeStudy(){
+      /* ★ پاکسازی فوری همه‌چیز */
       try{stopAudio();}catch(e){}
-      var o=document.getElementById('studyOverlay');
-      var chat=document.getElementById('studyChatPanel');
-      var tools=document.getElementById('studyToolsPanel');
-      var lib=document.getElementById('studyLibraryPanel');
-      if(chat) chat.remove();
-      if(tools) tools.remove();
-      if(lib) lib.remove();
+      try{
+        var overlay=document.getElementById('studyOverlay');
+        var chat=document.getElementById('studyChatPanel');
+        var tools=document.getElementById('studyToolsPanel');
+        var lib=document.getElementById('studyLibraryPanel');
+        var exitP=document.getElementById('exitReasonPopup');
+        var earlyP=document.getElementById('earlyExitPopup');
+        var choiceP=document.getElementById('notifChoicePopup');
+        var popup=document.getElementById('sirajPopup');
+        if(chat) chat.remove();
+        if(tools) tools.remove();
+        if(lib) lib.remove();
+        if(exitP) exitP.remove();
+        if(earlyP) earlyP.remove();
+        if(choiceP) choiceP.remove();
+        if(popup) popup.remove();
+      }catch(e){}
       if(_studyDragHandlers){
         try{
           document.removeEventListener('mousemove',_studyDragHandlers.move);
@@ -2537,30 +2554,35 @@
         }catch(e){}
         _studyDragHandlers=null;
       }
-      /* ★ ریست کامل state قبل از بستن */
-      if(studyTimer){ clearInterval(studyTimer); studyTimer=null; }
-      studyRunning=false;
-      studyPaused=false;
-      studySeconds=0;
-      studyTotalMinutes=0;
-      window.__studyTask='';
-      window.__studyTaskSourceId=null;
-      window.__studyTaskSourceDay=null;
-      try{ unlockSite(); }catch(e){}
-      /* ★ پاک کردن هر پاپ‌آپی که بازه */
-      var exitP=document.getElementById('exitReasonPopup');
-      if(exitP) exitP.remove();
-      var earlyP=document.getElementById('earlyExitPopup');
-      if(earlyP) earlyP.remove();
-      if(!o) return;
-      /* ★ بدون گارد dataset.closing */
-      o.classList.remove('open');
-      o.style.transition='opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.4,0,.2,1), visibility .45s';
-      setTimeout(function(){ if(o.parentNode) o.remove(); }, 620);
+      /* ★ ریست state */
+      try{
+        if(studyTimer){ clearInterval(studyTimer); studyTimer=null; }
+        studyRunning=false;
+        studyPaused=false;
+        studySeconds=0;
+        studyTotalMinutes=0;
+        window.__studyTask='';
+        window.__studyTaskSourceId=null;
+        window.__studyTaskSourceDay=null;
+        unlockSite();
+      }catch(e){}
+      /* ★ حذف overlay با انیمیشن */
+      var o=document.getElementById('studyOverlay');
+      if(o){
+        o.style.transition='opacity .35s ease, transform .35s ease';
+        o.style.opacity='0';
+        o.style.transform='scale(.94)';
+        setTimeout(function(){
+          if(o.parentNode) o.remove();
+        }, 380);
+      }
+      /* ★ رفرش پنل */
       setTimeout(function(){
-        if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
-        refreshBody('left');
-      }, 380);
+        try{
+          if(typeof window.renderPanelForPlanner==='function') window.renderPanelForPlanner();
+          if(typeof refreshBody==='function') refreshBody('left');
+        }catch(e){}
+      }, 420);
     }
     function blockKey(e){
       if(!studyRunning) return;
