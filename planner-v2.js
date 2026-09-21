@@ -3011,49 +3011,16 @@
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
+        /* ═══════════════════════════════════════════════════════════════
        NAV SLIDER
        ═══════════════════════════════════════════════════════════════ */
-        (function(){
-      /* true = پس‌زمینه و لیبل دکمه بعد از عوض‌شدن صفحه شروع می‌شن (بدون گیر وسط حرکت)
-         false = هم‌زمان با کلیک شروع می‌شن */
-      var SYNC_WITH_SWAP=true;
-
-      var nav=null, slider=null, fill=null;
-      var cur=null;
-      var lastBtn=null;
-      var fromBtn=null, rel=null;
-      var animating=false, animT=0, lastNow=0;
-      var raf=0, settleUntil=0;
-      var DUR=480;
+    (function(){
+      var nav=null, slider=null, fill=null, lastBtn=null;
+      var EASE='cubic-bezier(.3,.5,.2,1)';
 
       function imp(el,prop,val){ el.style.setProperty(prop,val,'important'); }
-      /* منحنی نرم: شروع ملایم، بدون جهش، فرود آرام (cubic-bezier .3,.5,.2,1) */
-      var ease=(function(x1,y1,x2,y2){
-        function A(a,b){return 1-3*b+3*a} function B(a,b){return 3*b-6*a} function C(a){return 3*a}
-        function calc(t,a,b){return ((A(a,b)*t+B(a,b))*t+C(a))*t}
-        function slope(t,a,b){return 3*A(a,b)*t*t+2*B(a,b)*t+C(a)}
-        return function(x){
-          if(x<=0) return 0; if(x>=1) return 1;
-          var t=x;
-          for(var i=0;i<8;i++){ var s=slope(t,x1,x2); if(Math.abs(s)<1e-6) break; t-=(calc(t,x1,x2)-x)/s; }
-          return calc(t,y1,y2);
-        };
-      })(.3,.5,.2,1);
-      function copy(o){ return {l:o.l,r:o.r,t:o.t,b:o.b}; }
 
-      function box(btn){
-        var l=btn.offsetLeft, t=btn.offsetTop;
-        return {l:l, r:l+btn.offsetWidth, t:t, b:t+btn.offsetHeight};
-      }
-      function padY(){
-        var pos=document.documentElement.getAttribute('data-nav-position')||'bottom';
-        return (pos==='left'||pos==='right')?2:4;
-      }
-      function target(btn){
-        var bx=box(btn), py=padY();
-        return { l:bx.l, r:bx.r, t:bx.t-py, b:bx.b+py, chat:btn.classList.contains('nav-btn-chat') };
-      }
+      /* اگه لحظه‌ای دو دکمه active بودن، جدیدترین رو بردار */
       function activeBtn(){
         var list=nav.querySelectorAll('.bottom-nav-btn.active');
         if(!list.length) return null;
@@ -3062,61 +3029,40 @@
         return list[0];
       }
 
-      function frame(now){
-        raf=0;
+      /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
+      function place(btn,animate){
+        if(!btn||!slider) return;
+        var isChat=btn.classList.contains('nav-btn-chat');
+        var pw=slider.offsetWidth, ph=slider.offsetHeight;
+        var x=btn.offsetLeft+(btn.offsetWidth-pw)/2;
+        var y=btn.offsetTop+(btn.offsetHeight-ph)/2;
+        if(animate){
+          /* رفتن روی دکمه‌ی هوش مصنوعی: اول برسه، بعد محو بشه */
+          imp(slider,'transition','transform .48s '+EASE+',opacity .24s ease'+(isChat?' .3s':''));
+        }else{
+          imp(slider,'transition','none');
+        }
+        imp(slider,'transform','translate3d('+x+'px,'+y+'px,0)');
+        imp(slider,'opacity',isChat?'0':'1');
+      }
+
+      function sync(){
         if(!nav||!slider) return;
-        var dt=lastNow?(now-lastNow):16; lastNow=now;
         var btn=activeBtn();
         if(!btn){ imp(slider,'opacity','0'); return; }
-        var tg=target(btn);
-
-        if(!cur){
-          cur=copy(tg); lastBtn=btn;
-        }else{
-          if(btn!==lastBtn){
-            var ob=box(lastBtn);
-            rel={ l:cur.l-ob.l, r:cur.r-ob.r, t:cur.t-ob.t, b:cur.b-ob.b };
-            fromBtn=lastBtn; lastBtn=btn; animT=0; animating=true; dt=0;
-          }
-          if(animating){
-            /* ساعت انیمیشن: اگه مرورگر وسط کار گیر کرد، انیمیشن نمی‌پره، از همون‌جا ادامه می‌ده */
-            if(dt>60 && window.console) console.warn('[nav] hitch '+Math.round(dt)+'ms (at '+Math.round(animT)+'ms of '+DUR+')');
-            animT+=Math.min(dt,32);
-            var p=Math.min(1,animT/DUR), e=ease(p);
-            var fb=box(fromBtn);
-            var fl=fb.l+rel.l, fr=fb.r+rel.r, ft=fb.t+rel.t, fbt=fb.b+rel.b;
-            cur.l=fl+(tg.l-fl)*e;
-            cur.r=fr+(tg.r-fr)*e;
-            cur.t=ft+(tg.t-ft)*e;
-            cur.b=fbt+(tg.b-fbt)*e;
-            if(p>=1) animating=false;
-          }else{
-            cur=copy(tg);
-          }
+        if(btn!==lastBtn){
+          var first=!lastBtn;
+          lastBtn=btn;
+          place(btn,!first);
         }
-
-        slider.style.width=Math.max(0,cur.r-cur.l)+'px';
-        slider.style.height=Math.max(0,cur.b-cur.t)+'px';
-        imp(slider,'transform','translate3d('+cur.l+'px,'+cur.t+'px,0)');
-        /* روی دکمه‌ی هوش مصنوعی: اول کامل می‌رسه، بعد محو می‌شه */
-        imp(slider,'opacity',(tg.chat&&!animating)?'0':'1');
-
-        if(animating||now<settleUntil){ raf=requestAnimationFrame(frame); }
-        else{ lastNow=0; }
       }
-
-      function kick(snap){
-        if(snap){ cur=null; animating=false; lastBtn=null; fromBtn=null; rel=null; }
-        settleUntil=performance.now()+900;
-        if(!raf) raf=requestAnimationFrame(frame);
+      function snap(){
+        if(!nav||!slider) return;
+        var btn=activeBtn(); if(!btn) return;
+        lastBtn=btn; place(btn,false);
       }
-      window.__moveNavSlider=function(){ kick(false); };
-
-            /* فعال‌کردن دکمه‌ی یک صفحه:
-         صبر می‌کنه تا فریم‌های سنگینِ تعویض صفحه تموم بشن (۲ فریم پشت‌سرهم سالم)، بعد شروع می‌کنه.
-         اینجوری انیمیشن نوار روی مرورگرِ آروم شروع می‌شه و اول کار نمی‌پره. */
-      var waitRaf=0, pendingView=null;
-      function doActivate(view){
+      window.__moveNavSlider=function(){ sync(); };
+      window.__navActivate=function(view){
         if(!nav) return;
         var tgt=null;
         nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){
@@ -3125,24 +3071,7 @@
         if(!tgt) return;
         nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){ b.classList.remove('active'); });
         tgt.classList.add('active');
-        kick(false);
-      }
-      window.__navActivate=function(view){
-        pendingView=view;
-        if(waitRaf) return;
-        var last=0, calm=0, start=performance.now();
-        function w(now){
-          var dt=last?(now-last):999; last=now;
-          calm=(dt<24)?calm+1:0;
-          if(calm>=2 || now-start>350){
-            waitRaf=0;
-            if(window.console && now-start>120) console.log('[nav] waited '+Math.round(now-start)+'ms for calm frames');
-            doActivate(pendingView);
-            return;
-          }
-          waitRaf=requestAnimationFrame(w);
-        }
-        waitRaf=requestAnimationFrame(w);
+        sync();
       };
 
       function initNavSlider(){
@@ -3154,26 +3083,28 @@
         fill=document.createElement('div');
         fill.className='nav-slider-fill';
         slider.appendChild(fill);
-        imp(slider,'transition','opacity .25s ease');
+        imp(slider,'will-change','transform,opacity');
         imp(slider,'opacity','0');
         nav.insertBefore(slider,nav.firstChild);
 
+        /* کلیک: هم‌زمان فعال بشه (حرکت روی GPU اجرا می‌شه و به سنگینی عوض‌شدن صفحه ربطی نداره) */
         nav.addEventListener('click',function(e){
-          if(SYNC_WITH_SWAP) return;
           var btn=e.target.closest('.bottom-nav-btn[data-view]');
           if(!btn) return;
           nav.querySelectorAll('.bottom-nav-btn').forEach(function(b){b.classList.remove('active');});
           btn.classList.add('active');
-          kick(false);
+          sync();
         },true);
 
-        new MutationObserver(function(){kick(false);}).observe(nav,{attributes:true,attributeFilter:['class'],subtree:true});
-        var row=document.getElementById('navRow');
-        if(row) new MutationObserver(function(){kick(false);}).observe(row,{attributes:true,attributeFilter:['class']});
-        new MutationObserver(function(){kick(true);}).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position','data-nav-style']});
-        window.addEventListener('resize',function(){kick(true);});
-        if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){kick(true);});
-        setTimeout(function(){kick(true);},150);
+        /* تغییر active از هرجای دیگه (مثلاً script.js) */
+        new MutationObserver(sync).observe(nav,{attributes:true,attributeFilter:['class'],subtree:true});
+
+        /* عوض‌شدن موقعیت نوار، تغییر اندازه، لود فونت: بدون حرکت جابه‌جا کن */
+        function resnap(){ snap(); setTimeout(snap,350); setTimeout(snap,800); }
+        new MutationObserver(resnap).observe(document.documentElement,{attributes:true,attributeFilter:['data-nav-position','data-nav-style']});
+        window.addEventListener('resize',resnap);
+        if(document.fonts&&document.fonts.ready) document.fonts.ready.then(snap);
+        setTimeout(snap,150);
         return true;
       }
 
@@ -3182,7 +3113,8 @@
         setTimeout(function(){ clearInterval(t); },8000);
       }
     })();
-            /* ★ انیمیشن سوییچ view */
+
+    /* ★ انیمیشن سوییچ view */
     (function(){
       function hook(){
         if(typeof window.switchView!=='function') return false;
@@ -3203,7 +3135,6 @@
           var newIdx=VIEW_ORDER.indexOf(view);
           if(!oldEl||!newEl||oldIdx===-1||newIdx===-1){
             orig.apply(this,arguments);
-            if(typeof window.__navActivate==='function') window.__navActivate(view);
             _currentMainView=view;
             if(typeof window.__moveNavSlider==='function') setTimeout(window.__moveNavSlider,60);
             return;
@@ -3222,7 +3153,6 @@
           oldEl.style.pointerEvents='none';
           window.switchView.__t1=setTimeout(function(){
             orig.apply(window,origArgs);
-            if(typeof window.__navActivate==='function') window.__navActivate(view);
             _currentMainView=view;
             newEl.classList.add(inClass);
             setTimeout(injectMainTopActions,10);
