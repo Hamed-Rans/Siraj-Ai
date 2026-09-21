@@ -2098,7 +2098,7 @@
         +'<span class="panel-btn-icon">'+SI_ICONS.library+'</span>'
         +'<div style="text-align:right;flex:1"><div>کتابخانه یادگیری</div><div style="font-size:11px;opacity:.85;font-weight:600;margin-top:3px">یادگرفته‌ها و تمرین‌ها'+(lc+pc>0?' · '+toFa(lc+pc)+' آیتم':'')+'</div></div>'
         +'</button>'
-        +'<div class="panel-card guide-card" style="margin-top:10px">'
+        +'<div class="panel-card guide-card">'
         +'<div class="card-title"><span class="title-icon">'+SI_ICONS.bookOpen+'</span>راهنما</div>'
         +'<div class="guide-list">'
         +'<div class="guide-item"><span class="guide-icon">'+SI_ICONS.sparkle+'</span>روی حالت مطالعه بزن</div>'
