@@ -6926,3 +6926,73 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   60%{transform:translateX(7px)}
   75%{transform:translateX(-3px)}
 }
+/* ═══════════════════════════════════════════════════════════════
+   EXIT REASON — هشدار: ایموجی چسبیده به متن
+   ═══════════════════════════════════════════════════════════════ */
+.exit-reason-warning{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:8px!important;
+  direction:rtl!important;
+  padding:10px 14px!important;
+  text-align:right!important;
+}
+.exit-reason-warning > .erw-emoji{
+  order:0!important;
+  margin:0!important;
+  padding:0!important;
+  flex-shrink:0!important;
+}
+.exit-reason-warning > span:not(.erw-emoji){
+  order:1!important;
+  flex:0 1 auto!important;
+  text-align:right!important;
+  margin:0!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS BEHAVIOR — فیکس دکمه‌های تب تنظیمات
+   ═══════════════════════════════════════════════════════════════ */
+[data-cat="behavior"] .row-btn{
+  min-height:76px!important;
+  max-height:76px!important;
+  padding:10px 8px!important;
+  border-radius:14px!important;
+  overflow:hidden!important;
+  gap:6px!important;
+  justify-content:center!important;
+}
+[data-cat="behavior"] .row-btn > span:first-child{
+  font-size:22px!important;
+  line-height:1!important;
+  display:block!important;
+  height:22px!important;
+}
+[data-cat="behavior"] .row-btn .rb-label{
+  font-size:11px!important;
+  line-height:1.2!important;
+  display:block!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  max-width:100%!important;
+}
+
+/* ═══ گریدها ═══ */
+[data-cat="behavior"] .setting-group .row-btns{
+  display:grid!important;
+  gap:8px!important;
+}
+[data-cat="behavior"] .setting-group .row-btns[style*="1fr 1fr 1fr"]{
+  grid-template-columns:repeat(3,1fr)!important;
+}
+[data-cat="behavior"] .setting-group .row-btns[style*="1fr 1fr"]{
+  grid-template-columns:repeat(2,1fr)!important;
+}
+
+/* ═══ فعال/غیرفعال اعلان‌ها (2 دکمه‌ای) ═══ */
+[data-cat="behavior"] .setting-group > div[style*="display:grid"][style*="1fr 1fr"]{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+}
