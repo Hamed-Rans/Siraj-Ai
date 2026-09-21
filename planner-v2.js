@@ -3029,13 +3029,12 @@
       }
 
       /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
-      function place(btn,animate){
+            function place(btn,animate){
         if(!btn||!slider) return;
         var isChat = btn.classList.contains('nav-btn-chat');
         var wasChat = slider.dataset.wasChat === '1';
         slider.dataset.wasChat = isChat ? '1' : '0';
 
-        /* ★ اندازه‌گیری دقیق با getBoundingClientRect */
         var navRect = nav.getBoundingClientRect();
         var btnRect = btn.getBoundingClientRect();
         var bw = Math.round(btnRect.width);
@@ -3059,39 +3058,35 @@
         var dy = y - prevY;
         var dist = Math.sqrt(dx*dx + dy*dy);
 
-        /* ★★ easing مناسب بر اساس فاصله ★★ */
-        var EASE_NEAR = 'cubic-bezier(0.16, 1, 0.3, 1)';   /* easeOutExpo — عالی برای فاصله کوتاه */
-        var EASE_FAR  = 'cubic-bezier(0.45, 0, 0.25, 1)';   /* easeInOut — عالی برای فاصله بلند */
-        var ease = dist > 180 ? EASE_FAR : EASE_NEAR;
-
-        /* ★★ مدت زمان متناسب با فاصله ★★ */
-        var dur = Math.min(1.0, 0.5 + dist * 0.00085);
+        /* ★ مدت زمان طولانی‌تر برای فواصل دور */
+        var dur = Math.min(1.1, 0.55 + dist * 0.0009);
         var durStr = dur.toFixed(2)+'s';
+        var EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'; /* easeOutExpo */
 
         if(!animate){
           imp(slider,'transition','none');
         } else if(isChat){
-          /* رفتن به FAB: حرکت کن، قبل رسیدن محو شو */
+          /* رفتن به FAB: قبل از رسیدن محو شو */
           var fadeDelay = (dur * 0.55).toFixed(2)+'s';
           var fadeDur = (dur * 0.4).toFixed(2)+'s';
           imp(slider,'transition',
-            'transform '+durStr+' '+ease+
-            ',width '+durStr+' '+ease+
-            ',height '+durStr+' '+ease+
+            'transform '+durStr+' '+EASE+
+            ',width '+durStr+' '+EASE+
+            ',height '+durStr+' '+EASE+
             ',opacity '+fadeDur+' ease '+fadeDelay);
         } else if(wasChat){
           /* برگشت از FAB: سریع ظاهر شو، بعد حرکت کن */
           imp(slider,'transition',
             'opacity .18s ease 0s'+
-            ',transform '+durStr+' '+ease+' .1s'+
-            ',width '+durStr+' '+ease+' .1s'+
-            ',height '+durStr+' '+ease+' .1s');
+            ',transform '+durStr+' '+EASE+' .1s'+
+            ',width '+durStr+' '+EASE+' .1s'+
+            ',height '+durStr+' '+EASE+' .1s');
         } else {
           /* حالت عادی */
           imp(slider,'transition',
-            'transform '+durStr+' '+ease+
-            ',width '+durStr+' '+ease+
-            ',height '+durStr+' '+ease+
+            'transform '+durStr+' '+EASE+
+            ',width '+durStr+' '+EASE+
+            ',height '+durStr+' '+EASE+
             ',opacity .26s ease');
         }
 
