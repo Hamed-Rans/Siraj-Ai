@@ -6745,3 +6745,11 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   gap:2px!important;
   padding:6px 4px!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   NAV SLIDER — باریک‌تر کردن بیضی در حالت چپ/راست
+   ═══════════════════════════════════════════════════════════════ */
+[data-nav-position="left"] .nav-slider-fill,
+[data-nav-position="right"] .nav-slider-fill{
+  transform:scaleX(0.82);
+  transform-origin:center center;
+}
