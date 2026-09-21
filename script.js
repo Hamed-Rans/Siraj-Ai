@@ -1997,7 +1997,9 @@ function syncLockTypedRow(val, mode) {
     var chars = String(val || '').split('');
     var existing = row.querySelectorAll('.lock-typed-char');
 
+    /* ═══ موفقیت / خطا — کل کادرها رو رنگی کن ═══ */
     if (mode === 'success' || mode === 'error') {
+        row.classList.add(mode === 'success' ? 'lock-row-success' : 'lock-row-error');
         existing.forEach(function (c) {
             c.classList.remove('success', 'error');
             c.classList.add(mode);
@@ -2005,6 +2007,7 @@ function syncLockTypedRow(val, mode) {
         return;
     }
 
+    /* ═══ خالی: cursor چشمک‌زن ═══ */
     if (chars.length === 0) {
         row.innerHTML = '<div class="lock-cursor"></div>';
         return;
@@ -2012,11 +2015,12 @@ function syncLockTypedRow(val, mode) {
     var cursor = row.querySelector('.lock-cursor');
     if (cursor) cursor.remove();
 
+    /* ═══ کم شد؟ ═══ */
     if (chars.length < existing.length) {
         for (var i = existing.length - 1; i >= chars.length; i--) {
             (function (el) {
                 el.classList.add('erasing');
-                setTimeout(function () { if (el.parentNode) el.remove(); }, 280);
+                setTimeout(function () { if (el.parentNode) el.remove(); }, 240);
             })(existing[i]);
         }
         for (var j = 0; j < chars.length && j < existing.length; j++) {
@@ -2029,6 +2033,7 @@ function syncLockTypedRow(val, mode) {
         return;
     }
 
+    /* ═══ اضافه شد ═══ */
     for (var k = 0; k < chars.length; k++) {
         if (existing[k]) {
             if (existing[k].dataset.raw !== chars[k]) {
@@ -2042,6 +2047,7 @@ function syncLockTypedRow(val, mode) {
             el.dataset.raw = chars[k];
             el.textContent = chars[k];
             row.appendChild(el);
+            /* ★ بعد از ۷۰۰ میلی‌ثانیه تبدیل به نقطه */
             (function (e) {
                 setTimeout(function () {
                     if (e.parentNode && !e.classList.contains('erasing')) {
@@ -2052,15 +2058,14 @@ function syncLockTypedRow(val, mode) {
                                 e.classList.remove('masking');
                                 e.classList.add('masked');
                             }
-                        }, 240);
+                        }, 200);
                     }
-                }, 1000);
+                }, 700);
             })(el);
         }
     }
 }
 window.syncLockTypedRow = syncLockTypedRow;
-
 function tryUnlock() {
     const inp = document.getElementById('lockInput');
     const err = document.getElementById('lockError');
