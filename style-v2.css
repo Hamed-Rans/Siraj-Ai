@@ -6561,3 +6561,17 @@ body.kb-open #box{
 #profileAvatarPreview:hover{
   opacity:.9;
 }
+.bottom-nav-btn:not(.nav-btn-chat){
+  transition:
+    max-width .48s cubic-bezier(.3,.5,.2,1),
+    padding .48s cubic-bezier(.3,.5,.2,1),
+    background .3s ease,color .3s ease,border-color .3s ease,
+    box-shadow .4s ease,transform .25s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.bottom-nav-btn::after{
+  transition:
+    max-width .48s cubic-bezier(.3,.5,.2,1),
+    max-height .48s cubic-bezier(.3,.5,.2,1),
+    opacity .3s ease,
+    margin .48s cubic-bezier(.3,.5,.2,1)!important;
+}
