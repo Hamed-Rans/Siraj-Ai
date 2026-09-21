@@ -2,7 +2,7 @@
    Siraj PWA Service Worker — Version-based Cache
    هر بار این نسخه رو عوض کنی، SW آپدیت می‌شه
    ═══════════════════════════════════════════════════════════════ */
-const VERSION = '2.5.30';
+const VERSION = '2.5.31';
 const CACHE = 'siraj-v' + VERSION;
 
 const ASSETS = [
