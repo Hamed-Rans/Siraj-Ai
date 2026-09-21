@@ -6852,3 +6852,77 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   border-color:var(--accent)!important;
   box-shadow:0 4px 14px -8px var(--accent)!important;
 }
+.exit-reason-checking{
+  text-align:center!important;
+  line-height:1.9!important;
+  padding:20px 16px!important;
+  font-size:12.5px!important;
+}
+.exit-reason-checking span{
+  display:block!important;
+  margin-top:10px!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   LOCK SCREEN — انیمیشن دونه‌دونه + موفقیت/خطا
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ تبدیل عدد به نقطه با چرخش ═══ */
+.lock-typed-char.masking{
+  animation:lockCharMasking .22s cubic-bezier(.4,0,.6,1) forwards;
+}
+@keyframes lockCharMasking{
+  0%{transform:scale(1) rotate(0);opacity:1}
+  50%{transform:scale(.55) rotate(-180deg);opacity:.6}
+  100%{transform:scale(1) rotate(-360deg);opacity:1}
+}
+
+.lock-typed-char.masked{
+  background:linear-gradient(160deg,rgba(88,166,255,.55),rgba(37,99,235,.85))!important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.35),
+    0 4px 12px -6px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.18)!important;
+  font-size:18px!important;
+  color:rgba(255,255,255,.85)!important;
+}
+
+/* ═══ موفقیت: همه کادرها سبز با موج ═══ */
+.lock-row-success .lock-typed-char{
+  background:linear-gradient(160deg,#3FB950 0%,#1A7F37 100%)!important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.3),
+    0 6px 18px -6px #3FB950,
+    inset 0 1px 0 rgba(255,255,255,.25)!important;
+  animation:lockPinSuccess .5s cubic-bezier(.34,1.4,.64,1) both;
+}
+.lock-row-success .lock-typed-char:nth-child(1){animation-delay:0s}
+.lock-row-success .lock-typed-char:nth-child(2){animation-delay:.08s}
+.lock-row-success .lock-typed-char:nth-child(3){animation-delay:.16s}
+.lock-row-success .lock-typed-char:nth-child(4){animation-delay:.24s}
+.lock-row-success .lock-typed-char:nth-child(5){animation-delay:.32s}
+.lock-row-success .lock-typed-char:nth-child(6){animation-delay:.40s}
+@keyframes lockPinSuccess{
+  0%{transform:scale(1) translateY(0)}
+  50%{transform:scale(1.2) translateY(-8px)}
+  100%{transform:scale(1) translateY(0)}
+}
+
+/* ═══ خطا: همه کادرها قرمز + لرزش کل ردیف ═══ */
+.lock-row-error .lock-typed-char{
+  background:linear-gradient(160deg,#F85149 0%,#DA3633 100%)!important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.3),
+    0 6px 18px -6px #F85149,
+    inset 0 1px 0 rgba(255,255,255,.2)!important;
+}
+.lock-row-error{
+  animation:lockRowShake .55s cubic-bezier(.4,0,.6,1) both;
+}
+@keyframes lockRowShake{
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-10px)}
+  30%{transform:translateX(10px)}
+  45%{transform:translateX(-7px)}
+  60%{transform:translateX(7px)}
+  75%{transform:translateX(-3px)}
+}
