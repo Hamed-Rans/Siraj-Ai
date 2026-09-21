@@ -3029,18 +3029,24 @@
       }
 
       /* پس‌زمینه رو وسط دکمه بذار. animate=false یعنی بدون حرکت (اسنپ) */
-        function place(btn,animate){
+              function place(btn,animate){
         if(!btn||!slider) return;
         var isChat=btn.classList.contains('nav-btn-chat');
         var pw=slider.offsetWidth, ph=slider.offsetHeight;
         var x=btn.offsetLeft+(btn.offsetWidth-pw)/2;
         var y=btn.offsetTop+(btn.offsetHeight-ph)/2;
-        /* ★ اگه همون مقصد قبلیه، دوباره اجرا نکن (رفع پرش) */
+        /* اگه همون مقصد قبلیه، دوباره اجرا نکن */
         if(slider.dataset.tx==String(x) && slider.dataset.ty==String(y)) return;
+        /* ★ فاصله از موقعیت قبلی رو حساب کن */
+        var prevX = parseFloat(slider.dataset.tx) || x;
+        var prevY = parseFloat(slider.dataset.ty) || y;
+        var dist = Math.sqrt(Math.pow(x-prevX, 2) + Math.pow(y-prevY, 2));
         slider.dataset.tx=String(x);
         slider.dataset.ty=String(y);
+        /* ★ مدت زمان پویا: کوتاه = 0.5s، بلند = تا 0.85s */
+        var dur = Math.min(0.85, 0.5 + dist * 0.0006);
         if(animate){
-          imp(slider,'transition','transform .65s '+EASE+',opacity .3s ease'+(isChat?' .35s':''));
+          imp(slider,'transition','transform '+dur.toFixed(2)+'s '+EASE+',opacity .3s ease'+(isChat?' .35s':''));
         }else{
           imp(slider,'transition','none');
         }
