@@ -2469,22 +2469,45 @@ function clearBgImage() {
 function handleProfileUpload(ev) {
     const f = ev.target.files ? ev.target.files[0] : null;
     if (!f) return;
-    if (f.size > 1.5 * 1024 * 1024) { toast('حجم عکس زیاد است (حداکثر ۱.۵ مگابایت)', 'error'); return; }
+    if (f.size > 1.5 * 1024 * 1024) {
+        toast('حجم عکس زیاد است (حداکثر ۱.۵ مگابایت)', 'error');
+        return;
+    }
     const r = new FileReader();
     r.onload = e => {
-        if (!settingsDraft) return;
-        settingsDraft.profileImage = e.target.result;
+        var dataUrl = e.target.result;
+
+        /* ★ آپدیت settings اصلی (نه فقط draft) */
+        settings.profileImage = dataUrl;
+        saveSettings();
+        try { localStorage.setItem(PROFILE_IMG_KEY, dataUrl); } catch(err) {}
+
+        /* ★ آپدیت draft هم اگه هست */
+        if (settingsDraft) settingsDraft.profileImage = dataUrl;
+
         /* ★ آپدیت فوری preview */
         var preview = document.getElementById('profileAvatarPreview');
         if (preview) {
-            preview.innerHTML = '<img src="' + e.target.result + '" alt="">';
+            preview.innerHTML = '<img src="' + dataUrl + '" alt="">';
         }
-        toast('عکس انتخاب شد ✓', 'success');
+
+        /* ★ آپدیت آواتار هدر */
+        var headerAvatar = document.querySelector('.main-top-avatar img');
+        if (headerAvatar) headerAvatar.src = dataUrl;
+
+        /* ★ آپدیت آواتار توی تنظیمات (about) */
+        var aboutAv = document.querySelector('.about-avatar');
+        if (aboutAv) {
+            var hasImg = aboutAv.querySelector('img');
+            if (hasImg) hasImg.src = dataUrl;
+            else aboutAv.innerHTML = '<img src="' + dataUrl + '" alt="حامد">';
+        }
+
+        toast('✓ عکس پروفایل آپلود شد', 'success');
     };
     r.readAsDataURL(f);
     ev.target.value = '';
 }
-
 function updatePassword() {
     const p1 = document.getElementById('newPass1');
     const p2 = document.getElementById('newPass2');
