@@ -6650,3 +6650,59 @@ body.kb-open #box{
   opacity:0!important;
   pointer-events:none!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   NAV v4 — اسلات‌های ثابت + لیبل زیر آیکون + پس‌زمینه‌ی بیضی
+   (هیچ عرض/ارتفاعی موقع انتخاب عوض نمی‌شه؛ فقط transform و opacity)
+   ═══════════════════════════════════════════════════════════════ */
+html #bottomNav{
+  --slot-w:66px;--slot-h:46px;
+  --pill-w:66px;--pill-h:46px;
+  --icon-up:-6px;--lab-b:6px;
+  --nav-e:cubic-bezier(.3,.5,.2,1);
+}
+html:is([data-nav-position="left"],[data-nav-position="right"]) #bottomNav{
+  --slot-w:74px;--slot-h:52px;
+  --pill-w:70px;--pill-h:46px;
+  --icon-up:-7px;--lab-b:8px;
+}
+
+/* دکمه‌ها: اندازه‌ی ثابت، آیکون وسط */
+html #bottomNav .bottom-nav-btn:not(.nav-btn-chat){
+  width:var(--slot-w)!important;min-width:var(--slot-w)!important;max-width:var(--slot-w)!important;
+  height:var(--slot-h)!important;min-height:var(--slot-h)!important;max-height:var(--slot-h)!important;
+  padding:0!important;gap:0!important;
+  flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  border-radius:999px!important;
+  transition:background .3s ease,color .3s ease!important;
+}
+/* آیکون: با انتخاب شدن کمی می‌ره بالا (فقط transform) */
+html #bottomNav .bottom-nav-btn:not(.nav-btn-chat) svg{
+  transform:translateY(0)!important;
+  transition:transform .45s var(--nav-e)!important;
+}
+html #bottomNav .bottom-nav-btn.active:not(.nav-btn-chat) svg{transform:translateY(var(--icon-up))!important}
+html #bottomNav .bottom-nav-btn:not(.nav-btn-chat):not(.active):hover svg{transform:scale(1.1)!important}
+
+/* لیبل: زیر آیکون، فقط با opacity/transform ظاهر می‌شه */
+html #bottomNav .bottom-nav-btn:not(.nav-btn-chat)::after{
+  content:attr(title)!important;display:block!important;
+  position:absolute!important;left:0!important;right:0!important;top:auto!important;bottom:var(--lab-b)!important;
+  width:auto!important;max-width:none!important;max-height:none!important;
+  margin:0!important;padding:0!important;text-align:center!important;
+  font-size:9.5px!important;line-height:1!important;font-weight:700!important;white-space:nowrap!important;
+  opacity:0!important;transform:translateY(5px)!important;
+  transition:opacity .3s ease,transform .45s var(--nav-e)!important;
+}
+html #bottomNav .bottom-nav-btn.active:not(.nav-btn-chat)::after{opacity:1!important;transform:translateY(0)!important}
+
+/* پس‌زمینه‌ی متحرک: بیضی افقی با گوشه‌ی کاملاً گرد */
+html #bottomNav .nav-slider{width:var(--pill-w)!important;height:var(--pill-h)!important}
+html #bottomNav .nav-slider-fill{border-radius:999px!important}
+
+/* موبایل: فقط آیکون (بدون لیبل)، اسلات کوچک‌تر */
+@media (max-width:900px){
+  html:is([data-nav-position="bottom"],[data-nav-position="top"]) #bottomNav{
+    --slot-w:42px;--slot-h:42px;--pill-w:40px;--pill-h:38px;--icon-up:0px;
+  }
+  html:is([data-nav-position="bottom"],[data-nav-position="top"]) #bottomNav .bottom-nav-btn:not(.nav-btn-chat)::after{display:none!important}
+}
