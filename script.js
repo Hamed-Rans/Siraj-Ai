@@ -2245,6 +2245,8 @@ function applySettings() {
     settings = JSON.parse(JSON.stringify(settingsDraft));
     saveSettings();
     applySettingsToUI();
+    /* ★ رفرش Dropdown مدل بعد از اعمال */
+    if (typeof renderModelsDropdown === 'function') renderModelsDropdown();
     try { localStorage.setItem(PROFILE_IMG_KEY, settings.profileImage || ''); } catch (e) {}
     if (settings.passwordEnabled && (!oldEnabled || oldPass !== settings.password)) {
         sessionStorage.setItem(LOCK_SESSION_KEY, '1');
@@ -2587,7 +2589,7 @@ function renderSettingsControls() {
     }
 
     tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'style' ? ' active' : '') + '" data-cat="style" onclick="switchSettingsCat(\'style\')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>استایل</button>';
-    tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior" onclick="switchSettingsCat(\'behavior\')"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/></svg>رفتار</button>';
+        tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior" onclick="switchSettingsCat(\'behavior\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>تنظیم سراج</button>';
     if (admin) {
         tabsHTML += '<button class="settings-tab-btn' + (settingsCat === 'models' ? ' active' : '') + '" data-cat="models" onclick="switchSettingsCat(\'models\')"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2z"/></svg>مدل‌ها</button>';
     }
@@ -2813,59 +2815,58 @@ function renderSettingsControls() {
             '</div>' +
         '</div>' +
 
-        '<div class="settings-content' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior">' +
+                '<div class="settings-content' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior">' +
             '<div class="setting-group">' +
                 '<label>مدل پیش‌فرض</label>' +
                 '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
                     APP_CONFIG.models.map(function(m){
                         var isActive = (s.selectedModel||'hakim') === m.id;
-                        return '<button class="row-btn' + (isActive ? ' active' : '') + '" onclick="updateDraft(\'selectedModel\',\'' + m.id + '\')" style="border-color:'+m.color+'40">' +
-                            '<span style="font-size:22px">'+m.emoji+'</span>' +
+                        return '<button class="row-btn' + (isActive ? ' active' : '') + '" onclick="updateDraft(\'selectedModel\',\'' + m.id + '\');renderSettingsControls()">' +
+                            '<span style="font-size:22px;line-height:1">'+m.emoji+'</span>' +
                             '<span class="rb-label" style="color:'+m.color+'">'+escapeHtml(m.name)+'</span>' +
                         '</button>';
                     }).join('') +
                 '</div>' +
             '</div>' +
             '<div class="setting-group">' +
-                '<label>حالت پیش‌فرض پاسخ</label>' +
-                '<div class="row-btns" style="grid-template-columns:1fr 1fr">' +
-                    '<button class="row-btn' + (!s.thinking && !s.quick ? ' active' : '') + '" onclick="updateDraft(\'thinking\',false);updateDraft(\'quick\',false)"><span class="rb-label">معمولی</span></button>' +
-                    '<button class="row-btn' + (s.thinking ? ' active' : '') + '" onclick="updateDraft(\'thinking\',true);updateDraft(\'quick\',false)"><span class="rb-label">🧠 تفکر عمیق</span></button>' +
-                    '<button class="row-btn' + (s.quick ? ' active' : '') + '" onclick="updateDraft(\'quick\',true);updateDraft(\'thinking\',false)"><span class="rb-label">⚡ پاسخ سریع</span></button>' +
+                '<label>حالت پاسخ</label>' +
+                '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
+                    '<button class="row-btn' + (!s.thinking && !s.quick ? ' active' : '') + '" onclick="updateDraft(\'thinking\',false);updateDraft(\'quick\',false);renderSettingsControls()"><span style="font-size:20px">💬</span><span class="rb-label">معمولی</span></button>' +
+                    '<button class="row-btn' + (s.thinking ? ' active' : '') + '" onclick="updateDraft(\'thinking\',true);updateDraft(\'quick\',false);renderSettingsControls()"><span style="font-size:20px">🧠</span><span class="rb-label">تفکر عمیق</span></button>' +
+                    '<button class="row-btn' + (s.quick ? ' active' : '') + '" onclick="updateDraft(\'quick\',true);updateDraft(\'thinking\',false);renderSettingsControls()"><span style="font-size:20px">⚡</span><span class="rb-label">پاسخ سریع</span></button>' +
                 '</div>' +
             '</div>' +
             '<div class="setting-group">' +
-                '<label>سطح پاسخ‌دهی سراج</label>' +
+                '<label>سطح پاسخ‌دهی</label>' +
                 '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
-                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='beginner'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'beginner\')"><span class="rb-label">ساده و خودی</span></button>' +
-                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='intermediate'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'intermediate\')"><span class="rb-label">متوسط</span></button>' +
-                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='advanced'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'advanced\')"><span class="rb-label">تخصصی و عمیق</span></button>' +
+                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='beginner'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'beginner\');renderSettingsControls()"><span class="rb-label">ساده</span></button>' +
+                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='intermediate'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'intermediate\');renderSettingsControls()"><span class="rb-label">متوسط</span></button>' +
+                    '<button class="row-btn' + ((s.aiLevel||'intermediate')==='advanced'?' active':'') + '" onclick="updateDraft(\'aiLevel\',\'advanced\');renderSettingsControls()"><span class="rb-label">تخصصی</span></button>' +
                 '</div>' +
             '</div>' +
             '<div class="setting-group">' +
                 '<label>زبان پاسخ</label>' +
                 '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
-                    '<button class="row-btn' + ((s.aiLang||'fa')==='fa'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'fa\')"><span class="rb-label">فارسی</span></button>' +
-                    '<button class="row-btn' + ((s.aiLang||'fa')==='ar'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'ar\')"><span class="rb-label">عربی</span></button>' +
-                    '<button class="row-btn' + ((s.aiLang||'fa')==='en'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'en\')"><span class="rb-label">English</span></button>' +
+                    '<button class="row-btn' + ((s.aiLang||'fa')==='fa'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'fa\');renderSettingsControls()"><span class="rb-label">فارسی</span></button>' +
+                    '<button class="row-btn' + ((s.aiLang||'fa')==='ar'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'ar\');renderSettingsControls()"><span class="rb-label">عربی</span></button>' +
+                    '<button class="row-btn' + ((s.aiLang||'fa')==='en'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'en\');renderSettingsControls()"><span class="rb-label">English</span></button>' +
                 '</div>' +
             '</div>' +
             '<div class="setting-group">' +
                 '<label>اعلان‌ها و یادآورها</label>' +
                 '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">' +
-                    '<button class="row-btn' + (s.notifEnabled !== false ? ' active' : '') + '" onclick="updateDraft(\'notifEnabled\',true)"><span class="rb-label">فعال ✓</span></button>' +
-                    '<button class="row-btn' + (s.notifEnabled === false ? ' active' : '') + '" onclick="updateDraft(\'notifEnabled\',false)"><span class="rb-label">خاموش ✗</span></button>' +
+                    '<button class="row-btn' + (s.notifEnabled !== false ? ' active' : '') + '" onclick="updateDraft(\'notifEnabled\',true);renderSettingsControls()"><span class="rb-label">فعال ✓</span></button>' +
+                    '<button class="row-btn' + (s.notifEnabled === false ? ' active' : '') + '" onclick="updateDraft(\'notifEnabled\',false);renderSettingsControls()"><span class="rb-label">خاموش ✗</span></button>' +
                 '</div>' +
             '</div>' +
             '<div class="setting-group">' +
                 '<label>تست و مجوز اعلان</label>' +
-                '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">' +
-                    '<button class="btn-primary" style="flex:1;justify-content:center" onclick="if(window.__sendTestNotification)window.__sendTestNotification()">ارسال نوتیف تست</button>' +
-                    '<button class="btn-secondary" style="flex:1;justify-content:center" onclick="if(window.__requestNotifPermission)window.__requestNotifPermission()">درخواست مجوز</button>' +
+                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">' +
+                    '<button class="btn-primary" onclick="if(window.__sendTestNotification)window.__sendTestNotification()">ارسال نوتیف تست</button>' +
+                    '<button class="btn-secondary" onclick="if(window.__requestNotifPermission)window.__requestNotifPermission()">درخواست مجوز</button>' +
                 '</div>' +
             '</div>' +
         '</div>' +
-
         (admin ? '<div class="settings-content' + (settingsCat === 'models' ? ' active' : '') + '" data-cat="models">' + modelsHTML + '</div>' : '') +
 
         '<div class="settings-content' + (settingsCat === 'profile' ? ' active' : '') + '" data-cat="profile">' +
@@ -3213,25 +3214,95 @@ window.addEventListener('load', () => {
         if (savedImg && !settings.profileImage) settings.profileImage = savedImg;
     } catch (e) {}
 
+       /* ═══════════════════════════════════════════════════════════════
+       SERVICE WORKER + AUTO UPDATE
+       ═══════════════════════════════════════════════════════════════ */
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js?v=2.5.5', { updateViaCache: 'none' }).then(function (reg) {
-            reg.update().catch(function () {});
-            reg.addEventListener('updatefound', function () {
-                var nw = reg.installing;
-                if (!nw) return;
-                nw.addEventListener('statechange', function () {
-                    if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                        if ('caches' in window) {
-                            caches.keys().then(function (names) {
-                                return Promise.all(names.map(function (n) {
-                                    return caches.delete(n);
-                                }));
-                            });
-                        }
+        var updatePending = false;
+
+        function showUpdateBanner() {
+            if (updatePending) return;
+            if (document.getElementById('swUpdateBanner')) return;
+            updatePending = true;
+
+            var b = document.createElement('div');
+            b.id = 'swUpdateBanner';
+            b.className = 'sw-update-banner';
+            b.innerHTML =
+                '<div class="sw-update-icon">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>' +
+                '</div>' +
+                '<div class="sw-update-text">' +
+                    '<div class="sw-update-title">نسخه جدید آماده‌ست!</div>' +
+                    '<div class="sw-update-sub">برای دریافت تغییرات جدید، بروزرسانی کن</div>' +
+                '</div>' +
+                '<button class="sw-update-btn" id="swUpdateBtn">بروزرسانی</button>' +
+                '<button class="sw-update-dismiss" id="swDismissBtn" title="بستن">✕</button>';
+
+            document.body.appendChild(b);
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () { b.classList.add('show'); });
+            });
+
+            document.getElementById('swUpdateBtn').onclick = function () {
+                var btn = this;
+                btn.textContent = 'داره بروز می‌شه...';
+                btn.disabled = true;
+                /* ★ به SW جدید بگو بیاد */
+                navigator.serviceWorker.getRegistration().then(function (reg) {
+                    if (reg && reg.waiting) {
+                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                    /* ★ کش قدیمی رو پاک کن */
+                    if ('caches' in window) {
+                        caches.keys().then(function (names) {
+                            return Promise.all(names.map(function (n) {
+                                if (n.startsWith('siraj-v')) return caches.delete(n);
+                            }));
+                        }).then(function () {
+                            setTimeout(function () { location.reload(); }, 400);
+                        });
+                    } else {
+                        setTimeout(function () { location.reload(); }, 400);
                     }
                 });
-            });
-        }).catch(function (err) { console.warn('[SW]', err); });
+            };
+
+            document.getElementById('swDismissBtn').onclick = function () {
+                b.classList.remove('show');
+                setTimeout(function () { b.remove(); }, 400);
+                updatePending = false;
+            };
+        }
+
+        navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+            .then(function (reg) {
+                /* ★ هر ۶۰ ثانیه چک کن نسخه جدید هست یا نه */
+                setInterval(function () { reg.update().catch(function () {}); }, 60000);
+
+                /* ★ اگه الان نسخه جدید آماده‌ست */
+                if (reg.waiting) showUpdateBanner();
+
+                /* ★ اگه داره نصب می‌شه */
+                reg.addEventListener('updatefound', function () {
+                    var nw = reg.installing;
+                    if (!nw) return;
+                    nw.addEventListener('statechange', function () {
+                        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                            showUpdateBanner();
+                        }
+                    });
+                });
+            })
+            .catch(function (err) { console.warn('[SW]', err); });
+
+        /* ★ اگه SW جدید کنترل رو گرفت، صفحه رو رفرش کن */
+        var refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (refreshing) return;
+            refreshing = true;
+            location.reload();
+        });
     }
 
     initNavState();
