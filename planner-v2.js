@@ -3068,10 +3068,10 @@
       Math.pow(tgt.h - smooth.h, 2)
     );
     var lerp;
-    if (dist > 250)      lerp = 0.10;
-    else if (dist > 100) lerp = 0.14;
-    else if (dist > 20)  lerp = 0.20;
-    else                 lerp = 0.28;
+    if (dist > 250)      lerp = 0.065;
+    else if (dist > 100) lerp = 0.085;
+    else if (dist > 20)  lerp = 0.12;
+    else                 lerp = 0.18;
 
     smooth.x += (tgt.x - smooth.x) * lerp;
     smooth.y += (tgt.y - smooth.y) * lerp;
