@@ -9013,85 +9013,6 @@ html body .history-item{
   color: #fff!important;
 }
 /* ═══════════════════════════════════════════════════════════════
-   FIX v4 — خط contact کنار آیکون + حذف بوردر/هاله هاور
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── حذف خط قدیمی کنار متن ─── */
-.contact-row .contact-info::before{
-  display: none!important;
-}
-
-/* ─── contact-row: بدون بوردر و بدون هاله ─── */
-.contact-row,
-.about-contacts .contact-row{
-  transform: none!important;
-  background: var(--panel-bg)!important;
-  border: 1px solid var(--border)!important;
-  box-shadow: none!important;
-  transition: background-color .35s ease!important;
-  position: relative!important;
-  overflow: hidden!important;
-}
-
-/* حالت هاور — فقط پس‌زمینه ملایم، بدون بوردر آبی، بدون هاله */
-.contact-row:hover,
-.about-contacts .contact-row:hover{
-  transform: none!important;
-  background: var(--accent-soft)!important;
-  border: 1px solid var(--border)!important;   /* بوردر ثابت */
-  box-shadow: none!important;                   /* هاله صفر */
-}
-
-/* ─── خط عمودی سمت راست کارت (کنار آیکون) ─── */
-.contact-row::before{
-  content: ''!important;
-  position: absolute!important;
-  top: 6px!important;
-  bottom: 6px!important;
-  right: 0!important;                            /* سمت راست کارت */
-  width: 4px!important;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    var(--accent-light) 15%,
-    var(--accent) 50%,
-    var(--accent-light) 85%,
-    transparent 100%)!important;
-  border-radius: 0 4px 4px 0!important;          /* گردی سمت چپ خط */
-  transform: scaleY(0)!important;
-  transform-origin: center!important;
-  opacity: 0!important;
-  transition:
-    transform .5s cubic-bezier(.34,1.4,.64,1),
-    opacity .3s ease!important;
-  box-shadow: 0 0 16px var(--accent)!important;
-  z-index: 10!important;
-  pointer-events: none!important;
-}
-.contact-row:hover::before{
-  transform: scaleY(1)!important;
-  opacity: 1!important;
-}
-
-/* اطمینان از اینکه ::after اجرا نشه */
-.contact-row::after{
-  display: none!important;
-  content: none!important;
-}
-
-/* ─── آیکون — فقط بزرگ شدن و رنگ ─── */
-.contact-row .contact-icon{
-  transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    background-color .3s ease,
-    color .3s ease!important;
-}
-.contact-row:hover .contact-icon{
-  transform: scale(1.25) rotate(-8deg)!important;
-  background: var(--accent)!important;
-  color: #fff!important;
-}
-/* ═══════════════════════════════════════════════════════════════
    FIX v5 — سایه رنگی + کارت‌های جاندار + انیمیشن قفل
    ═══════════════════════════════════════════════════════════════ */
 
@@ -9621,143 +9542,24 @@ html body .side-panel{
   box-shadow: 0 0 12px #F59E0B!important;
 }
 /* ═══════════════════════════════════════════════════════════════
-   FIX v8 — هاور نرم کارت‌های ارتباط با ما (خط سمت چپ)
+   CONTACT ROW — FINAL v10 (تنها نسخه معتبر)
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── حذف استایل‌های قدیمی ─── */
-.contact-row::before,
-.contact-row::after,
-.about-contacts .contact-row::before,
-.about-contacts .contact-row::after{
-  display: none!important;
-  content: none!important;
-}
-
-/* ─── کارت ارتباط — پایه ─── */
-.contact-row,
-.about-contacts .contact-row{
-  position: relative!important;
-  overflow: hidden!important;
-  transform: translateZ(0)!important;
-  backface-visibility: hidden!important;
-  transition:
-    transform .4s cubic-bezier(.22,1,.36,1),
-    background-color .35s cubic-bezier(.22,1,.36,1),
-    border-color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .45s cubic-bezier(.22,1,.36,1)!important;
-}
-
-/* ─── هاور — حرکت نرم به راست (برعکس گفتگوها) + سایه رنگی ─── */
-.contact-row:hover,
-.about-contacts .contact-row:hover{
-  transform: translateX(5px) translateY(-2px) scale(1.008)!important;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--accent) 8%, transparent),
-    color-mix(in srgb, var(--accent) 18%, transparent))!important;
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent)!important;
-  box-shadow:
-    0 4px 12px -6px rgba(0,0,0,.4),
-    0 12px 28px -12px var(--accent),
-    0 0 30px -12px var(--accent)!important;
-}
-
-/* ─── کلیک ─── */
-.contact-row:active,
-.about-contacts .contact-row:active{
-  transform: translateX(2px) translateY(0) scale(.99)!important;
-  transition-duration: .12s!important;
-}
-
-/* ─── خط جانبی سمت چپ کارت — از وسط باز می‌شه ─── */
-.contact-row::before,
-.about-contacts .contact-row::before{
-  content: ''!important;
-  display: block!important;
-  position: absolute!important;
-  top: 8px!important;
-  bottom: 8px!important;
-  left: 0!important;
-  width: 3px!important;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    var(--accent-light) 20%,
-    var(--accent) 50%,
-    var(--accent-light) 80%,
-    transparent 100%)!important;
-  border-radius: 0 3px 3px 0!important;
-  transform: scaleY(0)!important;
-  transform-origin: center!important;
-  opacity: 0!important;
-  transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    opacity .3s ease!important;
-  box-shadow: 0 0 12px var(--accent)!important;
-  z-index: 5!important;
-  pointer-events: none!important;
-}
-.contact-row:hover::before,
-.about-contacts .contact-row:hover::before{
-  transform: scaleY(1)!important;
-  opacity: 1!important;
-}
-
-/* ─── متن‌ها — تغییر رنگ نرم ─── */
-.contact-row .contact-label,
-.contact-row .contact-value{
-  transition: color .3s ease!important;
-}
-.contact-row:hover .contact-label{
-  color: var(--accent-light)!important;
-}
-.contact-row:hover .contact-value{
-  color: var(--text-main)!important;
-}
-
-/* ─── آیکون — بزرگ‌شدن و چرخش نرم ─── */
-.contact-row .contact-icon{
-  transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    background-color .3s ease,
-    color .3s ease,
-    box-shadow .35s ease!important;
-}
-.contact-row:hover .contact-icon,
-.about-contacts .contact-row:hover .contact-icon{
-  transform: scale(1.25) rotate(-8deg)!important;
-  background: var(--accent)!important;
-  color: #fff!important;
-  box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent),
-    0 8px 20px -6px var(--accent)!important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   FIX v9 — هاور کارت‌های ارتباط (غلبه بر transition:none قدیمی)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── حذف خط‌های قدیمی ─── */
+/* ─── ۱. حذف همه‌چیز قدیمی با قدرت بالا ─── */
 html body .contact-row::before,
 html body .contact-row::after,
 html body .about-contacts .contact-row::before,
 html body .about-contacts .contact-row::after{
   display: none!important;
   content: none!important;
+  opacity: 0!important;
+  width: 0!important;
+  height: 0!important;
+  background: none!important;
+  transform: none!important;
 }
 
-/* ─── کارت ارتباط — ترنزیشن کامل ─── */
-html body .contact-row,
-html body .about-contacts .contact-row,
-html body .contact-row *,
-html body .about-contacts .contact-row *{
-  transition:
-    transform .4s cubic-bezier(.22,1,.36,1),
-    background-color .35s cubic-bezier(.22,1,.36,1),
-    background .35s cubic-bezier(.22,1,.36,1),
-    border-color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .45s cubic-bezier(.22,1,.36,1),
-    color .3s ease!important;
-}
-
-/* ─── پایه کارت ─── */
+/* ─── ۲. کارت — پایه با ترنزیشن کامل ─── */
 html body .contact-row,
 html body .about-contacts .contact-row{
   position: relative!important;
@@ -9765,66 +9567,87 @@ html body .about-contacts .contact-row{
   transform: translate3d(0,0,0)!important;
   backface-visibility: hidden!important;
   will-change: transform!important;
+  transition:
+    transform .5s cubic-bezier(.22,1,.36,1),
+    background-color .4s cubic-bezier(.22,1,.36,1),
+    background .4s cubic-bezier(.22,1,.36,1),
+    border-color .4s cubic-bezier(.22,1,.36,1),
+    box-shadow .5s cubic-bezier(.22,1,.36,1)!important;
 }
 
-/* ─── هاور — حرکت به راست ─── */
+/* ─── ۳. هاور — حرکت نرم به راست ─── */
 html body .contact-row:hover,
 html body .about-contacts .contact-row:hover{
-  transform: translate3d(5px,-2px,0) scale(1.008)!important;
+  transform: translate3d(6px,-3px,0) scale(1.012)!important;
   background: linear-gradient(135deg,
-    color-mix(in srgb, var(--accent) 8%, transparent),
-    color-mix(in srgb, var(--accent) 18%, transparent))!important;
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent)!important;
+    color-mix(in srgb, var(--accent) 10%, transparent),
+    color-mix(in srgb, var(--accent) 22%, transparent))!important;
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent)!important;
   box-shadow:
-    0 4px 12px -6px rgba(0,0,0,.4),
-    0 12px 28px -12px var(--accent),
-    0 0 30px -12px var(--accent)!important;
+    0 6px 16px -8px rgba(0,0,0,.45),
+    0 14px 32px -14px var(--accent),
+    0 0 40px -14px var(--accent)!important;
 }
 
-/* ─── کلیک ─── */
+/* ─── ۴. کلیک ─── */
 html body .contact-row:active,
 html body .about-contacts .contact-row:active{
-  transform: translate3d(2px,0,0) scale(.99)!important;
+  transform: translate3d(2px,-1px,0) scale(.99)!important;
   transition-duration: .12s!important;
 }
 
-/* ─── خط جانبی سمت چپ — از وسط باز می‌شه ─── */
+/* ─── ۵. خط سمت چپ — با ترکیب left/inset/inset-inline ─── */
 html body .contact-row::before,
 html body .about-contacts .contact-row::before{
   content: ''!important;
   display: block!important;
   position: absolute!important;
-  top: 8px!important;
-  bottom: 8px!important;
+  
+  /* همه راه‌های ممکن برای left:0 */
   left: 0!important;
-  width: 3px!important;
+  right: auto!important;
+  inset: 8px auto 8px 0!important;
+  inset-inline-start: 0!important;
+  inset-inline-end: auto!important;
+  
+  width: 4px!important;
+  height: auto!important;
+  
   background: linear-gradient(180deg,
     transparent 0%,
-    var(--accent-light) 20%,
+    var(--accent-light) 15%,
     var(--accent) 50%,
-    var(--accent-light) 80%,
+    var(--accent-light) 85%,
     transparent 100%)!important;
-  border-radius: 0 3px 3px 0!important;
+  
+  border-radius: 0 4px 4px 0!important;
   transform: scaleY(0)!important;
-  transform-origin: center!important;
+  transform-origin: center center!important;
   opacity: 0!important;
+  
   transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    opacity .3s ease!important;
-  box-shadow: 0 0 12px var(--accent)!important;
-  z-index: 5!important;
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    opacity .35s ease!important;
+  
+  box-shadow: 
+    0 0 14px var(--accent),
+    0 0 24px -4px var(--accent-light)!important;
+  
+  z-index: 10!important;
   pointer-events: none!important;
+  direction: ltr!important;
 }
+
 html body .contact-row:hover::before,
 html body .about-contacts .contact-row:hover::before{
   transform: scaleY(1)!important;
   opacity: 1!important;
 }
 
-/* ─── متن‌ها ─── */
+/* ─── ۶. متن‌ها ─── */
 html body .contact-row .contact-label,
 html body .contact-row .contact-value{
-  transition: color .3s ease!important;
+  transition: color .35s ease!important;
 }
 html body .contact-row:hover .contact-label{
   color: var(--accent-light)!important;
@@ -9833,21 +9656,21 @@ html body .contact-row:hover .contact-value{
   color: var(--text-main)!important;
 }
 
-/* ─── آیکون ─── */
+/* ─── ۷. آیکون ─── */
 html body .contact-row .contact-icon,
 html body .about-contacts .contact-row .contact-icon{
   transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    background-color .3s ease,
-    color .3s ease,
-    box-shadow .35s ease!important;
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    background-color .35s ease,
+    color .35s ease,
+    box-shadow .4s ease!important;
 }
 html body .contact-row:hover .contact-icon,
 html body .about-contacts .contact-row:hover .contact-icon{
-  transform: scale(1.25) rotate(-8deg)!important;
+  transform: scale(1.3) rotate(-10deg)!important;
   background: var(--accent)!important;
   color: #fff!important;
   box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent),
-    0 8px 20px -6px var(--accent)!important;
+    0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent),
+    0 10px 24px -6px var(--accent)!important;
 }
