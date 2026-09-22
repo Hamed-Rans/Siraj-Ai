@@ -7452,3 +7452,95 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
 .task-remind.on{background:rgba(245,158,11,.15);color:#F59E0B}
 .task-remind.on svg{stroke:#F59E0B}
 .task-remind svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME FIX — رفع سفیدهای اضافی
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme^="light"] .preview-zone{
+  background:var(--panel-bg)!important;
+  border-color:rgba(31,35,40,.1)!important;
+}
+[data-theme^="light"] .pv-header{
+  background:rgba(255,255,255,.85)!important;
+  border-color:rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .pv-input-bar{
+  background:#FFFFFF!important;
+  border-color:rgba(31,35,40,.1)!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .pv-nav-preview{
+  background:linear-gradient(160deg,rgba(255,255,255,.98),rgba(246,248,250,.95))!important;
+  border-color:rgba(31,35,40,.08)!important;
+  box-shadow:0 4px 14px -6px rgba(31,35,40,.15)!important;
+}
+[data-theme^="light"] .pv-nav-preview-item{
+  background:rgba(0,0,0,.05)!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .pv-nav-preview-item.active{
+  background:var(--accent)!important;
+  color:#fff!important;
+}
+[data-theme^="light"] .pv-nav-preview-item.fab{
+  background:linear-gradient(160deg,var(--accent),var(--accent-dark))!important;
+  color:#fff!important;
+  box-shadow:0 0 0 2px #fff,0 0 0 3px var(--accent)!important;
+}
+[data-theme^="light"] .pv-nav-preview-item.collapse{
+  background:transparent!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"] .settings-content-wrap .setting-group{
+  background:rgba(255,255,255,.6)!important;
+  border-color:rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .row-btn{
+  background:#F6F8FA!important;
+  border-color:rgba(31,35,40,.1)!important;
+  color:var(--text-main)!important;
+}
+[data-theme^="light"] .row-btn:hover{
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+}
+[data-theme^="light"] .row-btn.active{
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+  color:var(--accent)!important;
+}
+[data-theme^="light"] [data-cat="behavior"] .row-btn.active{
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+  color:var(--accent)!important;
+}
+[data-theme^="light"] .guide-card,
+[data-theme^="light"] .panel-card{
+  background:#FFFFFF!important;
+  border-color:rgba(31,35,40,.1)!important;
+}
+[data-theme^="light"] .tasks-done-empty{
+  background:#F6F8FA!important;
+  border-color:rgba(31,35,40,.1)!important;
+  color:var(--text-muted)!important;
+}
+[data-theme^="light"][data-header-style="glass"] .pv-header{
+  background:rgba(255,255,255,.85)!important;
+  backdrop-filter:blur(20px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(180%)!important;
+}
+[data-theme^="light"][data-input-style="glass"] .pv-input-bar{
+  background:rgba(255,255,255,.9)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+}
+[data-theme^="light"] .welcome-card{
+  background:linear-gradient(160deg,rgba(255,255,255,.95),rgba(246,248,250,.9))!important;
+  border-color:rgba(31,35,40,.08)!important;
+}
+[data-theme^="light"] .bot .msg{
+  background:var(--bubble-bot-bg)!important;
+  border-color:var(--bubble-bot-border)!important;
+  color:var(--text-main)!important;
+}
