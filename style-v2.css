@@ -8842,3 +8842,177 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   gap:8px!important;
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX v3 — سایه‌ها + جابجایی dropdown + انیمیشن send + contact
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── ۱. سایه‌ها — قوی‌تر، دیده می‌شن ─── */
+html body .main-chat{
+  box-shadow:
+    0 2px 4px -2px rgba(0,0,0,.4),
+    0 20px 50px -20px rgba(0,0,0,.75),
+    0 0 40px -20px var(--accent)!important;
+}
+html body .side-panel{
+  box-shadow:
+    0 2px 4px -2px rgba(0,0,0,.4),
+    0 20px 50px -20px rgba(0,0,0,.75),
+    0 0 40px -20px var(--accent)!important;
+}
+html body .welcome-card{
+  box-shadow:
+    0 0 70px -15px var(--accent),
+    0 30px 70px -25px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.1)!important;
+}
+html body .welcome-card::before{
+  display:block!important;
+  opacity:.5!important;
+}
+html body .welcome-halo{
+  display:block!important;
+  opacity:.4!important;
+}
+html body .bottom-nav{
+  box-shadow:
+    0 4px 10px -4px rgba(0,0,0,.5),
+    0 16px 40px -16px rgba(0,0,0,.7),
+    0 0 30px -12px var(--accent)!important;
+}
+html body .input-bar{
+  box-shadow:
+    0 6px 20px -10px rgba(0,0,0,.55),
+    0 0 24px -12px var(--accent-soft)!important;
+}
+html body .daily-card,
+html body .panel-card,
+html body .tool-card,
+html body .planner-hero-card,
+html body .month-calendar,
+html body .month-goals,
+html body .task-item,
+html body .history-item{
+  box-shadow:
+    0 2px 4px -2px rgba(0,0,0,.3),
+    0 10px 26px -12px rgba(0,0,0,.5)!important;
+}
+
+/* ─── ۲. جابجایی dropdown مدل به سمت راست ─── */
+.input-bar #thinkBtn  { order: 1; }
+.input-bar #quickBtn  { order: 2; }
+.input-bar #dialectDD { order: 3; }
+.input-bar form       { order: 5; }
+.input-bar #sendBtn   { order: 6; }
+.input-bar #modelDD   { order: 7; }
+.input-bar #voiceBtn  { order: 8; }
+.input-bar > label    { order: 9; }
+
+/* ─── ۳. انیمیشن send button — از راست به چپ ─── */
+.send-btn{
+  transform-origin: right center!important;
+  transform: translateX(20px) scale(.4) rotate(-20deg)!important;
+  opacity: 0;
+  transition:
+    transform .42s cubic-bezier(.34,1.4,.64,1),
+    opacity .3s ease,
+    background .35s ease!important;
+}
+.send-btn.visible{
+  transform: translateX(0) scale(1) rotate(0)!important;
+  opacity: 1;
+}
+.send-btn:hover{
+  transform: translateX(-2px) scale(1.1) rotate(-4deg)!important;
+}
+.send-btn:active{
+  transform: translateX(0) scale(.92)!important;
+  transition-duration: .1s!important;
+}
+/* آیکون — بچرخه رو به چپ */
+.send-btn svg{
+  transform: scaleX(-1);
+  transition: transform .4s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.send-btn:hover svg{
+  transform: scaleX(-1) translateX(-2px);
+}
+.send-btn.pause-mode{
+  transform-origin: right center!important;
+}
+.send-btn.pause-mode svg{
+  transform: scaleX(1);
+}
+
+/* ─── ۴. contact-row — فقط آیکون + خط چپ ─── */
+.contact-row,
+.about-contacts .contact-row{
+  transform: none!important;
+  background: var(--panel-bg)!important;
+  border-color: var(--border)!important;
+  box-shadow: none!important;
+  transition:
+    background-color .35s ease,
+    border-color .35s ease!important;
+  position: relative!important;
+  overflow: hidden!important;
+}
+.contact-row:hover,
+.about-contacts .contact-row:hover{
+  transform: none!important;
+  background: var(--accent-soft)!important;
+  border-color: var(--accent)!important;
+  box-shadow: none!important;
+}
+
+/* حذف خط بالایی قدیمی */
+.contact-row::before,
+.contact-row::after{
+  display: none!important;
+  content: none!important;
+}
+
+/* خط عمودی سمت چپ کارت */
+.contact-row .contact-info{
+  position: relative!important;
+}
+.contact-row .contact-info::before{
+  content: ''!important;
+  position: absolute!important;
+  top: 0!important;
+  bottom: 0!important;
+  right: -12px!important;
+  width: 3px!important;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--accent-light) 20%,
+    var(--accent) 50%,
+    var(--accent-light) 80%,
+    transparent 100%)!important;
+  border-radius: 3px!important;
+  transform: scaleY(0)!important;
+  transform-origin: center!important;
+  opacity: 0!important;
+  transition:
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    opacity .3s ease!important;
+  pointer-events: none!important;
+  box-shadow: 0 0 12px var(--accent)!important;
+}
+.contact-row:hover .contact-info::before{
+  transform: scaleY(1)!important;
+  opacity: 1!important;
+}
+
+/* فقط آیکون بزرگ می‌شه */
+.contact-row .contact-icon{
+  transition:
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    background-color .3s ease,
+    color .3s ease!important;
+}
+.contact-row:hover .contact-icon{
+  transform: scale(1.25) rotate(-8deg)!important;
+  background: var(--accent)!important;
+  color: #fff!important;
+}
