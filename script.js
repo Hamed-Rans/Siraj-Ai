@@ -1502,6 +1502,10 @@ function startTypewriter(el) {
                 streamResultFull += piece;
                 if (streamTargetEl) {
                     streamTargetEl.innerHTML = formatMd(streamResultFull);
+                                       /* ★ آپدیت پاپ‌آپ */
+                    if (typeof window.__updateAiPopupContent === 'function') {
+                        window.__updateAiPopupContent(streamResultFull);
+                    }
                     const box = document.getElementById('box');
                     if (box) box.scrollTop = box.scrollHeight;
                 }
