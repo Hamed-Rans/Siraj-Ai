@@ -7839,3 +7839,97 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
     height:16px!important;
   }
 }
+/* ═══════════════════════════════════════════════════════════════
+   PAGE EMPTY CARD — دکمه کامل دیده بشه
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ کارت اصلی — padding-bottom کافی ═══ */
+.page-empty-card{
+  padding-bottom:70px!important;
+  margin-bottom:50px!important;
+  overflow:visible!important;
+  position:relative!important;
+}
+
+/* ═══ دکمه — مطمئن شو نمایش داده می‌شه ═══ */
+.page-empty-card .page-empty-soon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  padding:12px 26px!important;
+  margin-top:14px!important;
+  border-radius:16px!important;
+  font-family:var(--font-heading,'Morabba','Estedad',sans-serif)!important;
+  font-size:13.5px!important;
+  font-weight:800!important;
+  color:#fff!important;
+  background:linear-gradient(160deg,var(--accent-light),var(--accent-dark))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 3px rgba(0,0,0,.25),
+    0 10px 26px -10px var(--accent)!important;
+  position:relative!important;
+  z-index:5!important;
+  visibility:visible!important;
+  opacity:1!important;
+  animation:soonPulseSoft 3s ease-in-out infinite!important;
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.page-empty-card .page-empty-soon:hover{
+  transform:translateY(-3px) scale(1.02)!important;
+  animation-play-state:paused!important;
+}
+.page-empty-card .page-empty-soon:active{
+  transform:translateY(-1px) scale(.97)!important;
+}
+.page-empty-card .page-empty-soon svg{
+  width:18px!important;
+  height:18px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.2!important;
+  flex-shrink:0!important;
+}
+
+/* ═══ دکمه زرد — مقالات ═══ */
+.page-empty-card .page-empty-soon.gold{
+  background:linear-gradient(160deg,#F4D03F 0%,#D4AF37 50%,#B8860B 100%)!important;
+  color:#1A1A2E!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.4),
+    0 1px 3px rgba(0,0,0,.25),
+    0 10px 26px -10px #D4AF37!important;
+}
+
+/* ═══ حذف انیمیشن pulse قدیمی که با clipped می‌شد ═══ */
+.page-empty-soon{
+  animation:soonPulseSoft 3s ease-in-out infinite!important;
+}
+
+@keyframes soonPulseSoft{
+  0%,100%{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.2),
+      0 1px 3px rgba(0,0,0,.25),
+      0 10px 26px -10px var(--accent),
+      0 0 0 0 var(--accent-soft);
+  }
+  50%{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.25),
+      0 1px 3px rgba(0,0,0,.3),
+      0 10px 26px -10px var(--accent),
+      0 0 0 6px transparent;
+  }
+}
+
+/* ═══ اگه دکمه داخل shadow قرار داشت، از background جدا کن ═══ */
+.page-empty-card::before{
+  pointer-events:none!important;
+  z-index:1!important;
+}
+.page-empty-card > *{
+  position:relative!important;
+  z-index:2!important;
+}
