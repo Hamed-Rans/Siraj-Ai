@@ -7544,3 +7544,197 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   border-color:var(--bubble-bot-border)!important;
   color:var(--text-main)!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   BEHAVIOR TAB — فیکس دکمه‌ها + اسکرول
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ دکمه‌ها بدون تحمیل ارتفاع ═══ */
+[data-cat="behavior"] .row-btn{
+  min-height:auto!important;
+  max-height:none!important;
+  height:auto!important;
+  padding:14px 10px!important;
+  border-radius:14px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  overflow:visible!important;
+}
+[data-cat="behavior"] .row-btn > span:first-child{
+  font-size:26px!important;
+  line-height:1!important;
+  display:block!important;
+  height:auto!important;
+}
+[data-cat="behavior"] .row-btn .rb-label{
+  font-size:11.5px!important;
+  line-height:1.3!important;
+  white-space:normal!important;
+  word-break:break-word!important;
+  text-align:center!important;
+}
+
+/* ═══ گریدها ═══ */
+[data-cat="behavior"] .row-btns{
+  display:grid!important;
+  gap:8px!important;
+}
+
+/* ═══ رفع overflow-x + scrollbar ═══ */
+.settings-content{
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+.settings-content > *{
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+.settings-content-wrap{
+  overflow-x:hidden!important;
+}
+.setting-group{
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+.setting-group > div{
+  max-width:100%!important;
+}
+
+/* ═══ اسکرول‌بار تمیز ═══ */
+.settings-content::-webkit-scrollbar{
+  width:6px!important;
+  height:0!important;
+}
+.settings-content::-webkit-scrollbar-track{
+  background:transparent!important;
+}
+.settings-content::-webkit-scrollbar-thumb{
+  background:rgba(120,150,200,.25)!important;
+  border-radius:10px!important;
+}
+.settings-content::-webkit-scrollbar-thumb:hover{
+  background:rgba(120,150,200,.42)!important;
+}
+.settings-content::-webkit-scrollbar:horizontal{
+  display:none!important;
+  height:0!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   CONTACT ROW — هاور نرم و روون
+   ═══════════════════════════════════════════════════════════════ */
+.contact-row{
+  transition:
+    transform .45s cubic-bezier(.22,1,.36,1),
+    background .35s cubic-bezier(.22,1,.36,1),
+    border-color .3s cubic-bezier(.22,1,.36,1),
+    box-shadow .42s cubic-bezier(.22,1,.36,1)!important;
+  will-change:transform;
+}
+.contact-row:hover{
+  transform:translateX(-4px) translateY(-1px)!important;
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 6px 18px -10px rgba(0,0,0,.4)!important;
+}
+.contact-row .contact-icon{
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    background .3s cubic-bezier(.22,1,.36,1),
+    color .3s cubic-bezier(.22,1,.36,1)!important;
+}
+.contact-row:hover .contact-icon{
+  transform:scale(1.1) rotate(-5deg)!important;
+  background:var(--accent)!important;
+  color:#fff!important;
+}
+.contact-row:active{
+  transform:translateX(-2px) scale(.99)!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   TASK ITEM — هاور نرم + دکمه‌های ادیت/یادآور
+   ═══════════════════════════════════════════════════════════════ */
+.task-item{
+  transition:
+    transform .42s cubic-bezier(.22,1,.36,1),
+    background .35s cubic-bezier(.22,1,.36,1),
+    border-color .3s cubic-bezier(.22,1,.36,1),
+    box-shadow .42s cubic-bezier(.22,1,.36,1)!important;
+  will-change:transform;
+}
+.task-item:hover{
+  transform:translateX(-3px)!important;
+  box-shadow:0 5px 16px -10px rgba(0,0,0,.5)!important;
+}
+.task-item:active{
+  transform:translateX(-1px) scale(.995)!important;
+  transition-duration:.15s!important;
+}
+
+/* ═══ دکمه‌های ادیت / یادآور / حذف ═══ */
+.task-edit,
+.task-remind,
+.task-del{
+  opacity:0!important;
+  transform:translateX(6px);
+  transition:
+    opacity .3s cubic-bezier(.4,0,.2,1),
+    transform .4s cubic-bezier(.34,1.4,.64,1),
+    background .22s cubic-bezier(.4,0,.2,1),
+    color .22s cubic-bezier(.4,0,.2,1)!important;
+}
+.task-item:hover .task-edit,
+.task-item:hover .task-remind,
+.task-item:hover .task-del,
+.tasks-done-list .task-del{
+  opacity:1!important;
+  transform:translateX(0)!important;
+}
+
+/* ═══ هاور هر دکمه ═══ */
+.task-edit:hover{background:var(--accent-soft)!important;color:var(--accent)!important}
+.task-remind:hover{background:var(--accent-soft)!important;color:var(--accent)!important}
+.task-remind.on{background:rgba(245,158,11,.15)!important;color:#F59E0B!important;opacity:1!important;transform:translateX(0)!important}
+.task-del:hover{background:rgba(239,68,68,.15)!important;color:#EF4444!important}
+
+/* ═══ svg نرم ═══ */
+.task-edit svg,
+.task-remind svg,
+.task-del svg{
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.task-edit:hover svg,
+.task-remind:hover svg,
+.task-del:hover svg{
+  transform:scale(1.12)!important;
+}
+
+/* ═══ حذف خط بالایی از task-item ═══ */
+.task-item::after{
+  display:none!important;
+}
+
+/* ═══ اگه می‌خوای خط بالایی بمونه، انیمیشنش نرم‌تر ═══ */
+.task-item::before{
+  content:''!important;
+  position:absolute!important;
+  top:0!important;
+  right:50%!important;
+  left:50%!important;
+  height:2px!important;
+  background:linear-gradient(90deg,transparent,var(--accent-light) 30%,var(--accent) 50%,var(--accent-light) 70%,transparent)!important;
+  opacity:0!important;
+  transition:
+    right .55s cubic-bezier(.22,1,.36,1),
+    left .55s cubic-bezier(.22,1,.36,1),
+    opacity .35s cubic-bezier(.4,0,.2,1)!important;
+  pointer-events:none!important;
+  z-index:2!important;
+  border-radius:0 0 2px 2px!important;
+}
+.task-item:hover::before{
+  right:0!important;
+  left:0!important;
+  opacity:1!important;
+}
