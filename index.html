@@ -20,6 +20,46 @@
 <link href="https://cdn.jsdelivr.net/gh/aminabedi68/Morabba@master/dist/font-face.css" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=2.5.31">
 <link rel="stylesheet" href="style-v2.css?v=2.5.399">
+  <style id="siraj-aurora-force">
+body::before {
+  content: '' !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(ellipse 900px 700px at 20% 10%, rgba(168,132,255,.5), transparent 55%),
+    radial-gradient(ellipse 700px 800px at 85% 90%, rgba(236,100,180,.4), transparent 55%),
+    radial-gradient(ellipse 600px 600px at 10% 90%, rgba(100,210,240,.35), transparent 60%),
+    linear-gradient(160deg, #08061A 0%, #05060A 100%) !important;
+  background-attachment: fixed !important;
+}
+html[data-theme^="light"] body::before {
+  background:
+    radial-gradient(ellipse 900px 700px at 20% 10%, rgba(168,132,255,.4), transparent 55%),
+    radial-gradient(ellipse 700px 800px at 85% 90%, rgba(236,100,180,.3), transparent 55%),
+    radial-gradient(ellipse 600px 600px at 10% 90%, rgba(100,210,240,.25), transparent 60%),
+    linear-gradient(160deg, #F0F2F8 0%, #E5E8F0 100%) !important;
+}
+html[data-theme^="midnight"] body::before {
+  background:
+    radial-gradient(ellipse 900px 700px at 20% 10%, rgba(168,132,255,.5), transparent 55%),
+    radial-gradient(ellipse 700px 800px at 85% 90%, rgba(236,100,180,.4), transparent 55%),
+    radial-gradient(ellipse 600px 600px at 10% 90%, rgba(100,210,240,.35), transparent 60%),
+    #000 !important;
+}
+body::after {
+  content: '' !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  background-image: radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px) !important;
+  background-size: 36px 36px !important;
+  mask-image: radial-gradient(ellipse at center, #000 15%, transparent 70%) !important;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 15%, transparent 70%) !important;
+}
+</style>
 </head>
   <style>
 html[data-element-style="glass"] .input-bar,
