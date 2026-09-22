@@ -8143,3 +8143,79 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
     0 0 0 3px rgba(88,166,255,.2);
   transform:translateX(-50%) scale(1.08);
 }
+/* ═══════════════════════════════════════════════════════════════
+   CREATOR AVATAR — سازنده با بج و هاور آبی
+   ═══════════════════════════════════════════════════════════════ */
+.about-avatar.creator-avatar{
+  position:relative!important;
+  overflow:visible!important;
+  background:linear-gradient(160deg,#1a1a2e 0%,#0f0f1e 100%)!important;
+  cursor:pointer;
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .5s cubic-bezier(.22,1,.36,1)!important;
+}
+
+.about-avatar.creator-avatar img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  display:block!important;
+  border-radius:50%!important;
+  image-rendering:pixelated!important;
+  filter:grayscale(1) contrast(1.05);
+  transition:
+    filter .55s cubic-bezier(.22,1,.36,1),
+    transform .55s cubic-bezier(.34,1.4,.64,1)!important;
+}
+
+/* ★★ هاور: همه‌چیز آبی بشه ★★ */
+.about-avatar.creator-avatar:hover img{
+  filter:sepia(1) hue-rotate(180deg) saturate(5) brightness(1.1)!important;
+  transform:scale(1.04)!important;
+}
+
+.about-avatar.creator-avatar:hover{
+  box-shadow:
+    0 0 0 4px var(--panel-bg),
+    0 0 0 5px #58A6FF,
+    0 20px 45px -15px #58A6FF,
+    0 0 60px -10px #58A6FF!important;
+  transform:translateY(-5px) scale(1.03)!important;
+}
+
+/* ═══ بج CREATOR ═══ */
+.creator-badge{
+  position:absolute;
+  bottom:-14px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:5px 16px;
+  border-radius:20px;
+  background:linear-gradient(160deg,#F4D03F 0%,#D4AF37 100%);
+  color:#1A1A2E;
+  font-family:'Inter',var(--font-text),sans-serif;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1.2px;
+  white-space:nowrap;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.3),
+    0 4px 14px -4px #D4AF37;
+  transition:
+    background .5s cubic-bezier(.22,1,.36,1),
+    color .4s cubic-bezier(.22,1,.36,1),
+    box-shadow .5s cubic-bezier(.22,1,.36,1),
+    transform .5s cubic-bezier(.34,1.4,.64,1)!important;
+  z-index:3;
+}
+
+.about-avatar.creator-avatar:hover .creator-badge{
+  background:linear-gradient(160deg,#58A6FF 0%,#1F6FEB 100%)!important;
+  color:#fff!important;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.3),
+    0 6px 20px -4px #58A6FF,
+    0 0 0 3px rgba(88,166,255,.2)!important;
+  transform:translateX(-50%) scale(1.1)!important;
+}
