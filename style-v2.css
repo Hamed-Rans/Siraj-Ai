@@ -7239,41 +7239,6 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   display:none!important;
 }
 
-/* ═══ کارت‌های ارتباط با ما ═══ */
-.about-contacts .contact-row,
-.contact-row{
-  transition:
-    transform .5s cubic-bezier(.22,1,.36,1),
-    background .4s cubic-bezier(.22,1,.36,1),
-    border-color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .5s cubic-bezier(.22,1,.36,1)!important;
-  will-change:transform!important;
-}
-.about-contacts .contact-row:hover,
-.contact-row:hover{
-  transform:translateX(-5px) translateY(-2px)!important;
-  background:var(--accent-soft)!important;
-  border-color:var(--accent)!important;
-  box-shadow:0 8px 24px -12px var(--accent)!important;
-}
-.about-contacts .contact-row:active,
-.contact-row:active{
-  transform:translateX(-2px) scale(.99)!important;
-}
-
-/* ═══ آیکون ارتباط — چرخش و رنگ ═══ */
-.contact-row .contact-icon{
-  transition:
-    transform .55s cubic-bezier(.34,1.4,.64,1),
-    background .35s cubic-bezier(.22,1,.36,1),
-    color .35s cubic-bezier(.22,1,.36,1)!important;
-}
-.contact-row:hover .contact-icon{
-  transform:scale(1.15) rotate(-8deg)!important;
-  background:var(--accent)!important;
-  color:#fff!important;
-  box-shadow:0 4px 14px -6px var(--accent)!important;
-}
 /* ═══════════════════════════════════════════════════════════════
    CREATOR AVATAR — سازنده با بج و هاور
    ═══════════════════════════════════════════════════════════════ */
@@ -8078,95 +8043,6 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   box-shadow:
     0 8px 24px -12px rgba(0,0,0,.4),
     0 0 0 1px var(--accent-soft)!important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — فیکس قطعی هاور (حرکت بالا + چرخش آیکون)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ═══ بازنویسی کامل ═══ */
-.about-contacts .contact-row,
-.contact-row {
-  position: relative !important;
-  overflow: visible !important;
-  transform: translate3d(0, 0, 0) !important;
-  will-change: transform !important;
-  backface-visibility: hidden !important;
-  transition:
-    transform .55s cubic-bezier(.22,1,.36,1),
-    background-color .4s cubic-bezier(.22,1,.36,1),
-    border-color .4s cubic-bezier(.22,1,.36,1),
-    box-shadow .55s cubic-bezier(.22,1,.36,1) !important;
-}
-
-.about-contacts .contact-row:hover,
-.contact-row:hover {
-  transform: translate3d(0, -5px, 0) !important;
-  background-color: var(--accent-soft) !important;
-  border-color: var(--accent) !important;
-  box-shadow:
-    0 10px 26px -12px rgba(0,0,0,.5),
-    0 4px 12px -6px var(--accent) !important;
-}
-
-.about-contacts .contact-row:active,
-.contact-row:active {
-  transform: translate3d(0, -2px, 0) scale(.99) !important;
-  transition-duration: .15s !important;
-}
-
-/* ═══ آیکون — چرخش نرم ═══ */
-.about-contacts .contact-row .contact-icon,
-.contact-row .contact-icon {
-  transform: translateZ(0) !important;
-  transition:
-    transform .55s cubic-bezier(.34,1.4,.64,1),
-    background-color .35s cubic-bezier(.22,1,.36,1),
-    color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
-}
-
-.about-contacts .contact-row:hover .contact-icon,
-.contact-row:hover .contact-icon {
-  transform: scale(1.15) rotate(-10deg) translateZ(0) !important;
-  background-color: var(--accent) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 18px -6px var(--accent) !important;
-}
-
-/* ═══ خط بالایی ═══ */
-.about-contacts .contact-row::before,
-.contact-row::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  right: 50% !important;
-  left: 50% !important;
-  height: 2px !important;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--accent-light) 25%,
-    var(--accent) 50%,
-    var(--accent-light) 75%,
-    transparent 100%) !important;
-  opacity: 0 !important;
-  transition:
-    right .55s cubic-bezier(.22,1,.36,1),
-    left .55s cubic-bezier(.22,1,.36,1),
-    opacity .35s cubic-bezier(.4,0,.2,1) !important;
-  pointer-events: none !important;
-  z-index: 5 !important;
-  border-radius: 0 0 2px 2px !important;
-}
-
-.about-contacts .contact-row:hover::before,
-.contact-row:hover::before {
-  right: 0 !important;
-  left: 0 !important;
-  opacity: 1 !important;
-}
-
-.contact-row::after {
-  display: none !important;
 }
 /* ═══════════════════════════════════════════════════════════════
    AI POPUP — پاپ‌آپ شناور سمت چپ
