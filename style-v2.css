@@ -8590,3 +8590,161 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   color: #fff !important;
   box-shadow: 0 6px 18px -6px var(--accent) !important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   TASK ITEM — فقط خط بالایی، بدون حرکت
+   ═══════════════════════════════════════════════════════════════ */
+#view-planner .task-item,
+#view-planner .task-item * {
+  transition: none !important;
+}
+
+#view-planner .task-item {
+  transition:
+    border-color .35s cubic-bezier(.22,1,.36,1),
+    background-color .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+/* ═══ حذف کامل حرکت هاور ═══ */
+#view-planner .task-item:hover {
+  transform: none !important;
+  background-color: var(--bubble-bot-bg) !important;
+  border-color: var(--accent) !important;
+  box-shadow: none !important;
+}
+
+/* ═══ فقط خط بالایی نرم باز بشه ═══ */
+#view-planner .task-item::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 50% !important;
+  left: 50% !important;
+  height: 2px !important;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-light) 25%,
+    var(--accent) 50%,
+    var(--accent-light) 75%,
+    transparent 100%) !important;
+  opacity: 0 !important;
+  transition:
+    right .55s cubic-bezier(.22,1,.36,1),
+    left .55s cubic-bezier(.22,1,.36,1),
+    opacity .35s cubic-bezier(.4,0,.2,1) !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+  border-radius: 0 0 2px 2px !important;
+}
+
+#view-planner .task-item:hover::before {
+  right: 0 !important;
+  left: 0 !important;
+  opacity: 1 !important;
+}
+
+#view-planner .task-item::after {
+  display: none !important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   CONTACT ROW — خط بالایی + آیکون چرخش (بدون حرکت)
+   ═══════════════════════════════════════════════════════════════ */
+.contact-row {
+  position: relative !important;
+  overflow: hidden !important;
+  transition:
+    background-color .4s cubic-bezier(.22,1,.36,1),
+    border-color .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
+  transform: none !important;
+}
+
+.contact-row:hover {
+  transform: none !important;
+  background-color: var(--accent-soft) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 4px 14px -8px rgba(0,0,0,.4) !important;
+}
+
+/* ═══ خط بالایی ═══ */
+.contact-row::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 50% !important;
+  left: 50% !important;
+  height: 2px !important;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--accent-light) 25%,
+    var(--accent) 50%,
+    var(--accent-light) 75%,
+    transparent 100%) !important;
+  opacity: 0 !important;
+  transition:
+    right .55s cubic-bezier(.22,1,.36,1),
+    left .55s cubic-bezier(.22,1,.36,1),
+    opacity .35s cubic-bezier(.4,0,.2,1) !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+  border-radius: 0 0 2px 2px !important;
+}
+
+.contact-row:hover::before {
+  right: 0 !important;
+  left: 0 !important;
+  opacity: 1 !important;
+}
+
+.contact-row::after {
+  display: none !important;
+}
+
+/* ═══ آیکون — چرخش نرم + رنگ ═══ */
+.contact-row .contact-icon {
+  transition:
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    background-color .35s cubic-bezier(.22,1,.36,1),
+    color .35s cubic-bezier(.22,1,.36,1) !important;
+}
+
+.contact-row:hover .contact-icon {
+  transform: scale(1.12) rotate(-8deg) !important;
+  background-color: var(--accent) !important;
+  color: #fff !important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   BEHAVIOR TAB — متن‌ها کوچیک‌تر
+   ═══════════════════════════════════════════════════════════════ */
+[data-cat="behavior"] .row-btn {
+  min-height: 62px !important;
+  max-height: 62px !important;
+  height: 62px !important;
+  padding: 8px 6px !important;
+  gap: 4px !important;
+}
+
+[data-cat="behavior"] .row-btn .rb-label {
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+
+/* ═══ ایموجی مدل‌ها کوچیک‌تر ═══ */
+[data-cat="behavior"] .row-btn > span:first-child:not(.rb-label) {
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+
+/* ═══ دکمه‌های تست نوتیف ═══ */
+[data-cat="behavior"] .btn-primary,
+[data-cat="behavior"] .btn-secondary {
+  padding: 10px 12px !important;
+  font-size: 11px !important;
+  border-radius: 11px !important;
+}
