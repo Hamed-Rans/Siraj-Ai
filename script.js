@@ -2215,6 +2215,11 @@ function openSettings() {
         settingsCat = 'appearance';
         window._settingsSub = 'general';
         window._appearanceSubHidden = false;
+        /* ★★ همیشه profileImage رو از localStorage بخون قبل از کپی کردن */
+        try {
+            var savedProfImg = localStorage.getItem(PROFILE_IMG_KEY);
+            if (savedProfImg) settings.profileImage = savedProfImg;
+        } catch (e) {}
         settingsDraft = JSON.parse(JSON.stringify(settings));
         if (!settingsDraft.models) settingsDraft.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
         renderSettingsControls();
@@ -2258,13 +2263,11 @@ function closeSettings() {
 function applySettings() {
     if (!settingsDraft) return;
     const oldPass = settings.password, oldEnabled = settings.passwordEnabled;
-
-    /* ★ profileImage رو از localStorage بخون چون ممکنه کاربر بعد از باز کردن تنظیمات آپلود کرده باشه */
+    /* ★★ قبل از کپی، profileImage رو از localStorage بخون */
     try {
-        var savedImg = localStorage.getItem(PROFILE_IMG_KEY);
-        if (savedImg) settingsDraft.profileImage = savedImg;
-    } catch(e) {}
-
+        var savedProfImg3 = localStorage.getItem(PROFILE_IMG_KEY);
+        if (savedProfImg3) settingsDraft.profileImage = savedProfImg3;
+    } catch (e) {}
     settings = JSON.parse(JSON.stringify(settingsDraft));
     saveSettings();
     applySettingsToUI();
@@ -2498,11 +2501,24 @@ function handleProfileUpload(ev) {
     const r = new FileReader();
     r.onload = e => {
         var dataUrl = e.target.result;
+
+        /* ★ ۱. ذخیره در localStorage — منبع اصلی */
         try { localStorage.setItem(PROFILE_IMG_KEY, dataUrl); } catch(err) {}
+
+        /* ★ ۲. آپدیت settings اصلی */
         settings.profileImage = dataUrl;
-        if (settingsDraft) settingsDraft.profileImage = dataUrl;
         saveSettings();
+
+        /* ★ ۳. آپدیت settingsDraft (اگه تنظیمات بازه) */
+        if (settingsDraft) settingsDraft.profileImage = dataUrl;
+
+        /* ★ ۴. رفرش همه آواتارها */
         refreshAllAvatars(dataUrl);
+
+        /* ★ ۵. آپدیت آواتار پیش‌نمایش توی تنظیمات */
+        var previewEl = document.getElementById('profileAvatarPreview');
+        if (previewEl) previewEl.innerHTML = '<img src="' + dataUrl + '" alt="">';
+
         toast('✓ عکس پروفایل ذخیره شد', 'success');
     };
     r.readAsDataURL(f);
@@ -2510,12 +2526,19 @@ function handleProfileUpload(ev) {
 }
 
 function refreshAllAvatars(src) {
-    try { src = src || localStorage.getItem(PROFILE_IMG_KEY) || ''; } catch (e) { src = src || ''; }
+    if (!src) {
+        try { src = localStorage.getItem(PROFILE_IMG_KEY) || ''; } catch(e) { src = ''; }
+    }
     if (!src) src = 'siraj-logo.png';
+
+    /* ★ فقط آواتار هدر */
     document.querySelectorAll('.main-top-avatar img').forEach(function(img){ img.src = src; });
+
+    /* ★ آواتار پیش‌نمایش توی مشخصات من */
     var preview = document.getElementById('profileAvatarPreview');
     if (preview) preview.innerHTML = '<img src="' + src + '" alt="">';
-    /* ★ حذف شد — دیگه about-avatar رو تغییر نده */
+
+    /* ⚠️ توجه: about-avatar دیگه دستکاری نمی‌شه — اون مخصوص سازنده‌ست */
 }
 function updatePassword() {
     const p1 = document.getElementById('newPass1');
@@ -2797,6 +2820,13 @@ function renderSettingsControls() {
     var lh = lo.map(function (k) { return '<button class="level-opt' + (k === lvl ? ' active' : '') + '" data-level="' + k + '">' + LEVEL_LABELS[k] + '</button>'; }).join('');
     var vo = ['chat', 'planner', 'blog', 'videos', 'tools'];
     var vh = vo.map(function (k) { return '<button class="default-view-opt' + (k === dv ? ' active' : '') + '" data-view="' + k + '">' + VIEW_LABELS[k] + '</button>'; }).join('');
+        try {
+        var savedProfImg2 = localStorage.getItem(PROFILE_IMG_KEY);
+        if (savedProfImg2) {
+            s.profileImage = savedProfImg2;
+            if (settingsDraft) settingsDraft.profileImage = savedProfImg2;
+        }
+    } catch (e) {}
     var profileHTML =
         '<div class="setting-group profile-section">' +
             '<label style="font-size:13px;font-weight:800;color:var(--accent)">👤 مشخصات شخصی</label>' +
