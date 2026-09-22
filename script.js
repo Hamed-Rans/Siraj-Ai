@@ -2336,8 +2336,14 @@ function updateDraft(key, value) {
     if (['patternSize', 'patternOpacity', 'patternPerCorner', 'navShadowLevel', 'bgImageOpacity', 'autoLockMinutes', 'notifPreMinutes', 'studyDefaultMinutes'].includes(key)) value = parseInt(value, 10);
     if (key === 'bgPreset') { settingsDraft.bgImage = ''; settingsDraft.bgPreset = value; }
     else settingsDraft[key] = value;
-    document.querySelectorAll('#settingsContentWrap .row-btn, #settingsContentWrap .color-opt, #settingsContentWrap .pattern-opt, #settingsContentWrap .bg-opt, #settingsContentWrap .pattern-preset').forEach(b => {
-        if (b.dataset.key === key) b.classList.toggle('active', String(b.dataset.value) === String(value));
+        /* ★ رفع باگ: تشخیص state دکمه‌ها با parse کردن onclick */
+    var allBtns = document.querySelectorAll('#settingsContentWrap .row-btn, #settingsContentWrap .color-opt, #settingsContentWrap .pattern-opt, #settingsContentWrap .bg-opt, #settingsContentWrap .pattern-preset');
+    allBtns.forEach(function(b) {
+        var oc = (b.getAttribute('onclick') || '') + ' ' + (b.getAttribute('oninput') || '');
+        var m = oc.match(/updateDraft\(\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]+)['"]\s*\)/);
+        if (!m) return;
+        if (m[1] !== key) return;
+        b.classList.toggle('active', String(m[2]) === String(value));
     });
     if (['patternSize', 'patternOpacity', 'patternPerCorner', 'navShadowLevel', 'bgImageOpacity', 'autoLockMinutes', 'notifPreMinutes', 'studyDefaultMinutes'].includes(key)) {
         document.querySelectorAll('#settingsContentWrap input[type=range]').forEach(inp => {
@@ -2531,14 +2537,18 @@ function refreshAllAvatars(src) {
     }
     if (!src) src = 'siraj-logo.png';
 
-    /* ★ فقط آواتار هدر */
-    document.querySelectorAll('.main-top-avatar img').forEach(function(img){ img.src = src; });
+    /* ★ اگه هنوز آواتار توی هدر نیست، دوباره امتحان کن */
+    var avatars = document.querySelectorAll('.main-top-avatar img');
+    if (avatars.length === 0) {
+        /* آواتار هنوز ساخته نشده، بعداً امتحان کن */
+        setTimeout(function() { refreshAllAvatars(src); }, 200);
+        return;
+    }
+    avatars.forEach(function(img){ img.src = src; });
 
-    /* ★ آواتار پیش‌نمایش توی مشخصات من */
+    /* preview توی تنظیمات */
     var preview = document.getElementById('profileAvatarPreview');
     if (preview) preview.innerHTML = '<img src="' + src + '" alt="">';
-
-    /* ⚠️ توجه: about-avatar دیگه دستکاری نمی‌شه — اون مخصوص سازنده‌ست */
 }
 function updatePassword() {
     const p1 = document.getElementById('newPass1');
@@ -3394,7 +3404,7 @@ window.addEventListener('load', () => {
     cleanupSessions();
     checkLock();
 
-    sessionPingInterval = setInterval(() => {
+        sessionPingInterval = setInterval(() => {
         if (settings.passwordEnabled && settings.password && sessionStorage.getItem(LOCK_SESSION_KEY) === '1') {
             pingMySession();
             cleanupSessions();
@@ -3403,6 +3413,11 @@ window.addEventListener('load', () => {
     }, 30000);
 
     resetInactivityTimer();
+
+    /* ★ رفرش آواتارهای هدر بعد از لود کامل */
+    setTimeout(refreshAllAvatars, 500);
+    setTimeout(refreshAllAvatars, 1500);
+    setTimeout(refreshAllAvatars, 3000);
 });
 
 /* ═══════════════════════════════════════════════════════════════
