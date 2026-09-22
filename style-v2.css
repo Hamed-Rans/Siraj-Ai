@@ -9434,3 +9434,300 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
     0 1px 2px rgba(0,0,0,.25),
     0 8px 22px -8px #F59E0B!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   AURA GLASS — پس‌زمینه رنگی متحرک + شیشه‌ای مطلق
+   هر تم، پس‌زمینه‌ی رنگی خودش رو داره. متناسب با accent عوض می‌شه.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ ۱. متغیرهای جدید برای هر تم ═══ */
+:root{
+  --aura-c1: var(--accent);
+  --aura-c2: var(--accent-light);
+  --aura-c3: var(--accent-dark);
+  --aura-opacity: 1;
+}
+
+/* ═══ تم شبانه (Dark Mode) ═══ */
+[data-theme="dark-navy"]{
+  --aura-c1: #8B5CF6;  /* بنفش */
+  --aura-c2: #EC4899;  /* صورتی */
+  --aura-c3: #06B6D4;  /* فیروزه */
+}
+[data-theme="dark-crimson"]{
+  --aura-c1: #EF4444;
+  --aura-c2: #F97316;
+  --aura-c3: #EC4899;
+}
+[data-theme="dark-gold"]{
+  --aura-c1: #D4AF37;
+  --aura-c2: #F59E0B;
+  --aura-c3: #EAB308;
+}
+[data-theme="dark-purple"]{
+  --aura-c1: #A855F7;
+  --aura-c2: #8B5CF6;
+  --aura-c3: #EC4899;
+}
+[data-theme="dark-emerald"]{
+  --aura-c1: #10B981;
+  --aura-c2: #14B8A6;
+  --aura-c3: #06B6D4;
+}
+[data-theme="dark-indigo"]{
+  --aura-c1: #6366F1;
+  --aura-c2: #3B82F6;
+  --aura-c3: #A855F7;
+}
+
+/* ═══ تم روز (Light Mode) — ملایم‌تر ═══ */
+[data-theme^="light"]{
+  --aura-opacity: .55;
+}
+
+/* ═══ تم نیمه‌شب (Midnight) — تیره‌تر ═══ */
+[data-theme^="midnight"]{
+  --aura-opacity: 1.3;
+}
+
+/* ═══ ۲. پس‌زمینه Aurora — رنگی و متحرک ═══ */
+body::before{
+  content: '' !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(ellipse 900px 700px at 15% 10%,
+      color-mix(in srgb, var(--aura-c1) 45%, transparent),
+      transparent 55%),
+    radial-gradient(ellipse 800px 800px at 85% 20%,
+      color-mix(in srgb, var(--aura-c2) 35%, transparent),
+      transparent 55%),
+    radial-gradient(ellipse 700px 700px at 20% 90%,
+      color-mix(in srgb, var(--aura-c3) 30%, transparent),
+      transparent 55%),
+    radial-gradient(ellipse 600px 600px at 90% 90%,
+      color-mix(in srgb, var(--aura-c1) 25%, transparent),
+      transparent 60%),
+    var(--primary-gradient) !important;
+  opacity: var(--aura-opacity) !important;
+  animation: auraShift 25s ease-in-out infinite !important;
+  filter: saturate(1.15) !important;
+  transition: background 1s ease, opacity .6s ease !important;
+}
+
+@keyframes auraShift{
+  0%, 100%{
+    background-position: 0% 0%, 100% 0%, 50% 100%, 100% 100%, 0 0;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  }
+  33%{
+    background-position: 10% 5%, 90% 10%, 40% 90%, 85% 95%, 0 0;
+  }
+  66%{
+    background-position: 5% 15%, 95% 5%, 60% 85%, 95% 90%, 0 0;
+  }
+}
+
+/* ═══ ۳. نقطه‌چین ظریف روی پس‌زمینه ═══ */
+body::after{
+  content: '' !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  background-image: radial-gradient(rgba(255,255,255,.03) 1px, transparent 1px) !important;
+  background-size: 36px 36px !important;
+  mask-image: radial-gradient(ellipse at center, #000 10%, transparent 65%) !important;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 10%, transparent 65%) !important;
+  opacity: .7 !important;
+}
+[data-theme^="light"] body::after,
+body[data-theme^="light"]::after{
+  background-image: radial-gradient(rgba(0,0,0,.04) 1px, transparent 1px) !important;
+}
+
+/* ═══ ۴. شیشه‌ای مطلق روی همه المان‌ها (وقتی glass فعاله) ═══ */
+
+/* --- Main containers --- */
+[data-element-style="glass"] .main-chat,
+[data-element-style="glass"] .side-panel{
+  background: rgba(255,255,255,.05) !important;
+  backdrop-filter: blur(45px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(45px) saturate(200%) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 20px 50px -20px rgba(0,0,0,.7),
+    0 0 100px -30px var(--accent) !important;
+}
+
+/* --- Header --- */
+[data-element-style="glass"][data-header-style="glass"] .chat-header,
+[data-element-style="glass"][data-header-style="glass"] .planner-hero,
+[data-element-style="glass"][data-header-style="glass"] .page-title-bar{
+  background: rgba(255,255,255,.04) !important;
+  backdrop-filter: blur(50px) saturate(200%) brightness(1.05) !important;
+  -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.05) !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+}
+
+/* --- Input bar --- */
+[data-element-style="glass"][data-input-style="glass"] .input-bar{
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.06),
+    rgba(255,255,255,.03)) !important;
+  backdrop-filter: blur(50px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+}
+
+/* --- Cards --- */
+[data-element-style="glass"] .daily-card,
+[data-element-style="glass"] .panel-card,
+[data-element-style="glass"] .tool-card,
+[data-element-style="glass"] .month-calendar,
+[data-element-style="glass"] .month-goals,
+[data-element-style="glass"] .year-overview,
+[data-element-style="glass"] .planner-hero-card,
+[data-element-style="glass"] .week-grid-wrap,
+[data-element-style="glass"] .week-summary,
+[data-element-style="glass"] .learn-library-box,
+[data-element-style="glass"] .settings-modal,
+[data-element-style="glass"] .task-item,
+[data-element-style="glass"] .history-item,
+[data-element-style="glass"] .ll-item,
+[data-element-style="glass"] .contact-row,
+[data-element-style="glass"] .planner-stats-card{
+  background: linear-gradient(160deg,
+    rgba(255,255,255,.05),
+    rgba(255,255,255,.02)) !important;
+  backdrop-filter: blur(35px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(35px) saturate(190%) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 12px 32px -15px rgba(0,0,0,.5) !important;
+}
+
+/* --- Nav bar --- */
+[data-element-style="glass"][data-nav-style="glass"] .bottom-nav,
+[data-element-style="glass"][data-nav-style="blur"] .bottom-nav{
+  background: rgba(20,20,32,.65) !important;
+  backdrop-filter: blur(50px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 20px 50px -20px rgba(0,0,0,.8),
+    0 0 80px -25px var(--accent) !important;
+}
+
+/* --- Bubbles --- */
+[data-element-style="glass"] .bot .msg{
+  background: linear-gradient(160deg,
+    rgba(255,255,255,.07),
+    rgba(255,255,255,.03)) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+[data-element-style="glass"] .me .msg{
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent-light) 95%, transparent),
+    color-mix(in srgb, var(--accent) 90%, transparent)) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.25),
+    0 8px 24px -10px var(--accent) !important;
+}
+
+/* ═══ ۵. تم روز — شیشه‌ای روشن ═══ */
+[data-theme^="light"][data-element-style="glass"] .main-chat,
+[data-theme^="light"][data-element-style="glass"] .side-panel{
+  background: rgba(255,255,255,.7) !important;
+  border: 1px solid rgba(0,0,0,.06) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 20px 50px -20px rgba(0,0,0,.15) !important;
+}
+[data-theme^="light"][data-element-style="glass"] .bot .msg{
+  background: rgba(255,255,255,.85) !important;
+  border: 1px solid rgba(0,0,0,.05) !important;
+  color: var(--text-main) !important;
+}
+[data-theme^="light"][data-element-style="glass"] .daily-card,
+[data-theme^="light"][data-element-style="glass"] .panel-card,
+[data-theme^="light"][data-element-style="glass"] .tool-card,
+[data-theme^="light"][data-element-style="glass"] .planner-hero-card,
+[data-theme^="light"][data-element-style="glass"] .settings-modal{
+  background: rgba(255,255,255,.75) !important;
+  border: 1px solid rgba(0,0,0,.06) !important;
+}
+
+/* ═══ ۶. اسکرول‌بار شیشه‌ای ═══ */
+[data-element-style="glass"] ::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-light) 60%, transparent),
+    color-mix(in srgb, var(--accent) 60%, transparent)) !important;
+  box-shadow: 0 0 8px var(--accent-soft) !important;
+}
+
+/* ═══ ۷. درخشش ملایم دکمه‌های شیشه‌ای ═══ */
+[data-element-style="glass"] .bottom-nav-btn.nav-btn-chat,
+[data-element-style="glass"] .send-btn{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.3),
+    0 8px 24px -8px var(--accent),
+    0 0 40px -10px var(--accent) !important;
+}
+[data-element-style="glass"] .bottom-nav-btn.nav-btn-chat:hover,
+[data-element-style="glass"] .send-btn.visible:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.35),
+    0 12px 32px -8px var(--accent),
+    0 0 60px -8px var(--accent) !important;
+}
+
+/* ═══ ۸. کارت‌های روزانه — شیشه‌ای مطلق ═══ */
+[data-element-style="glass"] .daily-card{
+  border: 1px solid rgba(255,255,255,.1) !important;
+}
+[data-element-style="glass"] .daily-card .dcw-item{
+  background: rgba(255,255,255,.03) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+}
+
+/* ═══ ۹. تنظیمات — شیشه‌ای ═══ */
+[data-element-style="glass"] .settings-content-wrap .setting-group{
+  background: linear-gradient(160deg,
+    rgba(255,255,255,.04),
+    rgba(255,255,255,.015)) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+}
+
+/* ═══ ۱۰. پنل کناری — شیشه‌ای ═══ */
+[data-element-style="glass"] .side-panel{
+  backdrop-filter: blur(60px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(60px) saturate(220%) !important;
+}
+
+/* ═══ ۱۱. عکس پس‌زمینه — اگه کاربر عکس انتخاب کرد، روش یه لایه شیشه‌ای ═══ */
+[data-element-style="glass"] body::before,
+body.has-custom-bg[data-element-style="glass"]::before{
+  background:
+    radial-gradient(ellipse 900px 700px at 15% 10%,
+      color-mix(in srgb, var(--aura-c1) 35%, transparent),
+      transparent 55%),
+    radial-gradient(ellipse 800px 800px at 85% 20%,
+      color-mix(in srgb, var(--aura-c2) 25%, transparent),
+      transparent 55%),
+    radial-gradient(ellipse 700px 700px at 20% 90%,
+      color-mix(in srgb, var(--aura-c3) 22%, transparent),
+      transparent 55%),
+    var(--siraj-bg, var(--primary-gradient)) !important;
+}
