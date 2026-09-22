@@ -2846,7 +2846,7 @@ function renderSettingsControls() {
             '</div>' +
         '</div>' +
 
-                '<div class="settings-content' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior">' +
+        '<div class="settings-content' + (settingsCat === 'behavior' ? ' active' : '') + '" data-cat="behavior">' +
             '<div class="setting-group">' +
                 '<label>مدل پیش‌فرض</label>' +
                 '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
@@ -2854,7 +2854,7 @@ function renderSettingsControls() {
                         var isActive = (s.selectedModel||'hakim') === m.id;
                         return '<button class="row-btn' + (isActive ? ' active' : '') + '" onclick="updateDraft(\'selectedModel\',\'' + m.id + '\');renderSettingsControls()">' +
                             '<span style="font-size:22px;line-height:1">'+m.emoji+'</span>' +
-                            '<span class="rb-label" style="color:'+m.color+'">'+escapeHtml(m.name)+'</span>' +
+                            '<span class="rb-label">'+escapeHtml(m.name)+'</span>' +
                         '</button>';
                     }).join('') +
                 '</div>' +
@@ -2862,9 +2862,9 @@ function renderSettingsControls() {
             '<div class="setting-group">' +
                 '<label>حالت پاسخ</label>' +
                 '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
-                    '<button class="row-btn' + (!s.thinking && !s.quick ? ' active' : '') + '" onclick="updateDraft(\'thinking\',false);updateDraft(\'quick\',false);renderSettingsControls()"><span style="font-size:20px">💬</span><span class="rb-label">معمولی</span></button>' +
-                    '<button class="row-btn' + (s.thinking ? ' active' : '') + '" onclick="updateDraft(\'thinking\',true);updateDraft(\'quick\',false);renderSettingsControls()"><span style="font-size:20px">🧠</span><span class="rb-label">تفکر عمیق</span></button>' +
-                    '<button class="row-btn' + (s.quick ? ' active' : '') + '" onclick="updateDraft(\'quick\',true);updateDraft(\'thinking\',false);renderSettingsControls()"><span style="font-size:20px">⚡</span><span class="rb-label">پاسخ سریع</span></button>' +
+                    '<button class="row-btn' + (!s.thinking && !s.quick ? ' active' : '') + '" onclick="updateDraft(\'thinking\',false);updateDraft(\'quick\',false);renderSettingsControls()"><span class="rb-label">معمولی</span></button>' +
+                    '<button class="row-btn' + (s.thinking ? ' active' : '') + '" onclick="updateDraft(\'thinking\',true);updateDraft(\'quick\',false);renderSettingsControls()"><span class="rb-label">تفکر عمیق</span></button>' +
+                    '<button class="row-btn' + (s.quick ? ' active' : '') + '" onclick="updateDraft(\'quick\',true);updateDraft(\'thinking\',false);renderSettingsControls()"><span class="rb-label">پاسخ سریع</span></button>' +
                 '</div>' +
             '</div>' +
             '<div class="setting-group">' +
