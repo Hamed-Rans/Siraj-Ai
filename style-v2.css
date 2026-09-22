@@ -8513,3 +8513,80 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   display: none !important;
   height: 0 !important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR — رنگ تم
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ همه اسکرول‌بارها با رنگ تم ═══ */
+::-webkit-scrollbar {
+  width: 7px !important;
+  height: 7px !important;
+}
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent-light), var(--accent)) !important;
+  border-radius: 10px !important;
+  border: 1px solid transparent !important;
+  background-clip: padding-box !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent) !important;
+  border: 1px solid transparent !important;
+  background-clip: padding-box !important;
+}
+
+/* ═══ Firefox ═══ */
+* {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--accent) transparent !important;
+}
+
+/* ═══ محتوای پنل — هیچ خط اضافی ═══ */
+.side-panel .panel-content {
+  scrollbar-gutter: stable !important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   CONTACT ROW — هاور: بالا + آیکون چرخش (فیکس AI)
+   ═══════════════════════════════════════════════════════════════ */
+.contact-row {
+  transition:
+    transform .55s cubic-bezier(.22,1,.36,1),
+    background-color .4s cubic-bezier(.22,1,.36,1),
+    border-color .4s cubic-bezier(.22,1,.36,1),
+    box-shadow .55s cubic-bezier(.22,1,.36,1) !important;
+  will-change: transform !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
+
+.contact-row:hover {
+  transform: translate3d(0, -5px, 0) !important;
+  background-color: var(--accent-soft) !important;
+  border-color: var(--accent) !important;
+  box-shadow:
+    0 8px 22px -10px rgba(0,0,0,.5),
+    0 4px 12px -6px var(--accent) !important;
+}
+
+.contact-row:active {
+  transform: translate3d(0, -2px, 0) scale(.99) !important;
+  transition-duration: .15s !important;
+}
+
+/* ═══ آیکون — چرخش و رنگ ═══ */
+.contact-row .contact-icon {
+  transition:
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    background-color .35s cubic-bezier(.22,1,.36,1),
+    color .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
+}
+
+.contact-row:hover .contact-icon {
+  transform: scale(1.15) rotate(-10deg) !important;
+  background-color: var(--accent) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 18px -6px var(--accent) !important;
+}
