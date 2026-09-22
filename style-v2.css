@@ -7946,3 +7946,200 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   pointer-events:auto!important;
   cursor:pointer!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   Z-INDEX FIX — پنل‌های dropdown روی همه‌چیز
+   ═══════════════════════════════════════════════════════════════ */
+.dd-panel,
+.siraj-select-panel,
+.siraj-select.open,
+.dd-panel.model-dd-panel,
+.dropdown.open{
+  z-index:99999!important;
+}
+.siraj-select{
+  position:relative!important;
+  z-index:50!important;
+}
+.siraj-select.open{
+  z-index:10000!important;
+}
+.task-add-form,
+.task-form-selects,
+.tasks-list,
+.tasks-list-title,
+.daily-cards,
+.daily-card,
+.planner-body-content,
+.planner-pane > *{
+  z-index:auto!important;
+}
+/* ═══ اطمینان از stacking context درست ═══ */
+.planner-pane{
+  isolation:auto!important;
+}
+.task-add-form{
+  isolation:auto!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   TASK ITEM + CONTACT ROW — هاور نرم قوی
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ تسک‌های امروز ═══ */
+#view-planner .task-item{
+  transition:
+    transform .5s cubic-bezier(.22,1,.36,1),
+    background .4s cubic-bezier(.22,1,.36,1),
+    border-color .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .5s cubic-bezier(.22,1,.36,1)!important;
+  will-change:transform!important;
+  position:relative!important;
+}
+#view-planner .task-item:hover{
+  transform:translateX(-5px) translateY(-2px)!important;
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 8px 24px -12px var(--accent)!important;
+}
+#view-planner .task-item:active{
+  transform:translateX(-2px) translateY(0) scale(.997)!important;
+  transition-duration:.15s!important;
+}
+
+/* ═══ خط بالای task-item — نرم ═══ */
+#view-planner .task-item::before{
+  content:''!important;
+  position:absolute!important;
+  top:0!important;
+  right:50%!important;
+  left:50%!important;
+  height:2px!important;
+  background:linear-gradient(90deg,transparent,var(--accent-light) 30%,var(--accent) 50%,var(--accent-light) 70%,transparent)!important;
+  opacity:0!important;
+  transition:
+    right .6s cubic-bezier(.22,1,.36,1),
+    left .6s cubic-bezier(.22,1,.36,1),
+    opacity .4s cubic-bezier(.4,0,.2,1)!important;
+  pointer-events:none!important;
+  z-index:2!important;
+  border-radius:0 0 2px 2px!important;
+}
+#view-planner .task-item:hover::before{
+  right:0!important;
+  left:0!important;
+  opacity:1!important;
+}
+#view-planner .task-item::after{
+  display:none!important;
+}
+
+/* ═══ کارت‌های ارتباط با ما ═══ */
+.about-contacts .contact-row,
+.contact-row{
+  transition:
+    transform .5s cubic-bezier(.22,1,.36,1),
+    background .4s cubic-bezier(.22,1,.36,1),
+    border-color .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .5s cubic-bezier(.22,1,.36,1)!important;
+  will-change:transform!important;
+}
+.about-contacts .contact-row:hover,
+.contact-row:hover{
+  transform:translateX(-5px) translateY(-2px)!important;
+  background:var(--accent-soft)!important;
+  border-color:var(--accent)!important;
+  box-shadow:0 8px 24px -12px var(--accent)!important;
+}
+.about-contacts .contact-row:active,
+.contact-row:active{
+  transform:translateX(-2px) scale(.99)!important;
+}
+
+/* ═══ آیکون ارتباط — چرخش و رنگ ═══ */
+.contact-row .contact-icon{
+  transition:
+    transform .55s cubic-bezier(.34,1.4,.64,1),
+    background .35s cubic-bezier(.22,1,.36,1),
+    color .35s cubic-bezier(.22,1,.36,1)!important;
+}
+.contact-row:hover .contact-icon{
+  transform:scale(1.15) rotate(-8deg)!important;
+  background:var(--accent)!important;
+  color:#fff!important;
+  box-shadow:0 4px 14px -6px var(--accent)!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   CREATOR AVATAR — سازنده با بج و هاور
+   ═══════════════════════════════════════════════════════════════ */
+.about-avatar.creator-avatar{
+  position:relative!important;
+  overflow:visible!important;
+  background:linear-gradient(160deg,#1a1a2e 0%,#0f0f1e 100%)!important;
+  cursor:pointer;
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .5s cubic-bezier(.22,1,.36,1)!important;
+}
+
+.about-avatar.creator-avatar img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  display:block!important;
+  border-radius:50%!important;
+  image-rendering:pixelated!important;
+  filter:grayscale(1) contrast(1.05);
+  transition:
+    filter .55s cubic-bezier(.22,1,.36,1),
+    transform .55s cubic-bezier(.34,1.4,.64,1)!important;
+}
+
+.about-avatar.creator-avatar:hover img{
+  /* ★ روی هاور: کل عکس آبی می‌شه (شامل لباس) */
+  filter:grayscale(0) sepia(1) hue-rotate(180deg) saturate(4) brightness(1.05);
+  transform:scale(1.03);
+}
+
+.about-avatar.creator-avatar:hover{
+  box-shadow:
+    0 0 0 4px var(--panel-bg),
+    0 0 0 5px #58A6FF,
+    0 20px 45px -15px #58A6FF,
+    0 0 60px -10px #58A6FF!important;
+  transform:translateY(-4px) scale(1.02)!important;
+}
+
+/* ═══ بج CREATOR ═══ */
+.creator-badge{
+  position:absolute;
+  bottom:-14px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:5px 16px;
+  border-radius:20px;
+  background:linear-gradient(160deg,#F4D03F 0%,#D4AF37 100%);
+  color:#1A1A2E;
+  font-family:'Inter',var(--font-text),sans-serif;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1.2px;
+  white-space:nowrap;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.3),
+    0 4px 14px -4px #D4AF37;
+  transition:
+    background .5s cubic-bezier(.22,1,.36,1),
+    color .4s cubic-bezier(.22,1,.36,1),
+    box-shadow .5s cubic-bezier(.22,1,.36,1),
+    transform .5s cubic-bezier(.34,1.4,.64,1)!important;
+  z-index:3;
+}
+
+.about-avatar.creator-avatar:hover .creator-badge{
+  background:linear-gradient(160deg,#58A6FF 0%,#1F6FEB 100%);
+  color:#fff;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.3),
+    0 6px 20px -4px #58A6FF,
+    0 0 0 3px rgba(88,166,255,.2);
+  transform:translateX(-50%) scale(1.08);
+}
