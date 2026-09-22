@@ -8355,3 +8355,161 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
 .row-btn:active {
   transform: translateY(0) scale(.97) !important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS BUTTONS — کوچیک‌تر و متعادل
+   ═══════════════════════════════════════════════════════════════ */
+.row-btn {
+  min-height: 62px !important;
+  max-height: 62px !important;
+  height: 62px !important;
+  padding: 8px 6px !important;
+  gap: 4px !important;
+  border-radius: 12px !important;
+}
+.row-btn .rb-icon {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  flex-shrink: 0 !important;
+}
+.row-btn .rb-label {
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+.row-btn > span:first-child:not(.rb-label):not(.rb-icon) {
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+
+/* ═══ گریدهای ۳تایی ═══ */
+.row-btns {
+  display: grid !important;
+  gap: 8px !important;
+  grid-auto-flow: row !important;
+}
+.row-btns[style*="1fr 1fr 1fr"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+.row-btns[style*="1fr 1fr"]:not([style*="1fr 1fr 1fr"]) {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   HOVER — کارت‌های روزانه و ارتباط با ما (فیکس قطعی)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ تسک‌های امروز ═══ */
+#view-planner .task-item,
+#view-planner .task-item * {
+  transition: none !important;
+}
+#view-planner .task-item {
+  transition:
+    transform .55s cubic-bezier(.22,1,.36,1),
+    background-color .45s cubic-bezier(.22,1,.36,1),
+    border-color .4s cubic-bezier(.22,1,.36,1),
+    box-shadow .55s cubic-bezier(.22,1,.36,1) !important;
+  will-change: transform !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
+#view-planner .task-item:hover {
+  transform: translate3d(-4px, -1px, 0) !important;
+  background-color: var(--accent-soft) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 6px 20px -10px rgba(0,0,0,.5) !important;
+}
+
+/* ═══ کارت‌های ارتباط با ما ═══ */
+.contact-row,
+.contact-row * {
+  transition: none !important;
+}
+.contact-row {
+  transition:
+    transform .55s cubic-bezier(.22,1,.36,1),
+    background-color .45s cubic-bezier(.22,1,.36,1),
+    border-color .4s cubic-bezier(.22,1,.36,1),
+    box-shadow .55s cubic-bezier(.22,1,.36,1) !important;
+  will-change: transform !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
+.contact-row:hover {
+  transform: translate3d(-4px, -1px, 0) !important;
+  background-color: var(--accent-soft) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 6px 20px -10px rgba(0,0,0,.5) !important;
+}
+
+/* ═══ آیکون ارتباط ═══ */
+.contact-row .contact-icon {
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    background-color .35s cubic-bezier(.22,1,.36,1),
+    color .35s cubic-bezier(.22,1,.36,1) !important;
+}
+.contact-row:hover .contact-icon {
+  transform: scale(1.08) rotate(-4deg) !important;
+  background-color: var(--accent) !important;
+  color: #fff !important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR — برگردون به تم رنگی اصلی
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ برگردون اسکرول‌بار پیش‌فرض تم ═══ */
+.settings-content::-webkit-scrollbar,
+.settings-content-wrap::-webkit-scrollbar,
+.settings-preview::-webkit-scrollbar,
+.settings-tabs::-webkit-scrollbar,
+.side-panel .panel-content::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+.settings-content::-webkit-scrollbar-track,
+.settings-content-wrap::-webkit-scrollbar-track,
+.settings-preview::-webkit-scrollbar-track,
+.settings-tabs::-webkit-scrollbar-track,
+.side-panel .panel-content::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.settings-content::-webkit-scrollbar-thumb,
+.settings-content-wrap::-webkit-scrollbar-thumb,
+.settings-preview::-webkit-scrollbar-thumb,
+.settings-tabs::-webkit-scrollbar-thumb,
+.side-panel .panel-content::-webkit-scrollbar-thumb {
+  background: var(--accent) !important;
+  border-radius: 10px !important;
+  opacity: .6 !important;
+}
+.settings-content::-webkit-scrollbar-thumb:hover,
+.side-panel .panel-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-light) !important;
+}
+
+/* ═══ پنل کناری — اسکرول‌بار داخل کادر، نه بیرون ═══ */
+.side-panel {
+  overflow: hidden !important;
+}
+.side-panel .panel-content {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+.side-panel .panel-content > * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* ═══ اسکرول‌بار افقی رو مخفی کن ═══ */
+.panel-content::-webkit-scrollbar:horizontal,
+.settings-content::-webkit-scrollbar:horizontal {
+  display: none !important;
+  height: 0 !important;
+}
