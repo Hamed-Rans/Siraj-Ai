@@ -1725,27 +1725,43 @@ async function send() {
         const ctypeRaw = res.headers.get('content-type') || '';
         clearTimeout(timeoutId);
 
-        if (!res.ok) {
-            const t = document.getElementById('typing-indicator');
-            if (t) t.remove();
-            let msg = '';
-            let errBody = '';
-            try { errBody = await res.text(); } catch (e) {}
-            if (res.status === 429) msg = '🫴 رسیدیم به محدودیت\n\nپول وُردَه تا بتونی ادامه بدی پول زور وُردَه! 🫴💸\n\n۳۰ ثانیه دیگه دوباره امتحان کن.';
-            else if (res.status === 401 || res.status === 403) msg = '🔑 کلید API مشکل داره. به سازنده بگو عوضش کنه.';
-            else if (res.status === 404) msg = '🔍 مدل یا مسیر پیدا نشد (۴۰۴). شاید مدل خواب رفته.';
-            else if (res.status === 503) msg = '🔄 سرور الان شلوغه. یه ذره دیگه صبر کن.';
-            else msg = 'خطا (' + res.status + '): ' + (errBody.substring(0, 250) || 'بدون توضیح');
-            /* ★ اگه روی همون چت هستیم، توی UI نشون بده */
-            if (chatId === currentChatId) renderBotMsg(msg);
-            /* ★ ولی همیشه توی history ذخیره کن */
-            addMsgToHistory(chatId, 'assistant', msg);
-            delete pendingRequests[chatId];
-            chatInFlight = false;
-            isStreaming = false;
-            setSendButton();
-            return;
-        }
+       if (!res.ok) {
+    const t = document.getElementById('typing-indicator');
+    if (t) t.remove();
+    let msg = '';
+    let errBody = '';
+    try { errBody = await res.text(); } catch (e) {}
+
+    // ★ استخراج پیام تمیز از خطای JSON
+    let cleanErr = errBody;
+    try {
+        const parsed = JSON.parse(errBody);
+        if (parsed?.error?.message) cleanErr = parsed.error.message;
+        else if (parsed?.error?.status) cleanErr = parsed.error.status + ' — ' + (parsed.error.message || '');
+    } catch (e) {}
+
+    if (res.status === 429) {
+        msg = '🫴 رسیدیم به محدودیت\n\nپول وُردَه تا بتونی ادامه بدی پول زور وُردَه! 🫴💸\n\n۳۰ ثانیه دیگه دوباره امتحان کن.';
+    } else if (res.status === 401 || res.status === 403) {
+        msg = '🔑 کلید API مشکل داره. به سازنده بگو عوضش کنه.';
+    } else if (res.status === 404) {
+        msg = '🔍 مدل یا مسیر پیدا نشد (۴۰۴).\n\nجزئیات: ' + cleanErr.substring(0, 250);
+    } else if (res.status === 400) {
+        msg = '⚠️ درخواست نامعتبر (۴۰۰)\n\n' + cleanErr.substring(0, 350);
+    } else if (res.status === 503) {
+        msg = '🔄 سرور الان شلوغه. یه ذره دیگه صبر کن.';
+    } else {
+        msg = 'خطا (' + res.status + '): ' + cleanErr.substring(0, 300);
+    }
+
+    if (chatId === currentChatId) renderBotMsg(msg);
+    addMsgToHistory(chatId, 'assistant', msg);
+    delete pendingRequests[chatId];
+    chatInFlight = false;
+    isStreaming = false;
+    setSendButton();
+    return;
+}
 
         streamQueue = '';
         streamFinished = false;
