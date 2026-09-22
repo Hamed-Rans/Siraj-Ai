@@ -7934,79 +7934,15 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   z-index:2!important;
 }
 /* ═══════════════════════════════════════════════════════════════
-   BEHAVIOR TAB — فیکس قطعی دکمه‌ها
+   SETTINGS BUTTONS — فیکس نرم و بدون دستکاری گرید
    ═══════════════════════════════════════════════════════════════ */
-
-/* ═══ حذف contain:paint که محتوا رو می‌برید ═══ */
-.settings-content-wrap,
-.settings-content,
-.setting-group,
-.setting-group > div,
-[data-cat="behavior"],
-[data-cat="behavior"] .setting-group{
-  contain:none!important;
-}
-
-/* ═══ تنظیمات content — بدون ارتفاع قفل ═══ */
 .settings-content{
-  height:auto!important;
-  min-height:100%!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
-  padding-bottom:60px!important;
 }
-
-/* ═══ دکمه‌های رفتار — همه در یک ردیف منظم ═══ */
-[data-cat="behavior"] .row-btn{
-  min-height:80px!important;
-  height:80px!important;
-  max-height:80px!important;
-  padding:12px 8px!important;
-  box-sizing:border-box!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:6px!important;
-  overflow:hidden!important;
-  line-height:1!important;
-  border-radius:14px!important;
-}
-
-[data-cat="behavior"] .row-btn > span:first-child{
-  display:block!important;
-  font-size:24px!important;
-  line-height:1!important;
-  height:24px!important;
-  min-height:24px!important;
-  max-height:24px!important;
-  margin:0!important;
-  padding:0!important;
-  flex-shrink:0!important;
-}
-
-[data-cat="behavior"] .row-btn .rb-label{
-  display:block!important;
-  font-size:11px!important;
-  line-height:1.2!important;
-  height:auto!important;
-  max-height:16px!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-  max-width:100%!important;
-  flex-shrink:0!important;
-}
-
-/* ═══ گریدها — فاصله منظم ═══ */
-[data-cat="behavior"] .setting-group .row-btns{
-  display:grid!important;
-  gap:8px!important;
-  grid-auto-rows:80px!important;
-}
-
-/* ═══ اطمینان — هر setting-group ارتفاع کافی داره ═══ */
-[data-cat="behavior"] .setting-group{
-  padding-bottom:16px!important;
-  margin-bottom:14px!important;
+.settings-content .row-btn,
+.settings-content .color-opt,
+.settings-content .pattern-opt{
+  pointer-events:auto!important;
+  cursor:pointer!important;
 }
