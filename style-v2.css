@@ -7632,10 +7632,6 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
 }
 
 /* ═══ کارت‌های ارتباط با ما ═══ */
-.contact-row,
-.contact-row * {
-  transition: none !important;
-}
 .contact-row {
   transition:
     transform .55s cubic-bezier(.22,1,.36,1),
