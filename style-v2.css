@@ -9498,3 +9498,129 @@ html body .side-panel{
 .main-top-avatar{
   border: 2px solid color-mix(in srgb, var(--accent) 50%, transparent)!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX v7 — هاور نرم کارت‌های گفتگو + آیکون‌ها
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── کارت گفتگو — پایه ─── */
+.history-item{
+  transition:
+    transform .4s cubic-bezier(.22,1,.36,1),
+    background-color .35s cubic-bezier(.22,1,.36,1),
+    border-color .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .45s cubic-bezier(.22,1,.36,1)!important;
+  will-change: transform!important;
+  transform: translateZ(0)!important;
+  backface-visibility: hidden!important;
+  position: relative!important;
+  overflow: hidden!important;
+}
+
+/* ─── هاور — حرکت نرم + سایه رنگی ─── */
+.history-item:hover{
+  transform: translateX(-5px) translateY(-2px) scale(1.008)!important;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    color-mix(in srgb, var(--accent) 8%, transparent))!important;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent)!important;
+  box-shadow:
+    0 4px 12px -6px rgba(0,0,0,.4),
+    0 12px 28px -12px var(--accent),
+    0 0 30px -12px var(--accent)!important;
+}
+
+/* ─── کلیک ─── */
+.history-item:active{
+  transform: translateX(-2px) translateY(0) scale(.99)!important;
+  transition-duration: .12s!important;
+}
+
+/* ─── خط جانبی سمت راست کارت — از بالا و پایین باز می‌شه ─── */
+.history-item::before{
+  content: ''!important;
+  position: absolute!important;
+  top: 8px!important;
+  bottom: 8px!important;
+  right: 0!important;
+  width: 3px!important;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    var(--accent-light) 20%,
+    var(--accent) 50%,
+    var(--accent-light) 80%,
+    transparent 100%)!important;
+  border-radius: 3px 0 0 3px!important;
+  transform: scaleY(0)!important;
+  transform-origin: center!important;
+  opacity: 0!important;
+  transition:
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    opacity .3s ease!important;
+  box-shadow: 0 0 12px var(--accent)!important;
+  z-index: 5!important;
+  pointer-events: none!important;
+}
+.history-item:hover::before{
+  transform: scaleY(1)!important;
+  opacity: 1!important;
+}
+
+/* ─── لیبل و متن — تغییر رنگ نرم ─── */
+.history-item .h-title,
+.history-item .h-preview,
+.history-item .h-time{
+  transition: color .3s ease!important;
+}
+.history-item:hover .h-title{
+  color: var(--accent-light)!important;
+}
+.history-item:hover .h-preview{
+  color: var(--text-main)!important;
+}
+
+/* ─── آیکون‌های pin / edit / del — ظاهر شدن نرم ─── */
+.history-item .h-pin,
+.history-item .h-edit,
+.history-item .h-del{
+  transition:
+    opacity .3s ease,
+    transform .4s cubic-bezier(.34,1.4,.64,1),
+    background-color .25s ease,
+    color .25s ease!important;
+}
+.history-item:hover .h-pin,
+.history-item:hover .h-edit,
+.history-item:hover .h-del{
+  opacity: 1!important;
+  transform: translateX(0) scale(1)!important;
+}
+
+/* هاور روی خود دکمه */
+.history-item .h-pin:hover,
+.history-item .h-edit:hover,
+.history-item .h-del:hover{
+  transform: scale(1.15) translateX(0)!important;
+}
+
+/* ─── کارت‌های active و pinned ─── */
+.history-item.active{
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 25%, transparent),
+    color-mix(in srgb, var(--accent) 10%, transparent))!important;
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent)!important;
+}
+.history-item.pinned{
+  border-color: color-mix(in srgb, #F59E0B 60%, transparent)!important;
+  background: linear-gradient(135deg,
+    rgba(245,158,11,.15),
+    rgba(245,158,11,.05))!important;
+}
+.history-item.pinned::before{
+  background: linear-gradient(180deg,
+    transparent 0%,
+    #FBBF24 20%,
+    #F59E0B 50%,
+    #FBBF24 80%,
+    transparent 100%)!important;
+  box-shadow: 0 0 12px #F59E0B!important;
+}
