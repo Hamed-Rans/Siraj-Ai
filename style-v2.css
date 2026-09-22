@@ -8855,3 +8855,315 @@ body::before{
     0 10px 28px -8px var(--accent),
     0 0 40px -12px var(--accent)!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIRAJ GLASS v4 — Aurora + 3-Color Theme System
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ ۱) پالت سه‌رنگه هر تم ═══ */
+[data-theme$="-navy"]{
+  --aura-c1:#8B5CF6;--aura-c2:#EC4899;--aura-c3:#06B6D4;
+}
+[data-theme$="-crimson"]{
+  --aura-c1:#EF4444;--aura-c2:#F97316;--aura-c3:#EC4899;
+}
+[data-theme$="-gold"]{
+  --aura-c1:#D4AF37;--aura-c2:#F59E0B;--aura-c3:#EAB308;
+}
+[data-theme$="-purple"]{
+  --aura-c1:#A855F7;--aura-c2:#EC4899;--aura-c3:#8B5CF6;
+}
+[data-theme$="-emerald"]{
+  --aura-c1:#10B981;--aura-c2:#06B6D4;--aura-c3:#14B8A6;
+}
+[data-theme$="-indigo"]{
+  --aura-c1:#6366F1;--aura-c2:#3B82F6;--aura-c3:#A855F7;
+}
+[data-theme^="light"]{--aura-op:.6}
+[data-theme^="midnight"]{--aura-op:1.3}
+:root{--aura-op:1}
+
+/* ═══ ۲) ریشه‌ها شفاف بشن ═══ */
+html{background:#05060A!important;transition:background .8s ease}
+html[data-theme^="light"]{background:#E8EBF2!important}
+html[data-theme^="midnight"]{background:#000!important}
+body{
+  background:transparent!important;
+  background-image:none!important;
+  background-color:transparent!important;
+}
+
+/* ═══ ۳) پس‌زمینه Aurora (سه‌رنگ + تیرگی) ═══ */
+body::before{
+  content:''!important;
+  position:fixed!important;
+  inset:0!important;
+  z-index:-2!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(ellipse 900px 700px at 20% 10%,
+      color-mix(in srgb, var(--aura-c1) 45%, transparent), transparent 55%),
+    radial-gradient(ellipse 700px 800px at 85% 90%,
+      color-mix(in srgb, var(--aura-c2) 32%, transparent), transparent 55%),
+    radial-gradient(ellipse 600px 600px at 10% 90%,
+      color-mix(in srgb, var(--aura-c3) 26%, transparent), transparent 60%),
+    linear-gradient(160deg, #08061A 0%, #05060A 100%)!important;
+  background-attachment:fixed!important;
+  opacity:var(--aura-op)!important;
+  transition:background .8s ease, opacity .5s ease!important;
+}
+[data-theme^="light"] body::before{
+  background:
+    radial-gradient(ellipse 900px 700px at 20% 10%,
+      color-mix(in srgb, var(--aura-c1) 40%, transparent), transparent 55%),
+    radial-gradient(ellipse 700px 800px at 85% 90%,
+      color-mix(in srgb, var(--aura-c2) 30%, transparent), transparent 55%),
+    radial-gradient(ellipse 600px 600px at 10% 90%,
+      color-mix(in srgb, var(--aura-c3) 24%, transparent), transparent 60%),
+    linear-gradient(160deg, #F0F2F8 0%, #E5E8F0 100%)!important;
+}
+[data-theme^="midnight"] body::before{
+  background:
+    radial-gradient(ellipse 900px 700px at 20% 10%,
+      color-mix(in srgb, var(--aura-c1) 40%, transparent), transparent 55%),
+    radial-gradient(ellipse 700px 800px at 85% 90%,
+      color-mix(in srgb, var(--aura-c2) 30%, transparent), transparent 55%),
+    radial-gradient(ellipse 600px 600px at 10% 90%,
+      color-mix(in srgb, var(--aura-c3) 24%, transparent), transparent 60%),
+    #000!important;
+}
+
+/* ═══ ۴) نقطه‌چین ظریف ═══ */
+body::after{
+  content:''!important;
+  position:fixed!important;
+  inset:0!important;
+  z-index:-1!important;
+  pointer-events:none!important;
+  background-image:radial-gradient(rgba(255,255,255,.03) 1px, transparent 1px)!important;
+  background-size:36px 36px!important;
+  mask-image:radial-gradient(ellipse at center, #000 15%, transparent 70%)!important;
+  -webkit-mask-image:radial-gradient(ellipse at center, #000 15%, transparent 70%)!important;
+}
+[data-theme^="light"] body::after{
+  background-image:radial-gradient(rgba(0,0,0,.05) 1px, transparent 1px)!important;
+}
+
+/* ═══ ۵) رفع layout هدر (فیکس چیزی که به‌هم ریخت) ═══ */
+.chat-header,.planner-hero,.page-title-bar{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  min-height:56px!important;
+}
+.chat-header .header-brand{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  gap:10px!important;
+  flex:1!important;
+  min-width:0!important;
+}
+.chat-header .brand-text{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  min-width:0!important;
+  flex:1!important;
+}
+.chat-header .brand-text h1{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:baseline!important;
+  gap:6px!important;
+  white-space:nowrap!important;
+}
+.header-left-actions,#sirajHeaderActions{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+  z-index:100!important;
+  flex-shrink:0!important;
+}
+
+/* ═══ ۶) متغیرهای شیشه ═══ */
+:root{
+  --g-blur:45px;
+  --g-sat:200%;
+  --g-bg:rgba(255,255,255,.05);
+  --g-bg-2:rgba(255,255,255,.025);
+  --g-bg-solid:rgba(20,20,32,.72);
+  --g-border:rgba(255,255,255,.1);
+  --g-border-hi:rgba(255,255,255,.16);
+  --g-inset:inset 0 1px 0 rgba(255,255,255,.08);
+  --g-shadow:0 20px 50px -20px rgba(0,0,0,.7);
+}
+[data-theme^="midnight"]{
+  --g-bg:rgba(255,255,255,.04);
+  --g-bg-2:rgba(255,255,255,.02);
+  --g-bg-solid:rgba(12,12,24,.85);
+  --g-border:rgba(255,255,255,.08);
+  --g-shadow:0 24px 60px -20px rgba(0,0,0,.9);
+}
+[data-theme^="light"]{
+  --g-bg:rgba(255,255,255,.55);
+  --g-bg-2:rgba(255,255,255,.45);
+  --g-bg-solid:rgba(255,255,255,.88);
+  --g-border:rgba(0,0,0,.06);
+  --g-border-hi:rgba(0,0,0,.1);
+  --g-inset:inset 0 1px 0 rgba(255,255,255,.95);
+  --g-shadow:0 20px 50px -20px rgba(0,0,0,.12);
+}
+
+/* ═══ ۷) شیشه روی همه المان‌ها ═══ */
+[data-element-style="glass"] :is(
+  .main-chat,
+  .side-panel,
+  .chat-header,
+  .planner-hero,
+  .page-title-bar,
+  .input-bar,
+  .bottom-nav,
+  .daily-card,
+  .panel-card,
+  .tool-card,
+  .planner-hero-card,
+  .planner-stats-card,
+  .month-calendar,
+  .month-goals,
+  .month-goal,
+  .year-overview,
+  .week-grid-wrap,
+  .week-summary,
+  .week-cell-task,
+  .week-cell-edit,
+  .task-item,
+  .tasks-list,
+  .tasks-done-list,
+  .task-add-form,
+  .task-add-form input[type=text],
+  .history-item,
+  .history-search,
+  .ll-item,
+  .contact-row,
+  .learn-library-box,
+  .settings-modal,
+  .notif-panel,
+  .siraj-popup,
+  .task-notif-popup,
+  .dd-panel,
+  .siraj-select-panel,
+  .dd-trigger,
+  .siraj-select-trigger,
+  .bot .msg,
+  .welcome-card,
+  .settings-content-wrap .setting-group,
+  .settings-preview,
+  .preview-zone,
+  .row-btn,
+  .color-opt,
+  .pattern-opt
+){
+  background:var(--g-bg)!important;
+  backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat))!important;
+  -webkit-backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat))!important;
+  border-color:var(--g-border)!important;
+  box-shadow:var(--g-inset), var(--g-shadow)!important;
+}
+
+/* ═══ ۸) المان‌های حساس — شفافیت کمتر برای خوانایی ═══ */
+[data-element-style="glass"] :is(
+  .bottom-nav,
+  .settings-modal,
+  .notif-panel,
+  .dd-panel,
+  .siraj-select-panel,
+  .siraj-popup,
+  .task-notif-popup,
+  .learn-library-box,
+  .chat-header,
+  .planner-hero,
+  .page-title-bar,
+  .input-bar,
+  .task-add-form input[type=text]
+){
+  background:var(--g-bg-solid)!important;
+}
+
+/* ═══ ۹) هدر — بلور قوی‌تر ═══ */
+[data-element-style="glass"] :is(.chat-header,.planner-hero,.page-title-bar){
+  backdrop-filter:blur(52px) saturate(220%) brightness(1.05)!important;
+  -webkit-backdrop-filter:blur(52px) saturate(220%) brightness(1.05)!important;
+  border-bottom:1px solid var(--g-border)!important;
+  box-shadow:var(--g-inset)!important;
+}
+
+/* ═══ ۱۰) تقویم — سلول‌ها سبک‌تر ═══ */
+[data-element-style="glass"] .cal-day{
+  background:var(--g-bg-2)!important;
+  backdrop-filter:blur(22px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(180%)!important;
+  border:1px solid var(--g-border)!important;
+  box-shadow:none!important;
+}
+[data-element-style="glass"] .cal-day.selected{
+  background:linear-gradient(160deg,var(--accent-light),var(--accent-dark))!important;
+  border-color:transparent!important;
+  box-shadow:0 4px 14px -6px var(--accent)!important;
+}
+
+/* ═══ ۱۱) تم روشن — شیشه‌ی روشن ═══ */
+[data-theme^="light"][data-element-style="glass"] :is(
+  .settings-modal,
+  .settings-preview,
+  .preview-zone,
+  .settings-content-wrap .setting-group,
+  .chat-header,
+  .planner-hero,
+  .page-title-bar,
+  .input-bar,
+  .task-add-form input[type=text],
+  .bottom-nav,
+  .bot .msg,
+  .welcome-card,
+  .daily-card,
+  .panel-card,
+  .tool-card,
+  .planner-hero-card,
+  .planner-stats-card,
+  .month-calendar,
+  .month-goals,
+  .year-overview,
+  .week-grid-wrap,
+  .week-summary,
+  .task-item,
+  .history-item,
+  .ll-item,
+  .contact-row
+){
+  background:var(--g-bg-solid)!important;
+  color:var(--text-main)!important;
+}
+
+/* ═══ ۱۲) درخشش ملایم دکمه‌های accent ═══ */
+[data-element-style="glass"] :is(
+  .send-btn,
+  .nav-btn-chat,
+  .panel-study-btn,
+  .panel-library-btn,
+  .task-add-btn,
+  .btn-primary
+){
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.3),
+    0 10px 28px -8px var(--accent),
+    0 0 40px -12px var(--accent)!important;
+}
+
+/* ═══ ۱۳) پاپ‌آپ‌های شیشه‌ای ═══ */
+[data-element-style="glass"] .siraj-popup-overlay{
+  background:rgba(0,0,0,.5)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+}
