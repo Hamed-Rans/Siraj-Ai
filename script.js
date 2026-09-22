@@ -1897,42 +1897,6 @@ async function send() {
     isStreaming = false;
     setSendButton();
 }
-   
-        extractPlanFromResponse(full);
-        const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
-        if (streamEl) {
-            const pm = streamEl.parentElement;
-            pm.innerHTML = formatMd(full);
-            const blink = pm.querySelector('.cursor-blink');
-            if (blink) blink.remove();
-            const lat = document.createElement('div');
-            lat.className = 'latency-timer';
-            lat.textContent = elapsed + 's';
-            pm.parentElement.appendChild(lat);
-        }
-        addMsgToHistory(chatId, 'assistant', full);
-        delete pendingRequests[chatId];
-    } catch (err) {
-        clearTimeout(timeoutId);
-        const t = document.getElementById('typing-indicator');
-        if (t) t.remove();
-        delete pendingRequests[chatId];
-        console.error('[Siraj] Caught error:', err);
-        if (err.name === 'AbortError') {
-            if (controller.signal.reason === 'timeout') {
-              renderBotMsg('⏱️ زمان انتظار تمام شد (۱۲۰ ثانیه). اتصال اینترنت یا سرور رو چک کن و دوباره امتحان کن.');
-            }
-            chatInFlight = false;
-            isStreaming = false;
-            setSendButton();
-            return;
-        }
-            renderBotMsg('خطای شبکه: ' + err.message);
-    }
-    chatInFlight = false;
-    isStreaming = false;
-    setSendButton();
-}
 
 function extractPlanFromResponse(text) {
     const matches = [...text.matchAll(/\[PLAN\]\s*([-\d:]+\s*)?[|]?\s*([^\[\]]+?)\s*\[\/PLAN\]/g)];
