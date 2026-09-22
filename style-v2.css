@@ -8748,3 +8748,131 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   font-size: 11px !important;
   border-radius: 11px !important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   BEHAVIOR TAB — متن‌های واقعاً کوچیک
+   ═══════════════════════════════════════════════════════════════ */
+[data-cat="behavior"] .row-btns{
+  display:grid!important;
+  gap:8px!important;
+}
+[data-cat="behavior"] .row-btn{
+  min-height:56px!important;
+  max-height:56px!important;
+  height:56px!important;
+  padding:6px 4px!important;
+  gap:2px!important;
+  border-radius:11px!important;
+  overflow:hidden!important;
+}
+[data-cat="behavior"] .row-btn .rb-label{
+  font-size:9.5px!important;
+  font-weight:700!important;
+  line-height:1.1!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  max-width:100%!important;
+}
+[data-cat="behavior"] .row-btn > span:first-child:not(.rb-label){
+  font-size:16px!important;
+  line-height:1!important;
+  display:block!important;
+  margin:0!important;
+}
+[data-cat="behavior"] .setting-group > label{
+  font-size:11.5px!important;
+  margin-bottom:6px!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   STUDY / LIBRARY BUTTONS — رنگ از تم
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ دکمه مطالعه — گرادیانت تم ═══ */
+.panel-study-btn{
+  background:linear-gradient(160deg, var(--accent-light) 0%, var(--accent) 45%, var(--accent-dark) 100%)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 22px -8px var(--accent)!important;
+}
+.panel-study-btn:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    0 2px 4px rgba(0,0,0,.3),
+    0 12px 30px -8px var(--accent)!important;
+  filter:brightness(1.08);
+}
+
+/* ═══ دکمه کتابخانه — گرادیانت تم با یک قدم تیره‌تر ═══ */
+.panel-library-btn{
+  background:linear-gradient(160deg, var(--accent) 0%, var(--accent-dark) 100%)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.15),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 22px -8px var(--accent-dark)!important;
+}
+.panel-library-btn:hover{
+  transform:translateY(-4px) scale(1.01)!important;
+  filter:brightness(1.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 2px 4px rgba(0,0,0,.3),
+    0 12px 30px -8px var(--accent-dark)!important;
+}
+
+/* ═══ برای تم طلایی، یه ذره متفاوت ═══ */
+[data-theme$="gold"] .panel-study-btn{
+  background:linear-gradient(160deg, #E3B341 0%, #D4AF37 50%, #B8860B 100%)!important;
+  color:#1A1A2E!important;
+}
+[data-theme$="gold"] .panel-library-btn{
+  background:linear-gradient(160deg, #D4AF37 0%, #B8860B 100%)!important;
+  color:#1A1A2E!important;
+}
+[data-theme$="gold"] .panel-study-btn svg,
+[data-theme$="gold"] .panel-library-btn svg{
+  color:#1A1A2E!important;
+  stroke:#1A1A2E!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   STUDY CHAT — z-index بالاتر از اورلی
+   ═══════════════════════════════════════════════════════════════ */
+.study-chat-panel{
+  z-index:1000001!important;
+}
+.study-unified-panel{
+  z-index:1000001!important;
+}
+.study-overlay{
+  z-index:1000000!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   INPUT BAR — کاهش هاله رنگی پایین
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ حالت عادی — سایه خیلی ملایم ═══ */
+.input-bar-shell{
+  box-shadow:none!important;
+}
+
+/* ═══ حالت focus — سایه خیلی کم، بدون هاله رنگی ═══ */
+.input-bar-shell:focus-within,
+.input-bar-shell:has(.bar-input:focus){
+  box-shadow:
+    0 8px 24px -12px rgba(0,0,0,.4),
+    0 0 0 1px var(--accent-soft)!important;
+}
+
+/* ═══ روی خود input-bar هم سایه کم ═══ */
+.input-bar{
+  box-shadow:
+    0 4px 14px -10px rgba(0,0,0,.35),
+    0 0 20px -10px var(--accent-soft)!important;
+}
+
+.input-bar-shell:focus-within .input-bar,
+.input-bar-shell:has(.bar-input:focus) .input-bar{
+  box-shadow:
+    0 8px 24px -12px rgba(0,0,0,.4),
+    0 0 0 1px var(--accent-soft)!important;
+}
