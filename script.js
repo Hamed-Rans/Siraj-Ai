@@ -318,8 +318,11 @@ function loadSettings() {
     try {
         const l = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
         const s = Object.assign({}, APP_CONFIG.defaultSettings, l);
+        /* ★ همیشه از localStorage بخون — منبع حقیقت */
         const pi = localStorage.getItem(PROFILE_IMG_KEY);
-        if (pi) s.profileImage = pi;   /* ★ همیشه localStorage اولویت داره */
+        if (pi) {
+            s.profileImage = pi;
+        }
         if (!s.models) s.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
         if (s.appVersion !== '2.5') s.appVersion = '2.5';
         return s;
@@ -674,6 +677,14 @@ function applySettingsToUI(s) {
     const tb = document.getElementById('thinkBtn'); if (tb) tb.classList.toggle('active', t.thinking);
     const qb = document.getElementById('quickBtn'); if (qb) qb.classList.toggle('active', t.quick);
     applyPattern(document.getElementById('patternLayer'), t.pattern, t.patternColor1, t.patternColor2, t.patternPerCorner, t.patternSize, t.patternPosition, t.patternOpacity);
+       /* ★ بعد از هر تنظیم، آواتارها رو رفرش کن */
+    try {
+        var savedImg = localStorage.getItem(PROFILE_IMG_KEY);
+        if (savedImg) {
+            t.profileImage = savedImg;
+            document.querySelectorAll('.main-top-avatar img').forEach(function(img){ img.src = savedImg; });
+        }
+    } catch (e) {}
     var vb = document.getElementById('versionBadge');
     if (vb) vb.textContent = 'v' + (t.appVersion || '2.5');
     resetInactivityTimer();
@@ -1672,7 +1683,8 @@ async function send() {
 
     await new Promise(r => setTimeout(r, 500));
 
-    if (!controller.signal.aborted) {
+    /* ★ typing indicator — فقط اگه روی همون chat هستیم */
+    if (chatId === currentChatId && !controller.signal.aborted) {
         const w = document.createElement('div');
         w.className = 'msg-wrap bot';
         w.id = 'typing-indicator';
@@ -1690,7 +1702,6 @@ async function send() {
         const messages = buildMessagesForWorker(chatId, userText, fileData, fileType);
 
         console.log('[Siraj] POST →', url);
-        console.log('[Siraj] Payload:', { model: apiModel, messageCount: messages.length, stream: true });
 
         const res = await RateLimiter.run(() => fetch(url, {
             method: 'POST',
@@ -1703,7 +1714,6 @@ async function send() {
         }));
 
         const ctypeRaw = res.headers.get('content-type') || '';
-        console.log('[Siraj] ← Status:', res.status, '| CT:', ctypeRaw);
         clearTimeout(timeoutId);
 
         if (!res.ok) {
@@ -1712,14 +1722,14 @@ async function send() {
             let msg = '';
             let errBody = '';
             try { errBody = await res.text(); } catch (e) {}
-            console.error('[Siraj] Error body:', errBody);
-            if (res.status === 429) msg = '🫴 محدودیت رسیدیم به محدودیت\n\nپول وُردَه تا بتونی ادامه بدی پول زور وُردَه! 🫴💸\n\n۳۰ ثانیه دیگه دوباره امتحان کن.';
             if (res.status === 429) msg = '🫴 رسیدیم به محدودیت\n\nپول وُردَه تا بتونی ادامه بدی پول زور وُردَه! 🫴💸\n\n۳۰ ثانیه دیگه دوباره امتحان کن.';
             else if (res.status === 401 || res.status === 403) msg = '🔑 کلید API مشکل داره. به سازنده بگو عوضش کنه.';
             else if (res.status === 404) msg = '🔍 مدل یا مسیر پیدا نشد (۴۰۴). شاید مدل خواب رفته.';
-            else if (res.status === 503) msg = '🔄 سرور الان شلوغه. یه ذره دیگه صبر کن، درست می‌شه.';
+            else if (res.status === 503) msg = '🔄 سرور الان شلوغه. یه ذره دیگه صبر کن.';
             else msg = 'خطا (' + res.status + '): ' + (errBody.substring(0, 250) || 'بدون توضیح');
-            renderBotMsg(msg);
+            /* ★ اگه روی همون چت هستیم، توی UI نشون بده */
+            if (chatId === currentChatId) renderBotMsg(msg);
+            /* ★ ولی همیشه توی history ذخیره کن */
             addMsgToHistory(chatId, 'assistant', msg);
             delete pendingRequests[chatId];
             chatInFlight = false;
@@ -1734,7 +1744,8 @@ async function send() {
         streamWriting = false;
         let streamEl = null;
 
-                if (!controller.signal.aborted) {
+        /* ★ stream element — فقط اگه روی همون chat هستیم */
+        if (chatId === currentChatId && !controller.signal.aborted) {
             const t = document.getElementById('typing-indicator');
             if (t) t.remove();
             const w = document.createElement('div');
@@ -1753,6 +1764,139 @@ async function send() {
         let rawBody = '';
         const ctype = ctypeRaw.toLowerCase();
         const ctypeIsSSE = ctype.indexOf('text/event-stream') >= 0;
+
+        function extractDeltaFromJSON(j) {
+            if (!j || typeof j !== 'object') return '';
+            if (j.choices && j.choices[0]) {
+                const c = j.choices[0];
+                if (c.delta && c.delta.content) return c.delta.content;
+                if (c.message && c.message.content) return c.message.content;
+                if (c.text) return c.text;
+            }
+            if (j.candidates && j.candidates[0]) {
+                const c = j.candidates[0];
+                if (c.content && c.content.parts && c.content.parts[0] && c.content.parts[0].text) {
+                    return c.content.parts[0].text;
+                }
+            }
+            if (j.message && typeof j.message.content === 'string') return j.message.content;
+            if (j.response && typeof j.response === 'string') return j.response;
+            if (j.content && typeof j.content === 'string') return j.content;
+            if (j.output_text && typeof j.output_text === 'string') return j.output_text;
+            return '';
+        }
+
+        function consumeSSEText(text) {
+            const lines = text.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                const tr = lines[i].trim();
+                if (!tr || !tr.startsWith('data:')) continue;
+                const d = tr.slice(5).trim();
+                if (!d || d === '[DONE]') continue;
+                try {
+                    const j = JSON.parse(d);
+                    const delta = extractDeltaFromJSON(j);
+                    if (delta) { streamQueue += delta; gotAnyData = true; }
+                } catch (e) {}
+            }
+        }
+
+        if (ctypeIsSSE) {
+            try {
+                const reader = res.body.getReader();
+                const dec = new TextDecoder();
+                let buf = '';
+                while (true) {
+                    const readResult = await reader.read();
+                    if (readResult.done) break;
+                    buf += dec.decode(readResult.value, { stream: true });
+                    const lines = buf.split('\n');
+                    buf = lines.pop();
+                    for (let i = 0; i < lines.length; i++) {
+                        const tr = lines[i].trim();
+                        if (!tr || !tr.startsWith('data:')) continue;
+                        const d = tr.slice(5).trim();
+                        if (!d || d === '[DONE]') continue;
+                        try {
+                            const j = JSON.parse(d);
+                            const delta = extractDeltaFromJSON(j);
+                            if (delta) { streamQueue += delta; gotAnyData = true; }
+                        } catch (e) {}
+                    }
+                }
+                if (buf.trim()) consumeSSEText(buf);
+            } catch (e) {
+                console.warn('[Siraj] SSE read error:', e);
+            }
+        } else {
+            try { rawBody = await res.text(); } catch (e) {}
+            if (rawBody.indexOf('data:') >= 0) consumeSSEText(rawBody);
+            if (!gotAnyData && rawBody.trim()) {
+                try {
+                    const j = JSON.parse(rawBody);
+                    const content = extractDeltaFromJSON(j);
+                    if (content) { streamQueue += content; gotAnyData = true; }
+                } catch (e) {
+                    if (rawBody.indexOf('<') !== 0 && rawBody.indexOf('{') !== 0) {
+                        streamQueue += rawBody;
+                        gotAnyData = true;
+                    }
+                }
+            }
+        }
+
+        streamFinished = true;
+        let waitGuard = 0;
+        while (streamWriting && waitGuard < 900) { await new Promise(r => setTimeout(r, 40)); waitGuard++; }
+
+        let full = streamResultFull;
+        if (!full || !full.trim()) {
+            full = '⚠️ پاسخی از سرور نیامد.';
+        }
+
+        extractPlanFromResponse(full);
+        const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+
+        /* ★ نمایش نهایی — فقط اگه روی همون chat هستیم */
+        if (chatId === currentChatId && streamEl && streamEl.parentElement) {
+            const pm = streamEl.parentElement;
+            pm.innerHTML = formatMd(full);
+            const blink = pm.querySelector('.cursor-blink');
+            if (blink) blink.remove();
+            const lat = document.createElement('div');
+            lat.className = 'latency-timer';
+            lat.textContent = elapsed + 's';
+            if (pm.parentElement) pm.parentElement.appendChild(lat);
+        }
+
+        /* ★ همیشه توی history ذخیره کن */
+        addMsgToHistory(chatId, 'assistant', full);
+        delete pendingRequests[chatId];
+    } catch (err) {
+        clearTimeout(timeoutId);
+        const t = document.getElementById('typing-indicator');
+        if (t) t.remove();
+        delete pendingRequests[chatId];
+        console.error('[Siraj] Caught error:', err);
+        if (err.name === 'AbortError') {
+            if (controller.signal.reason === 'timeout') {
+                if (chatId === currentChatId) {
+                    renderBotMsg('⏱️ زمان انتظار تمام شد (۱۲۰ ثانیه).');
+                }
+            }
+            chatInFlight = false;
+            isStreaming = false;
+            setSendButton();
+            return;
+        }
+        if (chatId === currentChatId) {
+            renderBotMsg('خطای شبکه: ' + err.message);
+        }
+    }
+    chatInFlight = false;
+    isStreaming = false;
+    setSendButton();
+}
 
         function extractDeltaFromJSON(j) {
             if (!j || typeof j !== 'object') return '';
