@@ -9730,3 +9730,124 @@ html body .side-panel{
     0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent),
     0 8px 20px -6px var(--accent)!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX v9 — هاور کارت‌های ارتباط (غلبه بر transition:none قدیمی)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── حذف خط‌های قدیمی ─── */
+html body .contact-row::before,
+html body .contact-row::after,
+html body .about-contacts .contact-row::before,
+html body .about-contacts .contact-row::after{
+  display: none!important;
+  content: none!important;
+}
+
+/* ─── کارت ارتباط — ترنزیشن کامل ─── */
+html body .contact-row,
+html body .about-contacts .contact-row,
+html body .contact-row *,
+html body .about-contacts .contact-row *{
+  transition:
+    transform .4s cubic-bezier(.22,1,.36,1),
+    background-color .35s cubic-bezier(.22,1,.36,1),
+    background .35s cubic-bezier(.22,1,.36,1),
+    border-color .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .45s cubic-bezier(.22,1,.36,1),
+    color .3s ease!important;
+}
+
+/* ─── پایه کارت ─── */
+html body .contact-row,
+html body .about-contacts .contact-row{
+  position: relative!important;
+  overflow: hidden!important;
+  transform: translate3d(0,0,0)!important;
+  backface-visibility: hidden!important;
+  will-change: transform!important;
+}
+
+/* ─── هاور — حرکت به راست ─── */
+html body .contact-row:hover,
+html body .about-contacts .contact-row:hover{
+  transform: translate3d(5px,-2px,0) scale(1.008)!important;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 8%, transparent),
+    color-mix(in srgb, var(--accent) 18%, transparent))!important;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent)!important;
+  box-shadow:
+    0 4px 12px -6px rgba(0,0,0,.4),
+    0 12px 28px -12px var(--accent),
+    0 0 30px -12px var(--accent)!important;
+}
+
+/* ─── کلیک ─── */
+html body .contact-row:active,
+html body .about-contacts .contact-row:active{
+  transform: translate3d(2px,0,0) scale(.99)!important;
+  transition-duration: .12s!important;
+}
+
+/* ─── خط جانبی سمت چپ — از وسط باز می‌شه ─── */
+html body .contact-row::before,
+html body .about-contacts .contact-row::before{
+  content: ''!important;
+  display: block!important;
+  position: absolute!important;
+  top: 8px!important;
+  bottom: 8px!important;
+  left: 0!important;
+  width: 3px!important;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    var(--accent-light) 20%,
+    var(--accent) 50%,
+    var(--accent-light) 80%,
+    transparent 100%)!important;
+  border-radius: 0 3px 3px 0!important;
+  transform: scaleY(0)!important;
+  transform-origin: center!important;
+  opacity: 0!important;
+  transition:
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    opacity .3s ease!important;
+  box-shadow: 0 0 12px var(--accent)!important;
+  z-index: 5!important;
+  pointer-events: none!important;
+}
+html body .contact-row:hover::before,
+html body .about-contacts .contact-row:hover::before{
+  transform: scaleY(1)!important;
+  opacity: 1!important;
+}
+
+/* ─── متن‌ها ─── */
+html body .contact-row .contact-label,
+html body .contact-row .contact-value{
+  transition: color .3s ease!important;
+}
+html body .contact-row:hover .contact-label{
+  color: var(--accent-light)!important;
+}
+html body .contact-row:hover .contact-value{
+  color: var(--text-main)!important;
+}
+
+/* ─── آیکون ─── */
+html body .contact-row .contact-icon,
+html body .about-contacts .contact-row .contact-icon{
+  transition:
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    background-color .3s ease,
+    color .3s ease,
+    box-shadow .35s ease!important;
+}
+html body .contact-row:hover .contact-icon,
+html body .about-contacts .contact-row:hover .contact-icon{
+  transform: scale(1.25) rotate(-8deg)!important;
+  background: var(--accent)!important;
+  color: #fff!important;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent),
+    0 8px 20px -6px var(--accent)!important;
+}
