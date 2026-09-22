@@ -9747,3 +9747,69 @@ html body .about-contacts .contact-row:hover .contact-icon{
 .contact-row:hover .contact-label{
   color: var(--accent) !important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   CONTACT ROW — کارت ثابت، فقط افکت
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── حذف هر چیز اضافی روی کارت و آیکون ─── */
+.contact-row::before,
+.contact-row::after,
+.contact-row .contact-icon::before,
+.contact-row .contact-icon::after{
+  display: none !important;
+  content: none !important;
+}
+
+/* ─── کارت — ثابت، بدون حرکت ─── */
+.contact-row{
+  position: relative !important;
+  transform: none !important;
+  transition:
+    background-color .3s ease,
+    border-color .3s ease,
+    box-shadow .35s ease !important;
+}
+
+.contact-row:hover{
+  transform: none !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--accent) !important;
+  box-shadow:
+    0 6px 20px -10px var(--accent),
+    0 0 24px -10px var(--accent) !important;
+}
+
+.contact-row:active{
+  transform: none !important;
+}
+
+/* ─── آیکون — بدون خط، چرخش خیلی کم، بزرگ‌شدن خیلی کم ─── */
+.contact-row .contact-icon{
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition:
+    transform .35s cubic-bezier(.34,1.4,.64,1),
+    background-color .3s ease,
+    color .3s ease !important;
+}
+
+.contact-row:hover .contact-icon{
+  transform: scale(1.05) rotate(-3deg) !important;
+  background: var(--accent) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* ─── متن‌ها ─── */
+.contact-row .contact-label,
+.contact-row .contact-value{
+  font-size: inherit !important;
+  transition: color .3s ease !important;
+}
+
+.contact-row:hover .contact-label{
+  color: var(--accent) !important;
+}
