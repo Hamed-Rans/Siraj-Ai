@@ -71,6 +71,7 @@ const APP_CONFIG = {
         studyStrictMode: true,
         aiLevel: 'intermediate',
         aiLang: 'fa',
+        aiPopup: 'off',
         appVersion: '2.5'
     },
     themeColors: ['navy', 'crimson', 'gold', 'purple', 'emerald', 'indigo'],
@@ -2932,6 +2933,14 @@ function renderSettingsControls() {
                     '<button class="row-btn' + ((s.aiLang||'fa')==='en'?' active':'') + '" onclick="updateDraft(\'aiLang\',\'en\');renderSettingsControls()"><span class="rb-label">English</span></button>' +
                 '</div>' +
             '</div>' +
+                   '<div class="setting-group">' +
+                '<label>حالت پاپ‌آپ هوش مصنوعی</label>' +
+                '<div class="row-btns" style="grid-template-columns:1fr 1fr 1fr">' +
+                    '<button class="row-btn' + ((s.aiPopup||'off')==='off'?' active':'') + '" onclick="updateDraft(\'aiPopup\',\'off\');renderSettingsControls()"><span class="rb-label">خاموش</span></button>' +
+                    '<button class="row-btn' + ((s.aiPopup||'off')==='always'?' active':'') + '" onclick="updateDraft(\'aiPopup\',\'always\');renderSettingsControls()"><span class="rb-label">همیشه</span></button>' +
+                    '<button class="row-btn' + ((s.aiPopup||'off')==='active'?' active':'') + '" onclick="updateDraft(\'aiPopup\',\'active\');renderSettingsControls()"><span class="rb-label">فقط فعال</span></button>' +
+                '</div>' +
+            '</div>' +
             '<div class="setting-group">' +
                 '<label>اعلان‌ها و یادآورها</label>' +
                 '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">' +
@@ -3441,3 +3450,63 @@ window.__forceUpdate = function () {
         location.reload(true);
     }
 };
+
+/* ═══════════════════════════════════════════════════════════════
+   AI POPUP — پاپ‌آپ هوش مصنوعی وقتی از تب گفتگو خارج می‌شیم
+   ═══════════════════════════════════════════════════════════════ */
+var _aiPopupEl = null;
+
+function showAiPopup() {
+    if (_aiPopupEl) return;
+    if (!settings.aiPopup || settings.aiPopup === 'off') return;
+    if (settings.aiPopup === 'active' && !chatInFlight && !isStreaming) return;
+    /* ★ اگه توی chat هستیم، نیازی نیست */
+    var activeView = document.querySelector('.view.active');
+    if (activeView && activeView.id === 'view-chat') return;
+    /* ★ پاپ‌آپ بساز */
+    var el = document.createElement('div');
+    el.id = 'aiPopupFloat';
+    el.className = 'ai-popup-float';
+    el.innerHTML =
+        '<div class="ai-popup-header">' +
+            '<div class="ai-popup-title">' +
+                '<span class="ai-popup-dot"></span>' +
+                '<span>سراج — در حال پاسخ</span>' +
+            '</div>' +
+            '<button class="ai-popup-close" id="aiPopupClose">✕</button>' +
+        '</div>' +
+        '<div class="ai-popup-body" id="aiPopupBody"></div>' +
+        '<div class="ai-popup-footer">' +
+            '<button class="ai-popup-goto" id="aiPopupGoto">برگرد به گفتگو ←</button>' +
+        '</div>';
+    document.body.appendChild(el);
+    requestAnimationFrame(function () { el.classList.add('show'); });
+    _aiPopupEl = el;
+
+    el.querySelector('#aiPopupClose').onclick = function () {
+        el.classList.remove('show');
+        setTimeout(function () { el.remove(); _aiPopupEl = null; }, 350);
+    };
+    el.querySelector('#aiPopupGoto').onclick = function () {
+        if (typeof switchView === 'function') switchView('chat');
+        el.classList.remove('show');
+        setTimeout(function () { el.remove(); _aiPopupEl = null; }, 350);
+    };
+}
+
+function updateAiPopupContent(text) {
+    if (!_aiPopupEl) return;
+    var body = _aiPopupEl.querySelector('#aiPopupBody');
+    if (body) body.innerHTML = formatMd(text || '...');
+    body.scrollTop = body.scrollHeight;
+}
+
+function hideAiPopup() {
+    if (!_aiPopupEl) return;
+    _aiPopupEl.classList.remove('show');
+    setTimeout(function () { if (_aiPopupEl) { _aiPopupEl.remove(); _aiPopupEl = null; } }, 350);
+}
+
+window.__showAiPopup = showAiPopup;
+window.__updateAiPopupContent = updateAiPopupContent;
+window.__hideAiPopup = hideAiPopup;
