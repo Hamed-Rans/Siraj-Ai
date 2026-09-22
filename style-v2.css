@@ -9167,3 +9167,371 @@ body::after{
   backdrop-filter:blur(14px)!important;
   -webkit-backdrop-filter:blur(14px)!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIRAJ GLASS v5 — شیشه‌ای واقعی (blur قابل مشاهده) + فیکس‌ها
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── ۱) خنثی کردن isolation/tranform های مشکل‌ساز ─── */
+.settings-content-wrap,
+.settings-content,
+.panel-content,
+.planner-pane,
+.planner-body-content,
+#box,
+.week-grid-wrap,
+.week-table,
+.settings-body,
+.settings-left,
+.notif-list,
+.learn-library-list,
+.ll-item {
+  isolation: auto !important;
+  contain: none !important;
+}
+
+/* ─── ۲) شیشه‌ای واقعی — پس‌زمینه خیلی شفاف + blur قوی ─── */
+[data-element-style="glass"] :is(
+  .daily-card,
+  .panel-card,
+  .tool-card,
+  .planner-hero-card,
+  .planner-stats-card,
+  .month-calendar,
+  .month-goals,
+  .month-goal,
+  .year-overview,
+  .week-summary,
+  .week-cell-task,
+  .task-item,
+  .tasks-done-list,
+  .history-item,
+  .ll-item,
+  .contact-row,
+  .settings-content-wrap .setting-group,
+  .row-btn,
+  .color-opt,
+  .pattern-opt,
+  .bot .msg,
+  .welcome-card
+){
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.06) 0%,
+    rgba(255,255,255,.02) 100%) !important;
+  backdrop-filter: blur(60px) saturate(240%) brightness(1.1) !important;
+  -webkit-backdrop-filter: blur(60px) saturate(240%) brightness(1.1) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.1),
+    0 20px 50px -20px rgba(0,0,0,.5) !important;
+}
+
+/* ─── ۳) المان‌های حساس — کمی کدرتر برای خوانایی ─── */
+[data-element-style="glass"] :is(
+  .main-chat,
+  .side-panel,
+  .chat-header,
+  .planner-hero,
+  .page-title-bar,
+  .input-bar,
+  .bottom-nav,
+  .task-add-form input[type=text],
+  .history-search,
+  .settings-modal,
+  .notif-panel,
+  .siraj-popup,
+  .task-notif-popup,
+  .learn-library-box,
+  .dd-panel,
+  .siraj-select-panel,
+  .dd-trigger,
+  .siraj-select-trigger,
+  .preview-zone,
+  .settings-preview
+){
+  background: rgba(18,22,36,.55) !important;
+  backdrop-filter: blur(70px) saturate(240%) brightness(1.12) !important;
+  -webkit-backdrop-filter: blur(70px) saturate(240%) brightness(1.12) !important;
+  border-color: rgba(255,255,255,.14) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.1),
+    0 24px 60px -24px rgba(0,0,0,.7) !important;
+}
+
+/* ─── ۴) تم روشن — شیشه‌ای روشن ─── */
+[data-theme^="light"][data-element-style="glass"] :is(
+  .daily-card,
+  .panel-card,
+  .tool-card,
+  .planner-hero-card,
+  .planner-stats-card,
+  .month-calendar,
+  .month-goals,
+  .month-goal,
+  .year-overview,
+  .week-summary,
+  .week-cell-task,
+  .task-item,
+  .tasks-done-list,
+  .history-item,
+  .ll-item,
+  .contact-row,
+  .settings-content-wrap .setting-group,
+  .row-btn,
+  .color-opt,
+  .pattern-opt,
+  .welcome-card
+){
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.75) 0%,
+    rgba(255,255,255,.55) 100%) !important;
+  border-color: rgba(255,255,255,.9) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    0 20px 50px -20px rgba(0,0,0,.15) !important;
+}
+[data-theme^="light"][data-element-style="glass"] :is(
+  .main-chat,
+  .side-panel,
+  .chat-header,
+  .planner-hero,
+  .page-title-bar,
+  .input-bar,
+  .bottom-nav,
+  .settings-modal,
+  .notif-panel,
+  .bot .msg
+){
+  background: rgba(255,255,255,.78) !important;
+  border-color: rgba(0,0,0,.08) !important;
+}
+
+/* ─── ۵) نیمه‌شب — مشکی محض + Aurora پررنگ ─── */
+[data-theme^="midnight"][data-element-style="glass"] :is(
+  .daily-card,
+  .panel-card,
+  .tool-card,
+  .planner-hero-card,
+  .month-calendar,
+  .month-goals,
+  .year-overview,
+  .week-summary,
+  .task-item,
+  .settings-content-wrap .setting-group
+){
+  background: linear-gradient(135deg,
+    rgba(255,255,255,.05) 0%,
+    rgba(255,255,255,.015) 100%) !important;
+}
+[data-theme^="midnight"][data-element-style="glass"] :is(
+  .main-chat,
+  .side-panel,
+  .chat-header,
+  .planner-hero,
+  .page-title-bar,
+  .input-bar,
+  .bottom-nav,
+  .settings-modal,
+  .notif-panel
+){
+  background: rgba(6,8,16,.6) !important;
+}
+
+/* ─── ۶) 🔧 فیکس جدول هفتگی ─── */
+[data-element-style="glass"] .week-grid-wrap{
+  background: rgba(255,255,255,.025) !important;
+  backdrop-filter: blur(40px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(220%) !important;
+  overflow: hidden !important;
+}
+[data-element-style="glass"] .week-table{
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-element-style="glass"] .week-table th{
+  background: rgba(30,34,54,.85) !important;
+  backdrop-filter: blur(30px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+  border-bottom: 2px solid rgba(120,150,220,.25) !important;
+}
+[data-element-style="glass"] .week-table td{
+  background: transparent !important;
+}
+[data-element-style="glass"] .week-table td.hour-cell{
+  background: rgba(255,255,255,.035) !important;
+}
+[data-element-style="glass"] .week-table td.task-cell{
+  background: rgba(255,255,255,.015) !important;
+}
+[data-element-style="glass"] .week-table td.task-cell.today{
+  background: rgba(120,150,220,.08) !important;
+}
+[data-element-style="glass"] .week-cell-edit{
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-element-style="glass"] .week-cell-edit .wc-input{
+  background: rgba(255,255,255,.03) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px dashed rgba(255,255,255,.15) !important;
+}
+
+/* ─── ۷) 🔧 فیکس تقویم ─── */
+[data-element-style="glass"] .cal-day{
+  background: rgba(255,255,255,.035) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: none !important;
+}
+[data-element-style="glass"] .cal-day:hover{
+  background: rgba(255,255,255,.08) !important;
+  border-color: var(--accent) !important;
+}
+[data-element-style="glass"] .cal-day.selected{
+  background: linear-gradient(160deg,var(--accent-light),var(--accent-dark)) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 14px -6px var(--accent) !important;
+}
+
+/* ─── ۸) 🔧 فیکس تنظیمات — فونت کوچیک‌تر ─── */
+.settings-modal{
+  font-size: 13px !important;
+}
+.settings-modal .modal-header h3{
+  font-size: 14px !important;
+}
+.settings-modal .setting-group > label{
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+}
+.settings-modal .row-btn{
+  font-size: 10px !important;
+  min-height: 68px !important;
+  padding: 10px 6px !important;
+  gap: 5px !important;
+}
+.settings-modal .row-btn .rb-icon{
+  width: 20px !important;
+  height: 20px !important;
+}
+.settings-modal .row-btn .rb-label{
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+}
+.settings-modal .settings-tab-btn{
+  font-size: 11.5px !important;
+  padding: 9px 12px !important;
+}
+.settings-modal .settings-submenu-btn{
+  font-size: 11px !important;
+}
+.settings-modal .color-label{
+  font-size: 9px !important;
+}
+.settings-modal .pattern-name{
+  font-size: 9.5px !important;
+}
+.settings-modal .settings-content{
+  font-size: 12px !important;
+}
+.settings-modal .btn-primary,
+.settings-modal .btn-secondary{
+  font-size: 11.5px !important;
+  padding: 9px 14px !important;
+}
+.settings-modal .setting-group{
+  padding: 12px 14px !important;
+  gap: 6px !important;
+}
+/* پیش‌نمایش */
+.settings-preview .pv-msg{
+  font-size: 11px !important;
+}
+.settings-preview .pv-header-text{
+  font-size: 11px !important;
+}
+
+/* ─── ۹) 🔧 بازطراحی انیمیشن قفل ─── */
+.lock-typed-char.masking{
+  animation: lockCharMaskNew .28s cubic-bezier(.34,1.4,.64,1) forwards !important;
+}
+@keyframes lockCharMaskNew{
+  0%{
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+  50%{
+    transform: scale(.7) translateY(-4px);
+    opacity: .4;
+    filter: blur(1px);
+  }
+  100%{
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+.lock-typed-char.masked{
+  background: linear-gradient(160deg,
+    rgba(96,165,250,.35),
+    rgba(59,130,246,.55)) !important;
+  border: 1px solid rgba(120,170,255,.3) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.15),
+    0 2px 8px -4px rgba(96,165,250,.5) !important;
+  font-size: 16px !important;
+  color: rgba(255,255,255,.7) !important;
+}
+/* کاراکتر جدید — ورود نرم */
+.lock-typed-char{
+  animation: lockCharIn .22s cubic-bezier(.34,1.5,.64,1) both !important;
+}
+@keyframes lockCharIn{
+  0%{
+    transform: scale(.6) translateY(-6px);
+    opacity: 0;
+  }
+  100%{
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ─── ۱۰) حذف گرادیانت اضافی کارت‌های روزانه ─── */
+[data-element-style="glass"] .daily-card{
+  border: 1px solid rgba(255,255,255,.1) !important;
+}
+[data-element-style="glass"] .daily-card .dcw-item{
+  background: rgba(255,255,255,.02) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+/* ─── ۱۱) فیلد «عنوان کار جدید» شیشه‌ای ─── */
+[data-element-style="glass"] .task-add-form input[type=text]{
+  background: rgba(18,22,36,.5) !important;
+  backdrop-filter: blur(50px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 8px 24px -12px rgba(0,0,0,.6) !important;
+}
+[data-element-style="glass"] .task-add-form input[type=text]:focus{
+  border-color: var(--accent) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.1),
+    0 0 0 3px var(--accent-soft),
+    0 8px 24px -12px var(--accent) !important;
+}
+
+/* ─── ۱۲) فیلد جستجوی هوش مصنوعی ─── */
+[data-element-style="glass"] .bar-input,
+[data-element-style="glass"] .history-search{
+  background: rgba(255,255,255,.03) !important;
+}
