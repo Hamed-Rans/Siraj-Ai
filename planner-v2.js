@@ -2366,6 +2366,7 @@
         try{ unlockSite(); }catch(err){}
         closeStudy();
       };
+      el.querySelector('#studyChatBtn').onclick=toggleStudyChat;
       el.querySelector('#studyToolsBtn').onclick=toggleStudyTools;
       el.querySelector('#studyLibraryBtn').onclick=toggleStudyLibrary;
       el.querySelector('#studyPauseBtn').onclick=toggleStudyPause;
@@ -2665,16 +2666,14 @@
       try{stopAudio();}catch(e){}
       try{
         var overlay=document.getElementById('studyOverlay');
-        var chat=document.getElementById('studyChatPanel');
-        var tools=document.getElementById('studyToolsPanel');
-        var lib=document.getElementById('studyLibraryPanel');
+        var chat=document.getElementById('studyLeftDrawer');
+        var tools=document.getElementById('studyRightDrawer');
         var exitP=document.getElementById('exitReasonPopup');
         var earlyP=document.getElementById('earlyExitPopup');
         var choiceP=document.getElementById('notifChoicePopup');
         var popup=document.getElementById('sirajPopup');
         if(chat) chat.remove();
         if(tools) tools.remove();
-        if(lib) lib.remove();
         if(exitP) exitP.remove();
         if(earlyP) earlyP.remove();
         if(choiceP) choiceP.remove();
@@ -2770,53 +2769,6 @@
       box.innerHTML=html;
       box.scrollTop=box.scrollHeight;
     }
-    function toggleStudyChat(){
-      var ex=document.getElementById('studyChatPanel');
-      if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
-      var p=document.createElement('div');
-      p.id='studyChatPanel';p.className='study-chat-panel';
-      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">🤖 سراج — دستیار مطالعه</div><button class="study-chat-close" id="studyChatCloseBtn">✕</button></div>'
-        +'<div class="study-chat-messages" id="studyChatMessages"></div>'
-        +'<div class="study-chat-input-row">'
-        +'<input type="text" class="study-chat-input" id="studyChatInput" placeholder="سؤالت رو بپرس..." onkeydown="if(event.key===\'Enter\')window.__studyChatSend()">'
-        +'<button class="study-chat-send" onclick="window.__studyChatSend()">➤</button>'
-        +'</div>';
-      document.body.appendChild(p);
-      p.querySelector('#studyChatCloseBtn').onclick=function(){p.classList.remove('open');setTimeout(function(){p.remove();},320);};
-      renderStudyChat();
-      requestAnimationFrame(function(){p.classList.add('open');});
-      setTimeout(function(){var i=document.getElementById('studyChatInput');if(i) i.focus();},350);
-    }
-    function toggleStudyTools(){
-      var ex=document.getElementById('studyToolsPanel');
-      if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
-      var p=document.createElement('div');
-      p.id='studyToolsPanel';p.className='study-tools-panel';
-      p.innerHTML='<div class="study-chat-header"><div class="study-chat-header-title">🛠️ دستیارهای مطالعه</div><button class="study-chat-close" id="studyToolsCloseBtn">✕</button></div>'
-        +'<div class="study-tools-grid">'
-        +'<div class="study-tool-card" onclick="window.__studyTool(\'اعراب\')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><div class="stc-title">اعراب</div><div class="stc-desc">تجزیه و ترکیب</div></div>'
-        +'<div class="study-tool-card" onclick="window.__studyTool(\'تحلیل بیت\')"><svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/></svg><div class="stc-title">تحلیل بیت</div><div class="stc-desc">ادبی و بلاغی</div></div>'
-        +'<div class="study-tool-card" onclick="window.__studyTool(\'قواعد\')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="stc-title">قواعد</div><div class="stc-desc">نکات دستوری</div></div>'
-        +'<div class="study-tool-card" onclick="window.__studyTool(\'ترجمه\')"><svg viewBox="0 0 24 24"><path d="m5 8 6 6m-7 0 6-6 2-3M2 5h12"/><path d="M9 5v14"/><path d="M15 5v14"/><path d="M21 5v14"/></svg><div class="stc-title">ترجمه</div><div class="stc-desc">عربی به فارسی</div></div>'
-        +'<div class="study-tool-card" onclick="window.__studyTool(\'تمرین\')"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><div class="stc-title">تمرین ساز</div><div class="stc-desc">آزمون شخصی</div></div>'
-        +'<div class="study-tool-card" onclick="window.__studyTool(\'واژه\')"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><div class="stc-title">واژه جدید</div><div class="stc-desc">کلمه یاد بگیر</div></div>'
-        +'</div>';
-      document.body.appendChild(p);
-      p.querySelector('#studyToolsCloseBtn').onclick=function(){p.classList.remove('open');setTimeout(function(){p.remove();},320);};
-      requestAnimationFrame(function(){p.classList.add('open');});
-    }
-    window.__studyTool=function(type){
-      var tp=document.getElementById('studyToolsPanel');
-      if(tp){tp.classList.remove('open');setTimeout(function(){if(tp.parentNode)tp.remove();},320);}
-      setTimeout(function(){
-        var chat=document.getElementById('studyChatPanel');
-        if(!chat) toggleStudyChat();
-        setTimeout(function(){
-          var inp=document.getElementById('studyChatInput');
-          if(inp){inp.value='می‌خوام یه '+type+' بهم یاد بدی و تمرین کنی.';inp.focus();}
-        },420);
-      },260);
-    };
 
     window.__studyChatSend=async function(){
       var inp=document.getElementById('studyChatInput');
@@ -2879,37 +2831,6 @@
     }
     function saveStudyBooks(arr){
       try{ localStorage.setItem(STUDY_BOOKS_KEY, JSON.stringify(arr)); }catch(e){}
-    }
-
-    function toggleStudyLibrary(){
-      var ex=document.getElementById('studyLibraryPanel');
-      if(ex){ex.classList.remove('open');setTimeout(function(){ex.remove();},320);return;}
-
-      var p=document.createElement('div');
-      p.id='studyLibraryPanel';
-      p.className='study-tools-panel';
-      p.innerHTML=
-        '<div class="study-chat-header">'
-        +'<div class="study-chat-header-title">📚 کتابخانه من</div>'
-        +'<button class="study-chat-close" id="studyLibCloseBtn">✕</button>'
-        +'</div>'
-        +'<div class="study-lib-upload-row">'
-        +'<label class="study-lib-upload-btn">'
-        +'<input type="file" id="studyLibFileInput" accept=".pdf,.epub,.txt,.doc,.docx,.jpg,.png" multiple style="display:none">'
-        +'📁 آپلود کتاب'
-        +'</label>'
-        +'</div>'
-        +'<div class="study-lib-list" id="studyLibList"></div>';
-
-      document.body.appendChild(p);
-      p.querySelector('#studyLibCloseBtn').onclick=function(){
-        p.classList.remove('open');
-        setTimeout(function(){p.remove();},320);
-      };
-      p.querySelector('#studyLibFileInput').onchange=handleStudyBookUpload;
-
-      renderStudyLibraryList();
-      requestAnimationFrame(function(){ p.classList.add('open'); });
     }
 
     function handleStudyBookUpload(e){
@@ -3507,3 +3428,110 @@
     console.log('[Siraj v2.5] planner loaded ✓');
   }
 })();
+
+
+/* ═══════════════════════════════════════════════════════════════
+   STUDY DRAWERS — اضافه شده در انتهای فایل
+   ═══════════════════════════════════════════════════════════════ */
+
+window.closeStudyDrawer = function(side){
+  var el = document.getElementById(side === 'left' ? 'studyLeftDrawer' : 'studyRightDrawer');
+  if (!el) return;
+  el.classList.remove('open');
+  setTimeout(function(){ if (el.parentNode) el.remove(); }, 420);
+};
+
+window.__closeStudyDrawer = window.closeStudyDrawer;
+
+window.toggleStudyChat = function(){
+  var ex = document.getElementById('studyLeftDrawer');
+  if (ex) { window.closeStudyDrawer('left'); return; }
+  var right = document.getElementById('studyRightDrawer');
+  if (right) window.closeStudyDrawer('right');
+
+  var p = document.createElement('div');
+  p.id = 'studyLeftDrawer';
+  p.className = 'study-drawer study-drawer-left';
+  p.innerHTML =
+    '<div class="study-drawer-header">' +
+      '<div class="study-drawer-title">🤖 سراج — دستیار مطالعه</div>' +
+      '<button class="study-drawer-close" onclick="window.__closeStudyDrawer(\'left\')">✕</button>' +
+    '</div>' +
+    '<div class="study-chat-messages" id="studyChatMessages"></div>' +
+    '<div class="study-chat-input-row">' +
+      '<input type="text" class="study-chat-input" id="studyChatInput" placeholder="سؤالت رو بپرس..." onkeydown="if(event.key===\'Enter\')window.__studyChatSend()">' +
+      '<button class="study-chat-send" onclick="window.__studyChatSend()">➤</button>' +
+    '</div>';
+  document.body.appendChild(p);
+  if (typeof renderStudyChat === 'function') renderStudyChat();
+  requestAnimationFrame(function(){ p.classList.add('open'); });
+  setTimeout(function(){ var i = document.getElementById('studyChatInput'); if (i) i.focus(); }, 350);
+};
+
+window.openStudyRightDrawer = function(tab){
+  var _tab = tab || 'tools';
+  var ex = document.getElementById('studyRightDrawer');
+  if (ex) {
+    ex.querySelectorAll('.study-drawer-tab').forEach(function(t){
+      t.classList.toggle('active', t.getAttribute('data-tab') === _tab);
+    });
+    window.renderStudyRightContent(_tab);
+    return;
+  }
+  var left = document.getElementById('studyLeftDrawer');
+  if (left) window.closeStudyDrawer('left');
+
+  var p = document.createElement('div');
+  p.id = 'studyRightDrawer';
+  p.className = 'study-drawer study-drawer-right';
+  p.innerHTML =
+    '<div class="study-drawer-header">' +
+      '<div class="study-drawer-tabs">' +
+        '<button class="study-drawer-tab' + (_tab==='tools'?' active':'') + '" data-tab="tools">🛠️ دستیار</button>' +
+        '<button class="study-drawer-tab' + (_tab==='library'?' active':'') + '" data-tab="library">📚 کتابخانه</button>' +
+      '</div>' +
+      '<button class="study-drawer-close" onclick="window.__closeStudyDrawer(\'right\')">✕</button>' +
+    '</div>' +
+    '<div class="study-drawer-body" id="studyRightBody"></div>';
+  document.body.appendChild(p);
+  p.querySelectorAll('.study-drawer-tab').forEach(function(t){
+    t.onclick = function(){
+      var newTab = t.getAttribute('data-tab');
+      p.querySelectorAll('.study-drawer-tab').forEach(function(x){ x.classList.toggle('active', x===t); });
+      window.renderStudyRightContent(newTab);
+    };
+  });
+  window.renderStudyRightContent(_tab);
+  requestAnimationFrame(function(){ p.classList.add('open'); });
+};
+
+window.renderStudyRightContent = function(tab){
+  var body = document.getElementById('studyRightBody');
+  if (!body) return;
+  if (tab === 'tools') {
+    body.innerHTML =
+      '<div class="study-tools-grid">' +
+        '<div class="study-tool-card" onclick="window.__studyTool(\'اعراب\')"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><div class="stc-title">اعراب</div><div class="stc-desc">تجزیه و ترکیب</div></div>' +
+        '<div class="study-tool-card" onclick="window.__studyTool(\'تحلیل بیت\')"><svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/></svg><div class="stc-title">تحلیل بیت</div><div class="stc-desc">ادبی و بلاغی</div></div>' +
+        '<div class="study-tool-card" onclick="window.__studyTool(\'قواعد\')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><div class="stc-title">قواعد</div><div class="stc-desc">نکات دستوری</div></div>' +
+        '<div class="study-tool-card" onclick="window.__studyTool(\'ترجمه\')"><svg viewBox="0 0 24 24"><path d="m5 8 6 6m-7 0 6-6 2-3M2 5h12"/><path d="M9 5v14"/><path d="M15 5v14"/><path d="M21 5v14"/></svg><div class="stc-title">ترجمه</div><div class="stc-desc">عربی به فارسی</div></div>' +
+        '<div class="study-tool-card" onclick="window.__studyTool(\'تمرین\')"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg><div class="stc-title">تمرین ساز</div><div class="stc-desc">آزمون شخصی</div></div>' +
+        '<div class="study-tool-card" onclick="window.__studyTool(\'واژه\')"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><div class="stc-title">واژه جدید</div><div class="stc-desc">کلمه یاد بگیر</div></div>' +
+      '</div>';
+  } else {
+    body.innerHTML =
+      '<div class="study-lib-upload-row">' +
+        '<label class="study-lib-upload-btn">' +
+          '<input type="file" id="studyLibFileInput" accept=".pdf,.epub,.txt,.doc,.docx,.jpg,.png" multiple style="display:none">' +
+          '📁 آپلود کتاب' +
+        '</label>' +
+      '</div>' +
+      '<div class="study-lib-list" id="studyLibList"></div>';
+    var fi = document.getElementById('studyLibFileInput');
+    if (fi) fi.onchange = handleStudyBookUpload;
+    if (typeof renderStudyLibraryList === 'function') renderStudyLibraryList();
+  }
+};
+
+window.toggleStudyTools = function(){ window.openStudyRightDrawer('tools'); };
+window.toggleStudyLibrary = function(){ window.openStudyRightDrawer('library'); };
