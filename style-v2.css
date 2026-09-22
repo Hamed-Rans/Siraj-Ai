@@ -9016,3 +9016,82 @@ html body .history-item{
   background: var(--accent)!important;
   color: #fff!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX v4 — خط contact کنار آیکون + حذف بوردر/هاله هاور
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── حذف خط قدیمی کنار متن ─── */
+.contact-row .contact-info::before{
+  display: none!important;
+}
+
+/* ─── contact-row: بدون بوردر و بدون هاله ─── */
+.contact-row,
+.about-contacts .contact-row{
+  transform: none!important;
+  background: var(--panel-bg)!important;
+  border: 1px solid var(--border)!important;
+  box-shadow: none!important;
+  transition: background-color .35s ease!important;
+  position: relative!important;
+  overflow: hidden!important;
+}
+
+/* حالت هاور — فقط پس‌زمینه ملایم، بدون بوردر آبی، بدون هاله */
+.contact-row:hover,
+.about-contacts .contact-row:hover{
+  transform: none!important;
+  background: var(--accent-soft)!important;
+  border: 1px solid var(--border)!important;   /* بوردر ثابت */
+  box-shadow: none!important;                   /* هاله صفر */
+}
+
+/* ─── خط عمودی سمت راست کارت (کنار آیکون) ─── */
+.contact-row::before{
+  content: ''!important;
+  position: absolute!important;
+  top: 6px!important;
+  bottom: 6px!important;
+  right: 0!important;                            /* سمت راست کارت */
+  width: 4px!important;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--accent-light) 15%,
+    var(--accent) 50%,
+    var(--accent-light) 85%,
+    transparent 100%)!important;
+  border-radius: 0 4px 4px 0!important;          /* گردی سمت چپ خط */
+  transform: scaleY(0)!important;
+  transform-origin: center!important;
+  opacity: 0!important;
+  transition:
+    transform .5s cubic-bezier(.34,1.4,.64,1),
+    opacity .3s ease!important;
+  box-shadow: 0 0 16px var(--accent)!important;
+  z-index: 10!important;
+  pointer-events: none!important;
+}
+.contact-row:hover::before{
+  transform: scaleY(1)!important;
+  opacity: 1!important;
+}
+
+/* اطمینان از اینکه ::after اجرا نشه */
+.contact-row::after{
+  display: none!important;
+  content: none!important;
+}
+
+/* ─── آیکون — فقط بزرگ شدن و رنگ ─── */
+.contact-row .contact-icon{
+  transition:
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    background-color .3s ease,
+    color .3s ease!important;
+}
+.contact-row:hover .contact-icon{
+  transform: scale(1.25) rotate(-8deg)!important;
+  background: var(--accent)!important;
+  color: #fff!important;
+}
