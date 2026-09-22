@@ -8219,3 +8219,139 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
     0 0 0 3px rgba(88,166,255,.2)!important;
   transform:translateX(-50%) scale(1.1)!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS MODAL — فیکس قطعی (AG)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ ۱. حذف contain از همه‌جا ═══ */
+.settings-modal,
+.settings-modal *,
+.settings-body,
+.settings-left,
+.settings-content-wrap,
+.settings-content,
+.setting-group,
+.setting-group *,
+.row-btns,
+.row-btn,
+.color-row,
+.color-opt,
+.pattern-grid,
+.pattern-opt,
+.preview-zone,
+.preview-zone * {
+  contain: none !important;
+  contain-intrinsic-size: none !important;
+}
+
+/* ═══ ۲. settings-content-wrap = flex column با overflow hidden ═══ */
+.settings-content-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  position: relative !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  min-width: 0 !important;
+  isolation: isolate !important;
+}
+
+/* ═══ ۳. settings-content = scrollable flex item ═══ */
+.settings-content {
+  position: relative !important;
+  inset: auto !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 20px 22px 40px !important;
+  display: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+.settings-content.active {
+  display: block !important;
+}
+
+/* ═══ ۴. setting-group = بدون ارتفاع قفل ═══ */
+.setting-group {
+  display: block !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  margin-bottom: 14px !important;
+}
+
+.setting-group:last-child {
+  margin-bottom: 0 !important;
+}
+
+.setting-group > label {
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+
+/* ═══ ۵. row-btns = گرید آزاد ═══ */
+.row-btns {
+  display: grid !important;
+  gap: 10px !important;
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* ═══ ۶. row-btn = ارتفاع آزاد، محتوا کامل ═══ */
+.row-btn {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 76px !important;
+  padding: 14px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+
+/* ═══ ۷. آیکون دکمه = سایز ثابت ═══ */
+.row-btn .rb-icon {
+  width: 26px !important;
+  height: 26px !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+}
+
+/* ═══ ۸. label دکمه = فضای کافی ═══ */
+.row-btn .rb-label {
+  display: block !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+  line-height: 1.3 !important;
+  flex-shrink: 0 !important;
+}
+
+/* ═══ ۹. سایه و انیمیشن نرم دکمه ═══ */
+.row-btn {
+  transition:
+    background .28s cubic-bezier(.22,1,.36,1),
+    border-color .28s cubic-bezier(.22,1,.36,1),
+    transform .3s cubic-bezier(.34,1.4,.64,1),
+    box-shadow .35s cubic-bezier(.22,1,.36,1) !important;
+}
+
+.row-btn:hover {
+  transform: translateY(-2px) !important;
+}
+
+.row-btn:active {
+  transform: translateY(0) scale(.97) !important;
+}
