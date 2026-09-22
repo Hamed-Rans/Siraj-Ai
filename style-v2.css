@@ -9254,3 +9254,183 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
     width:88vw;
   }
 }
+/* ═══════════════════════════════════════════════════════════════
+   WELCOME CARD — گرادیانت سه‌رنگ متناسب با تم
+   ═══════════════════════════════════════════════════════════════ */
+.welcome-card::before{
+  background:
+    radial-gradient(circle at 82% 18%, var(--accent) 0%, transparent 48%),
+    radial-gradient(circle at 18% 82%, var(--accent-light) 0%, transparent 48%)!important;
+  opacity:.55!important;
+}
+
+/* ═══ هر تم رنگ سوم خودش ═══ */
+[data-theme="dark-navy"] .welcome-card::before,
+[data-theme="light-navy"] .welcome-card::before,
+[data-theme="midnight-navy"] .welcome-card::before{
+  background:
+    radial-gradient(circle at 82% 18%, #3B82F6 0%, transparent 48%),
+    radial-gradient(circle at 18% 82%, #8B5CF6 0%, transparent 48%)!important;
+}
+[data-theme="dark-crimson"] .welcome-card::before,
+[data-theme="light-crimson"] .welcome-card::before,
+[data-theme="midnight-crimson"] .welcome-card::before{
+  background:
+    radial-gradient(circle at 82% 18%, #EF4444 0%, transparent 48%),
+    radial-gradient(circle at 18% 82%, #F97316 0%, transparent 48%)!important;
+}
+[data-theme="dark-gold"] .welcome-card::before,
+[data-theme="light-gold"] .welcome-card::before,
+[data-theme="midnight-gold"] .welcome-card::before{
+  background:
+    radial-gradient(circle at 82% 18%, #D4AF37 0%, transparent 48%),
+    radial-gradient(circle at 18% 82%, #F59E0B 0%, transparent 48%)!important;
+}
+[data-theme="dark-purple"] .welcome-card::before,
+[data-theme="light-purple"] .welcome-card::before,
+[data-theme="midnight-purple"] .welcome-card::before{
+  background:
+    radial-gradient(circle at 82% 18%, #A855F7 0%, transparent 48%),
+    radial-gradient(circle at 18% 82%, #8B5CF6 0%, transparent 48%)!important;
+}
+[data-theme="dark-emerald"] .welcome-card::before,
+[data-theme="light-emerald"] .welcome-card::before,
+[data-theme="midnight-emerald"] .welcome-card::before{
+  background:
+    radial-gradient(circle at 82% 18%, #10B981 0%, transparent 48%),
+    radial-gradient(circle at 18% 82%, #14B8A6 0%, transparent 48%)!important;
+}
+[data-theme="dark-indigo"] .welcome-card::before,
+[data-theme="light-indigo"] .welcome-card::before,
+[data-theme="midnight-indigo"] .welcome-card::before{
+  background:
+    radial-gradient(circle at 82% 18%, #6366F1 0%, transparent 48%),
+    radial-gradient(circle at 18% 82%, #3B82F6 0%, transparent 48%)!important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   STUDY / LIBRARY BUTTONS — دو رنگ متفاوت برای هر تم
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════ تم نیلی (Navy) ═══════════════ */
+[data-theme="dark-navy"] .panel-study-btn,
+[data-theme="light-navy"] .panel-study-btn,
+[data-theme="midnight-navy"] .panel-study-btn{
+  background:linear-gradient(160deg, #60A5FA 0%, #3B82F6 50%, #2563EB 100%)!important;
+}
+[data-theme="dark-navy"] .panel-library-btn,
+[data-theme="light-navy"] .panel-library-btn,
+[data-theme="midnight-navy"] .panel-library-btn{
+  background:linear-gradient(160deg, #A855F7 0%, #8B5CF6 50%, #6366F1 100%)!important;
+}
+
+/* ═══════════════ تم آتشین (Crimson) ═══════════════ */
+[data-theme="dark-crimson"] .panel-study-btn,
+[data-theme="light-crimson"] .panel-study-btn,
+[data-theme="midnight-crimson"] .panel-study-btn{
+  background:linear-gradient(160deg, #F87171 0%, #EF4444 50%, #DC2626 100%)!important;
+}
+[data-theme="dark-crimson"] .panel-library-btn,
+[data-theme="light-crimson"] .panel-library-btn,
+[data-theme="midnight-crimson"] .panel-library-btn{
+  background:linear-gradient(160deg, #FBBF24 0%, #F97316 50%, #EA580C 100%)!important;
+}
+
+/* ═══════════════ تم زرین (Gold) ═══════════════ */
+[data-theme="dark-gold"] .panel-study-btn,
+[data-theme="light-gold"] .panel-study-btn,
+[data-theme="midnight-gold"] .panel-study-btn{
+  background:linear-gradient(160deg, #F4D03F 0%, #D4AF37 50%, #B8860B 100%)!important;
+  color:#1A1A2E!important;
+}
+[data-theme="dark-gold"] .panel-library-btn,
+[data-theme="light-gold"] .panel-library-btn,
+[data-theme="midnight-gold"] .panel-library-btn{
+  background:linear-gradient(160deg, #FBBF24 0%, #F59E0B 50%, #D97706 100%)!important;
+  color:#1A1A2E!important;
+}
+[data-theme$="gold"] .panel-study-btn .panel-btn-icon svg,
+[data-theme$="gold"] .panel-library-btn .panel-btn-icon svg{
+  stroke:#1A1A2E!important;
+}
+
+/* ═══════════════ تم جادویی (Purple) ═══════════════ */
+[data-theme="dark-purple"] .panel-study-btn,
+[data-theme="light-purple"] .panel-study-btn,
+[data-theme="midnight-purple"] .panel-study-btn{
+  background:linear-gradient(160deg, #C084FC 0%, #A855F7 50%, #9333EA 100%)!important;
+}
+[data-theme="dark-purple"] .panel-library-btn,
+[data-theme="light-purple"] .panel-library-btn,
+[data-theme="midnight-purple"] .panel-library-btn{
+  background:linear-gradient(160deg, #818CF8 0%, #6366F1 50%, #4F46E5 100%)!important;
+}
+
+/* ═══════════════ تم طبیعی (Emerald) ═══════════════ */
+[data-theme="dark-emerald"] .panel-study-btn,
+[data-theme="light-emerald"] .panel-study-btn,
+[data-theme="midnight-emerald"] .panel-study-btn{
+  background:linear-gradient(160deg, #34D399 0%, #10B981 50%, #059669 100%)!important;
+}
+[data-theme="dark-emerald"] .panel-library-btn,
+[data-theme="light-emerald"] .panel-library-btn,
+[data-theme="midnight-emerald"] .panel-library-btn{
+  background:linear-gradient(160deg, #2DD4BF 0%, #14B8A6 50%, #0D9488 100%)!important;
+}
+
+/* ═══════════════ تم نیلی-بنفش (Indigo) ═══════════════ */
+[data-theme="dark-indigo"] .panel-study-btn,
+[data-theme="light-indigo"] .panel-study-btn,
+[data-theme="midnight-indigo"] .panel-study-btn{
+  background:linear-gradient(160deg, #818CF8 0%, #6366F1 50%, #4F46E5 100%)!important;
+}
+[data-theme="dark-indigo"] .panel-library-btn,
+[data-theme="light-indigo"] .panel-library-btn,
+[data-theme="midnight-indigo"] .panel-library-btn{
+  background:linear-gradient(160deg, #60A5FA 0%, #3B82F6 50%, #2563EB 100%)!important;
+}
+
+/* ═══ سایه‌های متناسب ═══ */
+[data-theme="dark-navy"] .panel-study-btn,
+[data-theme="light-navy"] .panel-study-btn,
+[data-theme="midnight-navy"] .panel-study-btn{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 22px -8px #3B82F6!important;
+}
+[data-theme="dark-navy"] .panel-library-btn,
+[data-theme="light-navy"] .panel-library-btn,
+[data-theme="midnight-navy"] .panel-library-btn{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 22px -8px #8B5CF6!important;
+}
+[data-theme="dark-crimson"] .panel-study-btn,
+[data-theme="light-crimson"] .panel-study-btn,
+[data-theme="midnight-crimson"] .panel-study-btn{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 22px -8px #EF4444!important;
+}
+[data-theme="dark-crimson"] .panel-library-btn,
+[data-theme="light-crimson"] .panel-library-btn,
+[data-theme="midnight-crimson"] .panel-library-btn{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 22px -8px #F97316!important;
+}
+[data-theme$="gold"] .panel-study-btn{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.35),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 22px -8px #D4AF37!important;
+}
+[data-theme$="gold"] .panel-library-btn{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.35),
+    0 1px 2px rgba(0,0,0,.25),
+    0 8px 22px -8px #F59E0B!important;
+}
