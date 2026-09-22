@@ -869,12 +869,7 @@ function switchView(view) {
         if (typeof window.updateNavSlider === 'function') window.updateNavSlider(true);
     }, 10));
 }
-function switchView(view) {
-    /* ★ رفرش آواتارها بعد از تغییر تب */
-    refreshAllAvatars();
-    currentView = view;
-    ...
-}
+
 function toggleWelcome() {
     const w = document.getElementById('welcomeScreen'); if (!w) return;
     const box = document.getElementById('box'); if (!box) return;
