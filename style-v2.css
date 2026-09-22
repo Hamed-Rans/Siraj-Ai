@@ -7738,3 +7738,104 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   left:0!important;
   opacity:1!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   PAGE EMPTY SOON — دکمه «در حال آماده‌سازی»
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ کارت اصلی — اجازه بده دکمه بیرون نزنه ═══ */
+.page-empty-card{
+  padding-bottom:52px!important;
+  margin-bottom:48px!important;
+  overflow:visible!important;
+}
+
+/* ═══ دکمه — کامل دیده بشه ═══ */
+.page-empty-soon{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  padding:12px 26px!important;
+  border-radius:16px!important;
+  font-family:var(--font-heading,'Morabba','Estedad',sans-serif)!important;
+  font-size:13.5px!important;
+  font-weight:800!important;
+  letter-spacing:-.1px!important;
+  color:#fff!important;
+  background:linear-gradient(160deg,var(--accent-light),var(--accent-dark))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 1px 3px rgba(0,0,0,.25),
+    0 10px 26px -10px var(--accent)!important;
+  margin-top:8px!important;
+  position:relative!important;
+  z-index:5!important;
+  animation:soonPulseSoft 3s ease-in-out infinite!important;
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1)!important;
+}
+.page-empty-soon:hover{
+  transform:translateY(-3px) scale(1.02)!important;
+  animation-play-state:paused!important;
+}
+.page-empty-soon:active{
+  transform:translateY(-1px) scale(.97)!important;
+}
+.page-empty-soon svg{
+  width:18px!important;
+  height:18px!important;
+  stroke:currentColor!important;
+  fill:none!important;
+  stroke-width:2.2!important;
+  flex-shrink:0!important;
+}
+@keyframes soonPulseSoft{
+  0%,100%{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.2),
+      0 1px 3px rgba(0,0,0,.25),
+      0 10px 26px -10px var(--accent),
+      0 0 0 0 var(--accent-soft);
+  }
+  50%{
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.25),
+      0 1px 3px rgba(0,0,0,.3),
+      0 10px 26px -10px var(--accent),
+      0 0 0 8px transparent;
+  }
+}
+
+/* ═══ دکمه زرد — مقالات ═══ */
+.page-empty-soon.gold{
+  background:linear-gradient(160deg,#F4D03F 0%,#D4AF37 50%,#B8860B 100%)!important;
+  color:#1A1A2E!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.4),
+    0 1px 3px rgba(0,0,0,.25),
+    0 10px 26px -10px #D4AF37,
+    0 0 0 0 rgba(212,175,55,.3)!important;
+}
+.page-empty-soon.gold:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.45),
+    0 2px 5px rgba(0,0,0,.3),
+    0 14px 32px -10px #D4AF37,
+    0 0 0 4px rgba(212,175,55,.15)!important;
+}
+
+/* ═══ responsive ═══ */
+@media (max-width:600px){
+  .page-empty-card{
+    padding-bottom:40px!important;
+    margin-bottom:36px!important;
+  }
+  .page-empty-soon{
+    padding:11px 20px!important;
+    font-size:12.5px!important;
+    gap:8px!important;
+  }
+  .page-empty-soon svg{
+    width:16px!important;
+    height:16px!important;
+  }
+}
