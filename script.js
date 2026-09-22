@@ -319,7 +319,7 @@ function loadSettings() {
         const l = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
         const s = Object.assign({}, APP_CONFIG.defaultSettings, l);
         const pi = localStorage.getItem(PROFILE_IMG_KEY);
-        if (pi) s.profileImage = pi;   /* ★ همیشه از localStorage بخون */
+        if (pi) s.profileImage = pi;   /* ★ همیشه localStorage اولویت داره */
         if (!s.models) s.models = JSON.parse(JSON.stringify(APP_CONFIG.models));
         if (s.appVersion !== '2.5') s.appVersion = '2.5';
         return s;
@@ -843,7 +843,7 @@ function updateNavSlider(animate) {
    VIEW SWITCH
    ═══════════════════════════════════════════════════════════════ */
 function switchView(view) {
-    applySettingsToUI();
+    refreshAllAvatars();
     currentView = view;
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     const target = document.getElementById('view-' + view);
@@ -869,7 +869,12 @@ function switchView(view) {
         if (typeof window.updateNavSlider === 'function') window.updateNavSlider(true);
     }, 10));
 }
-
+function switchView(view) {
+    /* ★ رفرش آواتارها بعد از تغییر تب */
+    refreshAllAvatars();
+    currentView = view;
+    ...
+}
 function toggleWelcome() {
     const w = document.getElementById('welcomeScreen'); if (!w) return;
     const box = document.getElementById('box'); if (!box) return;
@@ -1672,7 +1677,7 @@ async function send() {
 
     await new Promise(r => setTimeout(r, 500));
 
-    if (chatId === currentChatId && !controller.signal.aborted) {
+    if (!controller.signal.aborted) {
         const w = document.createElement('div');
         w.className = 'msg-wrap bot';
         w.id = 'typing-indicator';
@@ -1713,12 +1718,13 @@ async function send() {
             let errBody = '';
             try { errBody = await res.text(); } catch (e) {}
             console.error('[Siraj] Error body:', errBody);
-            if (res.status === 429) msg = '⏳ محدودیت (۴۲۹). ۳۰ ثانیه صبر کن.';
-            else if (res.status === 401 || res.status === 403) msg = '🔑 کلید API مشکل داره.';
-            else if (res.status === 404) msg = '🔍 مدل یا مسیر پیدا نشد (۴۰۴).';
-            else if (res.status === 503) msg = '🔄 سرور الان شلوغه.';
+            if (res.status === 429) msg = '🫴 محدودیت رسیدیم به محدودیت\n\nپول وُردَه تا بتونی ادامه بدی پول زور وُردَه! 🫴💸\n\n۳۰ ثانیه دیگه دوباره امتحان کن.';
+            if (res.status === 429) msg = '🫴 رسیدیم به محدودیت\n\nپول وُردَه تا بتونی ادامه بدی پول زور وُردَه! 🫴💸\n\n۳۰ ثانیه دیگه دوباره امتحان کن.';
+            else if (res.status === 401 || res.status === 403) msg = '🔑 کلید API مشکل داره. به سازنده بگو عوضش کنه.';
+            else if (res.status === 404) msg = '🔍 مدل یا مسیر پیدا نشد (۴۰۴). شاید مدل خواب رفته.';
+            else if (res.status === 503) msg = '🔄 سرور الان شلوغه. یه ذره دیگه صبر کن، درست می‌شه.';
             else msg = 'خطا (' + res.status + '): ' + (errBody.substring(0, 250) || 'بدون توضیح');
-            if (chatId === currentChatId) renderBotMsg(msg);
+            renderBotMsg(msg);
             addMsgToHistory(chatId, 'assistant', msg);
             delete pendingRequests[chatId];
             chatInFlight = false;
@@ -1733,7 +1739,7 @@ async function send() {
         streamWriting = false;
         let streamEl = null;
 
-        if (chatId === currentChatId) {
+                if (!controller.signal.aborted) {
             const t = document.getElementById('typing-indicator');
             if (t) t.remove();
             const w = document.createElement('div');
@@ -1852,7 +1858,7 @@ async function send() {
 
         extractPlanFromResponse(full);
         const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
-        if (chatId === currentChatId && streamEl) {
+        if (streamEl) {
             const pm = streamEl.parentElement;
             pm.innerHTML = formatMd(full);
             const blink = pm.querySelector('.cursor-blink');
@@ -1872,14 +1878,14 @@ async function send() {
         console.error('[Siraj] Caught error:', err);
         if (err.name === 'AbortError') {
             if (controller.signal.reason === 'timeout') {
-                if (chatId === currentChatId) renderBotMsg('⏱️ زمان انتظار تمام شد (۱۲۰ ثانیه). اتصال اینترنت یا سرور رو چک کن و دوباره امتحان کن.');
+              renderBotMsg('⏱️ زمان انتظار تمام شد (۱۲۰ ثانیه). اتصال اینترنت یا سرور رو چک کن و دوباره امتحان کن.');
             }
             chatInFlight = false;
             isStreaming = false;
             setSendButton();
             return;
         }
-        if (chatId === currentChatId) renderBotMsg('خطای شبکه: ' + err.message);
+            renderBotMsg('خطای شبکه: ' + err.message);
     }
     chatInFlight = false;
     isStreaming = false;
@@ -2482,26 +2488,27 @@ function handleProfileUpload(ev) {
     const r = new FileReader();
     r.onload = e => {
         var dataUrl = e.target.result;
-
-        /* ★ ذخیره توی localStorage مستقیم — منبع اصلی */
         try { localStorage.setItem(PROFILE_IMG_KEY, dataUrl); } catch(err) {}
-
-        /* ★ آپدیت settings و settingsDraft هر دو */
         settings.profileImage = dataUrl;
         if (settingsDraft) settingsDraft.profileImage = dataUrl;
         saveSettings();
-
-        /* ★ آپدیت همه آواتارهای فعال توی صفحه */
-        var preview = document.getElementById('profileAvatarPreview');
-        if (preview) preview.innerHTML = '<img src="' + dataUrl + '" alt="">';
-        document.querySelectorAll('.main-top-avatar img').forEach(function(img){ img.src = dataUrl; });
-        var aboutAv = document.querySelector('.about-avatar');
-        if (aboutAv) aboutAv.innerHTML = '<img src="' + dataUrl + '" alt="حامد">';
-
+        refreshAllAvatars(dataUrl);
         toast('✓ عکس پروفایل ذخیره شد', 'success');
     };
     r.readAsDataURL(f);
     ev.target.value = '';
+}
+
+function refreshAllAvatars(src) {
+    if (!src) {
+        try { src = localStorage.getItem(PROFILE_IMG_KEY) || ''; } catch(e) { src = ''; }
+    }
+    if (!src) src = 'siraj-logo.png';
+    document.querySelectorAll('.main-top-avatar img').forEach(function(img){ img.src = src; });
+    var preview = document.getElementById('profileAvatarPreview');
+    if (preview) preview.innerHTML = '<img src="' + src + '" alt="">';
+    var aboutAv = document.querySelector('.about-avatar');
+    if (aboutAv) aboutAv.innerHTML = '<img src="' + src + '" alt="حامد">';
 }
 function updatePassword() {
     const p1 = document.getElementById('newPass1');
