@@ -657,6 +657,11 @@ function applyBodyBackground(t) {
    ═══════════════════════════════════════════════════════════════ */
 function applySettingsToUI(s) {
     const t = s || settings;
+    try {
+        var savedImg = localStorage.getItem(PROFILE_IMG_KEY);
+        if (savedImg) t.profileImage = savedImg;
+    } catch (e) {}
+    ...
     loadFontIfNeeded(t.fontFamily || 'vazirmatn');
     document.documentElement.setAttribute('data-theme', t.themeMode + '-' + t.themeColor);
     document.documentElement.setAttribute('data-bubble-shape', t.bubbleShape);
@@ -854,7 +859,7 @@ function updateNavSlider(animate) {
    VIEW SWITCH
    ═══════════════════════════════════════════════════════════════ */
 function switchView(view) {
-    refreshAllAvatars();
+    refreshAllAvatars();     setTimeout(refreshAllAvatars, 50);
     currentView = view;
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     const target = document.getElementById('view-' + view);
@@ -2506,15 +2511,12 @@ function handleProfileUpload(ev) {
 }
 
 function refreshAllAvatars(src) {
-    if (!src) {
-        try { src = localStorage.getItem(PROFILE_IMG_KEY) || ''; } catch(e) { src = ''; }
-    }
+    try { src = src || localStorage.getItem(PROFILE_IMG_KEY) || ''; } catch (e) { src = src || ''; }
     if (!src) src = 'siraj-logo.png';
     document.querySelectorAll('.main-top-avatar img').forEach(function(img){ img.src = src; });
     var preview = document.getElementById('profileAvatarPreview');
     if (preview) preview.innerHTML = '<img src="' + src + '" alt="">';
-    var aboutAv = document.querySelector('.about-avatar');
-    if (aboutAv) aboutAv.innerHTML = '<img src="' + src + '" alt="حامد">';
+    /* ★ حذف شد — دیگه about-avatar رو تغییر نده */
 }
 function updatePassword() {
     const p1 = document.getElementById('newPass1');
@@ -2933,7 +2935,7 @@ function renderSettingsControls() {
 
         '<div class="settings-content' + (settingsCat === 'about' ? ' active' : '') + '" data-cat="about">' +
             '<div class="about-hero">' +
-                '<div class="about-avatar">' + (s.profileImage ? '<img src="' + s.profileImage + '" alt="حامد">' : '<span style="font-size:44px">ح ا</span>') + '</div>' +
+                '<div class="about-avatar creator-avatar" id="creatorAvatar">' +     '<img src="creator.png" alt="حامد" onerror="this.style.display=\'none\'; this.parentElement.innerHTML=\'<span style=&quot;font-size:44px&quot;>ح ا</span>\'">' +     '<div class="creator-badge">AI CREATOR</div>' + '</div>' +
                 '<div class="about-name">حامد انصاری‌فر</div>' +
                 '<div class="about-role">سازنده سراج</div>' +
             '</div>' +
