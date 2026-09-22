@@ -9877,3 +9877,279 @@ body::after{
   background:rgba(255,255,255,.92)!important;
   border:1px solid rgba(0,0,0,.08)!important;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIRAJ GLASS v7 — فیکس نهایی (سفید کم‌رنگ به جای تیره)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── input bar — شیشه‌ی واقعی ─── */
+html[data-element-style="glass"] body .input-bar{
+  background:rgba(255,255,255,.05)!important;
+  backdrop-filter:blur(70px) saturate(240%)!important;
+  -webkit-backdrop-filter:blur(70px) saturate(240%)!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 8px 24px -12px rgba(0,0,0,.5)!important;
+}
+html[data-element-style="glass"][data-theme^="light"] body .input-bar{
+  background:rgba(255,255,255,.65)!important;
+  border:1px solid rgba(0,0,0,.06)!important;
+}
+html[data-element-style="glass"][data-theme^="midnight"] body .input-bar{
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+
+/* ─── main-chat ─── */
+html[data-element-style="glass"] body .main-chat{
+  background:rgba(255,255,255,.025)!important;
+  backdrop-filter:blur(70px) saturate(220%)!important;
+  -webkit-backdrop-filter:blur(70px) saturate(220%)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+html[data-element-style="glass"][data-theme^="light"] body .main-chat{
+  background:rgba(255,255,255,.45)!important;
+  border:1px solid rgba(255,255,255,.5)!important;
+}
+html[data-element-style="glass"][data-theme^="midnight"] body .main-chat{
+  background:rgba(255,255,255,.02)!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+}
+
+/* ─── هدرها ─── */
+html[data-element-style="glass"] body :is(.chat-header,.planner-hero,.page-title-bar){
+  background:rgba(255,255,255,.04)!important;
+  backdrop-filter:blur(65px) saturate(230%)!important;
+  -webkit-backdrop-filter:blur(65px) saturate(230%)!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+html[data-element-style="glass"][data-theme^="light"] body :is(.chat-header,.planner-hero,.page-title-bar){
+  background:rgba(255,255,255,.6)!important;
+  border-bottom:1px solid rgba(0,0,0,.06)!important;
+}
+html[data-element-style="glass"][data-theme^="midnight"] body :is(.chat-header,.planner-hero,.page-title-bar){
+  background:rgba(255,255,255,.03)!important;
+  border-bottom:1px solid rgba(255,255,255,.06)!important;
+}
+
+/* ─── کارت‌ها ─── */
+html[data-element-style="glass"] body :is(
+  .daily-card,.panel-card,.tool-card,.planner-hero-card,
+  .planner-stats-card,.month-calendar,.month-goals,.month-goal,
+  .year-overview,.week-summary,.task-item,.tasks-done-list,
+  .history-item,.ll-item,.contact-row,.setting-group,.row-btn
+){
+  background:rgba(255,255,255,.04)!important;
+  backdrop-filter:blur(50px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(50px) saturate(200%)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 8px 24px -12px rgba(0,0,0,.35)!important;
+}
+html[data-element-style="glass"][data-theme^="light"] body :is(
+  .daily-card,.panel-card,.tool-card,.planner-hero-card,
+  .planner-stats-card,.month-calendar,.month-goals,.month-goal,
+  .year-overview,.week-summary,.task-item,.tasks-done-list,
+  .history-item,.ll-item,.contact-row,.setting-group,.row-btn
+){
+  background:rgba(255,255,255,.55)!important;
+  border:1px solid rgba(255,255,255,.8)!important;
+}
+html[data-element-style="glass"][data-theme^="midnight"] body :is(
+  .daily-card,.panel-card,.tool-card,.planner-hero-card,
+  .planner-stats-card,.month-calendar,.month-goals,.month-goal,
+  .year-overview,.week-summary,.task-item,.tasks-done-list,
+  .history-item,.ll-item,.contact-row,.setting-group,.row-btn
+){
+  background:rgba(255,255,255,.025)!important;
+  border:1px solid rgba(255,255,255,.05)!important;
+}
+
+/* ─── نوار پایین ─── */
+html[data-element-style="glass"] body .bottom-nav{
+  background:rgba(255,255,255,.05)!important;
+  backdrop-filter:blur(70px) saturate(230%)!important;
+  -webkit-backdrop-filter:blur(70px) saturate(230%)!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+}
+html[data-element-style="glass"][data-theme^="light"] body .bottom-nav{
+  background:rgba(255,255,255,.65)!important;
+  border:1px solid rgba(0,0,0,.06)!important;
+}
+html[data-element-style="glass"][data-theme^="midnight"] body .bottom-nav{
+  background:rgba(255,255,255,.035)!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+}
+
+/* ─── فیلد «عنوان کار جدید» — شفاف + بدون بک‌گراند مزخرف ─── */
+html[data-element-style="glass"] body .task-add-form input[type=text]{
+  background:rgba(255,255,255,.03)!important;
+  backdrop-filter:blur(45px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(45px) saturate(200%)!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+html[data-element-style="glass"] body .task-add-form input[type=text]:focus{
+  border-color:var(--accent)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.08),
+    0 0 0 3px var(--accent-soft)!important;
+}
+html[data-element-style="glass"][data-theme^="light"] body .task-add-form input[type=text]{
+  background:rgba(255,255,255,.65)!important;
+  border:1px solid rgba(0,0,0,.06)!important;
+}
+
+/* ─── حذف سایه‌ی accent از دکمه‌ها (نور اشعه‌ای) ─── */
+.panel-study-btn,
+.panel-library-btn,
+.task-add-btn,
+.btn-primary,
+.send-btn,
+.lock-btn,
+.study-btn,
+.pv-apply-btn{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 2px 8px -2px rgba(0,0,0,.3)!important;
+}
+.panel-study-btn:hover,
+.panel-library-btn:hover,
+.task-add-btn:hover,
+.btn-primary:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    0 4px 12px -4px rgba(0,0,0,.35)!important;
+}
+
+/* ─── دکمه‌های روزانه/هفتگی/ماهانه/سالانه ─── */
+html[data-element-style="glass"] body .panel-planner-tab{
+  background:rgba(255,255,255,.03)!important;
+  backdrop-filter:blur(30px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+html[data-element-style="glass"] body .panel-planner-tab.active{
+  background:linear-gradient(135deg,var(--accent-light),var(--accent-dark))!important;
+  border-color:transparent!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    0 4px 14px -6px rgba(0,0,0,.4)!important;
+}
+
+/* ─── جدول هفتگی ─── */
+html[data-element-style="glass"] body .week-grid-wrap{
+  background:rgba(255,255,255,.02)!important;
+  backdrop-filter:blur(45px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(45px) saturate(200%)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+html[data-element-style="glass"] body .week-table{
+  background:transparent!important;
+}
+html[data-element-style="glass"] body .week-table th{
+  background:rgba(255,255,255,.06)!important;
+  backdrop-filter:blur(30px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(200%)!important;
+  border-bottom:1px solid rgba(255,255,255,.1)!important;
+}
+html[data-element-style="glass"] body .week-table td{
+  background:transparent!important;
+}
+html[data-element-style="glass"] body .week-table td.hour-cell{
+  background:rgba(255,255,255,.03)!important;
+}
+html[data-element-style="glass"] body .week-table td.task-cell.today{
+  background:rgba(120,150,220,.08)!important;
+}
+html[data-element-style="glass"] body .week-cell-edit .wc-input{
+  background:rgba(255,255,255,.03)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+  border:1px dashed rgba(255,255,255,.12)!important;
+}
+html[data-element-style="glass"] body .week-cell-task{
+  background:rgba(255,255,255,.05)!important;
+  backdrop-filter:blur(20px)!important;
+  -webkit-backdrop-filter:blur(20px)!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+}
+
+/* ─── تقویم ─── */
+html[data-element-style="glass"] body .cal-day{
+  background:rgba(255,255,255,.035)!important;
+  backdrop-filter:blur(20px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(180%)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+html[data-element-style="glass"] body .cal-day:hover{
+  background:rgba(255,255,255,.08)!important;
+  border-color:var(--accent)!important;
+}
+html[data-element-style="glass"] body .cal-day.selected{
+  background:linear-gradient(160deg,var(--accent-light),var(--accent-dark))!important;
+  border-color:transparent!important;
+}
+
+/* ─── تنظیمات — انیمیشن روان ─── */
+.modal-overlay{
+  transition:opacity .2s ease,visibility .2s ease!important;
+}
+.modal-overlay.open .settings-modal{
+  animation:settingsEnterV7 .28s cubic-bezier(.22,1,.36,1) both!important;
+}
+@keyframes settingsEnterV7{
+  0%{opacity:0;transform:scale(.96) translateY(12px);filter:blur(3px)}
+  100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}
+}
+html[data-element-style="glass"] body .settings-modal{
+  background:rgba(255,255,255,.05)!important;
+  backdrop-filter:blur(50px) saturate(200%)!important;
+  -webkit-backdrop-filter:blur(50px) saturate(200%)!important;
+  border:1px solid rgba(255,255,255,.1)!important;
+}
+html[data-element-style="glass"][data-theme^="light"] body .settings-modal{
+  background:rgba(255,255,255,.75)!important;
+  border:1px solid rgba(0,0,0,.06)!important;
+}
+html[data-element-style="glass"][data-theme^="midnight"] body .settings-modal{
+  background:rgba(255,255,255,.03)!important;
+  border:1px solid rgba(255,255,255,.06)!important;
+}
+
+/* ─── صفحه قفل — انیمیشن نرم ─── */
+.lock-typed-char.masking{
+  animation:lockCharMaskFinal .26s cubic-bezier(.34,1.4,.64,1) forwards!important;
+}
+@keyframes lockCharMaskFinal{
+  0%{transform:scale(1);opacity:1;filter:blur(0)}
+  45%{transform:scale(.75) translateY(-3px);opacity:.35;filter:blur(1.5px)}
+  100%{transform:scale(1);opacity:1;filter:blur(0)}
+}
+.lock-typed-char.masked{
+  background:linear-gradient(160deg,rgba(96,165,250,.35),rgba(59,130,246,.55))!important;
+  border:1px solid rgba(120,170,255,.3)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.15),
+    0 2px 8px -4px rgba(96,165,250,.5)!important;
+  font-size:16px!important;
+  color:rgba(255,255,255,.75)!important;
+}
+
+/* ─── history-search شیشه‌ای ─── */
+html[data-element-style="glass"] body .history-search{
+  background:rgba(255,255,255,.03)!important;
+  backdrop-filter:blur(30px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+
+/* ─── dropdown trigger ها ─── */
+html[data-element-style="glass"] body :is(.dd-trigger,.siraj-select-trigger){
+  background:rgba(255,255,255,.03)!important;
+  backdrop-filter:blur(30px) saturate(180%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(180%)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
