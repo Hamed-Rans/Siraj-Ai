@@ -9095,3 +9095,175 @@ html body .history-item{
   background: var(--accent)!important;
   color: #fff!important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX v5 — سایه رنگی + کارت‌های جاندار + انیمیشن قفل
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── ۱. سایه رنگی پشت main-chat و side-panel ─── */
+html body .main-chat,
+html body .side-panel{
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 4px 12px -2px rgba(0,0,0,.5),
+    0 24px 60px -20px rgba(0,0,0,.8),
+    0 0 80px -20px var(--accent),
+    0 0 120px -30px var(--accent-light)!important;
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent)!important;
+}
+
+/* ─── ۲. کارت‌ها — بوردر رنگی + سایه شیک ─── */
+.daily-card,
+.panel-card,
+.tool-card,
+.planner-hero-card,
+.planner-stats-card,
+.month-calendar,
+.month-goals,
+.year-overview,
+.week-grid-wrap,
+.week-summary,
+.task-item,
+.history-item,
+.ll-item,
+.contact-row,
+.setting-group,
+.welcome-card{
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border))!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.3),
+    0 8px 24px -12px rgba(0,0,0,.5),
+    0 0 30px -18px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.04)!important;
+  transition:
+    border-color .35s ease,
+    box-shadow .4s ease!important;
+}
+
+/* هاور — کارت‌ها زنده بشن */
+.daily-card:hover,
+.panel-card:hover,
+.tool-card:hover,
+.month-calendar:hover,
+.month-goals:hover,
+.task-item:hover,
+.history-item:hover,
+.ll-item:hover,
+.contact-row:hover{
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent)!important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.35),
+    0 12px 32px -12px rgba(0,0,0,.6),
+    0 0 40px -12px var(--accent),
+    0 0 60px -20px var(--accent-light),
+    inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+
+/* ─── ۳. هدر — خط پایین رنگی ─── */
+.chat-header,
+.planner-hero,
+.page-title-bar{
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent)!important;
+  box-shadow:
+    0 1px 0 0 color-mix(in srgb, var(--accent) 20%, transparent),
+    0 8px 24px -12px rgba(0,0,0,.4)!important;
+}
+
+/* ─── ۴. input bar — سایه رنگی ─── */
+.input-bar{
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border))!important;
+  box-shadow:
+    0 6px 20px -10px rgba(0,0,0,.5),
+    0 0 30px -14px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.05)!important;
+  transition:
+    border-color .3s ease,
+    box-shadow .4s ease!important;
+}
+.input-bar:focus-within{
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent)!important;
+  box-shadow:
+    0 8px 24px -10px rgba(0,0,0,.55),
+    0 0 40px -10px var(--accent),
+    0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent)!important;
+}
+
+/* ─── ۵. دکمه‌ها — سایه رنگی ─── */
+.send-btn{
+  box-shadow:
+    0 4px 14px -4px var(--accent),
+    0 0 24px -10px var(--accent-light)!important;
+}
+.bottom-nav{
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent)!important;
+  box-shadow:
+    0 4px 14px -4px rgba(0,0,0,.5),
+    0 16px 40px -16px rgba(0,0,0,.7),
+    0 0 50px -15px var(--accent),
+    0 0 80px -25px var(--accent-light)!important;
+}
+
+/* ─── ۶. انیمیشن جدید صفحه قفل — بدون چرخش ─── */
+.lock-typed-char.masking{
+  animation: lockCharMaskSmooth .35s cubic-bezier(.4,0,.2,1) forwards!important;
+}
+@keyframes lockCharMaskSmooth{
+  0%{
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(0);
+    color: #fff;
+  }
+  40%{
+    transform: scale(.85);
+    opacity: .6;
+    filter: blur(2px);
+    color: #fff;
+  }
+  70%{
+    transform: scale(1.05);
+    opacity: .9;
+    filter: blur(0);
+    color: var(--accent-light);
+  }
+  100%{
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(0);
+    color: rgba(255,255,255,.7);
+  }
+}
+
+/* کاراکتر masked — ظاهر نهایی نقطه */
+.lock-typed-char.masked{
+  background: linear-gradient(160deg,
+    color-mix(in srgb, var(--accent-light) 35%, transparent),
+    color-mix(in srgb, var(--accent) 55%, transparent))!important;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.15),
+    0 2px 8px -4px var(--accent),
+    0 0 12px -4px var(--accent-light)!important;
+  font-size: 15px!important;
+  color: rgba(255,255,255,.85)!important;
+  transition:
+    background .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease!important;
+}
+
+/* ─── ۷. قفل — انیمیشن ورود کاراکتر جدید ─── */
+.lock-typed-char{
+  animation: lockCharEnterSmooth .28s cubic-bezier(.34,1.4,.64,1) both!important;
+}
+@keyframes lockCharEnterSmooth{
+  0%{
+    transform: translateY(-8px) scale(.7);
+    opacity: 0;
+    filter: blur(3px);
+  }
+  100%{
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
