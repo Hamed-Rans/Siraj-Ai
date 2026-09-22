@@ -2812,8 +2812,16 @@ function renderSettingsControls() {
         '</div>';
     }
 
+        /* ★ profileImage رو از localStorage بگیر */
+    try {
+        var savedProf = localStorage.getItem(PROFILE_IMG_KEY);
+        if (savedProf) {
+            s.profileImage = savedProf;
+            if (settingsDraft) settingsDraft.profileImage = savedProf;
+        }
+    } catch (e) {}
     var p = getProfile();
-    var src = p.avatar || 'siraj-logo.png';
+    var src = s.profileImage || 'siraj-logo.png';
     var lvl = getUserLevel();
     var dv = getDefaultView();
     var lo = ['beginner', 'intermediate', 'advanced'];
