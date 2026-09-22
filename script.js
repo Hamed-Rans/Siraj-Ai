@@ -661,7 +661,6 @@ function applySettingsToUI(s) {
         var savedImg = localStorage.getItem(PROFILE_IMG_KEY);
         if (savedImg) t.profileImage = savedImg;
     } catch (e) {}
-    ...
     loadFontIfNeeded(t.fontFamily || 'vazirmatn');
     document.documentElement.setAttribute('data-theme', t.themeMode + '-' + t.themeColor);
     document.documentElement.setAttribute('data-bubble-shape', t.bubbleShape);
