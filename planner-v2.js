@@ -3365,6 +3365,14 @@
           }
           var oldName=_currentMainView;
           if(oldName===view){_currentMainView=view;return;}
+                    /* ★ AI Popup — وقتی از chat خارج شدیم */
+          if (view !== 'chat') {
+            setTimeout(function () {
+              if (typeof window.__showAiPopup === 'function') window.__showAiPopup();
+            }, 200);
+          } else {
+            if (typeof window.__hideAiPopup === 'function') window.__hideAiPopup();
+          }
           var oldEl=document.getElementById('view-'+oldName);
           var newEl=document.getElementById('view-'+view);
           var oldIdx=VIEW_ORDER.indexOf(oldName);
