@@ -10142,3 +10142,312 @@ html body .side-panel.minimized{
 html body .nav-slider.visible{
   transition: none !important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   POLISH — ظاهر شیک‌تر
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── ۱. Fade+Slide برای کارت‌ها موقع لود ─── */
+@keyframes cardEnter{
+  0%{opacity:0;transform:translateY(12px) scale(.98);filter:blur(3px)}
+  60%{opacity:1;filter:blur(0)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+.daily-card,
+.panel-card,
+.tool-card,
+.history-item,
+.task-item,
+.ll-item,
+.contact-row,
+.planner-hero-card,
+.month-goal,
+.cal-day{
+  animation:cardEnter .5s cubic-bezier(.22,1,.36,1) both;
+}
+.daily-card:nth-child(1),
+.history-item:nth-child(1),
+.task-item:nth-child(1){animation-delay:.03s}
+.daily-card:nth-child(2),
+.history-item:nth-child(2),
+.task-item:nth-child(2){animation-delay:.06s}
+.daily-card:nth-child(3),
+.history-item:nth-child(3),
+.task-item:nth-child(3){animation-delay:.09s}
+.history-item:nth-child(4),
+.task-item:nth-child(4){animation-delay:.12s}
+.history-item:nth-child(5),
+.task-item:nth-child(5){animation-delay:.15s}
+
+/* ─── ۲. گرادیانت ظریف روی کارت‌های مهم ─── */
+.daily-card,
+.planner-hero-card,
+.welcome-card{
+  background-image:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--accent) 6%, transparent) 0%,
+      transparent 40%,
+      transparent 60%,
+      color-mix(in srgb, var(--accent-light) 4%, transparent) 100%)!important;
+  background-blend-mode: overlay;
+}
+
+/* کارت امروز — تأکید بیشتر */
+.cal-day.today{
+  background-image:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--accent) 25%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 8%, transparent) 100%)!important;
+}
+.cal-day.selected{
+  background-image:
+    linear-gradient(135deg,
+      var(--accent-light) 0%,
+      var(--accent-dark) 100%)!important;
+}
+
+/* ─── ۳. Ripple روی دکمه‌ها ─── */
+.send-btn,
+.task-add-btn,
+.btn-primary,
+.panel-study-btn,
+.panel-library-btn,
+.bottom-nav-btn.nav-btn-chat,
+.main-top-icon-btn,
+.lock-btn,
+.pv-apply-btn{
+  position:relative!important;
+  overflow:hidden!important;
+}
+.send-btn::after,
+.task-add-btn::after,
+.btn-primary::after,
+.panel-study-btn::after,
+.panel-library-btn::after,
+.bottom-nav-btn.nav-btn-chat::after,
+.main-top-icon-btn::after,
+.lock-btn::after,
+.pv-apply-btn::after{
+  content:''!important;
+  position:absolute!important;
+  inset:0!important;
+  border-radius:inherit!important;
+  background:radial-gradient(circle at center,
+    rgba(255,255,255,.4) 0%,
+    transparent 70%)!important;
+  opacity:0!important;
+  transform:scale(0)!important;
+  pointer-events:none!important;
+  transition:opacity .4s ease,transform .6s cubic-bezier(.22,1,.36,1)!important;
+}
+.send-btn:active::after,
+.task-add-btn:active::after,
+.btn-primary:active::after,
+.panel-study-btn:active::after,
+.panel-library-btn:active::after,
+.bottom-nav-btn.nav-btn-chat:active::after,
+.main-top-icon-btn:active::after,
+.lock-btn:active::after,
+.pv-apply-btn:active::after{
+  opacity:1!important;
+  transform:scale(2.5)!important;
+  transition:opacity 0s ease,transform 0s!important;
+}
+
+/* ─── ۴. Loading Skeleton ─── */
+@keyframes skeletonShimmer{
+  0%{background-position:-200% 0}
+  100%{background-position:200% 0}
+}
+.skeleton{
+  background:linear-gradient(90deg,
+    color-mix(in srgb, var(--panel-bg) 100%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 15%, var(--panel-bg)) 50%,
+    color-mix(in srgb, var(--panel-bg) 100%, transparent) 100%)!important;
+  background-size:200% 100%!important;
+  animation:skeletonShimmer 1.6s ease-in-out infinite!important;
+  border-radius:8px!important;
+  color:transparent!important;
+  pointer-events:none!important;
+}
+.planner-pane > div:only-child:not(:has(> *)){
+  /* در حال بارگذاری */
+}
+
+/* ─── ۵. Micro-bounce روی FAB چت ─── */
+@keyframes fabBounce{
+  0%,92%,100%{transform:scale(1) translateY(0)}
+  94%{transform:scale(1.08) translateY(-4px)}
+  96%{transform:scale(.96) translateY(-1px)}
+  98%{transform:scale(1.03) translateY(-2px)}
+}
+.bottom-nav-btn.nav-btn-chat{
+  animation:fabBounce 25s ease-in-out infinite!important;
+}
+.bottom-nav-btn.nav-btn-chat:hover{
+  animation:none!important;
+}
+
+/* ─── ۶. Aura بعد از ارسال (شبه‌ذرات) ─── */
+@keyframes auraBurst{
+  0%{
+    box-shadow:
+      0 0 0 0 var(--accent),
+      0 0 0 0 var(--accent-light),
+      0 6px 18px -6px var(--accent);
+  }
+  100%{
+    box-shadow:
+      0 0 0 18px transparent,
+      0 0 0 30px transparent,
+      0 6px 18px -6px var(--accent);
+  }
+}
+.send-btn.pulse{
+  animation:auraBurst .8s cubic-bezier(.22,1,.36,1) !important;
+}
+
+/* ─── ۷. Gradient انیمیشنی روی welcome-title ─── */
+@keyframes gradientShift{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+.welcome-title,
+.brand-text h1 .accent-word,
+.planner-hero-title{
+  background-size:200% 200%!important;
+  animation:gradientShift 4s ease-in-out infinite!important;
+}
+
+/* ─── ۸. درخشش ملایم روی لوگو ─── */
+@keyframes logoGlow{
+  0%,100%{
+    filter:drop-shadow(0 0 8px var(--accent)) drop-shadow(0 0 16px color-mix(in srgb, var(--accent) 40%, transparent));
+  }
+  50%{
+    filter:drop-shadow(0 0 14px var(--accent)) drop-shadow(0 0 28px color-mix(in srgb, var(--accent) 60%, transparent));
+  }
+}
+.chat-header .brand-logo-wrap img,
+.welcome-logo img{
+  animation:logoGlow 3s ease-in-out infinite!important;
+}
+
+/* ─── ۹. Tooltip ظریف برای دکمه‌های نوار ─── */
+.bottom-nav-btn{
+  position:relative!important;
+}
+.bottom-nav-btn::before{
+  content:attr(title)!important;
+  position:absolute!important;
+  bottom:calc(100% + 8px)!important;
+  left:50%!important;
+  transform:translateX(-50%) translateY(4px)!important;
+  background:rgba(0,0,0,.85)!important;
+  color:#fff!important;
+  font-family:var(--font-text)!important;
+  font-size:10px!important;
+  font-weight:700!important;
+  padding:5px 10px!important;
+  border-radius:8px!important;
+  white-space:nowrap!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  transition:opacity .25s ease,transform .35s cubic-bezier(.34,1.4,.64,1)!important;
+  z-index:1000!important;
+  backdrop-filter:blur(10px)!important;
+  border:1px solid color-mix(in srgb, var(--accent) 30%, transparent)!important;
+}
+.bottom-nav-btn:hover::before{
+  opacity:1!important;
+  transform:translateX(-50%) translateY(0)!important;
+}
+.bottom-nav-btn.nav-btn-chat::before{
+  display:none!important;
+}
+
+/* ─── ۱۰. Highlight روی لینک‌ها ─── */
+.contact-value,
+.contact-label,
+.ll-item-text strong,
+.about-bio-card b,
+.about-bio-card strong{
+  background-image:linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 20%, transparent) 50%,
+    transparent 100%);
+  background-size:0% 100%;
+  background-repeat:no-repeat;
+  background-position:0 50%;
+  transition:background-size .5s cubic-bezier(.22,1,.36,1);
+}
+.contact-row:hover .contact-value,
+.contact-row:hover .contact-label{
+  background-size:100% 100%;
+}
+
+/* ─── ۱۱. Border Glow روی Focus ─── */
+@keyframes focusGlow{
+  0%,100%{
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent),
+      0 0 20px -5px var(--accent);
+  }
+  50%{
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent),
+      0 0 30px -5px var(--accent);
+  }
+}
+.bar-input:focus ~ *,
+.input-bar:focus-within{
+  animation:focusGlow 2s ease-in-out infinite;
+}
+.task-add-form input[type=text]:focus,
+.history-search:focus-within{
+  animation:focusGlow 2s ease-in-out infinite;
+}
+
+/* ─── ۱۲. Custom Scrollbar شیک ─── */
+::-webkit-scrollbar{
+  width:8px!important;
+  height:8px!important;
+}
+::-webkit-scrollbar-track{
+  background:transparent!important;
+}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,
+    var(--accent-light) 0%,
+    var(--accent) 50%,
+    var(--accent-dark) 100%)!important;
+  border-radius:10px!important;
+  border:2px solid transparent!important;
+  background-clip:padding-box!important;
+}
+::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,
+    var(--accent) 0%,
+    var(--accent-dark) 100%)!important;
+  background-clip:padding-box!important;
+}
+
+/* ─── ۱۳. Selected Text ─── */
+::selection{
+  background:color-mix(in srgb, var(--accent) 40%, transparent)!important;
+  color:#fff!important;
+}
+
+/* ─── ۱۴. Prefers Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce){
+  .daily-card,
+  .panel-card,
+  .tool-card,
+  .history-item,
+  .task-item,
+  .contact-row{
+    animation:none!important;
+  }
+  .bottom-nav-btn.nav-btn-chat{
+    animation:none!important;
+  }
+}
