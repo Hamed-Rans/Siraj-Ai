@@ -41,12 +41,18 @@ self.addEventListener('activate', e => {
 
 /* ═══ FETCH: استراتژی Network-first برای فایل‌های اصلی ═══ */
 self.addEventListener('fetch', e => {
+  // ★ فقط GET ها رو کش کن
   if (e.request.method !== 'GET') return;
-  if (e.request.url.indexOf('siraj-proxy') > -1) return;
+  
+  // ★ درخواست‌های extension رو نادیده بگیر
   if (e.request.url.startsWith('chrome-extension')) return;
 
   var url = new URL(e.request.url);
   var isAppFile = url.origin === self.location.origin;
+
+  // ★★★ مهم‌ترین تغییر: هر درخواستی که به دامنه‌ی خودمون نیست،
+  //       یا مسیرش /openai/chat/ داره → اصلاً به SW کاری نداشته باش
+  if (!isAppFile || url.pathname.indexOf('/openai/chat/') > -1) return;
 
   if (isAppFile) {
     /* ★ Network-first برای فایل‌های خود اپ */
