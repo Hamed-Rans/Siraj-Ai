@@ -8502,3 +8502,50 @@ html body .nav-slider.visible{
 .task-add-btn:hover::before{
   animation: glassShine 1.2s ease !important;
 }
+/* ═══════════════════════════════════════════════════════════════
+   FIX — مودال تنظیمات واقعاً بسته بشه (کلیک رو نگیره)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* وقتی بسته‌ست، کامل از جریان حذف بشه */
+.modal-overlay:not(.open):not(.closing){
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* وقتی در حال بسته‌ست، کلیک‌پذیر نباشه */
+.modal-overlay.closing{
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* وقتی بازه، فقط اون موقع کلیک‌پذیر باشه */
+.modal-overlay.open{
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 9999 !important;
+}
+
+/* ═══ فیکس نهایی: بچه‌های overlay هم مخفی بشن ═══ */
+.modal-overlay:not(.open):not(.closing) .settings-modal,
+.modal-overlay:not(.open):not(.closing) .settings-body,
+.modal-overlay:not(.open):not(.closing) .settings-left,
+.modal-overlay:not(.open):not(.closing) .settings-content,
+.modal-overlay:not(.open):not(.closing) .settings-content-wrap,
+.modal-overlay:not(.open):not(.closing) .settings-preview,
+.modal-overlay:not(.open):not(.closing) .settings-tabs{
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.modal-overlay.closing .settings-modal,
+.modal-overlay.closing .settings-content,
+.modal-overlay.closing .settings-body{
+  pointer-events: none !important;
+}
