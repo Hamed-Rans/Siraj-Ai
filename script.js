@@ -3530,3 +3530,119 @@ function hideAiPopup() {
 window.__showAiPopup = showAiPopup;
 window.__updateAiPopupContent = updateAiPopupContent;
 window.__hideAiPopup = hideAiPopup;
+
+
+/* ═══════════════════════════════════════════════════════════════
+   POLISH — Number Counter انیمیشنی + Ripple + Haptic
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  
+  /* تبدیل رقم لاتین به فارسی */
+  function toFa(n){
+    var fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+    return String(n).replace(/\d/g, function(d){ return fa[+d]; });
+  }
+  
+  /* شمارنده از 0 تا عدد نهایی */
+  function animateNumber(el, target, suffix){
+    if (!el) return;
+    if (el.dataset.animated === '1') return;
+    el.dataset.animated = '1';
+    
+    var duration = 900;
+    var start = performance.now();
+    var current = 0;
+    
+    function tick(now){
+      var progress = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      current = Math.round(eased * target);
+      el.textContent = toFa(current) + (suffix || '');
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  
+  /* پیدا کردن و انیمیت کردن اعداد */
+  function initCounters(){
+    document.querySelectorAll('.ymc-stat, .ws-num, .planner-stat-num').forEach(function(el){
+      var text = el.textContent.trim();
+      var match = text.match(/^([۰-۹\d]+)/);
+      if (!match) return;
+      var num = parseInt(match[1].replace(/[۰-۹]/g, function(d){
+        return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d);
+      }));
+      if (isNaN(num) || num === 0) return;
+      var suffix = text.replace(match[1], '');
+      animateNumber(el, num, suffix);
+    });
+  }
+  
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initCounters);
+  } else {
+    initCounters();
+  }
+  
+  if (typeof MutationObserver !== 'undefined'){
+    var obs = new MutationObserver(function(muts){
+      for (var i=0; i<muts.length; i++){
+        if (muts[i].addedNodes.length){
+          setTimeout(initCounters, 100);
+          break;
+        }
+      }
+    });
+    obs.observe(document.body, {childList:true, subtree:true});
+  }
+  
+  /* Haptic روی موبایل */
+  if ('vibrate' in navigator){
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest('.bottom-nav-btn, .send-btn, .task-add-btn, .main-top-icon-btn, .lock-btn, .panel-study-btn, .panel-library-btn, .bar-btn');
+      if (btn){
+        try { navigator.vibrate(8); } catch(err){}
+      }
+    }, {passive:true});
+  }
+  
+  /* Ripple از محل کلیک */
+  document.addEventListener('pointerdown', function(e){
+    var btn = e.target.closest('.send-btn, .task-add-btn, .btn-primary, .panel-study-btn, .panel-library-btn, .bottom-nav-btn.nav-btn-chat, .main-top-icon-btn, .lock-btn, .pv-apply-btn');
+    if (!btn) return;
+    
+    var rect = btn.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+    
+    var old = btn.querySelector('.ripple-wave');
+    if (old) old.remove();
+    
+    var ripple = document.createElement('span');
+    ripple.className = 'ripple-wave';
+    ripple.style.cssText = 
+      'position:absolute;' +
+      'left:' + x + 'px;' +
+      'top:' + y + 'px;' +
+      'width:10px;height:10px;' +
+      'margin:-5px 0 0 -5px;' +
+      'border-radius:50%;' +
+      'background:rgba(255,255,255,.5);' +
+      'pointer-events:none;' +
+      'transform:scale(0);' +
+      'opacity:1;' +
+      'transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .6s ease;';
+    
+    btn.appendChild(ripple);
+    
+    requestAnimationFrame(function(){
+      ripple.style.transform = 'scale(20)';
+      ripple.style.opacity = '0';
+    });
+    
+    setTimeout(function(){ if (ripple.parentNode) ripple.remove(); }, 650);
+  }, {passive:true});
+  
+  console.log('[Siraj Polish] loaded ✓');
+})();
