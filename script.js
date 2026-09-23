@@ -3060,7 +3060,7 @@ function renderSettingsControls() {
             inp.style.setProperty('--slider-pct', pct + '%');
         });
         if (settingsCat === 'privacy') renderSessionsList();
-        bindContactLinks();
+        // bindContactLinks();
 
         var profilePaneEl = document.querySelector('.settings-content[data-cat="profile"]');
         if (profilePaneEl) {
