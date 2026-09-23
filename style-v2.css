@@ -411,16 +411,6 @@
   color:#fff!important;
 }
 
-/* خط هاور بالای کارت‌ها */
-.daily-card::after,.panel-card::after,.tool-card::after,.month-goals::after,
-.month-calendar::after,.year-overview::after,.planner-hero-card::after,
-.task-item::after,.ll-item::after,.contact-row::after,.planner-stats-card::after{
-  transition:
-    right .5s cubic-bezier(.22,1,.36,1),
-    left .5s cubic-bezier(.22,1,.36,1),
-    opacity .35s cubic-bezier(.4,0,.2,1)!important;
-}
-
 /* ═══════════════════════════════════════════════════════════════
    ۱۲) CALENDAR — سلول‌های تقویم
    ═══════════════════════════════════════════════════════════════ */
@@ -8192,52 +8182,80 @@ html body .nav-slider.visible{
     animation:none!important;
   }
 }
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — نسخه نهایی (کارت ثابت + خط چپ نرم)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── حذف کامل هر چیز قدیمی ─── */
-.contact-row::before,
+/* حذف کامل خطوط پشت کارت‌ها */
+.daily-card::after,
+.panel-card::after,
+.tool-card::after,
+.month-goals::after,
+.month-calendar::after,
+.year-overview::after,
+.planner-hero-card::after,
+.planner-stats-card::after,
+.ll-item::after,
+.history-item::after,
 .contact-row::after,
-.about-contacts .contact-row::before,
-.about-contacts .contact-row::after{
+.contact-row::before,
+.history-item::before,
+.task-item::after,
+.task-item::before{
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+/* ═══ Wrapper «گفتگوهای قبلی» — ثابت ═══ */
+.panel-card:has(#historyList),
+.panel-card:has(.history-search){
+  transform: none !important;
+  background: var(--panel-bg) !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+.panel-card:has(#historyList):hover,
+.panel-card:has(.history-search):hover{
+  transform: none !important;
+  background: var(--panel-bg) !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+.panel-card:has(#historyList)::after,
+.panel-card:has(.history-search)::after,
+.panel-card:has(#historyList)::before,
+.panel-card:has(.history-search)::before{
   content: none !important;
   display: none !important;
 }
 
-/* ─── کارت — پایه، ثابت ─── */
-.contact-row,
-.about-contacts .contact-row{
+/* ═══ خود کارت‌های گفتگو — هاور نرم ═══ */
+.history-item{
   position: relative !important;
   overflow: hidden !important;
-  transform: none !important;
   transition:
     background-color .35s cubic-bezier(.22,1,.36,1),
     border-color .35s cubic-bezier(.22,1,.36,1),
     box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
-}
-
-/* ─── هاور: کارت ثابت، فقط پس‌زمینه + سایه ملایم ─── */
-.contact-row:hover,
-.about-contacts .contact-row:hover{
   transform: none !important;
-  background: var(--accent-soft) !important;
+}
+.history-item:hover{
+  transform: none !important;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 14%, transparent),
+    color-mix(in srgb, var(--accent) 6%, transparent)) !important;
   border-color: var(--accent) !important;
   box-shadow:
-    0 4px 14px -8px rgba(0,0,0,.35),
-    0 0 20px -10px var(--accent) !important;
+    0 4px 14px -8px rgba(0,0,0,.4),
+    0 0 24px -12px var(--accent) !important;
 }
 
-/* ─── خط عمودی سمت چپ کارت — از وسط باز می‌شه ─── */
-.contact-row::before,
-.about-contacts .contact-row::before{
+/* خط جانبی سمت راست */
+.history-item::before{
   content: '' !important;
   display: block !important;
   position: absolute !important;
-  top: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: auto !important;
+  top: 6px !important;
+  bottom: 6px !important;
+  right: 0 !important;
   width: 3px !important;
   background: linear-gradient(180deg,
     transparent 0%,
@@ -8245,7 +8263,7 @@ html body .nav-slider.visible{
     var(--accent) 50%,
     var(--accent-light) 75%,
     transparent 100%) !important;
-  border-radius: 0 3px 3px 0 !important;
+  border-radius: 3px 0 0 3px !important;
   opacity: 0 !important;
   transform: scaleY(0) !important;
   transform-origin: center !important;
@@ -8256,39 +8274,231 @@ html body .nav-slider.visible{
   pointer-events: none !important;
   z-index: 5 !important;
 }
-
-.contact-row:hover::before,
-.about-contacts .contact-row:hover::before{
+.history-item:hover::before{
   transform: scaleY(1) !important;
   opacity: 1 !important;
 }
+.history-item::after{
+  content: none !important;
+  display: none !important;
+}
+/* ═══════════════════════════════════════════════════════════════
+   UNIVERSAL GLASS EFFECT — روی همه دکمه‌ها
+   ═══════════════════════════════════════════════════════════════ */
 
-/* ─── آیکون: بزرگ‌شدن کم + چرخش کم ─── */
-.contact-row .contact-icon,
-.about-contacts .contact-row .contact-icon{
-  border: none !important;
-  outline: none !important;
+/* ─── پایه مشترک ─── */
+.btn-primary,
+.btn-secondary,
+.task-add-btn,
+.send-btn,
+.bar-btn,
+.panel-study-btn,
+.panel-library-btn,
+.panel-planner-tab,
+.bottom-nav-btn,
+.nav-collapse-tab,
+.main-top-icon-btn,
+.main-top-avatar,
+.row-btn,
+.color-opt,
+.pattern-opt,
+.settings-tab-btn,
+.settings-submenu-btn,
+.settings-subtab,
+.ll-action,
+.ll-filter,
+.study-btn,
+.study-sound-btn,
+.study-tool-card,
+.study-chat-send,
+.lock-btn,
+.siraj-popup-btn,
+.task-notif-actions button,
+.notif-btn,
+.sw-update-btn,
+.copy-day-btn,
+.undo-btn,
+.level-opt,
+.default-view-opt,
+.dd-trigger,
+.siraj-select-trigger,
+.pv-apply-btn,
+.pv-cancel-btn,
+.phc-nav-btn,
+.phc-back-inline,
+.wt-btn,
+.wc-btn,
+.mg-del,
+.task-del,
+.task-edit,
+.task-remind,
+.h-pin, .h-edit, .h-del,
+.session-row .s-del,
+.learn-library-close,
+.study-chat-close,
+.close-modal,
+.ai-popup-close,
+.task-notif-close,
+.siraj-popup-close,
+.notif-clear-btn{
+  position: relative !important;
+  overflow: hidden !important;
+  -webkit-tap-highlight-color: transparent !important;
   transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
+    transform .35s cubic-bezier(.34,1.4,.64,1),
     background-color .3s ease,
-    color .3s ease !important;
+    color .3s ease,
+    border-color .3s ease,
+    box-shadow .4s cubic-bezier(.22,1,.36,1),
+    filter .3s ease !important;
 }
 
-.contact-row:hover .contact-icon,
-.about-contacts .contact-row:hover .contact-icon{
-  transform: scale(1.08) rotate(-4deg) !important;
-  background: var(--accent) !important;
-  color: #fff !important;
-  box-shadow: none !important;
+/* ─── افکت شیشه‌ای روی هاور ─── */
+.btn-primary:hover,
+.btn-secondary:hover,
+.task-add-btn:hover,
+.send-btn.visible:hover,
+.bar-btn:hover,
+.panel-study-btn:hover,
+.panel-library-btn:hover,
+.panel-planner-tab:hover,
+.bottom-nav-btn:not(.nav-btn-chat):not(.active):hover,
+.nav-collapse-tab:hover,
+.main-top-icon-btn:hover,
+.main-top-avatar:hover,
+.row-btn:hover,
+.color-opt:hover,
+.pattern-opt:hover,
+.settings-tab-btn:hover,
+.settings-submenu-btn:hover,
+.settings-subtab:hover,
+.ll-action:hover,
+.ll-filter:hover,
+.study-btn:hover:not(:disabled),
+.study-sound-btn:hover,
+.study-tool-card:hover,
+.study-chat-send:hover,
+.lock-btn:hover,
+.siraj-popup-btn:hover,
+.task-notif-actions button:hover,
+.notif-btn:hover,
+.sw-update-btn:hover:not(:disabled),
+.copy-day-btn:hover,
+.undo-btn:hover,
+.level-opt:hover,
+.default-view-opt:hover,
+.dd-trigger:hover,
+.siraj-select-trigger:hover,
+.pv-apply-btn:hover,
+.pv-cancel-btn:hover,
+.phc-nav-btn:hover,
+.phc-back-inline:hover,
+.wt-btn:hover,
+.wc-btn:hover,
+.mg-del:hover,
+.task-del:hover,
+.task-edit:hover,
+.task-remind:hover,
+.h-pin:hover, .h-edit:hover, .h-del:hover,
+.session-row .s-del:hover,
+.learn-library-close:hover,
+.study-chat-close:hover,
+.close-modal:hover,
+.ai-popup-close:hover,
+.task-notif-close:hover,
+.notif-clear-btn:hover{
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow:
+    0 1px 2px -1px rgba(0,0,0,.25),
+    0 6px 18px -8px rgba(0,0,0,.4),
+    0 0 20px -8px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+  filter: brightness(1.06) !important;
 }
 
-/* ─── متن‌ها: رنگ نرم ─── */
-.contact-row .contact-label,
-.contact-row .contact-value{
-  font-size: inherit !important;
-  transition: color .3s ease !important;
+/* ─── دکمه‌های قابل توجه — شیشه‌ای قوی‌تر ─── */
+.panel-study-btn:hover,
+.panel-library-btn:hover,
+.btn-primary:hover,
+.task-add-btn:hover,
+.lock-btn:hover,
+.pv-apply-btn:hover{
+  filter: brightness(1.1) !important;
+  box-shadow:
+    0 2px 4px -1px rgba(0,0,0,.3),
+    0 10px 26px -10px var(--accent),
+    0 0 30px -10px var(--accent-light),
+    inset 0 1px 0 rgba(255,255,255,.2) !important;
 }
 
-.contact-row:hover .contact-label{
-  color: var(--accent) !important;
+/* ─── کلیک — فشار نرم ─── */
+.btn-primary:active,
+.btn-secondary:active,
+.task-add-btn:active,
+.send-btn:active,
+.bar-btn:active,
+.panel-study-btn:active,
+.panel-library-btn:active,
+.panel-planner-tab:active,
+.bottom-nav-btn:not(.nav-btn-chat):active,
+.nav-collapse-tab:active,
+.main-top-icon-btn:active,
+.main-top-avatar:active,
+.row-btn:active,
+.color-opt:active,
+.pattern-opt:active,
+.settings-tab-btn:active,
+.settings-submenu-btn:active,
+.study-btn:active:not(:disabled),
+.study-sound-btn:active,
+.study-tool-card:active,
+.lock-btn:active,
+.siraj-popup-btn:active,
+.notif-btn:active,
+.copy-day-btn:active,
+.undo-btn:active,
+.level-opt:active,
+.default-view-opt:active,
+.dd-trigger:active,
+.siraj-select-trigger:active,
+.pv-apply-btn:active,
+.phc-nav-btn:active,
+.phc-back-inline:active,
+.task-del:active,
+.task-edit:active,
+.task-remind:active{
+  transform: translateY(0) scale(.96) !important;
+  transition-duration: .1s !important;
+}
+
+/* ─── درخشش عبوری شیشه‌ای ─── */
+@keyframes glassShine{
+  0%{ left: -100%; opacity: 0; }
+  30%{ opacity: 1; }
+  100%{ left: 150%; opacity: 0; }
+}
+
+.panel-study-btn::before,
+.panel-library-btn::before,
+.btn-primary::before,
+.task-add-btn::before{
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: -100% !important;
+  width: 60% !important;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,.25) 50%,
+    transparent 100%) !important;
+  pointer-events: none !important;
+  transform: skewX(-20deg) !important;
+  opacity: 0 !important;
+}
+.panel-study-btn:hover::before,
+.panel-library-btn:hover::before,
+.btn-primary:hover::before,
+.task-add-btn:hover::before{
+  animation: glassShine 1.2s ease !important;
 }
