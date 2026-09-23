@@ -4,73 +4,6 @@
    ═══════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════════
-   ۱) NAV SLIDER — اسلاید فوق‌نرم بین دکمه‌ها
-   ═══════════════════════════════════════════════════════════════ */
-
-/* نوار اسلایدر — حرکت با easing سینمایی */
-.nav-slider{
-  position:absolute!important;
-  left:0!important;top:0!important;
-  pointer-events:none!important;
-  z-index:0!important;
-  opacity:0;
-  background:transparent!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  transition:
-    left .52s cubic-bezier(.22,1,.36,1),
-    top .52s cubic-bezier(.22,1,.36,1),
-    width .52s cubic-bezier(.22,1,.36,1),
-    height .52s cubic-bezier(.22,1,.36,1),
-    opacity .3s cubic-bezier(.4,0,.2,1)!important;
-  will-change:left,top,width,height,opacity!important;
-  backface-visibility:hidden!important;
-  transform:translateZ(0);
-  contain:layout style!important;
-}
-.nav-slider.visible{opacity:1!important}
-
-/* پرکننده داخل اسلایدر — با یک انیمیشن ورود نرم */
-.nav-slider-fill{
-  width:100%;
-  height:100%;
-  background:linear-gradient(135deg,var(--accent),var(--accent-dark))!important;
-  border-radius:20px;
-  box-shadow:
-    0 8px 24px -8px var(--accent),
-    0 2px 6px -2px var(--accent-soft),
-    inset 0 1px 0 rgba(255,255,255,.15)!important;
-  transform-origin:center;
-  transition:border-radius .35s cubic-bezier(.34,1.4,.64,1)!important;
-  position:relative;
-  overflow:hidden;
-}
-
-/* درخشش عبوری داخل اسلایدر */
-.nav-slider-fill::after{
-  content:''!important;
-  position:absolute!important;
-  top:0!important;left:-100%!important;
-  width:80%!important;height:100%!important;
-  background:linear-gradient(90deg,
-    transparent 0%,
-    rgba(255,255,255,.18) 40%,
-    rgba(255,255,255,.28) 50%,
-    rgba(255,255,255,.18) 60%,
-    transparent 100%)!important;
-  animation:navSliderShine 3.2s ease-in-out infinite!important;
-  pointer-events:none!important;
-}
-@keyframes navSliderShine{
-  0%{left:-100%}
-  60%{left:100%}
-  100%{left:100%}
-}
-
-[data-nav-position="left"] .nav-slider-fill,
-[data-nav-position="right"] .nav-slider-fill{border-radius:18px!important}
-
-/* ═══════════════════════════════════════════════════════════════
    ۲) NAV BUTTONS — ترنزیشن نرم‌تر روی همه حالت‌ها
    ═══════════════════════════════════════════════════════════════ */
 
@@ -332,38 +265,6 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ۶) HEADER ACTION BUTTONS
-   ═══════════════════════════════════════════════════════════════ */
-
-.main-top-avatar,
-.main-top-icon-btn{
-  transition:
-    transform .32s cubic-bezier(.34,1.4,.64,1),
-    background .28s cubic-bezier(.4,0,.2,1),
-    box-shadow .32s cubic-bezier(.22,1,.36,1),
-    color .25s cubic-bezier(.4,0,.2,1)!important;
-}
-.main-top-avatar:hover{
-  transform:scale(1.1) rotate(-3deg)!important;
-  box-shadow:
-    0 0 0 2px var(--panel-bg),
-    0 0 0 3px var(--accent),
-    0 8px 22px -6px var(--accent)!important;
-}
-.main-top-avatar:active{transform:scale(.94)!important;transition-duration:.1s!important}
-.main-top-icon-btn:hover{
-  transform:translateY(-2px) scale(1.1)!important;
-  box-shadow:0 8px 20px -6px var(--accent)!important;
-}
-.main-top-icon-btn:active{transform:scale(.92)!important;transition-duration:.1s!important}
-.main-top-icon-btn svg{
-  transition:transform .3s cubic-bezier(.34,1.4,.64,1)!important;
-}
-.main-top-icon-btn:hover svg{
-  transform:scale(1.15);
-}
-
-/* ═══════════════════════════════════════════════════════════════
    ۷) INPUT BAR — جمع شدن نرم + حلقه‌های چرخان
    ═══════════════════════════════════════════════════════════════ */
 
@@ -521,86 +422,6 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ۱۱) PLANNER — Hero Card, Task Items, Goals
-   ═══════════════════════════════════════════════════════════════ */
-
-.task-item:hover{
-  transform:translateX(-4px) scale(1.008)!important;
-  box-shadow:0 8px 22px -10px var(--accent)!important;
-}
-.task-item:active{
-  transform:translateX(-2px) scale(1)!important;
-  transition-duration:.12s!important;
-}
-
-.task-check{
-  transition:
-    background .28s cubic-bezier(.34,1.4,.64,1),
-    border-color .28s cubic-bezier(.34,1.4,.64,1),
-    transform .25s cubic-bezier(.34,1.4,.64,1)!important;
-}
-.task-check:hover{
-  transform:scale(1.15)!important;
-  border-color:var(--accent)!important;
-}
-.task-check:active{transform:scale(.92)!important}
-.task-check svg{
-  transition:opacity .25s cubic-bezier(.4,0,.2,1),transform .25s cubic-bezier(.34,1.4,.64,1)!important;
-}
-.task-check.checked svg{opacity:1;transform:scale(1)}
-
-.task-del{
-  transition:
-    background .22s cubic-bezier(.4,0,.2,1),
-    color .22s cubic-bezier(.4,0,.2,1),
-    transform .25s cubic-bezier(.34,1.4,.64,1)!important;
-}
-.task-del:hover{transform:scale(1.12)!important}
-.task-del:active{transform:scale(.92)!important}
-
-/* کارت اهداف */
-.month-goal{
-  transition:
-    transform .3s cubic-bezier(.34,1.4,.64,1),
-    border-color .28s cubic-bezier(.4,0,.2,1),
-    background .3s cubic-bezier(.4,0,.2,1)!important;
-}
-.month-goal:hover{transform:translateX(-4px) scale(1.01)!important}
-.mg-check-wrap{
-  transition:transform .28s cubic-bezier(.34,1.4,.64,1)!important;
-}
-.mg-check-wrap:hover{transform:scale(1.1)!important}
-.mg-check-wrap input:checked ~ .mg-check{
-  animation:mgCheckPop .38s cubic-bezier(.34,1.4,.64,1)!important;
-}
-@keyframes mgCheckPop{
-  0%{transform:scale(1)}
-  50%{transform:scale(1.25)}
-  100%{transform:scale(1.05)}
-}
-.mg-del{
-  transition:
-    opacity .25s cubic-bezier(.4,0,.2,1),
-    background .22s cubic-bezier(.4,0,.2,1),
-    color .22s cubic-bezier(.4,0,.2,1),
-    transform .25s cubic-bezier(.34,1.4,.64,1)!important;
-}
-.mg-del:hover{transform:scale(1.12)!important}
-
-/* دکمه افزودن هدف */
-.month-goal-add button{
-  transition:transform .3s cubic-bezier(.34,1.4,.64,1),box-shadow .3s cubic-bezier(.22,1,.36,1)!important;
-}
-.month-goal-add button:hover{
-  transform:translateY(-3px) scale(1.06)!important;
-  box-shadow:0 10px 22px -6px var(--accent)!important;
-}
-.month-goal-add button:active{
-  transform:translateY(-1px) scale(.96)!important;
-  transition-duration:.1s!important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
    ۱۲) CALENDAR — سلول‌های تقویم
    ═══════════════════════════════════════════════════════════════ */
 
@@ -668,43 +489,6 @@
 }
 .ws-box:hover{transform:translateY(-3px) scale(1.03)!important}
 .ws-box:active{transform:translateY(-1px) scale(.98)!important}
-
-/* ═══════════════════════════════════════════════════════════════
-   ۱۴) HISTORY ITEMS
-   ═══════════════════════════════════════════════════════════════ */
-
-.history-item{
-  transition:
-    transform .32s cubic-bezier(.34,1.4,.64,1),
-    border-color .28s cubic-bezier(.4,0,.2,1),
-    background .3s cubic-bezier(.4,0,.2,1),
-    box-shadow .35s cubic-bezier(.22,1,.36,1)!important;
-}
-.history-item:hover{
-  transform:translateX(-4px) translateY(-2px)!important;
-  box-shadow:0 12px 28px -12px var(--accent)!important;
-}
-.history-item:active{transform:translateX(-2px) translateY(0) scale(.995)!important}
-
-.history-item .h-pin,
-.history-item .h-edit,
-.history-item .h-del{
-  transition:
-    opacity .25s cubic-bezier(.4,0,.2,1),
-    transform .3s cubic-bezier(.34,1.4,.64,1),
-    background .22s cubic-bezier(.4,0,.2,1),
-    color .22s cubic-bezier(.4,0,.2,1)!important;
-}
-.history-item .h-pin:hover,
-.history-item .h-edit:hover,
-.history-item .h-del:hover{
-  transform:scale(1.15)!important;
-}
-.history-item .h-pin:active,
-.history-item .h-edit:active,
-.history-item .h-del:active{
-  transform:scale(.9)!important;
-}
 
 /* ═══════════════════════════════════════════════════════════════
    ۱۵) DROPDOWNS — پنل انتخاب مدل و گویش
@@ -1313,29 +1097,6 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ۲۹) CONTACT ROWS
-   ═══════════════════════════════════════════════════════════════ */
-
-.contact-row{
-  transition:
-    transform .32s cubic-bezier(.34,1.4,.64,1),
-    background .3s cubic-bezier(.4,0,.2,1),
-    border-color .28s cubic-bezier(.4,0,.2,1),
-    box-shadow .32s cubic-bezier(.22,1,.36,1)!important;
-}
-.contact-row:hover{
-  transform:translateX(-4px) scale(1.005)!important;
-  box-shadow:0 10px 26px -12px var(--accent)!important;
-}
-.contact-row:active{transform:translateX(-2px) scale(.995)!important}
-.contact-icon{
-  transition:transform .35s cubic-bezier(.34,1.4,.64,1),background .28s cubic-bezier(.4,0,.2,1),color .28s cubic-bezier(.4,0,.2,1)!important;
-}
-.contact-row:hover .contact-icon{
-  transform:scale(1.12) rotate(-6deg)!important;
-}
-
-/* ═══════════════════════════════════════════════════════════════
    ۳۰) WELCOME CARD
    ═══════════════════════════════════════════════════════════════ */
 
@@ -1806,25 +1567,7 @@
   background:transparent!important;
   border-color:transparent!important;
 }
-/* ═══════════════════════════════════════════════════════════════
-   FIX: دکمه پروفایل بزرگتر + هاور برجسته بدون چرخش
-   ═══════════════════════════════════════════════════════════════ */
-.main-top-avatar{
-  width:46px!important;
-  height:46px!important;
-  min-width:46px!important;
-  max-width:46px!important;
-}
-.main-top-avatar:hover{
-  transform:scale(1.08)!important;
-  box-shadow:
-    0 0 0 2px var(--panel-bg),
-    0 0 0 3px var(--accent),
-    0 8px 22px -6px var(--accent)!important;
-}
-.main-top-avatar:active{
-  transform:scale(.96)!important;
-}
+
 /* ═══════════════════════════════════════════════════════════════
    FIX: بهبود performance بستن مودال تنظیمات
    ═══════════════════════════════════════════════════════════════ */
@@ -2087,19 +1830,6 @@ body::before{
   box-shadow:0 0 0 3px var(--accent-soft);
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   FIX C4: انیمیشن نرم دکمه‌های هدر (بدون چرخش پروفایل)
-   ═══════════════════════════════════════════════════════════════ */
-.main-top-avatar:hover{
-  transform:scale(1.08)!important;
-  box-shadow:
-    0 0 0 2px var(--panel-bg),
-    0 0 0 3px var(--accent),
-    0 8px 22px -6px var(--accent)!important;
-}
-
-
 /* ═══════════════════════════════════════════════════════════════
    FIX C5: صفحه قفل — نمایش دونه‌دونه کاراکترها
    ═══════════════════════════════════════════════════════════════ */
@@ -2242,16 +1972,6 @@ body::before{
 .input-bar-shell::after{
   inset:-9px!important;
   border-radius:35px!important;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   D3: input bar بیشتر جمع بشه موقع فوکوس
-   ═══════════════════════════════════════════════════════════════ */
-.input-bar-shell:focus-within,
-.input-bar-shell:has(.bar-input:focus){
-  transform:translateY(-16px) scale(.88)!important;
-  box-shadow:0 26px 60px -18px var(--accent)!important;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2400,55 +2120,6 @@ body::before{
   animation:none!important;
   transform:translateY(-50%) translateZ(0)!important;
 }
-/* ═══════════════════════════════════════════════════════════════════════════
-   PATCH E — ظاهر بالغ و حرفه‌ای
-   شامل: shadows نرم، gradients ظریف، borders نازک، typography بالغ
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-
-/* ═══════════════════════════════════════════════════════════════
-   E1: کاهش درخشش (glow) رنگی — جایگزین با سایه‌های خنثی
-   ═══════════════════════════════════════════════════════════════ */
-.main-chat{
-  box-shadow:
-    0 1px 3px -1px rgba(0,0,0,.3),
-    0 8px 28px -12px rgba(0,0,0,.5)!important;
-}
-.side-panel{
-  box-shadow:
-    0 1px 3px -1px rgba(0,0,0,.3),
-    0 8px 28px -12px rgba(0,0,0,.5)!important;
-}
-.bottom-nav{
-  box-shadow:
-    0 1px 3px -1px rgba(0,0,0,.35),
-    0 12px 32px -14px rgba(0,0,0,.6)!important;
-}
-.daily-card,
-.panel-card,
-.tool-card,
-.month-calendar,
-.month-goals,
-.year-overview,
-.planner-hero-card,
-.planner-stats-card,
-.week-grid-wrap,
-.week-summary{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.25),
-    0 4px 14px -8px rgba(0,0,0,.35)!important;
-}
-.settings-modal{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.4),
-    0 24px 70px -22px rgba(0,0,0,.85)!important;
-}
-.notif-panel{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.4),
-    0 20px 50px -18px rgba(0,0,0,.75)!important;
-}
-
 
 /* ═══════════════════════════════════════════════════════════════
    E2: سایه‌های element hover نرم‌تر (بدون هاله رنگی)
@@ -2657,42 +2328,9 @@ body::before{
   letter-spacing:.1px;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   E8: کاهش درخشش دکمه‌های accent در حالت عادی
-   ═══════════════════════════════════════════════════════════════ */
-.main-top-icon-btn{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.3),
-    0 3px 10px -6px rgba(0,0,0,.4),
-    inset 0 1px 0 rgba(255,255,255,.18),
-    inset 0 -1px 0 rgba(0,0,0,.12)!important;
-}
-.main-top-icon-btn:hover{
-  box-shadow:
-    0 2px 4px -1px rgba(0,0,0,.35),
-    0 6px 16px -8px rgba(0,0,0,.5),
-    0 0 0 3px var(--accent-soft),
-    inset 0 1px 0 rgba(255,255,255,.22),
-    inset 0 -1px 0 rgba(0,0,0,.12)!important;
-}
-.main-top-avatar{
-  box-shadow:
-    0 0 0 2px var(--panel-bg),
-    0 0 0 3px var(--border-strong),
-    0 3px 10px -6px rgba(0,0,0,.4)!important;
-}
-.main-top-avatar:hover{
-  box-shadow:
-    0 0 0 2px var(--panel-bg),
-    0 0 0 3px var(--accent),
-    0 6px 16px -6px rgba(0,0,0,.5)!important;
-}
 /* ═══════════════════════════════════════════════════════════════════════════
    PATCH F — Final Fix
    ═══════════════════════════════════════════════════════════════════════════ */
-
-
 /* ═══════════════════════════════════════════════════════════════
    F1: هدرها + دکمه‌های هدر — کاملاً ثابت در جابجایی viewها
    ═══════════════════════════════════════════════════════════════ */
@@ -2888,141 +2526,6 @@ body::before{
   transform:scale(1) translateY(0)!important;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   F10: ظاهر بالغ — جایگزین PATCH E (priority بالاتر)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* --- کاهش درخشش (glow) رنگی --- */
-.main-chat,
-.side-panel{
-  box-shadow:
-    0 1px 3px -1px rgba(0,0,0,.3),
-    0 8px 28px -12px rgba(0,0,0,.5)!important;
-}
-.bottom-nav{
-  box-shadow:
-    0 1px 3px -1px rgba(0,0,0,.35),
-    0 12px 32px -14px rgba(0,0,0,.6)!important;
-}
-.daily-card,
-.panel-card,
-.tool-card,
-.month-calendar,
-.month-goals,
-.year-overview,
-.planner-hero-card,
-.planner-stats-card,
-.week-grid-wrap,
-.week-summary{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.25),
-    0 4px 14px -8px rgba(0,0,0,.35)!important;
-}
-.settings-modal,
-.notif-panel{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.4),
-    0 20px 50px -18px rgba(0,0,0,.75)!important;
-}
-
-/* --- سایه‌های hover نرم‌تر --- */
-.task-item:hover,
-.tool-card:hover,
-.cal-day:hover,
-.history-item:hover,
-.panel-planner-tab.active,
-.panel-study-btn,
-.panel-library-btn,
-.btn-primary,
-.lock-btn,
-.send-btn.visible,
-.task-add-btn{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.3),
-    0 4px 12px -6px rgba(0,0,0,.4)!important;
-}
-
-/* --- گرادیانت‌های ظریف‌تر --- */
-.me .msg{
-  background:linear-gradient(160deg,var(--accent-light) 0%,var(--accent) 100%)!important;
-}
-.send-btn,
-.task-add-btn,
-.btn-primary,
-.pv-apply-btn,
-.lock-btn,
-.study-btn{
-  background:linear-gradient(160deg,var(--accent-light) 0%,var(--accent-dark) 100%)!important;
-}
-.main-top-icon-btn{
-  background:linear-gradient(160deg,var(--accent) 0%,var(--accent-dark) 100%)!important;
-}
-.nav-slider-fill{
-  background:linear-gradient(160deg,var(--accent) 0%,var(--accent-dark) 100%)!important;
-}
-
-/* --- borders نازک‌تر --- */
-:root{
-  --border:rgba(120,150,200,.14);
-  --border-strong:rgba(120,150,200,.22);
-}
-[data-theme="dark-navy"]{--border:rgba(120,150,200,.14);--border-strong:rgba(120,150,200,.22)}
-[data-theme="dark-crimson"]{--border:rgba(239,120,120,.14);--border-strong:rgba(239,120,120,.22)}
-[data-theme="dark-gold"]{--border:rgba(212,175,55,.14);--border-strong:rgba(212,175,55,.24)}
-[data-theme="dark-purple"]{--border:rgba(168,85,247,.14);--border-strong:rgba(168,85,247,.22)}
-[data-theme="dark-emerald"]{--border:rgba(16,185,129,.14);--border-strong:rgba(16,185,129,.22)}
-[data-theme="dark-indigo"]{--border:rgba(99,102,241,.14);--border-strong:rgba(99,102,241,.22)}
-
-/* --- typography بالغ --- */
-.planner-hero-title,
-.brand-text h1{
-  font-size:19px!important;
-  font-weight:800!important;
-  letter-spacing:-.3px!important;
-}
-.welcome-title{
-  font-size:26px!important;
-  font-weight:800!important;
-  letter-spacing:-.4px!important;
-}
-.welcome-tagline{
-  font-size:14px!important;
-}
-
-/* --- svg stroke نازک‌تر --- */
-.planner-hero-icon svg,
-.page-empty-icon svg,
-.tool-card-icon svg,
-.study-tool-card svg,
-.card-title svg,
-.phc-nav-btn svg,
-.main-top-icon-btn svg,
-.bottom-nav-btn svg,
-.nav-collapse-tab svg{
-  stroke-width:1.7!important;
-}
-
-/* --- دکمه‌های هدر — سایه خنثی --- */
-.main-top-icon-btn{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.3),
-    0 3px 10px -6px rgba(0,0,0,.4),
-    inset 0 1px 0 rgba(255,255,255,.18),
-    inset 0 -1px 0 rgba(0,0,0,.12)!important;
-}
-.main-top-avatar{
-  box-shadow:
-    0 0 0 2px var(--panel-bg),
-    0 0 0 3px var(--border-strong),
-    0 3px 10px -6px rgba(0,0,0,.4)!important;
-}
-.main-top-avatar:hover{
-  box-shadow:
-    0 0 0 2px var(--panel-bg),
-    0 0 0 3px var(--accent),
-    0 6px 16px -6px rgba(0,0,0,.5)!important;
-}
 /* ═══════════════════════════════════════════════════════════════════════════
    PATCH G — Final Fix (قفل، تنظیمات، input bar، حلقه‌ها، فضاهای خالی)
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -3097,22 +2600,6 @@ body::before{
   font-size:22px!important;
   border-radius:12px!important;
 }
-
-
-/* ═══════════════════════════════════════════════════════════════
-   G3: input bar — «جمع شدن» به‌جای کوچک شدن سایز
-   ═══════════════════════════════════════════════════════════════ */
-.input-bar-shell:focus-within,
-.input-bar-shell:has(.bar-input:focus){
-  transform:translateY(-14px)!important;
-  box-shadow:0 22px 55px -18px var(--accent)!important;
-}
-.input-bar-shell{
-  transition:
-    transform .55s cubic-bezier(.34,1.4,.64,1),
-    box-shadow .4s ease!important;
-}
-
 
 /* ═══════════════════════════════════════════════════════════════
    G4: حلقه‌های چرخان — هم‌سرعت
@@ -3239,43 +2726,6 @@ body{
    PATCH H — Final Polish
    ═══════════════════════════════════════════════════════════════════════════ */
 
-
-/* ═══════════════════════════════════════════════════════════════
-   H1: صفحه قفل — کرسر چشمک‌زن + انیمیشن ماسک شدن کاراکترها
-   ═══════════════════════════════════════════════════════════════ */
-.lock-cursor{
-  width:3px;
-  height:32px;
-  border-radius:2px;
-  background:var(--accent);
-  box-shadow:0 0 12px var(--accent);
-  animation:lockCursorBlink 1.05s ease-in-out infinite;
-  align-self:center;
-}
-@keyframes lockCursorBlink{
-  0%,45%{opacity:1;transform:scaleY(1)}
-  55%,100%{opacity:.15;transform:scaleY(.85)}
-}
-.lock-typed-char.masking{
-  animation:lockCharMask .24s cubic-bezier(.4,0,.6,1) forwards;
-}
-@keyframes lockCharMask{
-  0%{transform:scale(1) rotate(0)}
-  50%{transform:scale(.6) rotate(-180deg);opacity:.5}
-  100%{transform:scale(1) rotate(-360deg);opacity:1}
-}
-.lock-typed-char.masked{
-  background:linear-gradient(160deg,rgba(59,130,246,.55),rgba(37,99,235,.85))!important;
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.35),
-    0 4px 12px -6px var(--accent),
-    inset 0 1px 0 rgba(255,255,255,.18)!important;
-  font-size:18px!important;
-  color:rgba(255,255,255,.85)!important;
-  letter-spacing:0!important;
-}
-
-
 /* ═══════════════════════════════════════════════════════════════
    H2: پنل نوتیف — همیشه زیر دکمه نوتیف، بدون همپوشانی
    ═══════════════════════════════════════════════════════════════ */
@@ -3372,25 +2822,6 @@ body{
   -webkit-background-clip:text!important;
   background-clip:text!important;
 }
-
-
-/* ═══════════════════════════════════════════════════════════════
-   H6: input bar — بالا آمدن + جمع شدن نرم
-   ═══════════════════════════════════════════════════════════════ */
-.input-bar-shell{
-  transition:
-    transform .55s cubic-bezier(.34,1.4,.64,1),
-    box-shadow .42s cubic-bezier(.22,1,.36,1)!important;
-  transform-origin:center bottom!important;
-}
-.input-bar-shell:focus-within,
-.input-bar-shell:has(.bar-input:focus){
-  transform:translateY(-14px) scale(.97)!important;
-  box-shadow:
-    0 22px 55px -18px rgba(0,0,0,.7),
-    0 0 0 1px var(--accent-soft)!important;
-}
-
 
 /* ═══════════════════════════════════════════════════════════════
    H7: حلقه‌های چرخان — هم‌سرعت، ۱۸۰ درجه اختلاف (هرگز به هم نمی‌رسن)
@@ -3549,17 +2980,6 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
 /* ═══════════════════════════════════════════════════════════════════════════
    PATCH I — انیمیشن صفحات (دو جهته) + input bar بیشتر جمع + آیکون‌ها
    ═══════════════════════════════════════════════════════════════════════════ *
-/* ═══════════════════════════════════════════════════════════════
-   I2: input bar بیشتر جمع بشه
-   ═══════════════════════════════════════════════════════════════ */
-.input-bar-shell:focus-within,
-.input-bar-shell:has(.bar-input:focus){
-  transform:translateY(-16px) scale(.93)!important;
-  box-shadow:
-    0 24px 60px -20px rgba(0,0,0,.75),
-    0 0 0 1px var(--accent-soft)!important;
-}
-
 
 /* ═══════════════════════════════════════════════════════════════
    I3: آیکون دستیار (چوب جادویی با جرقه) — سایز و استایل بهتر
@@ -4128,28 +3548,6 @@ html:is([data-nav-position="left"],[data-nav-position="right"]) .bottom-nav-btn.
   background:#F5F7FB!important;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   N5: بعد از بستن تنظیمات، مطمئن شو پنل مخفی و کلیک‌پذیر بشه
-   ═══════════════════════════════════════════════════════════════ */
-.modal-overlay:not(.open){
-  pointer-events:none!important;
-  visibility:hidden!important;
-  opacity:0!important;
-  display:none!important;
-}
-.modal-overlay.open{
-  display:flex!important;
-  pointer-events:auto!important;
-  visibility:visible!important;
-}
-/* رفع تداخل contain با pointer-events */
-.settings-content-wrap{
-  contain:none!important;
-  isolation:isolate!important;
-  overflow:hidden!important;
-  position:relative!important;
-}
 /* ═══════════════════════════════════════════════════════════════════════════
    PATCH P — بازطراحی ظاهر (بالغ و گرم)
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -6074,70 +5472,7 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   display:block!important;
   margin-top:10px!important;
 }
-/* ═══════════════════════════════════════════════════════════════
-   LOCK SCREEN — انیمیشن دونه‌دونه + موفقیت/خطا
-   ═══════════════════════════════════════════════════════════════ */
 
-/* ═══ تبدیل عدد به نقطه با چرخش ═══ */
-.lock-typed-char.masking{
-  animation:lockCharMasking .22s cubic-bezier(.4,0,.6,1) forwards;
-}
-@keyframes lockCharMasking{
-  0%{transform:scale(1) rotate(0);opacity:1}
-  50%{transform:scale(.55) rotate(-180deg);opacity:.6}
-  100%{transform:scale(1) rotate(-360deg);opacity:1}
-}
-
-.lock-typed-char.masked{
-  background:linear-gradient(160deg,rgba(88,166,255,.55),rgba(37,99,235,.85))!important;
-  box-shadow:
-    0 1px 2px rgba(0,0,0,.35),
-    0 4px 12px -6px var(--accent),
-    inset 0 1px 0 rgba(255,255,255,.18)!important;
-  font-size:18px!important;
-  color:rgba(255,255,255,.85)!important;
-}
-
-/* ═══ موفقیت: همه کادرها سبز با موج ═══ */
-.lock-row-success .lock-typed-char{
-  background:linear-gradient(160deg,#3FB950 0%,#1A7F37 100%)!important;
-  box-shadow:
-    0 1px 2px rgba(0,0,0,.3),
-    0 6px 18px -6px #3FB950,
-    inset 0 1px 0 rgba(255,255,255,.25)!important;
-  animation:lockPinSuccess .5s cubic-bezier(.34,1.4,.64,1) both;
-}
-.lock-row-success .lock-typed-char:nth-child(1){animation-delay:0s}
-.lock-row-success .lock-typed-char:nth-child(2){animation-delay:.08s}
-.lock-row-success .lock-typed-char:nth-child(3){animation-delay:.16s}
-.lock-row-success .lock-typed-char:nth-child(4){animation-delay:.24s}
-.lock-row-success .lock-typed-char:nth-child(5){animation-delay:.32s}
-.lock-row-success .lock-typed-char:nth-child(6){animation-delay:.40s}
-@keyframes lockPinSuccess{
-  0%{transform:scale(1) translateY(0)}
-  50%{transform:scale(1.2) translateY(-8px)}
-  100%{transform:scale(1) translateY(0)}
-}
-
-/* ═══ خطا: همه کادرها قرمز + لرزش کل ردیف ═══ */
-.lock-row-error .lock-typed-char{
-  background:linear-gradient(160deg,#F85149 0%,#DA3633 100%)!important;
-  box-shadow:
-    0 1px 2px rgba(0,0,0,.3),
-    0 6px 18px -6px #F85149,
-    inset 0 1px 0 rgba(255,255,255,.2)!important;
-}
-.lock-row-error{
-  animation:lockRowShake .55s cubic-bezier(.4,0,.6,1) both;
-}
-@keyframes lockRowShake{
-  0%,100%{transform:translateX(0)}
-  15%{transform:translateX(-10px)}
-  30%{transform:translateX(10px)}
-  45%{transform:translateX(-7px)}
-  60%{transform:translateX(7px)}
-  75%{transform:translateX(-3px)}
-}
 /* ═══════════════════════════════════════════════════════════════
    EXIT REASON — هشدار: ایموجی چسبیده به متن
    ═══════════════════════════════════════════════════════════════ */
@@ -6828,123 +6163,7 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   display:none!important;
   height:0!important;
 }
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — هاور نرم و روون
-   ═══════════════════════════════════════════════════════════════ */
-.contact-row{
-  transition:
-    transform .45s cubic-bezier(.22,1,.36,1),
-    background .35s cubic-bezier(.22,1,.36,1),
-    border-color .3s cubic-bezier(.22,1,.36,1),
-    box-shadow .42s cubic-bezier(.22,1,.36,1)!important;
-  will-change:transform;
-}
-.contact-row:hover{
-  transform:translateX(-4px) translateY(-1px)!important;
-  background:var(--accent-soft)!important;
-  border-color:var(--accent)!important;
-  box-shadow:0 6px 18px -10px rgba(0,0,0,.4)!important;
-}
-.contact-row .contact-icon{
-  transition:
-    transform .5s cubic-bezier(.34,1.4,.64,1),
-    background .3s cubic-bezier(.22,1,.36,1),
-    color .3s cubic-bezier(.22,1,.36,1)!important;
-}
-.contact-row:hover .contact-icon{
-  transform:scale(1.1) rotate(-5deg)!important;
-  background:var(--accent)!important;
-  color:#fff!important;
-}
-.contact-row:active{
-  transform:translateX(-2px) scale(.99)!important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   TASK ITEM — هاور نرم + دکمه‌های ادیت/یادآور
-   ═══════════════════════════════════════════════════════════════ */
-.task-item{
-  transition:
-    transform .42s cubic-bezier(.22,1,.36,1),
-    background .35s cubic-bezier(.22,1,.36,1),
-    border-color .3s cubic-bezier(.22,1,.36,1),
-    box-shadow .42s cubic-bezier(.22,1,.36,1)!important;
-  will-change:transform;
-}
-.task-item:hover{
-  transform:translateX(-3px)!important;
-  box-shadow:0 5px 16px -10px rgba(0,0,0,.5)!important;
-}
-.task-item:active{
-  transform:translateX(-1px) scale(.995)!important;
-  transition-duration:.15s!important;
-}
 
-/* ═══ دکمه‌های ادیت / یادآور / حذف ═══ */
-.task-edit,
-.task-remind,
-.task-del{
-  opacity:0!important;
-  transform:translateX(6px);
-  transition:
-    opacity .3s cubic-bezier(.4,0,.2,1),
-    transform .4s cubic-bezier(.34,1.4,.64,1),
-    background .22s cubic-bezier(.4,0,.2,1),
-    color .22s cubic-bezier(.4,0,.2,1)!important;
-}
-.task-item:hover .task-edit,
-.task-item:hover .task-remind,
-.task-item:hover .task-del,
-.tasks-done-list .task-del{
-  opacity:1!important;
-  transform:translateX(0)!important;
-}
-
-/* ═══ هاور هر دکمه ═══ */
-.task-edit:hover{background:var(--accent-soft)!important;color:var(--accent)!important}
-.task-remind:hover{background:var(--accent-soft)!important;color:var(--accent)!important}
-.task-remind.on{background:rgba(245,158,11,.15)!important;color:#F59E0B!important;opacity:1!important;transform:translateX(0)!important}
-.task-del:hover{background:rgba(239,68,68,.15)!important;color:#EF4444!important}
-
-/* ═══ svg نرم ═══ */
-.task-edit svg,
-.task-remind svg,
-.task-del svg{
-  transition:transform .35s cubic-bezier(.34,1.4,.64,1)!important;
-}
-.task-edit:hover svg,
-.task-remind:hover svg,
-.task-del:hover svg{
-  transform:scale(1.12)!important;
-}
-
-/* ═══ حذف خط بالایی از task-item ═══ */
-.task-item::after{
-  display:none!important;
-}
-
-/* ═══ اگه می‌خوای خط بالایی بمونه، انیمیشنش نرم‌تر ═══ */
-.task-item::before{
-  content:''!important;
-  position:absolute!important;
-  top:0!important;
-  right:50%!important;
-  left:50%!important;
-  height:2px!important;
-  background:linear-gradient(90deg,transparent,var(--accent-light) 30%,var(--accent) 50%,var(--accent-light) 70%,transparent)!important;
-  opacity:0!important;
-  transition:
-    right .55s cubic-bezier(.22,1,.36,1),
-    left .55s cubic-bezier(.22,1,.36,1),
-    opacity .35s cubic-bezier(.4,0,.2,1)!important;
-  pointer-events:none!important;
-  z-index:2!important;
-  border-radius:0 0 2px 2px!important;
-}
-.task-item:hover::before{
-  right:0!important;
-  left:0!important;
-  opacity:1!important;
-}
 /* ═══════════════════════════════════════════════════════════════
    PAGE EMPTY SOON — دکمه «در حال آماده‌سازی»
    ═══════════════════════════════════════════════════════════════ */
@@ -7186,57 +6405,6 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
 }
 .task-add-form{
   isolation:auto!important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   TASK ITEM + CONTACT ROW — هاور نرم قوی
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ═══ تسک‌های امروز ═══ */
-#view-planner .task-item{
-  transition:
-    transform .5s cubic-bezier(.22,1,.36,1),
-    background .4s cubic-bezier(.22,1,.36,1),
-    border-color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .5s cubic-bezier(.22,1,.36,1)!important;
-  will-change:transform!important;
-  position:relative!important;
-}
-#view-planner .task-item:hover{
-  transform:translateX(-5px) translateY(-2px)!important;
-  background:var(--accent-soft)!important;
-  border-color:var(--accent)!important;
-  box-shadow:0 8px 24px -12px var(--accent)!important;
-}
-#view-planner .task-item:active{
-  transform:translateX(-2px) translateY(0) scale(.997)!important;
-  transition-duration:.15s!important;
-}
-
-/* ═══ خط بالای task-item — نرم ═══ */
-#view-planner .task-item::before{
-  content:''!important;
-  position:absolute!important;
-  top:0!important;
-  right:50%!important;
-  left:50%!important;
-  height:2px!important;
-  background:linear-gradient(90deg,transparent,var(--accent-light) 30%,var(--accent) 50%,var(--accent-light) 70%,transparent)!important;
-  opacity:0!important;
-  transition:
-    right .6s cubic-bezier(.22,1,.36,1),
-    left .6s cubic-bezier(.22,1,.36,1),
-    opacity .4s cubic-bezier(.4,0,.2,1)!important;
-  pointer-events:none!important;
-  z-index:2!important;
-  border-radius:0 0 2px 2px!important;
-}
-#view-planner .task-item:hover::before{
-  right:0!important;
-  left:0!important;
-  opacity:1!important;
-}
-#view-planner .task-item::after{
-  display:none!important;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -7715,174 +6883,7 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
 .side-panel .panel-content {
   scrollbar-gutter: stable !important;
 }
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — هاور: بالا + آیکون چرخش (فیکس AI)
-   ═══════════════════════════════════════════════════════════════ */
-.contact-row {
-  transition:
-    transform .55s cubic-bezier(.22,1,.36,1),
-    background-color .4s cubic-bezier(.22,1,.36,1),
-    border-color .4s cubic-bezier(.22,1,.36,1),
-    box-shadow .55s cubic-bezier(.22,1,.36,1) !important;
-  will-change: transform !important;
-  transform: translateZ(0) !important;
-  backface-visibility: hidden !important;
-}
 
-.contact-row:hover {
-  transform: translate3d(0, -5px, 0) !important;
-  background-color: var(--accent-soft) !important;
-  border-color: var(--accent) !important;
-  box-shadow:
-    0 8px 22px -10px rgba(0,0,0,.5),
-    0 4px 12px -6px var(--accent) !important;
-}
-
-.contact-row:active {
-  transform: translate3d(0, -2px, 0) scale(.99) !important;
-  transition-duration: .15s !important;
-}
-
-/* ═══ آیکون — چرخش و رنگ ═══ */
-.contact-row .contact-icon {
-  transition:
-    transform .55s cubic-bezier(.34,1.4,.64,1),
-    background-color .35s cubic-bezier(.22,1,.36,1),
-    color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
-}
-
-.contact-row:hover .contact-icon {
-  transform: scale(1.15) rotate(-10deg) !important;
-  background-color: var(--accent) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 18px -6px var(--accent) !important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   TASK ITEM — فقط خط بالایی، بدون حرکت
-   ═══════════════════════════════════════════════════════════════ */
-#view-planner .task-item,
-#view-planner .task-item * {
-  transition: none !important;
-}
-
-#view-planner .task-item {
-  transition:
-    border-color .35s cubic-bezier(.22,1,.36,1),
-    background-color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
-  transform: none !important;
-  will-change: auto !important;
-}
-
-/* ═══ حذف کامل حرکت هاور ═══ */
-#view-planner .task-item:hover {
-  transform: none !important;
-  background-color: var(--bubble-bot-bg) !important;
-  border-color: var(--accent) !important;
-  box-shadow: none !important;
-}
-
-/* ═══ فقط خط بالایی نرم باز بشه ═══ */
-#view-planner .task-item::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  right: 50% !important;
-  left: 50% !important;
-  height: 2px !important;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--accent-light) 25%,
-    var(--accent) 50%,
-    var(--accent-light) 75%,
-    transparent 100%) !important;
-  opacity: 0 !important;
-  transition:
-    right .55s cubic-bezier(.22,1,.36,1),
-    left .55s cubic-bezier(.22,1,.36,1),
-    opacity .35s cubic-bezier(.4,0,.2,1) !important;
-  pointer-events: none !important;
-  z-index: 5 !important;
-  border-radius: 0 0 2px 2px !important;
-}
-
-#view-planner .task-item:hover::before {
-  right: 0 !important;
-  left: 0 !important;
-  opacity: 1 !important;
-}
-
-#view-planner .task-item::after {
-  display: none !important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — خط بالایی + آیکون چرخش (بدون حرکت)
-   ═══════════════════════════════════════════════════════════════ */
-.contact-row {
-  position: relative !important;
-  overflow: hidden !important;
-  transition:
-    background-color .4s cubic-bezier(.22,1,.36,1),
-    border-color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
-  transform: none !important;
-}
-
-.contact-row:hover {
-  transform: none !important;
-  background-color: var(--accent-soft) !important;
-  border-color: var(--accent) !important;
-  box-shadow: 0 4px 14px -8px rgba(0,0,0,.4) !important;
-}
-
-/* ═══ خط بالایی ═══ */
-.contact-row::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  right: 50% !important;
-  left: 50% !important;
-  height: 2px !important;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    var(--accent-light) 25%,
-    var(--accent) 50%,
-    var(--accent-light) 75%,
-    transparent 100%) !important;
-  opacity: 0 !important;
-  transition:
-    right .55s cubic-bezier(.22,1,.36,1),
-    left .55s cubic-bezier(.22,1,.36,1),
-    opacity .35s cubic-bezier(.4,0,.2,1) !important;
-  pointer-events: none !important;
-  z-index: 5 !important;
-  border-radius: 0 0 2px 2px !important;
-}
-
-.contact-row:hover::before {
-  right: 0 !important;
-  left: 0 !important;
-  opacity: 1 !important;
-}
-
-.contact-row::after {
-  display: none !important;
-}
-
-/* ═══ آیکون — چرخش نرم + رنگ ═══ */
-.contact-row .contact-icon {
-  transition:
-    transform .55s cubic-bezier(.34,1.4,.64,1),
-    background-color .35s cubic-bezier(.22,1,.36,1),
-    color .35s cubic-bezier(.22,1,.36,1) !important;
-}
-
-.contact-row:hover .contact-icon {
-  transform: scale(1.12) rotate(-8deg) !important;
-  background-color: var(--accent) !important;
-  color: #fff !important;
-}
 /* ═══════════════════════════════════════════════════════════════
    BEHAVIOR TAB — متن‌ها کوچیک‌تر
    ═══════════════════════════════════════════════════════════════ */
@@ -8467,82 +7468,7 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
 [data-theme="midnight-indigo"] .panel-library-btn{
   background:linear-gradient(160deg, #60A5FA 0%, #3B82F6 50%, #2563EB 100%)!important;
 }
-/* ═══════════════════════════════════════════════════════════════
-   RESTORE SHADOWS — سایه‌های نرم برای عمق
-   ═══════════════════════════════════════════════════════════════ */
 
-/* ─── main-chat و side-panel — سایه ملایم ─── */
-.main-chat,
-.side-panel{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.25),
-    0 8px 28px -12px rgba(0,0,0,.4)!important;
-}
-
-/* ─── welcome-card — سایه نرم بنفش ─── */
-.welcome-card{
-  box-shadow:
-    0 0 60px -20px var(--accent),
-    0 24px 60px -20px rgba(0,0,0,.5),
-    inset 0 1px 0 rgba(255,255,255,.06)!important;
-}
-.welcome-card::before{
-  display:block!important;
-  opacity:.35!important;
-}
-.welcome-halo{
-  display:block!important;
-  opacity:.25!important;
-}
-
-/* ─── کارت‌ها — سایه ملایم ─── */
-.daily-card,
-.panel-card,
-.tool-card,
-.planner-hero-card,
-.planner-stats-card,
-.month-calendar,
-.month-goals,
-.year-overview,
-.week-grid-wrap,
-.week-summary,
-.task-item,
-.history-item,
-.ll-item,
-.contact-row,
-.setting-group{
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.2),
-    0 6px 20px -10px rgba(0,0,0,.35)!important;
-}
-
-/* ─── نوار پایین — سایه با عمق ─── */
-.bottom-nav{
-  box-shadow:
-    0 4px 14px -4px rgba(0,0,0,.4),
-    0 12px 32px -14px rgba(0,0,0,.5),
-    0 0 24px -10px var(--accent)!important;
-}
-
-/* ─── input bar — سایه ملایم ─── */
-.input-bar{
-  box-shadow:
-    0 4px 16px -8px rgba(0,0,0,.4),
-    0 0 20px -10px var(--accent-soft)!important;
-}
-.input-bar-shell:focus-within .input-bar,
-.input-bar-shell:has(.bar-input:focus) .input-bar{
-  box-shadow:
-    0 12px 32px -12px var(--accent),
-    0 0 0 1px var(--accent-soft)!important;
-}
-
-/* ─── هدرها — سایه نرم زیر ─── */
-.chat-header,
-.planner-hero,
-.page-title-bar{
-  box-shadow:0 4px 16px -8px rgba(0,0,0,.25)!important;
-}
 /* ═══════════════════════════════════════════════════════════════
    FIXES v2 — هدر + کارت ارتباط + فونت تنظیمات
    ═══════════════════════════════════════════════════════════════ */
@@ -8596,75 +7522,6 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   align-self:center!important;
 }
 
-/* ─── ۲. کارت‌های ارتباط — بدون حرکت، خط واضح ─── */
-.contact-row,
-.about-contacts .contact-row{
-  transform:none!important;
-  transition:
-    background-color .3s ease,
-    border-color .3s ease,
-    box-shadow .3s ease!important;
-  position:relative!important;
-  overflow:hidden!important;
-}
-.contact-row:hover,
-.about-contacts .contact-row:hover{
-  transform:none!important;
-  background:var(--accent-soft)!important;
-  border-color:var(--accent)!important;
-  box-shadow:0 6px 20px -10px rgba(0,0,0,.4)!important;
-}
-
-/* خط بالایی — ضخیم و واضح */
-.contact-row::before{
-  content:''!important;
-  position:absolute!important;
-  top:0!important;
-  right:50%!important;
-  left:50%!important;
-  height:3px!important;
-  background:linear-gradient(90deg,
-    transparent 0%,
-    var(--accent-light) 15%,
-    var(--accent) 50%,
-    var(--accent-light) 85%,
-    transparent 100%)!important;
-  opacity:0!important;
-  transition:
-    right .5s cubic-bezier(.22,1,.36,1),
-    left .5s cubic-bezier(.22,1,.36,1),
-    opacity .3s ease!important;
-  pointer-events:none!important;
-  z-index:10!important;
-  border-radius:0 0 3px 3px!important;
-  box-shadow:0 0 14px var(--accent)!important;
-}
-.contact-row:hover::before{
-  right:0!important;
-  left:0!important;
-  opacity:1!important;
-}
-.contact-row::after{
-  display:none!important;
-}
-
-/* آیکون — برجسته‌تر */
-.contact-row .contact-icon{
-  transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    background-color .3s ease,
-    color .3s ease,
-    box-shadow .35s ease!important;
-}
-.contact-row:hover .contact-icon{
-  transform:scale(1.2) rotate(-6deg)!important;
-  background:var(--accent)!important;
-  color:#fff!important;
-  box-shadow:
-    0 0 0 3px var(--accent-soft),
-    0 8px 22px -6px var(--accent)!important;
-}
-
 /* ─── ۳. تنظیمات — فونت لیبل‌ها ─── */
 [data-cat="behavior"] .row-btn{
   min-height:60px!important;
@@ -8714,1124 +7571,8 @@ html #bottomNav .nav-slider-fill{border-radius:999px!important}
   gap:8px!important;
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
 }
-/* ═══════════════════════════════════════════════════════════════
-   FIX v3 — سایه‌ها + جابجایی dropdown + انیمیشن send + contact
-   ═══════════════════════════════════════════════════════════════ */
 
-/* ─── ۱. سایه‌ها — قوی‌تر، دیده می‌شن ─── */
-html body .main-chat{
-  box-shadow:
-    0 2px 4px -2px rgba(0,0,0,.4),
-    0 20px 50px -20px rgba(0,0,0,.75),
-    0 0 40px -20px var(--accent)!important;
-}
-html body .side-panel{
-  box-shadow:
-    0 2px 4px -2px rgba(0,0,0,.4),
-    0 20px 50px -20px rgba(0,0,0,.75),
-    0 0 40px -20px var(--accent)!important;
-}
-html body .welcome-card{
-  box-shadow:
-    0 0 70px -15px var(--accent),
-    0 30px 70px -25px rgba(0,0,0,.7),
-    inset 0 1px 0 rgba(255,255,255,.1)!important;
-}
-html body .welcome-card::before{
-  display:block!important;
-  opacity:.5!important;
-}
-html body .welcome-halo{
-  display:block!important;
-  opacity:.4!important;
-}
-html body .bottom-nav{
-  box-shadow:
-    0 4px 10px -4px rgba(0,0,0,.5),
-    0 16px 40px -16px rgba(0,0,0,.7),
-    0 0 30px -12px var(--accent)!important;
-}
-html body .input-bar{
-  box-shadow:
-    0 6px 20px -10px rgba(0,0,0,.55),
-    0 0 24px -12px var(--accent-soft)!important;
-}
-html body .daily-card,
-html body .panel-card,
-html body .tool-card,
-html body .planner-hero-card,
-html body .month-calendar,
-html body .month-goals,
-html body .task-item,
-html body .history-item{
-  box-shadow:
-    0 2px 4px -2px rgba(0,0,0,.3),
-    0 10px 26px -12px rgba(0,0,0,.5)!important;
-}
 
-/* ─── ۲. جابجایی dropdown مدل به سمت راست ─── */
-.input-bar #thinkBtn  { order: 1; }
-.input-bar #quickBtn  { order: 2; }
-.input-bar #dialectDD { order: 3; }
-.input-bar form       { order: 5; }
-.input-bar #sendBtn   { order: 6; }
-.input-bar #modelDD   { order: 7; }
-.input-bar #voiceBtn  { order: 8; }
-.input-bar > label    { order: 9; }
-
-/* ─── ۳. انیمیشن send button — از راست به چپ ─── */
-.send-btn{
-  transform-origin: right center!important;
-  transform: translateX(20px) scale(.4) rotate(-20deg)!important;
-  opacity: 0;
-  transition:
-    transform .42s cubic-bezier(.34,1.4,.64,1),
-    opacity .3s ease,
-    background .35s ease!important;
-}
-.send-btn.visible{
-  transform: translateX(0) scale(1) rotate(0)!important;
-  opacity: 1;
-}
-.send-btn:hover{
-  transform: translateX(-2px) scale(1.1) rotate(-4deg)!important;
-}
-.send-btn:active{
-  transform: translateX(0) scale(.92)!important;
-  transition-duration: .1s!important;
-}
-/* آیکون — بچرخه رو به چپ */
-.send-btn svg{
-  transform: scaleX(-1);
-  transition: transform .4s cubic-bezier(.34,1.4,.64,1)!important;
-}
-.send-btn:hover svg{
-  transform: scaleX(-1) translateX(-2px);
-}
-.send-btn.pause-mode{
-  transform-origin: right center!important;
-}
-.send-btn.pause-mode svg{
-  transform: scaleX(1);
-}
-
-/* ─── ۴. contact-row — فقط آیکون + خط چپ ─── */
-.contact-row,
-.about-contacts .contact-row{
-  transform: none!important;
-  background: var(--panel-bg)!important;
-  border-color: var(--border)!important;
-  box-shadow: none!important;
-  transition:
-    background-color .35s ease,
-    border-color .35s ease!important;
-  position: relative!important;
-  overflow: hidden!important;
-}
-.contact-row:hover,
-.about-contacts .contact-row:hover{
-  transform: none!important;
-  background: var(--accent-soft)!important;
-  border-color: var(--accent)!important;
-  box-shadow: none!important;
-}
-
-/* حذف خط بالایی قدیمی */
-.contact-row::before,
-.contact-row::after{
-  display: none!important;
-  content: none!important;
-}
-
-/* خط عمودی سمت چپ کارت */
-.contact-row .contact-info{
-  position: relative!important;
-}
-.contact-row .contact-info::before{
-  content: ''!important;
-  position: absolute!important;
-  top: 0!important;
-  bottom: 0!important;
-  right: -12px!important;
-  width: 3px!important;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    var(--accent-light) 20%,
-    var(--accent) 50%,
-    var(--accent-light) 80%,
-    transparent 100%)!important;
-  border-radius: 3px!important;
-  transform: scaleY(0)!important;
-  transform-origin: center!important;
-  opacity: 0!important;
-  transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    opacity .3s ease!important;
-  pointer-events: none!important;
-  box-shadow: 0 0 12px var(--accent)!important;
-}
-.contact-row:hover .contact-info::before{
-  transform: scaleY(1)!important;
-  opacity: 1!important;
-}
-
-/* فقط آیکون بزرگ می‌شه */
-.contact-row .contact-icon{
-  transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    background-color .3s ease,
-    color .3s ease!important;
-}
-.contact-row:hover .contact-icon{
-  transform: scale(1.25) rotate(-8deg)!important;
-  background: var(--accent)!important;
-  color: #fff!important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   FIX v5 — سایه رنگی + کارت‌های جاندار + انیمیشن قفل
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── ۱. سایه رنگی پشت main-chat و side-panel ─── */
-html body .main-chat,
-html body .side-panel{
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.04),
-    0 4px 12px -2px rgba(0,0,0,.5),
-    0 24px 60px -20px rgba(0,0,0,.8),
-    0 0 80px -20px var(--accent),
-    0 0 120px -30px var(--accent-light)!important;
-  border-color: color-mix(in srgb, var(--accent) 25%, transparent)!important;
-}
-
-/* ─── ۲. کارت‌ها — بوردر رنگی + سایه شیک ─── */
-.daily-card,
-.panel-card,
-.tool-card,
-.planner-hero-card,
-.planner-stats-card,
-.month-calendar,
-.month-goals,
-.year-overview,
-.week-grid-wrap,
-.week-summary,
-.task-item,
-.history-item,
-.ll-item,
-.contact-row,
-.setting-group,
-.welcome-card{
-  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border))!important;
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.3),
-    0 8px 24px -12px rgba(0,0,0,.5),
-    0 0 30px -18px var(--accent),
-    inset 0 1px 0 rgba(255,255,255,.04)!important;
-  transition:
-    border-color .35s ease,
-    box-shadow .4s ease!important;
-}
-
-/* هاور — کارت‌ها زنده بشن */
-.daily-card:hover,
-.panel-card:hover,
-.tool-card:hover,
-.month-calendar:hover,
-.month-goals:hover,
-.task-item:hover,
-.history-item:hover,
-.ll-item:hover,
-.contact-row:hover{
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent)!important;
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.35),
-    0 12px 32px -12px rgba(0,0,0,.6),
-    0 0 40px -12px var(--accent),
-    0 0 60px -20px var(--accent-light),
-    inset 0 1px 0 rgba(255,255,255,.06)!important;
-}
-
-/* ─── ۳. هدر — خط پایین رنگی ─── */
-.chat-header,
-.planner-hero,
-.page-title-bar{
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent)!important;
-  box-shadow:
-    0 1px 0 0 color-mix(in srgb, var(--accent) 20%, transparent),
-    0 8px 24px -12px rgba(0,0,0,.4)!important;
-}
-
-/* ─── ۴. input bar — سایه رنگی ─── */
-.input-bar{
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border))!important;
-  box-shadow:
-    0 6px 20px -10px rgba(0,0,0,.5),
-    0 0 30px -14px var(--accent),
-    inset 0 1px 0 rgba(255,255,255,.05)!important;
-  transition:
-    border-color .3s ease,
-    box-shadow .4s ease!important;
-}
-.input-bar:focus-within{
-  border-color: color-mix(in srgb, var(--accent) 60%, transparent)!important;
-  box-shadow:
-    0 8px 24px -10px rgba(0,0,0,.55),
-    0 0 40px -10px var(--accent),
-    0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent)!important;
-}
-
-/* ─── ۵. دکمه‌ها — سایه رنگی ─── */
-.send-btn{
-  box-shadow:
-    0 4px 14px -4px var(--accent),
-    0 0 24px -10px var(--accent-light)!important;
-}
-.bottom-nav{
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent)!important;
-  box-shadow:
-    0 4px 14px -4px rgba(0,0,0,.5),
-    0 16px 40px -16px rgba(0,0,0,.7),
-    0 0 50px -15px var(--accent),
-    0 0 80px -25px var(--accent-light)!important;
-}
-
-/* ─── ۶. انیمیشن جدید صفحه قفل — بدون چرخش ─── */
-.lock-typed-char.masking{
-  animation: lockCharMaskSmooth .35s cubic-bezier(.4,0,.2,1) forwards!important;
-}
-@keyframes lockCharMaskSmooth{
-  0%{
-    transform: scale(1);
-    opacity: 1;
-    filter: blur(0);
-    color: #fff;
-  }
-  40%{
-    transform: scale(.85);
-    opacity: .6;
-    filter: blur(2px);
-    color: #fff;
-  }
-  70%{
-    transform: scale(1.05);
-    opacity: .9;
-    filter: blur(0);
-    color: var(--accent-light);
-  }
-  100%{
-    transform: scale(1);
-    opacity: 1;
-    filter: blur(0);
-    color: rgba(255,255,255,.7);
-  }
-}
-
-/* کاراکتر masked — ظاهر نهایی نقطه */
-.lock-typed-char.masked{
-  background: linear-gradient(160deg,
-    color-mix(in srgb, var(--accent-light) 35%, transparent),
-    color-mix(in srgb, var(--accent) 55%, transparent))!important;
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent)!important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.15),
-    0 2px 8px -4px var(--accent),
-    0 0 12px -4px var(--accent-light)!important;
-  font-size: 15px!important;
-  color: rgba(255,255,255,.85)!important;
-  transition:
-    background .3s ease,
-    border-color .3s ease,
-    box-shadow .3s ease!important;
-}
-
-/* ─── ۷. قفل — انیمیشن ورود کاراکتر جدید ─── */
-.lock-typed-char{
-  animation: lockCharEnterSmooth .28s cubic-bezier(.34,1.4,.64,1) both!important;
-}
-@keyframes lockCharEnterSmooth{
-  0%{
-    transform: translateY(-8px) scale(.7);
-    opacity: 0;
-    filter: blur(3px);
-  }
-  100%{
-    transform: translateY(0) scale(1);
-    opacity: 1;
-    filter: blur(0);
-  }
-}
-/* ═══════════════════════════════════════════════════════════════
-   FIX v6 — سایه ملایم‌تر + بوردر رنگی روی همه المان‌ها
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── ۱. سایه‌های main-chat و side-panel — ملایم‌تر ─── */
-html body .main-chat,
-html body .side-panel{
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.03),
-    0 2px 8px -2px rgba(0,0,0,.35),
-    0 16px 40px -18px rgba(0,0,0,.55),
-    0 0 50px -20px var(--accent)!important;
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent)!important;
-}
-
-/* ─── ۲. کارت‌ها — سایه ملایم + بوردر رنگی ─── */
-.daily-card,
-.panel-card,
-.tool-card,
-.planner-hero-card,
-.planner-stats-card,
-.month-calendar,
-.month-goals,
-.year-overview,
-.week-grid-wrap,
-.week-summary,
-.task-item,
-.history-item,
-.ll-item,
-.contact-row,
-.setting-group,
-.welcome-card{
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border))!important;
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.2),
-    0 6px 16px -10px rgba(0,0,0,.35),
-    0 0 20px -14px var(--accent),
-    inset 0 1px 0 rgba(255,255,255,.04)!important;
-  transition:
-    border-color .3s ease,
-    box-shadow .35s ease!important;
-}
-
-/* هاور — ملایم‌تر */
-.daily-card:hover,
-.panel-card:hover,
-.tool-card:hover,
-.month-calendar:hover,
-.month-goals:hover,
-.task-item:hover,
-.history-item:hover,
-.ll-item:hover,
-.contact-row:hover{
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent)!important;
-  box-shadow:
-    0 1px 2px -1px rgba(0,0,0,.25),
-    0 8px 22px -12px rgba(0,0,0,.45),
-    0 0 30px -12px var(--accent),
-    inset 0 1px 0 rgba(255,255,255,.05)!important;
-}
-
-/* ─── ۳. هدرها — خط پایین رنگی ملایم ─── */
-.chat-header,
-.planner-hero,
-.page-title-bar{
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 25%, transparent)!important;
-  box-shadow:
-    0 1px 0 0 color-mix(in srgb, var(--accent) 15%, transparent),
-    0 4px 16px -10px rgba(0,0,0,.3)!important;
-}
-
-/* ─── ۴. input bar — بوردر رنگی ─── */
-.input-bar{
-  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border))!important;
-  box-shadow:
-    0 4px 14px -8px rgba(0,0,0,.4),
-    0 0 20px -12px var(--accent),
-    inset 0 1px 0 rgba(255,255,255,.05)!important;
-  transition:
-    border-color .3s ease,
-    box-shadow .35s ease!important;
-}
-.input-bar:focus-within{
-  border-color: color-mix(in srgb, var(--accent) 65%, transparent)!important;
-  box-shadow:
-    0 6px 18px -8px rgba(0,0,0,.5),
-    0 0 30px -10px var(--accent),
-    0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent)!important;
-}
-
-/* ─── ۵. دکمه‌ها و نوار پایین ─── */
-.send-btn{
-  box-shadow:
-    0 3px 10px -3px var(--accent),
-    0 0 18px -8px var(--accent-light)!important;
-}
-.bottom-nav{
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent)!important;
-  box-shadow:
-    0 3px 10px -3px rgba(0,0,0,.4),
-    0 12px 30px -14px rgba(0,0,0,.55),
-    0 0 35px -14px var(--accent)!important;
-}
-
-/* ─── ۶. همه المان‌های کوچیک — بوردر رنگی ─── */
-
-/* دکمه‌های نوار پایین */
-.bottom-nav-btn:not(.nav-btn-chat){
-  border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent)!important;
-}
-
-/* دکمه‌های داخل input */
-.bar-btn{
-  border: 1px solid color-mix(in srgb, var(--accent) 15%, var(--border))!important;
-}
-.bar-btn:hover{
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent)!important;
-}
-
-/* dropdown trigger ها */
-.dd-trigger,
-.siraj-select-trigger{
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border))!important;
-}
-.dd-trigger:hover,
-.siraj-select-trigger:hover{
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent)!important;
-}
-
-/* dropdown panels */
-.dd-panel,
-.siraj-select-panel{
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent)!important;
-}
-
-/* دکمه‌های تنظیمات */
-.row-btn,
-.color-opt,
-.pattern-opt,
-.settings-subtab{
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border))!important;
-}
-.row-btn:hover,
-.color-opt:hover,
-.pattern-opt:hover,
-.settings-subtab:hover{
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent)!important;
-}
-
-/* دکمه‌های تب پلنر */
-.panel-planner-tab{
-  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border))!important;
-}
-.panel-planner-tab:hover{
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent)!important;
-}
-
-/* فیلدهای input */
-.task-add-form input[type=text],
-.history-search,
-.task-inline-edit{
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border))!important;
-}
-.task-add-form input[type=text]:focus,
-.history-search:focus-within,
-.task-inline-edit:focus{
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent)!important;
-}
-
-/* سلول‌های تقویم */
-.cal-day{
-  border: 1px solid color-mix(in srgb, var(--accent) 15%, var(--border))!important;
-}
-.cal-day:hover{
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent)!important;
-}
-
-/* جدول هفتگی */
-.week-table th{
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent)!important;
-}
-.week-table td{
-  border-left: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border))!important;
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border))!important;
-}
-
-/* work-cell-task */
-.week-cell-task{
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent)!important;
-}
-
-/* پیام‌های چت */
-.bot .msg{
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent)!important;
-}
-.me .msg{
-  border: 1px solid color-mix(in srgb, var(--accent-light) 30%, transparent)!important;
-}
-
-/* پنل‌ها */
-.notif-panel,
-.settings-modal{
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent)!important;
-}
-
-/* پاپ‌آپ‌ها */
-.siraj-popup,
-.task-notif-popup,
-.learn-library-box{
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent)!important;
-}
-
-/* دکمه‌های تم‌ها و رنگ‌ها */
-.level-opt,
-.default-view-opt,
-.copy-day-btn{
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border))!important;
-}
-.level-opt:hover,
-.default-view-opt:hover,
-.copy-day-btn:hover{
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent)!important;
-}
-
-/* آیکون‌های هدر */
-.main-top-icon-btn{
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent)!important;
-}
-.main-top-avatar{
-  border: 2px solid color-mix(in srgb, var(--accent) 50%, transparent)!important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   FIX v7 — هاور نرم کارت‌های گفتگو + آیکون‌ها
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── کارت گفتگو — پایه ─── */
-.history-item{
-  transition:
-    transform .4s cubic-bezier(.22,1,.36,1),
-    background-color .35s cubic-bezier(.22,1,.36,1),
-    border-color .35s cubic-bezier(.22,1,.36,1),
-    box-shadow .45s cubic-bezier(.22,1,.36,1)!important;
-  will-change: transform!important;
-  transform: translateZ(0)!important;
-  backface-visibility: hidden!important;
-  position: relative!important;
-  overflow: hidden!important;
-}
-
-/* ─── هاور — حرکت نرم + سایه رنگی ─── */
-.history-item:hover{
-  transform: translateX(-5px) translateY(-2px) scale(1.008)!important;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--accent) 18%, transparent),
-    color-mix(in srgb, var(--accent) 8%, transparent))!important;
-  border-color: color-mix(in srgb, var(--accent) 55%, transparent)!important;
-  box-shadow:
-    0 4px 12px -6px rgba(0,0,0,.4),
-    0 12px 28px -12px var(--accent),
-    0 0 30px -12px var(--accent)!important;
-}
-
-/* ─── کلیک ─── */
-.history-item:active{
-  transform: translateX(-2px) translateY(0) scale(.99)!important;
-  transition-duration: .12s!important;
-}
-
-/* ─── خط جانبی سمت راست کارت — از بالا و پایین باز می‌شه ─── */
-.history-item::before{
-  content: ''!important;
-  position: absolute!important;
-  top: 8px!important;
-  bottom: 8px!important;
-  right: 0!important;
-  width: 3px!important;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    var(--accent-light) 20%,
-    var(--accent) 50%,
-    var(--accent-light) 80%,
-    transparent 100%)!important;
-  border-radius: 3px 0 0 3px!important;
-  transform: scaleY(0)!important;
-  transform-origin: center!important;
-  opacity: 0!important;
-  transition:
-    transform .45s cubic-bezier(.34,1.4,.64,1),
-    opacity .3s ease!important;
-  box-shadow: 0 0 12px var(--accent)!important;
-  z-index: 5!important;
-  pointer-events: none!important;
-}
-.history-item:hover::before{
-  transform: scaleY(1)!important;
-  opacity: 1!important;
-}
-
-/* ─── لیبل و متن — تغییر رنگ نرم ─── */
-.history-item .h-title,
-.history-item .h-preview,
-.history-item .h-time{
-  transition: color .3s ease!important;
-}
-.history-item:hover .h-title{
-  color: var(--accent-light)!important;
-}
-.history-item:hover .h-preview{
-  color: var(--text-main)!important;
-}
-
-/* ─── آیکون‌های pin / edit / del — ظاهر شدن نرم ─── */
-.history-item .h-pin,
-.history-item .h-edit,
-.history-item .h-del{
-  transition:
-    opacity .3s ease,
-    transform .4s cubic-bezier(.34,1.4,.64,1),
-    background-color .25s ease,
-    color .25s ease!important;
-}
-.history-item:hover .h-pin,
-.history-item:hover .h-edit,
-.history-item:hover .h-del{
-  opacity: 1!important;
-  transform: translateX(0) scale(1)!important;
-}
-
-/* هاور روی خود دکمه */
-.history-item .h-pin:hover,
-.history-item .h-edit:hover,
-.history-item .h-del:hover{
-  transform: scale(1.15) translateX(0)!important;
-}
-
-/* ─── کارت‌های active و pinned ─── */
-.history-item.active{
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--accent) 25%, transparent),
-    color-mix(in srgb, var(--accent) 10%, transparent))!important;
-  border-color: color-mix(in srgb, var(--accent) 60%, transparent)!important;
-}
-.history-item.pinned{
-  border-color: color-mix(in srgb, #F59E0B 60%, transparent)!important;
-  background: linear-gradient(135deg,
-    rgba(245,158,11,.15),
-    rgba(245,158,11,.05))!important;
-}
-.history-item.pinned::before{
-  background: linear-gradient(180deg,
-    transparent 0%,
-    #FBBF24 20%,
-    #F59E0B 50%,
-    #FBBF24 80%,
-    transparent 100%)!important;
-  box-shadow: 0 0 12px #F59E0B!important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — FINAL v10 (تنها نسخه معتبر)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── ۱. حذف همه‌چیز قدیمی با قدرت بالا ─── */
-html body .contact-row::before,
-html body .contact-row::after,
-html body .about-contacts .contact-row::before,
-html body .about-contacts .contact-row::after{
-  display: none!important;
-  content: none!important;
-  opacity: 0!important;
-  width: 0!important;
-  height: 0!important;
-  background: none!important;
-  transform: none!important;
-}
-
-/* ─── ۲. کارت — پایه با ترنزیشن کامل ─── */
-html body .contact-row,
-html body .about-contacts .contact-row{
-  position: relative!important;
-  overflow: hidden!important;
-  transform: translate3d(0,0,0)!important;
-  backface-visibility: hidden!important;
-  will-change: transform!important;
-  transition:
-    transform .5s cubic-bezier(.22,1,.36,1),
-    background-color .4s cubic-bezier(.22,1,.36,1),
-    background .4s cubic-bezier(.22,1,.36,1),
-    border-color .4s cubic-bezier(.22,1,.36,1),
-    box-shadow .5s cubic-bezier(.22,1,.36,1)!important;
-}
-
-/* ─── ۳. هاور — حرکت نرم به راست ─── */
-html body .contact-row:hover,
-html body .about-contacts .contact-row:hover{
-  transform: translate3d(6px,-3px,0) scale(1.012)!important;
-  background: linear-gradient(135deg,
-    color-mix(in srgb, var(--accent) 10%, transparent),
-    color-mix(in srgb, var(--accent) 22%, transparent))!important;
-  border-color: color-mix(in srgb, var(--accent) 60%, transparent)!important;
-  box-shadow:
-    0 6px 16px -8px rgba(0,0,0,.45),
-    0 14px 32px -14px var(--accent),
-    0 0 40px -14px var(--accent)!important;
-}
-
-/* ─── ۴. کلیک ─── */
-html body .contact-row:active,
-html body .about-contacts .contact-row:active{
-  transform: translate3d(2px,-1px,0) scale(.99)!important;
-  transition-duration: .12s!important;
-}
-
-/* ─── ۵. خط سمت چپ — با ترکیب left/inset/inset-inline ─── */
-html body .contact-row::before,
-html body .about-contacts .contact-row::before{
-  content: ''!important;
-  display: block!important;
-  position: absolute!important;
-  
-  /* همه راه‌های ممکن برای left:0 */
-  left: 0!important;
-  right: auto!important;
-  inset: 8px auto 8px 0!important;
-  inset-inline-start: 0!important;
-  inset-inline-end: auto!important;
-  
-  width: 4px!important;
-  height: auto!important;
-  
-  background: linear-gradient(180deg,
-    transparent 0%,
-    var(--accent-light) 15%,
-    var(--accent) 50%,
-    var(--accent-light) 85%,
-    transparent 100%)!important;
-  
-  border-radius: 0 4px 4px 0!important;
-  transform: scaleY(0)!important;
-  transform-origin: center center!important;
-  opacity: 0!important;
-  
-  transition:
-    transform .55s cubic-bezier(.34,1.4,.64,1),
-    opacity .35s ease!important;
-  
-  box-shadow: 
-    0 0 14px var(--accent),
-    0 0 24px -4px var(--accent-light)!important;
-  
-  z-index: 10!important;
-  pointer-events: none!important;
-  direction: ltr!important;
-}
-
-html body .contact-row:hover::before,
-html body .about-contacts .contact-row:hover::before{
-  transform: scaleY(1)!important;
-  opacity: 1!important;
-}
-
-/* ─── ۶. متن‌ها ─── */
-html body .contact-row .contact-label,
-html body .contact-row .contact-value{
-  transition: color .35s ease!important;
-}
-html body .contact-row:hover .contact-label{
-  color: var(--accent-light)!important;
-}
-html body .contact-row:hover .contact-value{
-  color: var(--text-main)!important;
-}
-
-/* ─── ۷. آیکون ─── */
-html body .contact-row .contact-icon,
-html body .about-contacts .contact-row .contact-icon{
-  transition:
-    transform .5s cubic-bezier(.34,1.4,.64,1),
-    background-color .35s ease,
-    color .35s ease,
-    box-shadow .4s ease!important;
-}
-html body .contact-row:hover .contact-icon,
-html body .about-contacts .contact-row:hover .contact-icon{
-  transform: scale(1.3) rotate(-10deg)!important;
-  background: var(--accent)!important;
-  color: #fff!important;
-  box-shadow:
-    0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent),
-    0 10px 24px -6px var(--accent)!important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — نسخه تمیز (تنها نسخه معتبر)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── حذف هر چیز قدیمی روی ::before و ::after ─── */
-.contact-row::after{
-  display: none !important;
-  content: none !important;
-}
-
-/* ─── کارت — پایه ─── */
-.contact-row{
-  position: relative !important;
-  overflow: hidden !important;
-  transition:
-    transform .35s cubic-bezier(.22,1,.36,1),
-    background-color .3s ease,
-    border-color .3s ease,
-    box-shadow .35s ease !important;
-}
-
-/* ─── هاور ─── */
-.contact-row:hover{
-  transform: translateX(4px) !important;
-  background: var(--accent-soft) !important;
-  border-color: var(--accent) !important;
-  box-shadow: 0 6px 20px -10px var(--accent) !important;
-}
-
-.contact-row:active{
-  transform: translateX(2px) scale(.995) !important;
-  transition-duration: .1s !important;
-}
-
-/* ─── خط عمودی سمت چپ ─── */
-.contact-row::before{
-  content: '' !important;
-  display: block !important;
-  position: absolute !important;
-  top: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: auto !important;
-  width: 3px !important;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    var(--accent) 20%,
-    var(--accent) 80%,
-    transparent 100%) !important;
-  border-radius: 0 2px 2px 0 !important;
-  opacity: 0 !important;
-  transform: translateX(-100%) !important;
-  transition:
-    opacity .25s ease .05s,
-    transform .4s cubic-bezier(.22,1,.36,1) !important;
-  pointer-events: none !important;
-  z-index: 2 !important;
-}
-
-/* هاور → خط از چپ میاد تو */
-.contact-row:hover::before{
-  opacity: 1 !important;
-  transform: translateX(0) !important;
-  transition:
-    opacity .15s ease,
-    transform .45s cubic-bezier(.34,1.4,.64,1) !important;
-}
-
-/* ─── آیکون — بزرگ شدن نرم ─── */
-.contact-row .contact-icon{
-  transition:
-    transform .4s cubic-bezier(.34,1.4,.64,1),
-    background-color .3s ease,
-    color .3s ease !important;
-}
-
-.contact-row:hover .contact-icon{
-  transform: scale(1.15) !important;
-  background: var(--accent) !important;
-  color: #fff !important;
-}
-
-/* ─── متن‌ها — بدون تغییر سایز، فقط رنگ ─── */
-.contact-row .contact-label,
-.contact-row .contact-value{
-  font-size: inherit !important;
-  transition: color .3s ease !important;
-}
-
-.contact-row:hover .contact-label{
-  color: var(--accent) !important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — نسخه پایانی
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── حذف هر چیز قدیمی ─── */
-.contact-row::after{
-  display: none !important;
-  content: none !important;
-}
-
-/* ─── پاک کردن بوردر و سایه آیکون ─── */
-.contact-row .contact-icon{
-  border: none !important;
-  outline: none !important;
-}
-
-/* ─── کارت — بدون حرکت عمودی ─── */
-.contact-row{
-  position: relative !important;
-  overflow: hidden !important;
-  transition:
-    transform .35s cubic-bezier(.22,1,.36,1),
-    background-color .3s ease,
-    border-color .3s ease,
-    box-shadow .35s ease !important;
-}
-
-/* ─── هاور — فقط کمی به راست + سایه برجسته ─── */
-.contact-row:hover{
-  transform: translateX(4px) !important;
-  background: var(--accent-soft) !important;
-  border-color: var(--accent) !important;
-  box-shadow:
-    0 4px 12px -6px rgba(0,0,0,.35),
-    0 8px 22px -10px var(--accent) !important;
-}
-
-.contact-row:active{
-  transform: translateX(2px) !important;
-  transition-duration: .1s !important;
-}
-
-/* ─── خط عمودی سمت چپ — بدون پرش ─── */
-.contact-row::before{
-  content: '' !important;
-  display: block !important;
-  position: absolute !important;
-  top: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: auto !important;
-  width: 3px !important;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    var(--accent) 20%,
-    var(--accent) 80%,
-    transparent 100%) !important;
-  border-radius: 0 2px 2px 0 !important;
-  opacity: 0 !important;
-  transform: translateX(-100%) !important;
-  transition:
-    opacity .2s ease .05s,
-    transform .4s cubic-bezier(.22,1,.36,1) !important;
-  pointer-events: none !important;
-  z-index: 2 !important;
-}
-
-.contact-row:hover::before{
-  opacity: 1 !important;
-  transform: translateX(0) !important;
-  transition:
-    opacity .1s ease,
-    transform .4s cubic-bezier(.34,1.4,.64,1) !important;
-}
-
-/* ─── آیکون — بزرگ شدن کم، بدون چرخش، بدون خط ─── */
-.contact-row .contact-icon{
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  transition:
-    transform .35s cubic-bezier(.34,1.4,.64,1),
-    background-color .3s ease,
-    color .3s ease !important;
-}
-
-.contact-row:hover .contact-icon{
-  transform: scale(1.08) !important;
-  background: var(--accent) !important;
-  color: #fff !important;
-  box-shadow: none !important;
-}
-
-/* ─── متن‌ها — بدون تغییر سایز ─── */
-.contact-row .contact-label,
-.contact-row .contact-value{
-  font-size: inherit !important;
-  transition: color .3s ease !important;
-}
-
-.contact-row:hover .contact-label{
-  color: var(--accent) !important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   CONTACT ROW — کارت ثابت، فقط افکت
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── حذف هر چیز اضافی روی کارت و آیکون ─── */
-.contact-row::before,
-.contact-row::after,
-.contact-row .contact-icon::before,
-.contact-row .contact-icon::after{
-  display: none !important;
-  content: none !important;
-}
-
-/* ─── کارت — ثابت، بدون حرکت ─── */
-.contact-row{
-  position: relative !important;
-  transform: none !important;
-  transition:
-    background-color .3s ease,
-    border-color .3s ease,
-    box-shadow .35s ease !important;
-}
-
-.contact-row:hover{
-  transform: none !important;
-  background: var(--accent-soft) !important;
-  border-color: var(--accent) !important;
-  box-shadow:
-    0 6px 20px -10px var(--accent),
-    0 0 24px -10px var(--accent) !important;
-}
-
-.contact-row:active{
-  transform: none !important;
-}
-
-/* ─── آیکون — بدون خط، چرخش خیلی کم، بزرگ‌شدن خیلی کم ─── */
-.contact-row .contact-icon{
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  transition:
-    transform .35s cubic-bezier(.34,1.4,.64,1),
-    background-color .3s ease,
-    color .3s ease !important;
-}
-
-.contact-row:hover .contact-icon{
-  transform: scale(1.05) rotate(-3deg) !important;
-  background: var(--accent) !important;
-  color: #fff !important;
-  box-shadow: none !important;
-  border: none !important;
-  outline: none !important;
-}
-
-/* ─── متن‌ها ─── */
-.contact-row .contact-label,
-.contact-row .contact-value{
-  font-size: inherit !important;
-  transition: color .3s ease !important;
-}
-
-.contact-row:hover .contact-label{
-  color: var(--accent) !important;
-}
-/* ═══════════════════════════════════════════════════════════════
-   FIX — انیمیشن اسلایدی نوار منو (غلبه بر transition قدیمی)
-   ═══════════════════════════════════════════════════════════════ */
-
-/* حذف کامل transition از اسلایدر — RAF همه‌چیز رو مدیریت می‌کنه */
-html body .nav-slider,
-html body #navSlider{
-  transition: none !important;
-  transition-property: none !important;
-  transition-duration: 0s !important;
-  will-change: transform, opacity, width, height !important;
-  animation: none !important;
-}
-
-/* فیل داخلی — فقط border-radius نرم بمونه */
-html body .nav-slider-fill{
-  transition: border-radius .3s ease !important;
-  animation: none !important;
-}
 /* ═══════════════════════════════════════════════════════════════
    FIX — سایه قوی‌تر + بوردر رنگی همه‌جا
    ═══════════════════════════════════════════════════════════════ */
@@ -10450,4 +8191,104 @@ html body .nav-slider.visible{
   .bottom-nav-btn.nav-btn-chat{
     animation:none!important;
   }
+}
+/* ═══════════════════════════════════════════════════════════════
+   CONTACT ROW — نسخه نهایی (کارت ثابت + خط چپ نرم)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── حذف کامل هر چیز قدیمی ─── */
+.contact-row::before,
+.contact-row::after,
+.about-contacts .contact-row::before,
+.about-contacts .contact-row::after{
+  content: none !important;
+  display: none !important;
+}
+
+/* ─── کارت — پایه، ثابت ─── */
+.contact-row,
+.about-contacts .contact-row{
+  position: relative !important;
+  overflow: hidden !important;
+  transform: none !important;
+  transition:
+    background-color .35s cubic-bezier(.22,1,.36,1),
+    border-color .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .4s cubic-bezier(.22,1,.36,1) !important;
+}
+
+/* ─── هاور: کارت ثابت، فقط پس‌زمینه + سایه ملایم ─── */
+.contact-row:hover,
+.about-contacts .contact-row:hover{
+  transform: none !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--accent) !important;
+  box-shadow:
+    0 4px 14px -8px rgba(0,0,0,.35),
+    0 0 20px -10px var(--accent) !important;
+}
+
+/* ─── خط عمودی سمت چپ کارت — از وسط باز می‌شه ─── */
+.contact-row::before,
+.about-contacts .contact-row::before{
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  width: 3px !important;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    var(--accent-light) 25%,
+    var(--accent) 50%,
+    var(--accent-light) 75%,
+    transparent 100%) !important;
+  border-radius: 0 3px 3px 0 !important;
+  opacity: 0 !important;
+  transform: scaleY(0) !important;
+  transform-origin: center !important;
+  transition:
+    transform .4s cubic-bezier(.34,1.4,.64,1),
+    opacity .3s ease !important;
+  box-shadow: 0 0 10px var(--accent) !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+}
+
+.contact-row:hover::before,
+.about-contacts .contact-row:hover::before{
+  transform: scaleY(1) !important;
+  opacity: 1 !important;
+}
+
+/* ─── آیکون: بزرگ‌شدن کم + چرخش کم ─── */
+.contact-row .contact-icon,
+.about-contacts .contact-row .contact-icon{
+  border: none !important;
+  outline: none !important;
+  transition:
+    transform .45s cubic-bezier(.34,1.4,.64,1),
+    background-color .3s ease,
+    color .3s ease !important;
+}
+
+.contact-row:hover .contact-icon,
+.about-contacts .contact-row:hover .contact-icon{
+  transform: scale(1.08) rotate(-4deg) !important;
+  background: var(--accent) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+/* ─── متن‌ها: رنگ نرم ─── */
+.contact-row .contact-label,
+.contact-row .contact-value{
+  font-size: inherit !important;
+  transition: color .3s ease !important;
+}
+
+.contact-row:hover .contact-label{
+  color: var(--accent) !important;
 }
