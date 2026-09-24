@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   Siraj PWA Service Worker — Version-based Cache
-   هر بار این نسخه رو عوض کنی، SW آپدیت می‌شه
+   Siraj PWA Service Worker — Safe Version
    ═══════════════════════════════════════════════════════════════ */
 const VERSION = '2.5.32';
 const CACHE = 'siraj-v' + VERSION;
@@ -16,83 +15,64 @@ const ASSETS = [
   './manifest.json'
 ];
 
-/* ═══ INSTALL: کش اولیه ═══ */
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(ASSETS)).catch(() => {})
   );
-  /* ★ با نصب، فوراً فعال شو ولی منتظر بمون تا کاربر بگه */
   self.skipWaiting();
 });
 
-/* ═══ ACTIVATE: پاک کردن کش‌های قدیمی ═══ */
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys => Promise.all(
       keys.map(k => {
-        if (k !== CACHE && k.startsWith('siraj-v')) {
-          console.log('[SW] Deleting old cache:', k);
-          return caches.delete(k);
-        }
+        if (k !== CACHE && k.startsWith('siraj-v')) return caches.delete(k);
       })
     )).then(() => self.clients.claim())
   );
 });
 
-/* ═══ FETCH: استراتژی Network-first برای فایل‌های اصلی ═══ */
+/* ═══ FETCH — فقط فایل‌های استاتیک خود اپ ═══ */
 self.addEventListener('fetch', e => {
-  // ★ فقط GET ها رو کش کن
+  // ★ فقط GET ها
   if (e.request.method !== 'GET') return;
-  
-  // ★ درخواست‌های extension رو نادیده بگیر
-  if (e.request.url.startsWith('chrome-extension')) return;
 
-  var url = new URL(e.request.url);
-  var isAppFile = url.origin === self.location.origin;
+  // ★ فقط درخواست‌های همون دامنه (GitHub Pages)
+  const url = new URL(e.request.url);
+  if (url.origin !== self.location.origin) return;
 
-  // ★★★ مهم‌ترین تغییر: هر درخواستی که به دامنه‌ی خودمون نیست،
-  //       یا مسیرش /openai/chat/ داره → اصلاً به SW کاری نداشته باش
-  if (!isAppFile || url.pathname.indexOf('/openai/chat/') > -1) return;
+  // ★ هر چیزی به /openai/ یا /api/ یا ورکر → SW دخالت نکنه
+  if (url.pathname.includes('/openai/') ||
+      url.pathname.includes('/api/') ||
+      url.pathname.includes('/chat/')) return;
 
-  if (isAppFile) {
-    /* ★ Network-first برای فایل‌های خود اپ */
-    e.respondWith(
-      fetch(e.request).then(res => {
-        if (res && res.ok) {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return res;
-      }).catch(() => {
-        return caches.match(e.request).then(cached => {
-          return cached || caches.match('./index.html');
-        });
-      })
-    );
-  } else {
-    /* ★ Cache-first برای منابع خارجی (فونت‌ها، CDN) */
-    e.respondWith(
-      caches.match(e.request).then(cached => {
-        return cached || fetch(e.request).then(res => {
-          if (res && res.ok && res.type === 'basic') {
-            const clone = res.clone();
-            caches.open(CACHE).then(c => c.put(e.request, clone));
-          }
-          return res;
-        }).catch(() => caches.match('./index.html'));
-      })
-    );
-  }
+  // ★ فایل‌های API و font-face و ... → skip
+  if (url.href.includes('workers.dev') ||
+      url.href.includes('siraj-proxy') ||
+      url.href.includes('jsdelivr')) return;
+
+  // ★ Network-first برای فایل‌های استاتیک
+  e.respondWith(
+    fetch(e.request).then(res => {
+      if (res && res.ok) {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone)).catch(()=>{});
+      }
+      return res;
+    }).catch(() => {
+      return caches.match(e.request).then(cached => {
+        return cached || caches.match('./index.html');
+      });
+    })
+  );
 });
 
-/* ═══ MESSAGE: از اپ پیام بگیر ═══ */
 self.addEventListener('message', e => {
   if (e.data && e.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 });
 
-/* ═══ NOTIFICATION CLICK ═══ */
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(
