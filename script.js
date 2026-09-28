@@ -3331,7 +3331,7 @@ window.addEventListener('load', () => {
        دلیل: SW باعث می‌شد fetch های API کش بشن و خطای «Failed to fetch» بده
        برای فعال‌سازی مجدد: ENABLE_SW را true کن (فقط بعد از اصلاح sw.js)
        ═══════════════════════════════════════════════════════════════ */
-    const ENABLE_SW = false;
+    const ENABLE_SW = true;
     if (ENABLE_SW && 'serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
             .catch(function (err) { console.warn('[SW]', err); });
