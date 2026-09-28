@@ -3326,56 +3326,16 @@ window.addEventListener('load', () => {
        /* ═══════════════════════════════════════════════════════════════
        SERVICE WORKER + AUTO UPDATE
        ═══════════════════════════════════════════════════════════════ */
-    if ('serviceWorker' in navigator) {
-        var updatePending = false;
-
-        function showUpdateBanner() {
-            if (updatePending) return;
-            if (document.getElementById('swUpdateBanner')) return;
-            updatePending = true;
-
-            var b = document.createElement('div');
-            b.id = 'swUpdateBanner';
-            b.className = 'sw-update-banner';
-            b.innerHTML =
-                '<div class="sw-update-icon">' +
-                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>' +
-                '</div>' +
-                '<div class="sw-update-text">' +
-                    '<div class="sw-update-title">نسخه جدید آماده‌ست!</div>' +
-                    '<div class="sw-update-sub">برای دریافت تغییرات جدید، بروزرسانی کن</div>' +
-                '</div>' +
-                '<button class="sw-update-btn" id="swUpdateBtn">بروزرسانی</button>' +
-                '<button class="sw-update-dismiss" id="swDismissBtn" title="بستن">✕</button>';
-
-            document.body.appendChild(b);
-            requestAnimationFrame(function () {
-                requestAnimationFrame(function () { b.classList.add('show'); });
-            });
-
-            document.getElementById('swUpdateBtn').onclick = function () {
-                var btn = this;
-                btn.textContent = 'داره بروز می‌شه...';
-                btn.disabled = true;
-                /* ★ به SW جدید بگو بیاد */
-                navigator.serviceWorker.getRegistration().then(function (reg) {
-                    if (reg && reg.waiting) {
-                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                    }
-                    /* ★ کش قدیمی رو پاک کن */
-                    if ('caches' in window) {
-                        caches.keys().then(function (names) {
-                            return Promise.all(names.map(function (n) {
-                                if (n.startsWith('siraj-v')) return caches.delete(n);
-                            }));
-                        }).then(function () {
-                            setTimeout(function () { location.reload(); }, 400);
-                        });
-                    } else {
-                        setTimeout(function () { location.reload(); }, 400);
-                    }
-                });
-            };
+        /* ═══════════════════════════════════════════════════════════════
+       SERVICE WORKER — غیرفعال موقت
+       دلیل: SW باعث می‌شد fetch های API کش بشن و خطای «Failed to fetch» بده
+       برای فعال‌سازی مجدد: ENABLE_SW را true کن (فقط بعد از اصلاح sw.js)
+       ═══════════════════════════════════════════════════════════════ */
+    const ENABLE_SW = false;
+    if (ENABLE_SW && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+            .catch(function (err) { console.warn('[SW]', err); });
+    }
 
             document.getElementById('swDismissBtn').onclick = function () {
                 b.classList.remove('show');
@@ -3384,7 +3344,7 @@ window.addEventListener('load', () => {
             };
         }
 
-        navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+        /* ★ SW موقتاً غیرفعال شد تا مشکل fetch حل بشه */ if (false && 'serviceWorker' in navigator) {     // ... کد قبلی اینجا بمونه ولی اجرا نمی‌شه }
             .then(function (reg) {
                 /* ★ هر ۶۰ ثانیه چک کن نسخه جدید هست یا نه */
                 setInterval(function () { reg.update().catch(function () {}); }, 60000);
