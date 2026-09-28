@@ -3336,44 +3336,6 @@ window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
             .catch(function (err) { console.warn('[SW]', err); });
     }
-
-            document.getElementById('swDismissBtn').onclick = function () {
-                b.classList.remove('show');
-                setTimeout(function () { b.remove(); }, 400);
-                updatePending = false;
-            };
-        }
-
-        /* ★ SW موقتاً غیرفعال شد تا مشکل fetch حل بشه */ if (false && 'serviceWorker' in navigator) {     // ... کد قبلی اینجا بمونه ولی اجرا نمی‌شه }
-            .then(function (reg) {
-                /* ★ هر ۶۰ ثانیه چک کن نسخه جدید هست یا نه */
-                setInterval(function () { reg.update().catch(function () {}); }, 60000);
-
-                /* ★ اگه الان نسخه جدید آماده‌ست */
-                if (reg.waiting) showUpdateBanner();
-
-                /* ★ اگه داره نصب می‌شه */
-                reg.addEventListener('updatefound', function () {
-                    var nw = reg.installing;
-                    if (!nw) return;
-                    nw.addEventListener('statechange', function () {
-                        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                            showUpdateBanner();
-                        }
-                    });
-                });
-            })
-            .catch(function (err) { console.warn('[SW]', err); });
-
-        /* ★ اگه SW جدید کنترل رو گرفت، صفحه رو رفرش کن */
-        var refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', function () {
-            if (refreshing) return;
-            refreshing = true;
-            location.reload();
-        });
-    }
-
     initNavState();
     applySettingsToUI();
     ensureCurrentFontLoaded();
